@@ -12,13 +12,15 @@
             background-color: #d1c0a8;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
+            height: 100vh; /* Fallback untuk browser lama */
+            height: 100dvh; /* Dynamic Viewport untuk HP */
         }
 
         .container {
             display: flex;
             width: 100vw;
-            height: 100vh;
-            flex-direction: row; /* Default PC: Menu di Kanan */
+            height: 100%;
+            flex-direction: row;
         }
 
         /* Desain Buku */
@@ -29,6 +31,7 @@
             box-shadow: 10px 0 30px rgba(0,0,0,0.3);
             z-index: 2;
             position: relative;
+            overflow: hidden;
         }
 
         /* Lembaran Kertas */
@@ -171,50 +174,58 @@
            ========================================================= */
         @media screen and (max-width: 768px) {
             .container {
-                flex-direction: column; /* Menu dipindah ke bawah buku */
+                flex-direction: column; 
             }
 
             .left-page {
-                display: none; /* Sembunyikan halaman kiri di HP agar layar luas */
+                display: none; 
             }
 
             .page {
-                padding: 25px 20px; /* Perkecil jarak padding di HP */
+                padding: 25px 20px; 
             }
 
-            /* Ubah Menu Tabs ke Bawah (Horizontal) */
+            .book {
+                z-index: 1; /* Turunkan layer buku di HP */
+            }
+
+            /* Ubah Menu Tabs ke Bawah */
             .tabs {
                 width: 100vw;
-                height: 70px;
-                flex-direction: row; /* Berjejer ke samping */
+                height: 65px;
+                flex-direction: row; 
                 padding-top: 0;
                 padding-bottom: 0;
                 gap: 2px;
                 justify-content: space-between;
-                align-items: flex-end; /* Nempel di dasar layar */
+                align-items: stretch; /* Agar tinggi tab menyesuaikan kotak */
                 background-color: #d1c0a8;
+                flex-shrink: 0; /* PENTING: Mencegah menu tergencet sampai hilang */
+                z-index: 10; /* PENTING: Pastikan menu selalu di atas buku */
+                position: relative;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
             }
 
             .tab {
-                writing-mode: horizontal-tb; /* Teks normal / horizontal */
-                border-radius: 12px 12px 0 0; /* Lengkungnya di atas */
+                writing-mode: horizontal-tb; 
+                border-radius: 12px 12px 0 0; 
                 border: 2px solid #bba382;
                 border-bottom: none;
                 margin-left: 0;
-                margin-top: 0;
-                padding: 12px 5px;
-                font-size: 12px; /* Ukuran font dikecilkan sedikit */
-                flex: 1; /* Membagi rata lebar tombol */
+                margin-top: 5px; /* Sedikit jarak di atas agar efek pop-up terlihat */
+                padding: 5px;
+                font-size: 13px; 
+                flex: 1; 
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                box-shadow: none;
             }
 
             .tab:hover, .tab.active {
-                transform: translateY(-5px); /* Animasi pop-up naik ke atas */
+                transform: translateY(-5px); 
             }
 
-            /* Sesuaikan gambar Beranda fullscreen untuk padding HP */
             #beranda.active {
                 margin: -25px -20px;
                 width: calc(100% + 40px);
@@ -228,7 +239,7 @@
     <div class="container">
         <div class="book">
             <div class="page left-page">
-                </div>
+            </div>
 
             <div class="page right-page">
                 
