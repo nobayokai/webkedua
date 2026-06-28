@@ -3,169 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Catatan Digital</title>
+    <title>Portal Pembelajaran</title>
     <style>
         /* Desain Background dan Layout Utama */
         body {
-            background-color: #d1c0a8; /* Warna meja kayu simulasi */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            background-color: #d1c0a8; /* Warna latar menyerupai meja */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* Mencegah scroll di luar buku */
         }
 
-        /* Desain Buku */
+        .container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Desain Buku (Fullscreen) */
         .book {
             display: flex;
-            background-color: #fcf5e3;
-            width: 80%;
-            max-width: 1000px;
-            height: 80vh;
-            border-radius: 5px 15px 15px 5px;
-            box-shadow: 15px 20px 40px rgba(0,0,0,0.4), inset -5px 0 15px rgba(0,0,0,0.05);
-            position: relative;
-            border: 2px solid #bba382;
+            flex: 1; /* Memenuhi sisa layar setelah dikurangi area tab */
+            background-color: #fcf5e3; /* Kertas bersih tanpa garis */
+            box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+            z-index: 2;
         }
 
-        /* Lembaran Kertas dengan Garis */
+        /* Lembaran Kertas */
         .page {
             flex: 1;
-            padding: 50px;
+            padding: 60px 80px;
             overflow-y: auto;
-            background: repeating-linear-gradient(
-                #fcf5e3,
-                #fcf5e3 38px,
-                #d3c5ab 40px
-            );
-            line-height: 40px;
             font-size: 18px;
             color: #333;
+            line-height: 1.8;
         }
 
         /* Halaman Kiri (Cover Dalam) */
         .left-page {
-            border-right: 3px solid #ccc;
-            box-shadow: inset -10px 0 20px rgba(0,0,0,0.05);
-            border-radius: 5px 0 0 5px;
+            border-right: 2px solid #d3c5ab;
+            box-shadow: inset -15px 0 20px rgba(0,0,0,0.03);
         }
 
-        /* Halaman Kanan (Konten) */
-        .right-page {
-            border-radius: 0 15px 15px 0;
-        }
-
-        /* Desain Menu Tabs di Kanan */
+        /* Desain Menu Tabs di Kanan (Menempel pada buku) */
         .tabs {
-            position: absolute;
-            right: -60px; /* Menonjol keluar buku */
-            top: 40px;
+            width: 55px; /* Lebar area tab */
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
+            padding-top: 50px;
+            z-index: 1;
         }
 
         .tab {
             background: #e6d3b8;
             border: 2px solid #bba382;
+            border-left: none; /* Menghilangkan border kiri agar menyatu dengan buku */
             padding: 20px 10px;
             cursor: pointer;
-            writing-mode: vertical-rl; /* Teks berdiri */
+            writing-mode: vertical-rl; /* Teks berdiri vertikal */
             text-orientation: mixed;
-            border-radius: 0 10px 10px 0;
+            border-radius: 0 12px 12px 0;
             font-weight: bold;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+            font-family: 'Georgia', serif;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.2);
             transition: 0.3s;
             user-select: none;
+            margin-left: -5px; /* Menarik tab ke dalam sedikit agar rapat tanpa celah */
         }
 
         .tab:hover, .tab.active {
             background: #bba382;
             color: white;
-            transform: translateX(10px);
+            transform: translateX(5px);
         }
 
         /* Konten Halaman */
-        .content-section {
-            display: none;
+        .content-section { 
+            display: none; 
         }
-
+        
         .content-section.active {
             display: block;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.4s ease-in-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1, h2 {
             font-family: 'Georgia', serif;
+            color: #2c2c2c;
             margin-top: 0;
         }
 
         /* Form Login Sederhana */
         .login-form input {
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 15px 0;
             width: 80%;
-            border: 1px solid #bba382;
+            border: none;
             background: transparent;
             border-bottom: 2px solid #bba382;
             font-size: 16px;
+            outline: none;
         }
+        
+        .login-form input:focus { 
+            border-bottom-color: #8c7355; 
+        }
+        
         .login-form button {
-            padding: 10px 20px;
+            margin-top: 20px;
+            padding: 12px 30px;
             background-color: #bba382;
             color: white;
             border: none;
             cursor: pointer;
             font-weight: bold;
             border-radius: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        
+        .login-form button:hover { 
+            background-color: #8c7355; 
         }
     </style>
 </head>
 <body>
 
-    <div class="book">
-        <div class="page left-page">
-            <h1>Halo!</h1>
-            <p>Selamat Datang di Portal Pembelajaran Online.</p>
-            <p>Silakan klik menu pembatas buku di sebelah kanan untuk mulai menjelajah.</p>
-            <p id="status-loading" style="color: #888; font-style: italic;">Sedang menghubungkan ke Google Sheets...</p>
-        </div>
-
-        <div class="page right-page">
-            
-            <div id="beranda" class="content-section active">
-                <h2 id="judul-beranda">Beranda</h2>
-                <p id="konten-beranda">Memuat data...</p>
+    <div class="container">
+        <div class="book">
+            <div class="page left-page">
+                <h1>Halo!</h1>
+                <p>Selamat Datang di Portal Pembelajaran Online.</p>
+                <p>Silakan klik menu pembatas buku di sebelah kanan untuk mulai menjelajah.</p>
+                <p id="status-loading" style="color: #888; font-style: italic;">Sedang menghubungkan ke Google Sheets...</p>
             </div>
 
-            <div id="edukasi" class="content-section">
-                <h2 id="judul-edukasi">Permainan Edukasi</h2>
-                <p id="konten-edukasi">Memuat data...</p>
-            </div>
+            <div class="page right-page">
+                
+                <div id="beranda" class="content-section active">
+                    <h2 id="judul-beranda">Beranda</h2>
+                    <p id="konten-beranda">Memuat data...</p>
+                </div>
 
-            <div id="soal" class="content-section">
-                <h2 id="judul-soal">Latihan Soal</h2>
-                <p id="konten-soal">Memuat data...</p>
-            </div>
+                <div id="edukasi" class="content-section">
+                    <h2 id="judul-edukasi">Permainan Edukasi</h2>
+                    <p id="konten-edukasi">Memuat data...</p>
+                </div>
 
-            <div id="materi" class="content-section">
-                <h2 id="judul-materi">Kumpulan Materi</h2>
-                <p id="konten-materi">Memuat data...</p>
-            </div>
+                <div id="soal" class="content-section">
+                    <h2 id="judul-soal">Latihan Soal</h2>
+                    <p id="konten-soal">Memuat data...</p>
+                </div>
 
-            <div id="login" class="content-section">
-                <h2>Login Siswa</h2>
-                <div class="login-form">
-                    <input type="text" placeholder="Masukkan Username"><br>
-                    <input type="password" placeholder="Masukkan Password"><br>
-                    <button type="button">Masuk ke Kelas</button>
+                <div id="materi" class="content-section">
+                    <h2 id="judul-materi">Kumpulan Materi</h2>
+                    <p id="konten-materi">Memuat data...</p>
+                </div>
+
+                <div id="login" class="content-section">
+                    <h2>Login Siswa</h2>
+                    <div class="login-form">
+                        <input type="text" placeholder="Masukkan Username"><br>
+                        <input type="password" placeholder="Masukkan Password"><br>
+                        <button type="button">Masuk ke Kelas</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,20 +189,19 @@
     <script>
         // Fungsi untuk mengganti halaman saat tab diklik
         function switchTab(tabId, element) {
-            // Sembunyikan semua konten
+            // Sembunyikan semua konten dan hapus status aktif pada tab
             document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
-            // Hapus status aktif dari semua tab
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             
-            // Tampilkan konten yang dipilih dan beri efek aktif pada tab
+            // Tampilkan konten yang dipilih dan beri efek aktif
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
         }
 
-        // --- GANTI URL DI BAWAH INI DENGAN URL APPS SCRIPT KAMU ---
+        // --- GANTI URL DI BAWAH INI DENGAN URL APPS SCRIPT MILIKMU ---
         const SCRIPT_URL = 'URL_APPS_SCRIPT_KAMU_DI_SINI';
 
-        // Fungsi untuk mengambil data dari Google Sheets
+        // Fungsi untuk mengambil data dari database Google Sheets
         async function fetchGoogleSheetsData() {
             try {
                 const response = await fetch(SCRIPT_URL);
@@ -203,7 +209,8 @@
                 
                 // Menuliskan data ke dalam HTML berdasarkan kolom 'menu'
                 data.forEach(item => {
-                    const menuId = item.menu.toLowerCase();
+                    // Pastikan penamaan di Google Sheets (beranda, edukasi, dll) sesuai
+                    const menuId = item.menu.toLowerCase().trim();
                     const titleElement = document.getElementById(`judul-${menuId}`);
                     const contentElement = document.getElementById(`konten-${menuId}`);
                     
@@ -220,7 +227,7 @@
             }
         }
 
-        // Panggil fungsi saat halaman pertama kali dibuka
+        // Jalankan fungsi saat web dibuka
         fetchGoogleSheetsData();
     </script>
 </body>
