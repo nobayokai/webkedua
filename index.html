@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Pembelajaran V.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal Pembelajaran</title>
     <style>
         /* Desain Background dan Layout Utama */
         body {
@@ -18,41 +18,50 @@
             display: flex;
             width: 100vw;
             height: 100vh;
+            flex-direction: row; /* Default PC: Menu di Kanan */
         }
 
-        /* Desain Buku (Fullscreen) */
+        /* Desain Buku */
         .book {
             display: flex;
             flex: 1;
             background-color: #fcf5e3;
             box-shadow: 10px 0 30px rgba(0,0,0,0.3);
             z-index: 2;
+            position: relative;
         }
 
         /* Lembaran Kertas */
         .page {
             flex: 1;
+            padding: 60px 80px;
             overflow-y: auto;
             font-size: 18px;
             color: #333;
             line-height: 1.8;
-            display: flex;
-            flex-direction: column;
+            position: relative;
         }
 
         /* Halaman Kiri (Cover Dalam) */
         .left-page {
             border-right: 2px solid #d3c5ab;
             box-shadow: inset -15px 0 20px rgba(0,0,0,0.03);
-            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Halaman Kanan */
-        .right-page {
-            padding: 0; /* Padding dinolkan agar Canva bisa full screen */
+        /* Notifikasi Loading */
+        #status-loading {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
-        /* Desain Menu Tabs di Kanan */
+        /* Desain Menu Tabs di Kanan (Tampilan PC) */
         .tabs {
             width: 55px;
             display: flex;
@@ -60,6 +69,7 @@
             gap: 10px;
             padding-top: 50px;
             z-index: 1;
+            background-color: transparent;
         }
 
         .tab {
@@ -77,6 +87,7 @@
             transition: 0.3s;
             user-select: none;
             margin-left: -5px;
+            text-align: center;
         }
 
         .tab:hover, .tab.active {
@@ -88,11 +99,6 @@
         /* Konten Halaman */
         .content-section { 
             display: none; 
-            width: 100%;
-            height: 100%;
-            padding: 60px 80px; /* Padding dipindah ke sini untuk halaman selain beranda */
-            box-sizing: border-box;
-            overflow-y: auto;
         }
         
         .content-section.active {
@@ -100,10 +106,19 @@
             animation: fadeIn 0.4s ease-in-out;
         }
 
-        /* Khusus Beranda agar full screen */
-        #beranda.content-section {
+        /* Khusus Beranda Fullscreen di PC */
+        #beranda.active {
+            display: flex;
             padding: 0;
-            overflow: hidden;
+            margin: -60px -80px; 
+            width: calc(100% + 160px);
+            height: calc(100% + 120px);
+        }
+
+        #beranda img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         @keyframes fadeIn {
@@ -117,11 +132,12 @@
             margin-top: 0;
         }
 
-        /* Form Login Sederhana */
+        /* Form Login */
         .login-form input {
             padding: 12px;
             margin: 15px 0;
-            width: 80%;
+            width: 90%;
+            max-width: 300px;
             border: none;
             background: transparent;
             border-bottom: 2px solid #bba382;
@@ -149,6 +165,62 @@
         .login-form button:hover { 
             background-color: #8c7355; 
         }
+
+        /* =========================================================
+           PENGATURAN TAMPILAN HP (RESPONSIF MOBILE)
+           ========================================================= */
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column; /* Menu dipindah ke bawah buku */
+            }
+
+            .left-page {
+                display: none; /* Sembunyikan halaman kiri di HP agar layar luas */
+            }
+
+            .page {
+                padding: 25px 20px; /* Perkecil jarak padding di HP */
+            }
+
+            /* Ubah Menu Tabs ke Bawah (Horizontal) */
+            .tabs {
+                width: 100vw;
+                height: 70px;
+                flex-direction: row; /* Berjejer ke samping */
+                padding-top: 0;
+                padding-bottom: 0;
+                gap: 2px;
+                justify-content: space-between;
+                align-items: flex-end; /* Nempel di dasar layar */
+                background-color: #d1c0a8;
+            }
+
+            .tab {
+                writing-mode: horizontal-tb; /* Teks normal / horizontal */
+                border-radius: 12px 12px 0 0; /* Lengkungnya di atas */
+                border: 2px solid #bba382;
+                border-bottom: none;
+                margin-left: 0;
+                margin-top: 0;
+                padding: 12px 5px;
+                font-size: 12px; /* Ukuran font dikecilkan sedikit */
+                flex: 1; /* Membagi rata lebar tombol */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .tab:hover, .tab.active {
+                transform: translateY(-5px); /* Animasi pop-up naik ke atas */
+            }
+
+            /* Sesuaikan gambar Beranda fullscreen untuk padding HP */
+            #beranda.active {
+                margin: -25px -20px;
+                width: calc(100% + 40px);
+                height: calc(100% + 50px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -156,13 +228,14 @@
     <div class="container">
         <div class="book">
             <div class="page left-page">
-                 <p>SDIT HIDAYATUT TAUFIQ</p>
-            </div>
+                </div>
 
             <div class="page right-page">
                 
+                <p id="status-loading">Sedang menghubungkan ke database...</p>
+                
                 <div id="beranda" class="content-section active">
-                    <img src="https://i.postimg.cc/HkqfbYVN/baner-TAHUN-AJARAN-2026-2027.jpg" style="width: 100%; height: 100%; border: none;" allow="fullscreen" allowfullscreen></img>
+                    <img src="https://i.postimg.cc/HkqfbYVN/baner-TAHUN-AJARAN-2026-2027.jpg" alt="Banner Beranda">
                 </div>
 
                 <div id="edukasi" class="content-section">
@@ -194,14 +267,13 @@
         <div class="tabs">
             <div class="tab active" onclick="switchTab('beranda', this)">Beranda</div>
             <div class="tab" onclick="switchTab('edukasi', this)">Edukasi</div>
-            <div class="tab" onclick="switchTab('soal', this)">Latihan Soal</div>
+            <div class="tab" onclick="switchTab('soal', this)">Latihan</div>
             <div class="tab" onclick="switchTab('materi', this)">Materi</div>
             <div class="tab" onclick="switchTab('login', this)">Login</div>
         </div>
     </div>
 
     <script>
-        // Fungsi untuk mengganti halaman saat tab diklik
         function switchTab(tabId, element) {
             document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -213,38 +285,30 @@
         // --- GANTI URL DI BAWAH INI DENGAN URL APPS SCRIPT MILIKMU ---
         const SCRIPT_URL = 'URL_APPS_SCRIPT_KAMU_DI_SINI';
 
-        // Fungsi untuk mengambil data dari database Google Sheets
         async function fetchGoogleSheetsData() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
                 
-                // Menuliskan data ke dalam HTML berdasarkan kolom 'menu'
                 data.forEach(item => {
                     const menuId = item.menu.toLowerCase().trim();
                     const titleElement = document.getElementById(`judul-${menuId}`);
                     const contentElement = document.getElementById(`konten-${menuId}`);
                     
-                    if (titleElement && contentElement) {
+                    if (titleElement && contentElement && menuId !== 'beranda') {
                         titleElement.innerText = item.judul;
                         contentElement.innerText = item.konten;
                     }
                 });
 
-                document.getElementById('status-loading').innerText = "Data berhasil dimuat dari Google Sheets!";
-                
-                // Opsional: Hilangkan tulisan loading jika sudah selesai
-                setTimeout(() => {
-                    document.getElementById('status-loading').style.display = 'none';
-                }, 2000);
-
+                document.getElementById('status-loading').style.display = 'none';
             } catch (error) {
                 console.error('Error fetching data:', error);
-                document.getElementById('status-loading').innerText = "Gagal memuat data. Pastikan URL Apps Script sudah benar.";
+                document.getElementById('status-loading').innerText = "Gagal memuat data. Pastikan URL Apps Script benar.";
+                document.getElementById('status-loading').style.color = "red";
             }
         }
 
-        // Jalankan fungsi saat web dibuka
         fetchGoogleSheetsData();
     </script>
 </body>
