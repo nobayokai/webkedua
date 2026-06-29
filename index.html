@@ -9,7 +9,22 @@
 <body>
     <div class="container">
         <div class="book">
-  <div class="page left-page" id="kiri-statis"></div>
+  <div class="page left-page" id="kiri-statis">
+
+      <script>
+    // Memuat animasi ke halaman kiri saat web pertama kali terbuka
+    fetch('animasi-kiri.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('kiri-statis').innerHTML = data;
+            // Menjalankan script yang ada di dalam file tersebut
+            const script = document.createElement('script');
+            script.innerHTML = document.querySelector('#kiri-statis script').innerHTML;
+            document.body.appendChild(script);
+        });
+</script>
+      
+  </div>
 
   <div class="page right-page">
     <div id="area-konten">
