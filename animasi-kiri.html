@@ -1,0 +1,59 @@
+<div class="animation-container">
+    <div class="mascot-box" onclick="gantiEkspresi()">
+        <div id="maskot" class="buku-lucu">
+            <div class="mata-kiri"></div>
+            <div class="mata-kanan"></div>
+            <div id="mulut" class="mulut"></div>
+        </div>
+        <p id="pesan-maskot" class="teks-animasi">Klik aku!</p>
+    </div>
+</div>
+
+<style>
+    .animation-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; cursor: pointer; }
+    
+    .buku-lucu {
+        width: 120px; height: 150px; background: #f7d794; border: 5px solid #574b90;
+        border-radius: 15px; position: relative; transition: transform 0.3s;
+    }
+    
+    .mata-kiri, .mata-kanan {
+        width: 15px; height: 15px; background: #333; border-radius: 50%; position: absolute; top: 40px;
+    }
+    .mata-kiri { left: 30px; }
+    .mata-kanan { right: 30px; }
+    
+    .mulut {
+        width: 40px; height: 20px; border: 4px solid #333; border-top: none;
+        border-radius: 0 0 20px 20px; position: absolute; bottom: 40px; left: 40px;
+    }
+
+    /* Animasi saat diklik */
+    .gembira { background: #78e08f !important; transform: scale(1.1); }
+    .kaget { border-color: #eb2f06 !important; }
+</style>
+
+<script>
+    function gantiEkspresi() {
+        const maskot = document.getElementById('maskot');
+        const mulut = document.getElementById('mulut');
+        const pesan = document.getElementById('pesan-maskot');
+        
+        // Random aksi
+        const aksi = Math.floor(Math.random() * 3);
+        
+        if(aksi === 0) {
+            maskot.className = 'buku-lucu gembira';
+            mulut.style.borderRadius = '20px 20px 0 0';
+            pesan.innerText = "Yay, asyik belajar!";
+        } else if(aksi === 1) {
+            maskot.className = 'buku-lucu kaget';
+            mulut.style.borderRadius = '50%';
+            pesan.innerText = "Eh, ada apa?";
+        } else {
+            maskot.className = 'buku-lucu';
+            mulut.style.borderRadius = '0 0 20px 20px';
+            pesan.innerText = "Klik aku lagi dong!";
+        }
+    }
+</script>
