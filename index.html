@@ -293,34 +293,7 @@
             element.classList.add('active');
         }
 
-        // --- GANTI URL DI BAWAH INI DENGAN URL APPS SCRIPT MILIKMU ---
-        const SCRIPT_URL = 'URL_APPS_SCRIPT_KAMU_DI_SINI';
-
-        async function fetchGoogleSheetsData() {
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                
-                data.forEach(item => {
-                    const menuId = item.menu.toLowerCase().trim();
-                    const titleElement = document.getElementById(`judul-${menuId}`);
-                    const contentElement = document.getElementById(`konten-${menuId}`);
-                    
-                    if (titleElement && contentElement && menuId !== 'beranda') {
-                        titleElement.innerText = item.judul;
-                        contentElement.innerText = item.konten;
-                    }
-                });
-
-                document.getElementById('status-loading').style.display = 'none';
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('status-loading').innerText = "Gagal memuat data. Pastikan URL Apps Script benar.";
-                document.getElementById('status-loading').style.color = "red";
-            }
-        }
-
-        fetchGoogleSheetsData();
+        
     </script>
 </body>
 </html>
