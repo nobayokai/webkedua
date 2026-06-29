@@ -10,6 +10,70 @@
     <div class="container">
         <div class="book">
             <div class="page left-page">
+                <div class="animation-container">
+    <div class="buku-lucu">
+        <div class="mata"></div>
+        <div class="mulut"></div>
+    </div>
+    <p class="teks-animasi">Halo! Selamat belajar ya!</p>
+</div>
+
+<style>
+    .animation-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+    }
+
+    /* Karakter Buku Lucu */
+    .buku-lucu {
+        width: 100px;
+        height: 120px;
+        background: #f7d794;
+        border: 4px solid #574b90;
+        border-radius: 10px;
+        position: relative;
+        animation: melambai 2s infinite;
+    }
+
+    .mata {
+        width: 15px;
+        height: 15px;
+        background: #333;
+        border-radius: 50%;
+        position: absolute;
+        top: 30px;
+        left: 20px;
+        box-shadow: 45px 0 0 #333;
+    }
+
+    .mulut {
+        width: 30px;
+        height: 15px;
+        border: 3px solid #333;
+        border-top: none;
+        border-radius: 0 0 15px 15px;
+        position: absolute;
+        bottom: 30px;
+        left: 35px;
+    }
+
+    /* Animasi Melambai */
+    @keyframes melambai {
+        0%, 100% { transform: rotate(-5deg); }
+        50% { transform: rotate(5deg); }
+    }
+
+    .teks-animasi {
+        margin-top: 20px;
+        font-family: 'Comic Sans MS', cursive;
+        color: #574b90;
+        font-weight: bold;
+    }
+</style>
                 </div>
             
             <div class="page right-page">
