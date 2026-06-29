@@ -150,12 +150,50 @@ h1, h2 {
     background-color: #8c7355; 
 }
 
+/* RESPONSIF DESKTOP */
+@media screen and (min-width: 769px) {
+    .left-page {
+        display: flex !important;
+    }
+    
+    .right-page {
+        width: auto;
+    }
+    
+    .book {
+        flex-direction: row;
+    }
+}
+
 /* RESPONSIF MOBILE */
 @media screen and (max-width: 768px) {
-    .container { flex-direction: column; }
-    .left-page { display: none; }
-    .page { padding: 25px 20px; }
-    .book { z-index: 1; }
+    .container { 
+        flex-direction: column; 
+    }
+    
+    .left-page { 
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        flex: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .page { 
+        padding: 25px 20px; 
+    }
+    
+    .book { 
+        z-index: 1;
+        flex-direction: column;
+    }
+
+    .right-page {
+        width: 100% !important;
+        flex: 1;
+    }
 
     .tabs {
         width: 100vw;
@@ -197,44 +235,16 @@ h1, h2 {
         width: calc(100% + 40px);
         height: calc(100% + 50px);
     }
+
     #kiri-statis{
         width: 100%;
         height: 100%;
-        display: flex;
+        display: none;
     }
 
     #eco-mascot-stage{
-          width: 100% !important;
-          height: 100% !important;
-          min-height: 520px; /* tetap seperti di animasi-kiri.html */
-    }
-
-    /* Untuk desktop */
-.left-page {
-    display: block;
-}
-
-/* Untuk tablet */
-@media (max-width: 1024px) {
-    .left-page {
-        display: none;
-    }
-}
-
-/* Untuk handphone */
-@media (max-width: 768px) {
-    .left-page {
-        display: none;
-    }
-    
-    .right-page {
         width: 100% !important;
+        height: 100% !important;
+        min-height: 520px;
     }
-    
-    .book {
-        flex-direction: column;
-    }
-}
-
-
 }
