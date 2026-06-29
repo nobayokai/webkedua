@@ -1,517 +1,773 @@
 <style>
-  /* Pastikan mengikuti ukuran halaman kiri */
-  #kucing-mascot-wrap{
+  :root{
+    --bg: transparent; /* ikut background index */
+    --card: rgba(255,255,255,.55);
+    --card-strong: rgba(255,255,255,.72);
+    --stroke: rgba(0,0,0,.08);
+    --text: #2c2c2c;
+
+    --green:#10b981;
+    --green2:#047857;
+    --pink:#f472b6;
+    --purple:#a78bfa;
+    --blue:#38bdf8;
+    --amber:#f59e0b;
+  }
+
+  #widget-islam{
     width: 100%;
     height: 100%;
-    display: flex;
+    display:flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 14px 10px;
+    padding: 10px 10px;
     box-sizing: border-box;
-    background: transparent; /* penting: ikut background index */
-    user-select: none;
+    gap: 10px;
+    background: var(--bg);
   }
 
-  /* Ornamen judul di atas */
-  .mascot-title{
-    margin-top: 2px;
-    margin-bottom: 6px;
-    text-align: center;
-    font-weight: 800;
-    letter-spacing: .2px;
-    color: #064e3b; /* hijau tua */
-    line-height: 1.1;
-  }
-  .mascot-title .sub{
-    display: inline-block;
-    font-size: 12px;
-    color: rgba(6,78,59,.75);
-    font-weight: 700;
-    margin-top: 4px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: rgba(52,211,153,.14);
-    border: 1px solid rgba(16,185,129,.22);
-  }
-  .mascot-title .main{
-    font-size: 16px;
-    background: linear-gradient(90deg, #10b981, #047857);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 1px 0 rgba(255,255,255,.35);
+  .widget-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
   }
 
-  /* Area animasi */
-  #eco-mascot-stage{
+  .card{
+    background: var(--card);
+    border: 1px solid var(--stroke);
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 12px;
+    overflow:hidden;
     position: relative;
-    width: 100%;
-    height: 100%;
-    min-height: 420px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
   }
-
-  /* Maskot klik */
-  .cat{
-    width: min(280px, 90%);
-    aspect-ratio: 1 / 1.05;
-    position: relative;
-    cursor: pointer;
-    transform: translateZ(0);
-  }
-
-  /* Shadow */
-  .cat .shadow{
-    position: absolute;
-    left: 50%;
-    bottom: 6%;
-    width: 70%;
-    height: 8%;
-    transform: translateX(-50%);
-    background: radial-gradient(closest-side, rgba(2,6,23,.25), transparent 70%);
-    filter: blur(3px);
-    opacity: .55;
-  }
-
-  /* Body */
-  .cat .body{
-    position: absolute;
-    left: 50%;
-    top: 40%;
-    width: 76%;
-    height: 50%;
-    transform: translateX(-50%);
-    border-radius: 48% 48% 40% 40%;
-    background: linear-gradient(180deg, #FDE68A, #F59E0B);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.25),
-                0 18px 30px rgba(2,6,23,.12);
-  }
-
-  /* Perut lebih lembut */
-  .cat .belly{
-    position: absolute;
-    left: 50%;
-    top: 52%;
-    width: 45%;
-    height: 38%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background: rgba(255,255,255,.35);
-    filter: blur(.2px);
-  }
-
-  /* Ekor */
-  .cat .tail{
-    position: absolute;
-    right: 4%;
-    top: 58%;
-    width: 42%;
-    height: 32%;
-    transform-origin: 15% 50%;
-    background: linear-gradient(180deg, #FBBF24, #D97706);
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.18);
-    transition: transform .25s ease;
-    transform: rotate(18deg);
-  }
-
-  /* Tail ujung */
-  .cat .tail::after{
+  .card::after{
     content:"";
     position:absolute;
-    right: -8%;
-    top: 38%;
-    width: 36%;
-    height: 50%;
-    background: rgba(0,0,0,.08);
-    border-radius: 999px;
-    filter: blur(.2px);
-    opacity: .35;
-  }
-
-  /* Kepala */
-  .cat .head{
-    position: absolute;
-    left: 50%;
-    top: 8%;
-    width: 70%;
-    height: 46%;
-    transform: translateX(-50%);
-    border-radius: 50% 50% 45% 45%;
-    background: linear-gradient(180deg, #FEF3C7, #FCD34D);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.28);
-  }
-
-  /* Telinga kiri kanan (segitiga pakai border) */
-  .cat .ear{
-    position: absolute;
-    top: -12%;
-    width: 0;
-    height: 0;
-    border-left: 18% solid transparent;
-    border-right: 18% solid transparent;
-    border-bottom: 34% solid #F59E0B;
-    filter: drop-shadow(0 4px 6px rgba(2,6,23,.08));
-  }
-  .cat .ear.left{ left: 10%; transform: rotate(-8deg); }
-  .cat .ear.right{ right: 10%; transform: rotate(8deg); }
-
-  .cat .ear::after{
-    content:"";
-    position:absolute;
-    left: -15%;
-    top: 16%;
-    width: 0;
-    height: 0;
-    border-left: 15% solid transparent;
-    border-right: 15% solid transparent;
-    border-bottom: 28% solid rgba(255,255,255,.26);
-  }
-
-  /* Peci / topi mini (Islamic vibe) */
-  .cat .peci{
-    position: absolute;
-    left: 50%;
-    top: -2%;
-    width: 56%;
-    height: 26%;
-    transform: translateX(-50%);
-    border-radius: 12px 12px 16px 16px;
-    background: linear-gradient(180deg, #0f766e, #0a5a57);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.18);
-  }
-  .cat .peci::after{
-    content:"";
-    position:absolute;
-    left: 50%;
-    bottom: -26%;
-    transform: translateX(-50%);
-    width: 70%;
-    height: 50%;
-    background: rgba(0,0,0,.12);
-    border-radius: 999px;
-    filter: blur(2px);
-    opacity: .25;
-  }
-
-  .cat .crescent{
-    position: absolute;
-    left: 50%;
-    top: 3%;
-    width: 22px;
-    height: 22px;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #FDE68A, #F59E0B);
-    box-shadow: 0 8px 16px rgba(245,158,11,.25);
-  }
-  .cat .crescent::after{
-    content:"";
-    position:absolute;
-    inset: 6px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #0f766e, #0a5a57);
-  }
-
-  /* Mata */
-  .cat .eyes{
-    position: absolute;
-    left: 50%;
-    top: 34%;
-    width: 70%;
-    height: 26%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 16%;
-    align-items: center;
-    justify-content: center;
-  }
-  .cat .eye{
-    position: relative;
-    width: 42%;
-    height: 100%;
-    border-radius: 999px;
-    background: rgba(255,255,255,.9);
-    box-shadow: inset 0 0 0 3px rgba(2,6,23,.06);
-    overflow: hidden;
-  }
-
-  .cat .pupil{
-    position: absolute;
-    left: 50%;
-    top: 55%;
-    width: 26%;
-    height: 26%;
-    transform: translate(-50%,-50%)
-      translate(calc(var(--ex, 0) * 10px), calc(var(--ey, 0) * 7px));
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #111827, #000);
-    transition: transform 50ms linear;
-  }
-
-  /* Berkedip sederhana */
-  .cat .blink{
-    position:absolute;
-    left: 50%;
-    top: 48%;
-    width: 10%;
-    height: 10px;
-    transform: translate(-50%,-50%);
-    background: rgba(2,6,23,.12);
-    border-radius: 999px;
-    opacity: 0;
-    animation: blink 5.8s infinite;
+    inset:-40px -60px auto -60px;
+    height: 90px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%);
     pointer-events:none;
   }
-  @keyframes blink{
-    0%, 92%, 100% { opacity: 0; transform: translate(-50%,-50%) scaleX(1); }
-    93% { opacity: 1; }
-    94% { opacity: 0; }
-  }
 
-  /* Hidung & mulut */
-  .cat .nose{
-    position: absolute;
-    left: 50%;
-    top: 55%;
-    width: 14px;
-    height: 10px;
-    transform: translateX(-50%);
-    background: rgba(2,6,23,.15);
-    border-radius: 0 0 10px 10px;
+  .brand{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 2px;
   }
-  .cat .mouth{
-    position:absolute;
-    left: 50%;
-    top: 62%;
-    width: 36%;
-    height: 12%;
-    transform: translateX(-50%);
-    border-bottom: 3px solid rgba(2,6,23,.35);
-    border-radius: 0 0 40px 40px;
-    opacity: .9;
+  .brand .title{
+    font-family: Georgia, serif;
+    font-weight: 950;
+    color: var(--green2);
+    font-size: 13px;
+    letter-spacing: .2px;
   }
-
-  /* Alis lucu */
-  .cat .brow{
-    position:absolute;
-    top: 28%;
-    width: 20%;
-    height: 6%;
-    border-top: 3px solid rgba(2,6,23,.18);
+  .brand .chip{
+    font-size: 11px;
+    padding: 6px 10px;
     border-radius: 999px;
-    opacity: .8;
-  }
-  .cat .brow.left{ left: 28%; transform: rotate(-8deg); }
-  .cat .brow.right{ right: 28%; transform: rotate(8deg); }
-
-  /* Kaki kanan/kiri */
-  .cat .paw{
-    position:absolute;
-    bottom: 24%;
-    width: 18%;
-    height: 18%;
-    border-radius: 18px;
-    background: linear-gradient(180deg, #FBBF24, #D97706);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.15);
-    transition: transform .25s ease;
-  }
-  .cat .paw.left{ left: 26%; transform: rotate(10deg); }
-  .cat .paw.right{ right: 26%; transform: rotate(-8deg); }
-
-  /* Buku mini (ramah lingkungan) */
-  .cat .eco-book{
-    position:absolute;
-    left: 50%;
-    bottom: 33%;
-    width: 30%;
-    height: 14%;
-    transform: translateX(-50%);
-    border-radius: 10px;
-    background: linear-gradient(180deg, #34D399, #10B981);
-    box-shadow: 0 12px 20px rgba(16,185,129,.18), inset 0 0 0 3px rgba(255,255,255,.20);
-    border: 2px solid rgba(255,255,255,.22);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.25);
+    color: rgba(4,120,87,.95);
     font-weight: 900;
-    color: #064E3B;
-    opacity: .95;
+    white-space: nowrap;
+    max-width: 45%;
+    overflow:hidden;
+    text-overflow: ellipsis;
   }
 
-  /* Daun kecil untuk pose 2 */
-  .cat .leaf{
-    position:absolute;
-    right: 18%;
-    bottom: 48%;
-    width: 18%;
-    height: 14%;
-    border-radius: 50% 50% 50% 50%;
-    background: linear-gradient(180deg, #22C55E, #16A34A);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.2);
-    opacity: 0;
-    transform: translateY(8px) rotate(-20deg);
-    transition: opacity .25s ease, transform .35s ease;
+  /* Clock */
+  .clock-now{ display:flex; flex-direction: column; gap: 8px; }
+  .clock-time{
+    font-size: 34px; font-weight: 950; color:#1f2937;
+    line-height: 1; letter-spacing: .4px;
   }
-  .cat .leaf::after{
-    content:"";
-    position:absolute;
-    left: 50%;
-    top: 10%;
-    width: 3px;
-    height: 80%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,.45);
+  .clock-date{
+    color: rgba(31,41,55,.75);
+    font-weight: 850;
+    font-size: 13px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .clock-dot{
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 6px rgba(16,185,129,.12);
+    margin-top: 4px; flex: 0 0 auto;
+  }
+
+  /* Cuaca */
+  .weather-top{
+    display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .weather-temp{
+    font-size: 26px; font-weight: 1000; color:#0f172a;
+    line-height: 1;
+  }
+  .weather-desc{
+    color: rgba(31,41,55,.75);
+    font-weight: 900; font-size: 12px;
+    display:flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .weather-row{
+    display:grid; grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .weather-pill{
+    background: rgba(255,255,255,.35);
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 14px;
+    padding: 8px 10px;
+  }
+  .weather-pill .k{
+    font-size: 10.5px; font-weight: 950; color: rgba(0,0,0,.45);
+    text-transform: uppercase;
+    letter-spacing: .2px;
+  }
+  .weather-pill .v{
+    font-size: 12px; font-weight: 1000; color: rgba(0,0,0,.72);
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+
+  /* Kalender */
+  .cal-head{
+    display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .cal-month{ font-weight: 1000; color: var(--text); font-size: 14px; }
+  .cal-weekdays{
+    display:grid; grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 1000;
+    color: rgba(0,0,0,.45);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .cal-grid{
+    display:grid; grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 1000;
+    position: relative;
+    z-index: 1;
+  }
+  .cal-day{
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: rgba(0,0,0,.55);
+    background: rgba(255,255,255,.25);
+    border: 1px solid rgba(0,0,0,.05);
+    min-height: 0;
+    overflow:hidden;
+  }
+  .cal-day.muted{ opacity: .35; }
+  .cal-day.today{
+    background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.08));
+    border: 1px solid rgba(16,185,129,.35);
+    color: rgba(4,120,87,.98);
+    box-shadow: 0 10px 18px rgba(16,185,129,.18);
+  }
+
+  /* Sholat */
+  .prayer{
+    display:flex; flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  .prayer-head{
+    display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .next{
+    font-size: 11px; font-weight: 950; color: rgba(0,0,0,.55);
+    line-height: 1.2;
+  }
+  .next strong{ color: var(--green2); font-size: 12px; }
+  .countdown{
+    font-weight: 1000; font-size: 12px;
+    padding: 7px 10px;
     border-radius: 999px;
+    border: 1px solid rgba(16,185,129,.28);
+    background: rgba(16,185,129,.12);
+    color: rgba(4,120,87,.95);
+    white-space: nowrap;
   }
 
-  /* Pose control */
-  .cat.pose-0 .paw.right{ transform: rotate(-8deg); }
-  .cat.pose-1 .paw.right{
-    transform: rotate(-40deg) translateY(-2px);
-    animation: wave 900ms ease-in-out infinite;
+  .prayer-list{
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow:auto;
+    padding-right: 4px;
+    position: relative;
+    z-index: 1;
   }
-  @keyframes wave{
-    0%{ transform: rotate(-35deg) translateY(-2px); }
-    50%{ transform: rotate(-55deg) translateY(-4px); }
-    100%{ transform: rotate(-35deg) translateY(-2px); }
-  }
-  .cat.pose-2 .paw.right{ transform: rotate(-18deg); animation: none; }
-  .cat.pose-2 .leaf{ opacity: 1; transform: translateY(0) rotate(-8deg); }
-  .cat.pose-2 .tail{ transform: rotate(-8deg); }
 
-  /* Tail gerak halus */
-  .cat .tail{ animation: tailIdle 2.8s ease-in-out infinite; }
-  @keyframes tailIdle{
-    0%, 100% { transform: rotate(18deg); }
-    50% { transform: rotate(10deg); }
+  .prayer-item{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.38);
+    border: 1px solid rgba(0,0,0,.05);
   }
-  .cat.pose-2 .tail{ animation: none; }
+  .prayer-item .name{
+    font-weight: 1000;
+    font-size: 12px;
+    color: rgba(0,0,0,.62);
+    display:flex;
+    align-items:center;
+    gap: 8px;
+  }
+  .badge{
+    width: 10px; height: 10px; border-radius: 3px;
+    background: var(--green);
+  }
+  .prayer-item .time{
+    font-weight: 1100;
+    font-size: 12px;
+    color: rgba(0,0,0,.72);
+    white-space: nowrap;
+  }
+  .prayer-item.active{
+    background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.10));
+    border: 1px solid rgba(16,185,129,.33);
+    box-shadow: 0 14px 22px rgba(16,185,129,.14);
+  }
+  .prayer-item.active .time{ color: rgba(4,120,87,.98); }
 
-  /* Aksesibilitas */
-  .sr-only{
-    position:absolute; width:1px; height:1px;
-    padding:0; margin:-1px; overflow:hidden;
-    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  .footer-note{
+    font-size: 11px;
+    color: rgba(0,0,0,.45);
+    font-weight: 850;
+    text-align:center;
+    padding: 2px 0;
+  }
+
+  @media (max-width: 768px){
+    .widget-grid{ grid-template-columns: 1fr; }
+    .card{ padding: 10px; }
+    .clock-time{ font-size: 30px; }
+    .brand .chip{ max-width: 70%; }
   }
 </style>
 
-<div id="kucing-mascot-wrap">
-  <div class="mascot-title">
-    <div class="main">Sekolah Islam Ramah Lingkungan</div>
-    <div class="sub">Klik kucingnya ✨</div>
+<div id="widget-islam">
+  <div class="brand">
+    <div class="title">🕌 Widget Sekolah Islam</div>
+    <div class="chip" id="chip-lokasi">Mencari lokasi...</div>
   </div>
 
-  <div id="eco-mascot-stage">
-    <div class="cat pose-0" id="kucingMaskot" role="button" tabindex="0" aria-label="Maskot kucing. Klik untuk ganti pose. Mata mengikuti kursor.">
-      <div class="shadow"></div>
-
-      <div class="tail" aria-hidden="true"></div>
-
-      <div class="body" aria-hidden="true">
-        <div class="belly" aria-hidden="true"></div>
-      </div>
-
-      <!-- Kaki -->
-      <div class="paw left" aria-hidden="true"></div>
-      <div class="paw right" aria-hidden="true"></div>
-
-      <!-- Tangan/penanda eco -->
-      <div class="eco-book" aria-hidden="true">♻</div>
-      <div class="leaf" aria-hidden="true"></div>
-
-      <!-- Kepala -->
-      <div class="head">
-        <div class="ear left" aria-hidden="true"></div>
-        <div class="ear right" aria-hidden="true"></div>
-
-        <div class="peci" aria-hidden="true">
-          <div class="crescent" aria-hidden="true"></div>
+  <div class="widget-grid">
+    <!-- Clock -->
+    <div class="card">
+      <div class="clock-now">
+        <div class="clock-time" id="clock-time">--:--:--</div>
+        <div class="clock-date">
+          <span class="clock-dot"></span>
+          <span id="clock-date">-</span>
         </div>
-
-        <div class="brow left" aria-hidden="true"></div>
-        <div class="brow right" aria-hidden="true"></div>
-
-        <div class="eyes" aria-hidden="true">
-          <div class="eye"><div class="pupil" id="pupilL"></div></div>
-          <div class="eye"><div class="pupil" id="pupilR"></div></div>
+        <div style="margin-top:10px;">
+          <div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div>
+          <div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:4px;">—</div>
         </div>
-
-        <div class="blink" aria-hidden="true"></div>
-        <div class="nose" aria-hidden="true"></div>
-        <div class="mouth" aria-hidden="true"></div>
       </div>
-
-      <div class="sr-only">Maskot kucing, mata mengikuti kursor.</div>
     </div>
+
+    <!-- Weather -->
+    <div class="card">
+      <div class="weather-top">
+        <div>
+          <div style="font-weight:1100;color:rgba(0,0,0,.55);font-size:12px; margin-bottom:4px;">Cuaca hari ini</div>
+          <div class="weather-desc"><span id="weather-icon">🌤️</span><span id="weather-desc">—</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="weather-temp" id="weather-temp">—</div>
+          <div style="font-weight:950;color:rgba(0,0,0,.45);font-size:11px;margin-top:4px;" id="weather-time">—</div>
+        </div>
+      </div>
+
+      <div class="weather-row">
+        <div class="weather-pill">
+          <div class="k">Hujan</div>
+          <div class="v" id="weather-rain">—</div>
+        </div>
+        <div class="weather-pill">
+          <div class="k">Angin</div>
+          <div class="v" id="weather-wind">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prayer -->
+    <div class="card" style="grid-column: 1 / span 1;">
+      <div class="prayer">
+        <div class="prayer-head">
+          <div class="next" id="next-prayer">Berikutnya: <strong>—</strong></div>
+          <div class="countdown" id="countdown">—</div>
+        </div>
+        <div class="prayer-list" id="prayer-list"></div>
+      </div>
+    </div>
+
+    <!-- Kalender -->
+    <div class="card" style="grid-column: 2 / span 1;">
+      <div class="cal-head">
+        <div class="cal-month" id="cal-month">-</div>
+        <div style="font-weight:950;color:rgba(0,0,0,.45);font-size:12px;">Jadwal & agenda harian</div>
+      </div>
+
+      <div class="cal-weekdays">
+        <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+      </div>
+
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Data: Jadwal sholat (Aladhan) + Metode Kemenag (via parameter) & Cuaca (Open-Meteo).
   </div>
 </div>
 
 <script>
-  (function () {
-    const mascot = document.getElementById('kucingMaskot');
-    if (!mascot) return;
+(async function(){
+  const elTime = document.getElementById('clock-time');
+  const elDate = document.getElementById('clock-date');
+  const elGreeting = document.getElementById('clock-greeting');
+  const elChipLokasi = document.getElementById('chip-lokasi');
 
-    const poses = ['pose-0', 'pose-1', 'pose-2'];
-    let poseIndex = 0;
+  const elPrayerList = document.getElementById('prayer-list');
+  const elNextStrong = document.querySelector('#next-prayer strong');
+  const elCountdown = document.getElementById('countdown');
 
-    function setPose(nextIndex) {
-      poseIndex = (nextIndex + poses.length) % poses.length;
-      mascot.classList.remove(...poses);
-      mascot.classList.add(poses[poseIndex]);
+  const elCalMonth = document.getElementById('cal-month');
+  const elCalGrid = document.getElementById('cal-grid');
+
+  const elWeatherTemp = document.getElementById('weather-temp');
+  const elWeatherDesc = document.getElementById('weather-desc');
+  const elWeatherRain = document.getElementById('weather-rain');
+  const elWeatherWind = document.getElementById('weather-wind');
+  const elWeatherTime = document.getElementById('weather-time');
+  const elWeatherIcon = document.getElementById('weather-icon');
+
+  const dotColors = {
+    Subuh: 'var(--blue)',
+    Terbit:'var(--amber)',
+    Dzuhur:'var(--green)',
+    Ashar:'var(--purple)',
+    Maghrib:'var(--pink)',
+    Isya:'var(--blue)'
+  };
+
+  const namesOrder = ['Subuh','Terbit','Dzuhur','Ashar','Maghrib','Isya'];
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  function formatClock(d){
+    const h = d.getHours();
+    const isPM = h >= 12;
+    const hh = h % 12 || 12;
+    return `${hh}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${isPM ? 'PM' : 'AM'}`;
+  }
+  function formatDate(d){
+    const weekday = new Intl.DateTimeFormat('id-ID', { weekday:'short' }).format(d);
+    const day = d.getDate();
+    const month = new Intl.DateTimeFormat('id-ID', { month:'short' }).format(d);
+    const year = d.getFullYear();
+    return `${weekday}, ${day} ${month} ${year}`;
+  }
+  function greeting(d){
+    const h = d.getHours();
+    if (h < 5) return 'Masuk waktu malam 🌙';
+    if (h < 11) return 'Semangat pagi! ☀️';
+    if (h < 15) return 'Waktu belajar & berdzikir ✨';
+    if (h < 18) return 'Hati tetap sejuk 🤲';
+    if (h < 20) return 'Mari siapkan ibadah maghrib 🌿';
+    return 'Tenanglah, istirahat sebentar 🕌';
+  }
+
+  function parseHHMMToDate(timeStr, baseDate){
+    // timeStr: "05:12" => Date
+    const [hh, mm] = timeStr.split(':').map(Number);
+    return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hh, mm, 0, 0);
+  }
+
+  function minutesToHHMM(totalMinutes){
+    const hh = Math.floor(totalMinutes / 60);
+    const mm = totalMinutes % 60;
+    return `${hh}j ${pad2(mm)}m`;
+  }
+
+  function getNextPrayer(prayers, now){
+    const base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0,0);
+
+    const times = namesOrder.map(n => ({
+      name: n,
+      time: parseHHMMToDate(prayers[n], base)
+    })).filter(x => !isNaN(x.time.getTime()));
+
+    // active: waktu yang sedang berlangsung (atau terakhir sebelum sekarang)
+    let active = times[0];
+    for (const t of times){
+      if (t.time <= now) active = t;
     }
 
-    mascot.addEventListener('click', () => setPose(poseIndex + 1));
-    mascot.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setPose(poseIndex + 1);
+    // next: yang > now, kalau habis semua maka subuh besok
+    let next = times.find(t => t.time > now);
+    if (!next){
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate()+1);
+      // fallback: cari subuh pakai hari ini +1 (anggap subuh dari API hari ini sudah ada; kalau lewat semua, next cukup subuh besok)
+      // kita panggil re-fetch saat midnight kalau mau lebih presisi.
+      const subuhTomorrow = parseHHMMToDate(prayers['Subuh'], tomorrow);
+      next = { name: 'Subuh', time: subuhTomorrow };
+    }
+
+    const diffMs = next.time - now;
+    const diffMin = Math.max(0, Math.floor(diffMs / 60000));
+    const countdown = minutesToHHMM(diffMin);
+
+    return { nextName: next.name, activeName: active.name, countdown };
+  }
+
+  function renderPrayerTimes(prayers){
+    const now = new Date();
+    elPrayerList.innerHTML = '';
+
+    // aktif + next
+    const { nextName, activeName, countdown } = getNextPrayer(prayers, now);
+    elNextStrong.textContent = nextName;
+    elCountdown.textContent = `⏳ ${countdown}`;
+
+    for (const name of namesOrder){
+      const t = prayers[name] || '--:--';
+      const row = document.createElement('div');
+      row.className = 'prayer-item' + (name === activeName ? ' active' : '');
+
+      const left = document.createElement('div');
+      left.className = 'name';
+      const dot = document.createElement('span');
+      dot.className = 'badge';
+      dot.style.background = dotColors[name] || 'var(--green)';
+      left.appendChild(dot);
+      left.appendChild(document.createTextNode(name));
+
+      const right = document.createElement('div');
+      right.className = 'time';
+      right.textContent = t;
+
+      row.appendChild(left);
+      row.appendChild(right);
+      elPrayerList.appendChild(row);
+    }
+  }
+
+  // Kalender sederhana (minggu dimulai Senin)
+  function renderCalendar(date){
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    const first = new Date(y, m, 1);
+    const last = new Date(y, m+1, 0);
+
+    elCalMonth.textContent = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
+
+    elCalGrid.innerHTML = '';
+    const today = new Date();
+
+    function jsToMondayIndex(jsDay){
+      // Sun->6, Mon->0, Tue->1 ... Sat->5
+      return (jsDay + 6) % 7;
+    }
+
+    const startIndex = jsToMondayIndex(first.getDay()); // 0..6
+    for(let i=0;i<startIndex;i++){
+      const cell = document.createElement('div');
+      cell.className = 'cal-day muted';
+      cell.textContent = '';
+      elCalGrid.appendChild(cell);
+    }
+
+    for(let day=1; day<=last.getDate(); day++){
+      const cell = document.createElement('div');
+      cell.className = 'cal-day';
+      cell.textContent = day;
+
+      const isToday =
+        day === today.getDate() &&
+        y === today.getFullYear() &&
+        m === today.getMonth();
+      if (isToday) cell.classList.add('today');
+
+      elCalGrid.appendChild(cell);
+    }
+
+    // isi sisa biar rapi
+    const rem = elCalGrid.children.length % 7;
+    if(rem !== 0){
+      const add = 7 - rem;
+      for(let i=0;i<add;i++){
+        const cell = document.createElement('div');
+        cell.className = 'cal-day muted';
+        cell.textContent = '';
+        elCalGrid.appendChild(cell);
       }
-    });
+    }
+  }
 
-    // Eye follow cursor
-    let targetEx = 0, targetEy = 0;
-    let currentEx = 0, currentEy = 0;
+  // Weather mapping (open-meteo weather_code)
+  function weatherCodeToText(code){
+    const map = {
+      0: ['Cerah', '☀️'],
+      1: ['Cerah Berawan', '🌤️'],
+      2: ['Berawan', '⛅'],
+      3: ['Mendung', '☁️'],
+      45:['Kabut', '🌫️'],
+      48:['Kabut', '🌫️'],
+      51:['Gerimis', '🌦️'],
+      53:['Gerimis', '🌦️'],
+      55:['Gerimis', '🌧️'],
+      61:['Hujan Ringan', '🌧️'],
+      63:['Hujan', '🌧️'],
+      65:['Hujan Lebat', '🌧️'],
+      66:['Hujan Beku Ringan', '🌧️'],
+      67:['Hujan Beku', '🌧️'],
+      71:['Salju Ringan', '❄️'],
+      73:['Salju', '❄️'],
+      75:['Salju Lebat', '❄️'],
+      77:['Butiran Salju', '❄️'],
+      80:['Hujan Lokal', '🌦️'],
+      81:['Hujan Lokal', '🌧️'],
+      82:['Hujan Sangat', '🌧️'],
+      85:['Hujan Salju', '🌨️'],
+      86:['Hujan Salju', '🌨️'],
+      95:['Petir', '⛈️'],
+      96:['Petir', '⛈️'],
+      99:['Petir Lebat', '⛈️']
+    };
+    return map[code] || ['Cuaca', '🌈'];
+  }
 
-    function setTargetFromPoint(clientX, clientY) {
-      const rect = mascot.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height * 0.33; // area mata
+  function getDateYMD(d){
+    const y = d.getFullYear();
+    const m = pad2(d.getMonth()+1);
+    const day = pad2(d.getDate());
+    return `${y}-${m}-${day}`;
+  }
 
-      const dx = (clientX - cx) / (rect.width / 2);
-      const dy = (clientY - cy) / (rect.height / 2);
+  // ==========================
+  // Konfigurasi metode Kemenag
+  // ==========================
+  // Catatan penting:
+  // Aladhan mengharuskan "method" berupa ID angka.
+  // Biasanya Kemenag ada, tapi ID bisa berubah. Kita set default dulu.
+  // Jika waktu sholat tidak sesuai Kemenag, kamu bilang ya -> nanti aku ganti ID-nya.
+  const KEMENAG_METHOD_ID = 9; // <-- sering dipakai untuk Kemenag (bisa disesuaikan)
 
-      // clamp
-      targetEx = Math.max(-1, Math.min(1, dx));
-      targetEy = Math.max(-1, Math.min(1, dy));
+  const locationState = { lat: null, lon: null, place: '—', ready:false };
+  let prayersCache = null;
+
+  function startClockLoop(){
+    setInterval(() => {
+      const now = new Date();
+      elTime.textContent = formatClock(now);
+      elDate.textContent = formatDate(now);
+      elGreeting.textContent = greeting(now);
+
+      // Update countdown + active (pakai cache jadwal)
+      if (prayersCache){
+        renderPrayerTimes(prayersCache);
+      }
+    }, 1000);
+  }
+
+  async function reverseGeocode(lat, lon){
+    // Nominatim (OSM) tanpa key, tapi ada rate limit.
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' }});
+    if(!res.ok) throw new Error('reverse-geocode failed');
+    const data = await res.json();
+    const addr = data.address || {};
+
+    // Ambil nama kota/provinsi kalau ada
+    const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+    const prov = addr.state || addr.province || '';
+    const label = [city, prov].filter(Boolean).join(', ') || (data.display_name || 'Lokasi');
+    return label;
+  }
+
+  async function fetchPrayerTimes(lat, lon){
+    // Aladhan: timings by coordinates
+    const today = new Date();
+    const dateStr = getDateYMD(today); // YYYY-MM-DD
+    // endpoint: /v1/timings?latitude=...&longitude=...&method=...&timezonestring=...
+    // timezonestring opsional; kita pakai timezone browser agar format waktu sesuai perangkat.
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const url = `https://api.aladhan.com/v1/timings?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&method=${encodeURIComponent(KEMENAG_METHOD_ID)}&school=0&date=${encodeURIComponent(dateStr)}&timezonestring=${encodeURIComponent(tz)}`;
+
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('prayer-times fetch failed');
+    const json = await res.json();
+
+    // data.data.timings
+    const t = json?.data?.timings;
+    if(!t) throw new Error('prayer-times parse failed');
+
+    // Map Aladhan -> UI
+    // Aladhan umumnya: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha
+    // (nama bisa sedikit beda; tapi biasanya ini)
+    return {
+      Subuh: (t.Fajr || t.FajrTime || '').slice(0,5) || '--:--',
+      Terbit: (t.Sunrise || t.SunriseTime || '').slice(0,5) || '--:--',
+      Dzuhur: (t.Dhuhr || t.DhuhrTime || '').slice(0,5) || '--:--',
+      Ashar: (t.Asr || t.AsrTime || '').slice(0,5) || '--:--',
+      Maghrib: (t.Maghrib || t.MaghribTime || '').slice(0,5) || '--:--',
+      Isya: (t.Isha || t.IshaTime || '').slice(0,5) || '--:--'
+    };
+  }
+
+  async function fetchWeather(lat, lon){
+    // Open-Meteo current weather (tanpa API key)
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('weather fetch failed');
+
+    const json = await res.json();
+    const cur = json.current || {};
+    const temp = cur.temperature_2m;
+    const code = cur.weather_code;
+    const rainProb = cur.precipitation_probability;
+    const wind = cur.wind_speed_10m;
+
+    const [desc, icon] = weatherCodeToText(code);
+
+    elWeatherIcon.textContent = icon;
+    elWeatherDesc.textContent = desc;
+
+    if (typeof temp === 'number') elWeatherTemp.textContent = `${Math.round(temp)}°C`;
+    else elWeatherTemp.textContent = '—';
+
+    if (typeof rainProb === 'number') elWeatherRain.textContent = `${Math.round(rainProb)}%`;
+    else elWeatherRain.textContent = '—';
+
+    if (typeof wind === 'number') elWeatherWind.textContent = `${Math.round(wind)} km/jam`;
+    else elWeatherWind.textContent = '—';
+
+    const now = new Date();
+    elWeatherTime.textContent = `Update ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  }
+
+  function startInitUI(){
+    const now = new Date();
+    elTime.textContent = formatClock(now);
+    elDate.textContent = formatDate(now);
+    elGreeting.textContent = greeting(now);
+    renderCalendar(now);
+
+    // placeholder list
+    elPrayerList.innerHTML = '';
+    for (const n of namesOrder){
+      const row = document.createElement('div');
+      row.className = 'prayer-item';
+      row.innerHTML = `
+        <div class="name"><span class="badge" style="background:${dotColors[n]||'var(--green)'}"></span>${n}</div>
+        <div class="time">—</div>
+      `;
+      elPrayerList.appendChild(row);
+    }
+  }
+
+  function startGeolocation(){
+    if(!navigator.geolocation){
+      elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
+      // Default Jakarta
+      locationState.lat = -6.200000;
+      locationState.lon = 106.816666;
+      locationState.place = 'Jakarta';
+      locationState.ready = true;
+
+      // jalankan fetch
+      (async () => {
+        try{
+          prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon);
+          renderPrayerTimes(prayersCache);
+        }catch(e){
+          elChipLokasi.textContent = 'Lokasi: Jakarta (default) — jadwal gagal';
+        }
+        try{
+          await fetchWeather(locationState.lat, locationState.lon);
+        }catch(e){
+          // ignore weather error
+        }
+      })();
+      return;
     }
 
-    function animate() {
-      currentEx += (targetEx - currentEx) * 0.12;
-      currentEy += (targetEy - currentEy) * 0.12;
+    elChipLokasi.textContent = 'Mencari lokasi...';
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      locationState.lat = pos.coords.latitude;
+      locationState.lon = pos.coords.longitude;
+      try{
+        locationState.place = await reverseGeocode(locationState.lat, locationState.lon);
+      }catch(e){
+        locationState.place = `(${locationState.lat.toFixed(2)}, ${locationState.lon.toFixed(2)})`;
+      }
+      elChipLokasi.textContent = `Lokasi: ${locationState.place}`;
+      locationState.ready = true;
 
-      mascot.style.setProperty('--ex', currentEx.toFixed(3));
-      mascot.style.setProperty('--ey', currentEy.toFixed(3));
+      // fetch prayer & weather
+      try{
+        prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon);
+        renderPrayerTimes(prayersCache);
+      }catch(e){
+        elChipLokasi.textContent = `Lokasi: ${locationState.place} — jadwal gagal (CORS/akses/API)`;
+      }
 
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
+      try{
+        await fetchWeather(locationState.lat, locationState.lon);
+      }catch(e){
+        // ignore
+      }
+    }, async () => {
+      elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
+      locationState.lat = -6.200000;
+      locationState.lon = 106.816666;
 
-    document.addEventListener('mousemove', (e) => {
-      setTargetFromPoint(e.clientX, e.clientY);
-    }, { passive: true });
+      try{
+        prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon);
+        renderPrayerTimes(prayersCache);
+      }catch(e){}
 
-    document.addEventListener('touchmove', (e) => {
-      if (!e.touches || !e.touches[0]) return;
-      setTargetFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
+      try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
+      locationState.ready = true;
+    }, { enableHighAccuracy:false, timeout: 8000, maximumAge: 600000 });
+  }
 
-    document.addEventListener('mouseleave', () => {
-      targetEx = 0; targetEy = 0;
-    });
-  })();
+  // init
+  startInitUI();
+  startClockLoop();
+  startGeolocation();
+})();
 </script>
