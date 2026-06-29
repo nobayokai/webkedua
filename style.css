@@ -209,4 +209,32 @@ h1, h2 {
           min-height: 520px; /* tetap seperti di animasi-kiri.html */
     }
 
+    /* Untuk desktop */
+.left-page {
+    display: block;
+}
+
+/* Untuk tablet */
+@media (max-width: 1024px) {
+    .left-page {
+        display: none;
+    }
+}
+
+/* Untuk handphone */
+@media (max-width: 768px) {
+    .left-page {
+        display: none;
+    }
+    
+    .right-page {
+        width: 100% !important;
+    }
+    
+    .book {
+        flex-direction: column;
+    }
+}
+
+
 }
