@@ -1,297 +1,363 @@
-<!-- Maskot Ramah Lingkungan - Animasi Mata Ikut Kursor + Posenya berubah saat diklik -->
 <style>
-  /* Container halaman kiri biar rapi */
+  /* Pastikan mengikuti ukuran halaman kiri */
+  #kucing-mascot-wrap{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 14px 10px;
+    box-sizing: border-box;
+    background: transparent; /* penting: ikut background index */
+    user-select: none;
+  }
+
+  /* Ornamen judul di atas */
+  .mascot-title{
+    margin-top: 2px;
+    margin-bottom: 6px;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: .2px;
+    color: #064e3b; /* hijau tua */
+    line-height: 1.1;
+  }
+  .mascot-title .sub{
+    display: inline-block;
+    font-size: 12px;
+    color: rgba(6,78,59,.75);
+    font-weight: 700;
+    margin-top: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(52,211,153,.14);
+    border: 1px solid rgba(16,185,129,.22);
+  }
+  .mascot-title .main{
+    font-size: 16px;
+    background: linear-gradient(90deg, #10b981, #047857);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 1px 0 rgba(255,255,255,.35);
+  }
+
+  /* Area animasi */
   #eco-mascot-stage{
     position: relative;
     width: 100%;
     height: 100%;
-    min-height: 520px;
+    min-height: 420px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
     overflow: hidden;
-    user-select: none;
   }
 
-  /* Efek latar sederhana */
-  #eco-mascot-stage::before{
-    content:"";
-    position:absolute; inset:-40px;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(56, 189, 248, .18), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(34, 197, 94, .16), transparent 48%),
-      radial-gradient(circle at 40% 80%, rgba(59, 130, 246, .12), transparent 45%);
-    filter: blur(1px);
-    pointer-events:none;
-  }
-
-  /* Maskot */
-  .eco-mascot{
-    position: relative;
-    width: min(320px, 90%);
+  /* Maskot klik */
+  .cat{
+    width: min(280px, 90%);
     aspect-ratio: 1 / 1.05;
+    position: relative;
     cursor: pointer;
     transform: translateZ(0);
   }
 
-  /* Bayangan */
-  .eco-mascot .shadow{
-    position:absolute;
+  /* Shadow */
+  .cat .shadow{
+    position: absolute;
     left: 50%;
-    bottom: 10px;
+    bottom: 6%;
     width: 70%;
-    height: 10%;
+    height: 8%;
     transform: translateX(-50%);
-    background: radial-gradient(closest-side, rgba(0,0,0,.25), transparent 70%);
-    filter: blur(2px);
-    opacity: .45;
+    background: radial-gradient(closest-side, rgba(2,6,23,.25), transparent 70%);
+    filter: blur(3px);
+    opacity: .55;
   }
 
-  /* Badan dasar */
-  .eco-mascot .body{
-    position:absolute;
+  /* Body */
+  .cat .body{
+    position: absolute;
     left: 50%;
-    top: 26%;
-    width: 78%;
-    height: 62%;
+    top: 40%;
+    width: 76%;
+    height: 50%;
     transform: translateX(-50%);
-    border-radius: 28px 28px 34px 34px;
-    background: linear-gradient(180deg, #E8F7FF, #BEE7FF);
-    box-shadow:
-      inset 0 0 0 3px rgba(15, 23, 42, .06),
-      0 10px 25px rgba(2, 6, 23, .12);
+    border-radius: 48% 48% 40% 40%;
+    background: linear-gradient(180deg, #FDE68A, #F59E0B);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.25),
+                0 18px 30px rgba(2,6,23,.12);
   }
 
-  /* Jubah */
-  .eco-mascot .robe{
-    position:absolute;
+  /* Perut lebih lembut */
+  .cat .belly{
+    position: absolute;
     left: 50%;
-    top: 37%;
-    width: 78%;
-    height: 48%;
+    top: 52%;
+    width: 45%;
+    height: 38%;
     transform: translateX(-50%);
-    border-radius: 26px 26px 34px 34px;
-    background: linear-gradient(180deg, #0EA5A4, #0B7285);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.22);
+    border-radius: 50%;
+    background: rgba(255,255,255,.35);
+    filter: blur(.2px);
   }
 
-  /* Lengan */
-  .eco-mascot .arm{
-    position:absolute;
-    top: 44%;
-    width: 18%;
-    height: 22%;
-    border-radius: 14px;
-    background: linear-gradient(180deg, #0B7285, #075985);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.12);
-    transform-origin: 50% 0%;
-  }
-  .eco-mascot .arm.left{
-    left: 18%;
-    transform: rotate(-10deg);
-  }
-  .eco-mascot .arm.right{
-    right: 18%;
-    transform: rotate(8deg);
-  }
-
-  /* “Tangan” lucu */
-  .eco-mascot .hand{
-    position:absolute;
-    bottom: -10%;
-    left: 50%;
-    width: 70%;
-    height: 34%;
-    transform: translateX(-50%);
+  /* Ekor */
+  .cat .tail{
+    position: absolute;
+    right: 4%;
+    top: 58%;
+    width: 42%;
+    height: 32%;
+    transform-origin: 15% 50%;
+    background: linear-gradient(180deg, #FBBF24, #D97706);
     border-radius: 999px;
-    background: linear-gradient(180deg, #F5D0A6, #E7B98A);
-    box-shadow: inset 0 0 0 3px rgba(15,23,42,.08);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.18);
+    transition: transform .25s ease;
+    transform: rotate(18deg);
+  }
+
+  /* Tail ujung */
+  .cat .tail::after{
+    content:"";
+    position:absolute;
+    right: -8%;
+    top: 38%;
+    width: 36%;
+    height: 50%;
+    background: rgba(0,0,0,.08);
+    border-radius: 999px;
+    filter: blur(.2px);
+    opacity: .35;
   }
 
   /* Kepala */
-  .eco-mascot .head{
-    position:absolute;
+  .cat .head{
+    position: absolute;
     left: 50%;
-    top: 6%;
-    width: 62%;
-    height: 42%;
+    top: 8%;
+    width: 70%;
+    height: 46%;
     transform: translateX(-50%);
-    border-radius: 50% 50% 42% 42%;
-    background: linear-gradient(180deg, #FFFFFF, #E6F4FF);
-    box-shadow:
-      inset 0 0 0 3px rgba(15, 23, 42, .06),
-      0 12px 22px rgba(2, 6, 23, .10);
+    border-radius: 50% 50% 45% 45%;
+    background: linear-gradient(180deg, #FEF3C7, #FCD34D);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.28);
   }
 
-  /* Sorban/Topi */
-  .eco-mascot .turban{
-    position:absolute;
-    left: 50%;
+  /* Telinga kiri kanan (segitiga pakai border) */
+  .cat .ear{
+    position: absolute;
     top: -12%;
-    width: 80%;
-    height: 40%;
-    transform: translateX(-50%);
-    border-radius: 28px;
-    background: linear-gradient(180deg, #0EA5A4, #047857);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.18);
+    width: 0;
+    height: 0;
+    border-left: 18% solid transparent;
+    border-right: 18% solid transparent;
+    border-bottom: 34% solid #F59E0B;
+    filter: drop-shadow(0 4px 6px rgba(2,6,23,.08));
   }
-  .eco-mascot .crescent{
-    position:absolute;
-    left: 50%;
-    top: 2%;
-    width: 26px;
-    height: 26px;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #FEF3C7, #F59E0B);
-    box-shadow: 0 6px 14px rgba(245, 158, 11, .35);
-  }
-  .eco-mascot .crescent::after{
+  .cat .ear.left{ left: 10%; transform: rotate(-8deg); }
+  .cat .ear.right{ right: 10%; transform: rotate(8deg); }
+
+  .cat .ear::after{
     content:"";
     position:absolute;
-    inset: 7px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #0EA5A4, #047857);
+    left: -15%;
+    top: 16%;
+    width: 0;
+    height: 0;
+    border-left: 15% solid transparent;
+    border-right: 15% solid transparent;
+    border-bottom: 28% solid rgba(255,255,255,.26);
   }
 
-  /* Badge kecil (daur ulang ramah lingkungan) */
-  .eco-mascot .eco-badge{
-    position:absolute;
-    right: 6%;
-    bottom: 8%;
-    width: 18%;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #A7F3D0, #34D399);
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.35);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    color:#064E3B;
-  }
-
-  /* Area mata */
-  .eco-mascot .eyes{
-    position:absolute;
-    top: 33%;
+  /* Peci / topi mini (Islamic vibe) */
+  .cat .peci{
+    position: absolute;
     left: 50%;
-    width: 72%;
-    height: 28%;
+    top: -2%;
+    width: 56%;
+    height: 26%;
     transform: translateX(-50%);
-    display:flex;
-    gap: 14%;
-    align-items:center;
-    justify-content:center;
+    border-radius: 12px 12px 16px 16px;
+    background: linear-gradient(180deg, #0f766e, #0a5a57);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.18);
+  }
+  .cat .peci::after{
+    content:"";
+    position:absolute;
+    left: 50%;
+    bottom: -26%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 50%;
+    background: rgba(0,0,0,.12);
+    border-radius: 999px;
+    filter: blur(2px);
+    opacity: .25;
   }
 
-  .eco-mascot .eye{
+  .cat .crescent{
+    position: absolute;
+    left: 50%;
+    top: 3%;
+    width: 22px;
+    height: 22px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #FDE68A, #F59E0B);
+    box-shadow: 0 8px 16px rgba(245,158,11,.25);
+  }
+  .cat .crescent::after{
+    content:"";
+    position:absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #0f766e, #0a5a57);
+  }
+
+  /* Mata */
+  .cat .eyes{
+    position: absolute;
+    left: 50%;
+    top: 34%;
+    width: 70%;
+    height: 26%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16%;
+    align-items: center;
+    justify-content: center;
+  }
+  .cat .eye{
     position: relative;
     width: 42%;
     height: 100%;
-    background: #FFFFFF;
-    border-radius: 50%;
-    box-shadow: inset 0 0 0 3px rgba(15,23,42,.08);
-    overflow:hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.9);
+    box-shadow: inset 0 0 0 3px rgba(2,6,23,.06);
+    overflow: hidden;
   }
 
-  .eco-mascot .pupil{
-    position:absolute;
+  .cat .pupil{
+    position: absolute;
     left: 50%;
-    top: 52%;
+    top: 55%;
     width: 26%;
     height: 26%;
-    transform: translate(-50%, -50%)
+    transform: translate(-50%,-50%)
       translate(calc(var(--ex, 0) * 10px), calc(var(--ey, 0) * 7px));
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #111827, #000000);
-    transition: transform 60ms linear;
+    background: radial-gradient(circle at 30% 30%, #111827, #000);
+    transition: transform 50ms linear;
   }
 
-  /* Efek berkedip */
-  .eco-mascot .blink{
+  /* Berkedip sederhana */
+  .cat .blink{
     position:absolute;
     left: 50%;
-    top: 50%;
-    width: 0%;
-    height: 14px;
-    transform: translate(-50%, -50%);
-    background: rgba(15,23,42,.12);
+    top: 48%;
+    width: 10%;
+    height: 10px;
+    transform: translate(-50%,-50%);
+    background: rgba(2,6,23,.12);
     border-radius: 999px;
     opacity: 0;
+    animation: blink 5.8s infinite;
     pointer-events:none;
-    animation: blink 5.2s infinite;
   }
   @keyframes blink{
-    0%, 92%, 100% { opacity: 0; width: 0%; }
-    93% { opacity: 1; width: 72%; }
-    94% { opacity: 0; width: 0%; }
+    0%, 92%, 100% { opacity: 0; transform: translate(-50%,-50%) scaleX(1); }
+    93% { opacity: 1; }
+    94% { opacity: 0; }
   }
 
   /* Hidung & mulut */
-  .eco-mascot .nose{
-    position:absolute;
+  .cat .nose{
+    position: absolute;
     left: 50%;
-    top: 60%;
-    width: 12px;
-    height: 8px;
+    top: 55%;
+    width: 14px;
+    height: 10px;
     transform: translateX(-50%);
-    border-radius: 0 0 8px 8px;
-    background: rgba(15,23,42,.12);
+    background: rgba(2,6,23,.15);
+    border-radius: 0 0 10px 10px;
   }
-  .eco-mascot .mouth{
+  .cat .mouth{
     position:absolute;
     left: 50%;
-    top: 65%;
-    width: 34%;
-    height: 14%;
+    top: 62%;
+    width: 36%;
+    height: 12%;
     transform: translateX(-50%);
-    border-bottom: 4px solid rgba(15,23,42,.35);
-    border-radius: 0 0 30px 30px;
+    border-bottom: 3px solid rgba(2,6,23,.35);
+    border-radius: 0 0 40px 40px;
     opacity: .9;
   }
 
-  /* Buku kecil di depan */
-  .eco-mascot .book{
+  /* Alis lucu */
+  .cat .brow{
+    position:absolute;
+    top: 28%;
+    width: 20%;
+    height: 6%;
+    border-top: 3px solid rgba(2,6,23,.18);
+    border-radius: 999px;
+    opacity: .8;
+  }
+  .cat .brow.left{ left: 28%; transform: rotate(-8deg); }
+  .cat .brow.right{ right: 28%; transform: rotate(8deg); }
+
+  /* Kaki kanan/kiri */
+  .cat .paw{
+    position:absolute;
+    bottom: 24%;
+    width: 18%;
+    height: 18%;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #FBBF24, #D97706);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.15);
+    transition: transform .25s ease;
+  }
+  .cat .paw.left{ left: 26%; transform: rotate(10deg); }
+  .cat .paw.right{ right: 26%; transform: rotate(-8deg); }
+
+  /* Buku mini (ramah lingkungan) */
+  .cat .eco-book{
     position:absolute;
     left: 50%;
-    top: 58%;
-    width: 44%;
-    height: 18%;
+    bottom: 33%;
+    width: 30%;
+    height: 14%;
     transform: translateX(-50%);
-    background: linear-gradient(180deg, #F59E0B, #D97706);
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(217, 119, 6, .22);
-    border: 3px solid rgba(255,255,255,.22);
-  }
-  .eco-mascot .book::after{
-    content:"";
-    position:absolute;
-    left: 10%;
-    top: 18%;
-    width: 80%;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.45);
+    border-radius: 10px;
+    background: linear-gradient(180deg, #34D399, #10B981);
+    box-shadow: 0 12px 20px rgba(16,185,129,.18), inset 0 0 0 3px rgba(255,255,255,.20);
+    border: 2px solid rgba(255,255,255,.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #064E3B;
+    opacity: .95;
   }
 
-  /* Daun untuk pose ke-3 */
-  .eco-mascot .leaf{
+  /* Daun kecil untuk pose 2 */
+  .cat .leaf{
     position:absolute;
     right: 18%;
-    top: 49%;
-    width: 24%;
-    height: 18%;
-    transform-origin: 50% 50%;
+    bottom: 48%;
+    width: 18%;
+    height: 14%;
+    border-radius: 50% 50% 50% 50%;
     background: linear-gradient(180deg, #22C55E, #16A34A);
-    border-radius: 50% 10% 50% 10%;
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.22);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.2);
     opacity: 0;
-    transform: translateY(6px) rotate(-20deg);
+    transform: translateY(8px) rotate(-20deg);
     transition: opacity .25s ease, transform .35s ease;
   }
-  .eco-mascot .leaf::after{
+  .cat .leaf::after{
     content:"";
     position:absolute;
     left: 50%;
@@ -299,103 +365,102 @@
     width: 3px;
     height: 80%;
     transform: translateX(-50%);
-    background: rgba(255,255,255,.55);
+    background: rgba(255,255,255,.45);
     border-radius: 999px;
   }
 
-  /* Pose perubahan: default -> waving -> memegang daun */
-  .eco-mascot.pose-0 .arm.right{
-    transform: rotate(8deg);
-  }
-  .eco-mascot.pose-1 .arm.right{
-    transform: rotate(-28deg);
-    transition: transform .25s ease;
-    animation: wave 1s ease-in-out infinite;
+  /* Pose control */
+  .cat.pose-0 .paw.right{ transform: rotate(-8deg); }
+  .cat.pose-1 .paw.right{
+    transform: rotate(-40deg) translateY(-2px);
+    animation: wave 900ms ease-in-out infinite;
   }
   @keyframes wave{
-    0%{ transform: rotate(-18deg); }
-    50%{ transform: rotate(-40deg); }
-    100%{ transform: rotate(-18deg); }
+    0%{ transform: rotate(-35deg) translateY(-2px); }
+    50%{ transform: rotate(-55deg) translateY(-4px); }
+    100%{ transform: rotate(-35deg) translateY(-2px); }
   }
+  .cat.pose-2 .paw.right{ transform: rotate(-18deg); animation: none; }
+  .cat.pose-2 .leaf{ opacity: 1; transform: translateY(0) rotate(-8deg); }
+  .cat.pose-2 .tail{ transform: rotate(-8deg); }
 
-  .eco-mascot.pose-2 .arm.right{
-    transform: rotate(-38deg);
-    transition: transform .25s ease;
-    animation: none;
+  /* Tail gerak halus */
+  .cat .tail{ animation: tailIdle 2.8s ease-in-out infinite; }
+  @keyframes tailIdle{
+    0%, 100% { transform: rotate(18deg); }
+    50% { transform: rotate(10deg); }
   }
-  .eco-mascot.pose-2 .leaf{
-    opacity: 1;
-    transform: translateY(-2px) rotate(-8deg);
-  }
+  .cat.pose-2 .tail{ animation: none; }
 
-  /* Hint teks */
-  .eco-mascot .hint{
-    position:absolute;
-    left: 50%;
-    bottom: 2%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    color: rgba(15,23,42,.65);
-    background: rgba(255,255,255,.55);
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(15,23,42,.08);
-    box-shadow: 0 10px 18px rgba(2,6,23,.07);
+  /* Aksesibilitas */
+  .sr-only{
+    position:absolute; width:1px; height:1px;
+    padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
 </style>
 
-<div id="eco-mascot-stage">
-  <div class="eco-mascot pose-0" id="ecoMascot" role="button" tabindex="0" aria-label="Maskot sekolah islam ramah lingkungan, klik untuk mengubah pose">
-    <div class="shadow"></div>
+<div id="kucing-mascot-wrap">
+  <div class="mascot-title">
+    <div class="main">Sekolah Islam Ramah Lingkungan</div>
+    <div class="sub">Klik kucingnya ✨</div>
+  </div>
 
-    <div class="body"></div>
-    <div class="robe"></div>
+  <div id="eco-mascot-stage">
+    <div class="cat pose-0" id="kucingMaskot" role="button" tabindex="0" aria-label="Maskot kucing. Klik untuk ganti pose. Mata mengikuti kursor.">
+      <div class="shadow"></div>
 
-    <div class="arm left">
-      <div class="hand"></div>
-    </div>
-    <div class="arm right">
-      <div class="hand"></div>
-    </div>
+      <div class="tail" aria-hidden="true"></div>
 
-    <div class="head">
-      <div class="turban">
-        <div class="crescent"></div>
+      <div class="body" aria-hidden="true">
+        <div class="belly" aria-hidden="true"></div>
       </div>
 
-      <div class="eyes">
-        <div class="eye">
-          <div class="pupil" id="pupilL"></div>
+      <!-- Kaki -->
+      <div class="paw left" aria-hidden="true"></div>
+      <div class="paw right" aria-hidden="true"></div>
+
+      <!-- Tangan/penanda eco -->
+      <div class="eco-book" aria-hidden="true">♻</div>
+      <div class="leaf" aria-hidden="true"></div>
+
+      <!-- Kepala -->
+      <div class="head">
+        <div class="ear left" aria-hidden="true"></div>
+        <div class="ear right" aria-hidden="true"></div>
+
+        <div class="peci" aria-hidden="true">
+          <div class="crescent" aria-hidden="true"></div>
         </div>
-        <div class="eye">
-          <div class="pupil" id="pupilR"></div>
+
+        <div class="brow left" aria-hidden="true"></div>
+        <div class="brow right" aria-hidden="true"></div>
+
+        <div class="eyes" aria-hidden="true">
+          <div class="eye"><div class="pupil" id="pupilL"></div></div>
+          <div class="eye"><div class="pupil" id="pupilR"></div></div>
         </div>
+
+        <div class="blink" aria-hidden="true"></div>
+        <div class="nose" aria-hidden="true"></div>
+        <div class="mouth" aria-hidden="true"></div>
       </div>
 
-      <div class="blink"></div>
-      <div class="nose"></div>
-      <div class="mouth"></div>
-      <div class="eco-badge">♻</div>
+      <div class="sr-only">Maskot kucing, mata mengikuti kursor.</div>
     </div>
-
-    <div class="book"></div>
-    <div class="leaf" aria-hidden="true"></div>
-
-    <div class="hint">Klik! 🟢 Mata ikut kursor ✨</div>
   </div>
 </div>
 
 <script>
   (function () {
-    const mascot = document.getElementById('ecoMascot');
+    const mascot = document.getElementById('kucingMaskot');
     if (!mascot) return;
 
-    // Pose state
     const poses = ['pose-0', 'pose-1', 'pose-2'];
     let poseIndex = 0;
 
-    function setPose(i){
-      poseIndex = (i + poses.length) % poses.length;
+    function setPose(nextIndex) {
+      poseIndex = (nextIndex + poses.length) % poses.length;
       mascot.classList.remove(...poses);
       mascot.classList.add(poses[poseIndex]);
     }
@@ -412,23 +477,20 @@
     let targetEx = 0, targetEy = 0;
     let currentEx = 0, currentEy = 0;
 
-    const maxX = 1; // normalisasi
-    const maxY = 1;
-
-    function setTargetFromPoint(clientX, clientY){
+    function setTargetFromPoint(clientX, clientY) {
       const rect = mascot.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height * 0.33; // fokus ke area mata (lebih natural)
+      const cy = rect.top + rect.height * 0.33; // area mata
 
       const dx = (clientX - cx) / (rect.width / 2);
       const dy = (clientY - cy) / (rect.height / 2);
 
-      targetEx = Math.max(-maxX, Math.min(maxX, dx));
-      targetEy = Math.max(-maxY, Math.min(maxY, dy));
+      // clamp
+      targetEx = Math.max(-1, Math.min(1, dx));
+      targetEy = Math.max(-1, Math.min(1, dy));
     }
 
-    function animate(){
-      // smoothing
+    function animate() {
       currentEx += (targetEx - currentEx) * 0.12;
       currentEy += (targetEy - currentEy) * 0.12;
 
@@ -439,18 +501,15 @@
     }
     requestAnimationFrame(animate);
 
-    // Mouse
     document.addEventListener('mousemove', (e) => {
       setTargetFromPoint(e.clientX, e.clientY);
     }, { passive: true });
 
-    // Touch (biar tetap responsif)
     document.addEventListener('touchmove', (e) => {
       if (!e.touches || !e.touches[0]) return;
       setTargetFromPoint(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
 
-    // Biar saat tidak ada input, mata kembali ke tengah
     document.addEventListener('mouseleave', () => {
       targetEx = 0; targetEy = 0;
     });
