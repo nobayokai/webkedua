@@ -47,11 +47,11 @@ function switchRole(role, elBtn) {
 async function handleLogin(e) {
     e.preventDefault();
 
-    
     const form  = e.target;  
-    const nis   = form.querySelector('#nis').value.trim();  
-    const pass  = form.querySelector('#password').value.trim();  
-    const pesan = form.querySelector('#pesan-login');  
+    const nis   = form.querySelector('#input-nis').value.trim();  
+    const pass  = form.querySelector('#input-pass').value.trim();  
+    const pesan = document.getElementById('pesan-login');  
+
 
     if (!nis || !pass) {
         pesan.style.color = 'red';
