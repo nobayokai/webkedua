@@ -48,19 +48,10 @@ async function handleLogin(e) {
     e.preventDefault();
 
     
-    // DEBUG - hapus setelah fix  
-    console.log('nis el:', document.getElementById('nis'));  
-    console.log('password el:', document.getElementById('password'));  
-    console.log('pesan el:', document.getElementById('pesan-login'));  
-
-   
-
-    const activeBtn   = document.querySelector('.role-btn.active');
-    const currentRole = activeBtn ? activeBtn.dataset.role : 'siswa';
-
-    const nis   = document.getElementById('nis').value.trim();
-    const pass  = document.getElementById('password').value.trim();
-    const pesan = document.getElementById('pesan-login');
+    const form  = e.target;  
+    const nis   = form.querySelector('#nis').value.trim();  
+    const pass  = form.querySelector('#password').value.trim();  
+    const pesan = form.querySelector('#pesan-login');  
 
     if (!nis || !pass) {
         pesan.style.color = 'red';
