@@ -4,7 +4,10 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjoXZ0FEOIwkaBRsRjM
 // TOGGLE PASSWORD
 // =============================================
 function togglePass(inputId, iconEl) {
+    // inputId yang dikirim dari login.html adalah 'password'
     const input = document.getElementById(inputId);
+    if (!input) return; // aman kalau null
+    
     if (input.type === 'password') {
         input.type = 'text';
         iconEl.textContent = '🙈';
@@ -13,6 +16,7 @@ function togglePass(inputId, iconEl) {
         iconEl.textContent = '👁️';
     }
 }
+
 
 // =============================================
 // SWITCH ROLE (Siswa/Guru)
@@ -43,21 +47,21 @@ function switchRole(role, elBtn) {
 async function handleLogin(e) {
     e.preventDefault();
 
-    const activeBtn  = document.querySelector('.role-btn.active');
+    const activeBtn   = document.querySelector('.role-btn.active');
     const currentRole = activeBtn ? activeBtn.dataset.role : 'siswa';
 
-    const nis  = document.getElementById('input-nis').value.trim();
-    const pass = document.getElementById('input-pass').value.trim();
+    const nis   = document.getElementById('nis').value.trim();
+    const pass  = document.getElementById('password').value.trim();
     const pesan = document.getElementById('pesan-login');
 
     if (!nis || !pass) {
-        pesan.style.color   = 'red';
-        pesan.textContent   = '⚠️ Isi semua kolom!';
+        pesan.style.color = 'red';
+        pesan.textContent = '⚠️ Isi semua kolom!';
         return;
     }
 
-    pesan.style.color   = 'blue';
-    pesan.textContent   = '⏳ Sedang login...';
+    pesan.style.color = 'blue';
+    pesan.textContent = '⏳ Sedang login...';
 
     try {
         const params = new URLSearchParams({
@@ -101,6 +105,7 @@ async function handleLogin(e) {
         pesan.textContent = '❌ Gagal terhubung ke server!';
     }
 }
+
 
 // =============================================
 // UPDATE MENU LOGIN/LOGOUT
