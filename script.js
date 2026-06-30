@@ -56,9 +56,6 @@ function switchRole(role, elBtn) {
 
 
 // =============================================
-// HANDLE LOGIN
-// =============================================
-// =============================================
 // HANDLE LOGIN DENGAN POPUP
 // =============================================
 async function handleLogin(e) {
@@ -163,6 +160,7 @@ function showLoginPopup(type, message) {
 
     return modal;
 }
+
 
 
 
