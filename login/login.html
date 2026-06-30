@@ -11,14 +11,6 @@
 
     <!-- Card Login -->
     <div class="login-card" id="login-card">
-
-        <!-- Avatar -->
-        <div class="avatar-area">
-            <div class="avatar-icon siswa" id="avatar-icon">🎒</div>
-            <div class="login-title"    id="login-title">Halo, Siswa!</div>
-            <div class="login-subtitle" id="login-subtitle">Masuk untuk melanjutkan belajar</div>
-        </div>
-
         <!-- Form -->
         <form id="login-form" onsubmit="handleLogin(event)">
 
@@ -52,34 +44,13 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Lupa Password -->
-            <div class="forgot-link">
-                <a href="#" onclick="hubungiGuru(); return false;">Lupa password?</a>
-            </div>
-
             <!-- Tombol Login -->
             <button type="submit" class="btn-login siswa" id="btn-login">
                 Masuk
             </button>
 
-            <!-- Notifikasi -->
-            <div class="notif" id="notif-box"></div>
-
+             <p id="pesan-login" style="min-height:20px; text-align:center;"></p> 
         </form>
-
-        <!-- Divider -->
-        <div class="divider">
-            <div class="divider-line"></div>
-            <span>info</span>
-            <div class="divider-line"></div>
-        </div>
-
-        <!-- Info Badge -->
-        <div class="info-badge" id="info-badge">
-            <span class="icon">💡</span>
-            <span id="info-text">Gunakan NIS dan password yang diberikan oleh gurumu</span>
-        </div>
 
     </div>
 </div>
