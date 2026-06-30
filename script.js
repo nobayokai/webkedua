@@ -122,44 +122,49 @@ async function handleLogin(e) {
 // FUNGSI POPUP LOGIN (Aesthetic Version)
 // =============================================
 function showLoginPopup(type, message) {
-    
     const oldModal = document.querySelector('.modal');
     if (oldModal) oldModal.remove();
 
     const modal = document.createElement('div');
     modal.className = 'modal';
 
-    let iconHTML = '';
-    let extraClass = '';
+    let contentHTML = '';
 
     if (type === 'loading') {
-        iconHTML = `<div class="hourglass"></div>`;
+        contentHTML = `
+            <div class="modal-content">
+                <div class="spinner"></div>
+                <p>${message}</p>
+            </div>
+        `;
     } else if (type === 'success') {
-        iconHTML = `<div style="font-size: 48px;">✅</div>`;
-        extraClass = 'success';
+        contentHTML = `
+            <div class="modal-content success">
+                <div class="modal-icon">✅</div>
+                <p>${message}</p>
+            </div>
+        `;
     } else if (type === 'error') {
-        iconHTML = `<div style="font-size: 48px;">❌</div>`;
-        extraClass = 'error';
+        contentHTML = `
+            <div class="modal-content error">
+                <div class="modal-icon">❌</div>
+                <p>${message}</p>
+            </div>
+        `;
     }
 
-    modal.innerHTML = `
-        <div class="modal-content ${extraClass}">
-            <div class="modal-icon">${iconHTML}</div>
-            <p>${message}</p>
-        </div>
-    `;
-
+    modal.innerHTML = contentHTML;
     document.body.appendChild(modal);
 
-    // Klik di luar untuk close (kecuali loading)
     if (type !== 'loading') {
-        modal.addEventListener('click', (e) => {
+        modal.addEventListener('click', function(e) {
             if (e.target === modal) modal.remove();
         });
     }
 
     return modal;
 }
+
 
 
 
