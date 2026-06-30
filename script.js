@@ -122,7 +122,7 @@ async function handleLogin(e) {
 // FUNGSI POPUP LOGIN (Aesthetic Version)
 // =============================================
 function showLoginPopup(type, message) {
-    // Hapus modal lama jika ada
+    
     const oldModal = document.querySelector('.modal');
     if (oldModal) oldModal.remove();
 
