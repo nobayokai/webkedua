@@ -47,6 +47,14 @@ function switchRole(role, elBtn) {
 async function handleLogin(e) {
     e.preventDefault();
 
+    
+    // DEBUG - hapus setelah fix  
+    console.log('nis el:', document.getElementById('nis'));  
+    console.log('password el:', document.getElementById('password'));  
+    console.log('pesan el:', document.getElementById('pesan-login'));  
+
+   
+
     const activeBtn   = document.querySelector('.role-btn.active');
     const currentRole = activeBtn ? activeBtn.dataset.role : 'siswa';
 
