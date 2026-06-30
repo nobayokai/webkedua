@@ -1,7 +1,7 @@
 // =============================================
 // KONFIGURASI - Ganti dengan URL Apps Script kamu
 // =============================================
-const LOGIN_SCRIPT_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_URL_KAMU/exec';
+const LOGIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3FrVGfLdH64N_uiBKprAWg7W0nYqabg9bBcmGh94AIfoV-2hQruJk6EO2GybHNdm9xA/exec';
 
 // =============================================
 // STATE
