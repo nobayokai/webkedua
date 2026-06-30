@@ -86,30 +86,29 @@ async function handleLogin(e) {
         // Hapus popup loading
         modal.remove();
 
-        if (data.status === 'success') {
-            // Simpan data login
-            localStorage.setItem('user_login', JSON.stringify({
-                nama  : data.nama,
-                role  : currentRole,
-                id    : data.id,
-                token : data.token
-            }));
+        if (data.status === 'success') {  
+    localStorage.setItem('user_login', JSON.stringify({  
+        nama  : data.nama,  
+        role  : currentRole,  
+        id    : data.id,  
+        token : data.token  
+    }));  
 
-            updateMenuLogin();
+    updateMenuLogin();  
 
-            // Tampilkan popup sukses
-            const successModal = showLoginPopup('success', `✅ Login Berhasil!<br>Selamat datang, ${data.nama}`);
+    // Tampilkan popup sukses dengan nama  
+    const successModal = showLoginPopup('success', `Selamat datang, ${data.nama}`);  
 
-            setTimeout(() => {
-                successModal.remove();
-                const tabBeranda = document.querySelector('.tab');
-                loadPage('beranda-konten.html', tabBeranda);
-            }, 1500);
+    setTimeout(() => {  
+        successModal.remove();  
+        const tabBeranda = document.querySelector('.tab');  
+        loadPage('beranda-konten.html', tabBeranda);  
+    }, 1500);  
 
-        } else {
-            // Tampilkan popup error
-            showLoginPopup('error', `❌ ${data.message || 'Login gagal!'}`);
-        }
+} else {  
+    // Pesan error baru  
+    showLoginPopup('error', 'Sepertinya data yang kamu masukan salah');  
+}  
 
     } catch (err) {
         modal.remove();
@@ -197,12 +196,19 @@ function updateMenuLogin() {
 // =============================================
 // HANDLE LOGOUT
 // =============================================
-function handleLogout() {
-    localStorage.removeItem('user_login');
-    updateMenuLogin();
-    const tabBeranda = document.querySelector('.tab');
-    loadPage('beranda-konten.html', tabBeranda);
-}
+function handleLogout() {  
+    // Hapus data login  
+    localStorage.removeItem('user_login');  
+
+    // Tampilkan popup logout  
+    const logoutModal = showLoginPopup('success', 'Kamu telah berhasil keluar');  
+
+    setTimeout(() => {  
+        logoutModal.remove();  
+        // Refresh halaman atau kembali ke halaman login  
+        location.reload();  
+    }, 1500);  
+}  
 
 
 // =============================================
