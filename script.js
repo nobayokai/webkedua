@@ -1,7 +1,7 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjoXZ0FEOIwkaBRsRjMq4y8WMkDtT8mfHHVkJ9yW2FY60kqeBkm8o8i7G4lMrNcvGq/exec';
 
 // =============================================
-// CURRENT ROLE (default siswa)
+// GLOBAL VARIABLE
 // =============================================
 let currentRole = 'siswa';
 
@@ -24,13 +24,13 @@ function togglePass(inputId, iconEl) {
 
 
 // =============================================
-// SWITCH ROLE (Siswa/Guru)
+// SWITCH ROLE
 // =============================================
 function switchRole(role, elBtn) {
     currentRole = role;
 
     document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-    elBtn.classList.add('active');
+    if (elBtn) elBtn.classList.add('active');
 
     const labelNis  = document.getElementById('label-nis');
     const labelPass = document.getElementById('label-pass');
@@ -38,15 +38,15 @@ function switchRole(role, elBtn) {
     const inputNis  = document.getElementById('input-nis');
 
     if (role === 'siswa') {
-        labelNis.textContent      = 'NIS';
-        labelPass.textContent     = 'Password';
-        inputNis.placeholder      = 'Masukkan NIS kamu';
-        btnLogin.className        = 'btn-login siswa';
+        labelNis.textContent  = 'NIS';
+        labelPass.textContent = 'Password';
+        inputNis.placeholder  = 'Masukkan NIS kamu';
+        if (btnLogin) btnLogin.className = 'btn-login siswa';
     } else {
-        labelNis.textContent      = 'NIP';
-        labelPass.textContent     = 'Password';
-        inputNis.placeholder      = 'Masukkan NIP kamu';
-        btnLogin.className        = 'btn-login guru';
+        labelNis.textContent  = 'NIP';
+        labelPass.textContent = 'Password';
+        inputNis.placeholder  = 'Masukkan NIP kamu';
+        if (btnLogin) btnLogin.className = 'btn-login guru';
     }
 
     document.getElementById('input-nis').value  = '';
@@ -126,8 +126,6 @@ function updateMenuLogin() {
     const tabLogin  = document.getElementById('tab-login');
     const tabLogout = document.getElementById('tab-logout');
 
-    console.log('updateMenuLogin dipanggil, userLogin:', userLogin);
-
     if (!tabLogin || !tabLogout) {
         console.warn('tab-login atau tab-logout tidak ditemukan!');
         return;
@@ -172,7 +170,6 @@ async function loadPage(namaFile, elemenTab) {
         if (!response.ok) throw new Error('Halaman tidak ditemukan');
 
         const htmlContent = await response.text();
-
         areaKonten.innerHTML = '';
 
         const temp = document.createElement('div');
@@ -182,11 +179,11 @@ async function loadPage(namaFile, elemenTab) {
             areaKonten.appendChild(node.cloneNode(true));
         });
 
-        // Eksekusi ulang script yang ada di dalam halaman
+        // Eksekusi script di dalam halaman
         Array.from(areaKonten.querySelectorAll('script')).forEach(oldScript => {
             const newScript = document.createElement('script');
             if (oldScript.src) {
-                newScript.src   = oldScript.src;
+                newScript.src = oldScript.src;
                 newScript.async = false;
             } else {
                 newScript.textContent = oldScript.textContent;
@@ -198,14 +195,6 @@ async function loadPage(namaFile, elemenTab) {
     } catch (error) {
         areaKonten.innerHTML = `<p style="color:red;">Gagal memuat halaman: ${error.message}</p>`;
     }
-}
-
-
-// =============================================
-// FETCH DATA GOOGLE SHEETS
-// =============================================
-async function fetchGoogleSheetsData() {
-    // isi sesuai kebutuhan
 }
 
 
