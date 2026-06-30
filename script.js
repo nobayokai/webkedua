@@ -239,7 +239,34 @@ async function loadPage(namaFile, elemenTab) {
         if (!response.ok) throw new Error('Halaman tidak ditemukan');
 
         const htmlContent = await response.text();
-        areaKonten.innerHTML = htmlContent;
+
+        // ✅ Pakai ini bukan innerHTML langsung
+        areaKonten.innerHTML = '';
+
+        const temp = document.createElement('div');
+        temp.innerHTML = htmlContent;
+
+        // Pindahkan semua elemen ke areaKonten
+        Array.from(temp.childNodes).forEach(node => {
+            areaKonten.appendChild(node.cloneNode(true));
+        });
+
+        // ✅ Eksekusi ulang semua tag <script> yang ada di halaman
+        Array.from(areaKonten.querySelectorAll('script')).forEach(oldScript => {
+            const newScript = document.createElement('script');
+
+            if (oldScript.src) {
+                // Script eksternal (src="...")
+                newScript.src = oldScript.src;
+                newScript.async = false;
+            } else {
+                // Script inline
+                newScript.textContent = oldScript.textContent;
+            }
+
+            document.head.appendChild(newScript);
+            oldScript.remove();
+        });
 
         fetchGoogleSheetsData();
 
@@ -247,6 +274,7 @@ async function loadPage(namaFile, elemenTab) {
         areaKonten.innerHTML = `<p style="color:red;">Gagal memuat halaman: ${error.message}</p>`;
     }
 }
+
 
 // =============================================
 // FETCH GOOGLE SHEETS
