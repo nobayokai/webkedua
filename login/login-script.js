@@ -1,7 +1,4 @@
-// =============================================
-// KONFIGURASI - Ganti dengan URL Apps Script kamu
-// =============================================
-const LOGIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3FrVGfLdH64N_uiBKprAWg7W0nYqabg9bBcmGh94AIfoV-2hQruJk6EO2GybHNdm9xA/exec';
+
 
 // =============================================
 // STATE
@@ -106,7 +103,7 @@ async function handleLogin(e) {
     });
 
     try {
-        const res  = await fetch(`${LOGIN_SCRIPT_URL}?${params}`);
+        const res  = await fetch(`${SCRIPT_URL}?${params}`);
         const data = await res.json();
 
         btn.disabled  = false;
