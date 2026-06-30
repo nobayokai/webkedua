@@ -5,22 +5,21 @@
 
     <!-- Toggle Role -->
     <div class="role-toggle">
-        <button class="role-btn active" id="btn-siswa" onclick="switchRole('siswa')">🎒 Siswa</button>
-        <button class="role-btn"        id="btn-guru"  onclick="switchRole('guru')">👨‍🏫 Guru</button>
+        <button class="role-btn active" id="btn-siswa" onclick="switchRole('siswa', this)">🎒 Siswa</button>
+        <button class="role-btn"        id="btn-guru"  onclick="switchRole('guru', this)">👨‍🏫 Guru</button>
     </div>
 
     <!-- Card Login -->
     <div class="login-card" id="login-card">
-        <!-- Form -->
         <form id="login-form" onsubmit="handleLogin(event)">
 
-            <!-- Username / NIS -->
+            <!-- NIS / NIP -->
             <div class="input-group">
-                <label class="input-label" id="label-user">NIS / Username</label>
+                <label class="input-label" id="label-nis">NIS / Username</label>
                 <input
                     type="text"
                     class="input-field"
-                    id="input-user"
+                    id="input-nis"
                     placeholder="Masukkan NIS kamu"
                     autocomplete="username"
                     required
@@ -29,7 +28,7 @@
 
             <!-- Password -->
             <div class="input-group">
-                <label class="input-label">Password</label>
+                <label class="input-label" id="label-pass">Password</label>
                 <div class="password-wrapper">
                     <input
                         type="password"
@@ -39,18 +38,19 @@
                         autocomplete="current-password"
                         required
                     >
-                    <button type="button" class="toggle-password" onclick="togglePass()">
+                    <button type="button" class="toggle-password" onclick="togglePass('input-pass', document.getElementById('eye-icon'))">
                         <span id="eye-icon">👁️</span>
                     </button>
                 </div>
             </div>
+
             <!-- Tombol Login -->
             <button type="submit" class="btn-login siswa" id="btn-login">
                 Masuk
             </button>
 
-             <p id="pesan-login" style="min-height:20px; text-align:center;"></p> 
-        </form>
+            <p id="pesan-login" style="min-height:20px; text-align:center;"></p>
 
+        </form>
     </div>
 </div>
