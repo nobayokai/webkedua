@@ -1,13 +1,18 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjoXZ0FEOIwkaBRsRjMq4y8WMkDtT8mfHHVkJ9yW2FY60kqeBkm8o8i7G4lMrNcvGq/exec';
 
 // =============================================
+// CURRENT ROLE (default siswa)
+// =============================================
+let currentRole = 'siswa';
+
+
+// =============================================
 // TOGGLE PASSWORD
 // =============================================
 function togglePass(inputId, iconEl) {
-    // inputId yang dikirim dari login.html adalah 'password'
     const input = document.getElementById(inputId);
-    if (!input) return; // aman kalau null
-    
+    if (!input) return;
+
     if (input.type === 'password') {
         input.type = 'text';
         iconEl.textContent = '🙈';
@@ -22,18 +27,26 @@ function togglePass(inputId, iconEl) {
 // SWITCH ROLE (Siswa/Guru)
 // =============================================
 function switchRole(role, elBtn) {
+    currentRole = role;
+
     document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
     elBtn.classList.add('active');
 
     const labelNis  = document.getElementById('label-nis');
     const labelPass = document.getElementById('label-pass');
+    const btnLogin  = document.getElementById('btn-login');
+    const inputNis  = document.getElementById('input-nis');
 
     if (role === 'siswa') {
-        labelNis.textContent  = 'NIS';
-        labelPass.textContent = 'Password';
+        labelNis.textContent      = 'NIS';
+        labelPass.textContent     = 'Password';
+        inputNis.placeholder      = 'Masukkan NIS kamu';
+        btnLogin.className        = 'btn-login siswa';
     } else {
-        labelNis.textContent  = 'NIP';
-        labelPass.textContent = 'Password';
+        labelNis.textContent      = 'NIP';
+        labelPass.textContent     = 'Password';
+        inputNis.placeholder      = 'Masukkan NIP kamu';
+        btnLogin.className        = 'btn-login guru';
     }
 
     document.getElementById('input-nis').value  = '';
@@ -41,17 +54,16 @@ function switchRole(role, elBtn) {
     document.getElementById('pesan-login').textContent = '';
 }
 
+
 // =============================================
 // HANDLE LOGIN
 // =============================================
 async function handleLogin(e) {
     e.preventDefault();
 
-    const form  = e.target;  
-    const nis   = form.querySelector('#input-nis').value.trim();  
-    const pass  = form.querySelector('#input-pass').value.trim();  
-    const pesan = document.getElementById('pesan-login');  
-
+    const nis   = document.getElementById('input-nis').value.trim();
+    const pass  = document.getElementById('input-pass').value.trim();
+    const pesan = document.getElementById('pesan-login');
 
     if (!nis || !pass) {
         pesan.style.color = 'red';
@@ -110,9 +122,9 @@ async function handleLogin(e) {
 // UPDATE MENU LOGIN/LOGOUT
 // =============================================
 function updateMenuLogin() {
-    const userLogin  = localStorage.getItem('user_login');
-    const tabLogin   = document.getElementById('tab-login');
-    const tabLogout  = document.getElementById('tab-logout');
+    const userLogin = localStorage.getItem('user_login');
+    const tabLogin  = document.getElementById('tab-login');
+    const tabLogout = document.getElementById('tab-logout');
 
     console.log('updateMenuLogin dipanggil, userLogin:', userLogin);
 
@@ -132,6 +144,7 @@ function updateMenuLogin() {
     }
 }
 
+
 // =============================================
 // HANDLE LOGOUT
 // =============================================
@@ -141,6 +154,7 @@ function handleLogout() {
     const tabBeranda = document.querySelector('.tab');
     loadPage('beranda-konten.html', tabBeranda);
 }
+
 
 // =============================================
 // LOAD PAGE
@@ -186,12 +200,14 @@ async function loadPage(namaFile, elemenTab) {
     }
 }
 
+
 // =============================================
 // FETCH DATA GOOGLE SHEETS
 // =============================================
 async function fetchGoogleSheetsData() {
-    // isi sesuai kebutuhan kamu
+    // isi sesuai kebutuhan
 }
+
 
 // =============================================
 // INIT
