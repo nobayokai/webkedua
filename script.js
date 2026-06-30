@@ -58,21 +58,22 @@ function switchRole(role, elBtn) {
 // =============================================
 // HANDLE LOGIN
 // =============================================
+// =============================================
+// HANDLE LOGIN DENGAN POPUP
+// =============================================
 async function handleLogin(e) {
     e.preventDefault();
 
     const nis   = document.getElementById('input-nis').value.trim();
     const pass  = document.getElementById('input-pass').value.trim();
-    const pesan = document.getElementById('pesan-login');
 
     if (!nis || !pass) {
-        pesan.style.color = 'red';
-        pesan.textContent = '⚠️ Isi semua kolom!';
+        showLoginPopup('error', '⚠️ Harap isi NIS dan Password!');
         return;
     }
 
-    pesan.style.color = 'blue';
-    pesan.textContent = '⏳ Sedang login...';
+    // Tampilkan popup loading
+    const modal = showLoginPopup('loading', '⏳ Sedang verifikasi...');
 
     try {
         const params = new URLSearchParams({
@@ -85,9 +86,11 @@ async function handleLogin(e) {
         const res  = await fetch(`${SCRIPT_URL}?${params}`);
         const data = await res.json();
 
-        console.log('Response login:', data);
+        // Hapus popup loading
+        modal.remove();
 
         if (data.status === 'success') {
+            // Simpan data login
             localStorage.setItem('user_login', JSON.stringify({
                 nama  : data.nama,
                 role  : currentRole,
@@ -97,25 +100,70 @@ async function handleLogin(e) {
 
             updateMenuLogin();
 
-            pesan.style.color = 'green';
-            pesan.textContent = `✅ Selamat datang, ${data.nama}!`;
+            // Tampilkan popup sukses
+            const successModal = showLoginPopup('success', `✅ Login Berhasil!<br>Selamat datang, ${data.nama}`);
 
             setTimeout(() => {
+                successModal.remove();
                 const tabBeranda = document.querySelector('.tab');
                 loadPage('beranda-konten.html', tabBeranda);
-            }, 1000);
+            }, 1500);
 
         } else {
-            pesan.style.color = 'red';
-            pesan.textContent = `❌ ${data.message || 'Login gagal!'}`;
+            // Tampilkan popup error
+            showLoginPopup('error', `❌ ${data.message || 'Login gagal!'}`);
         }
 
     } catch (err) {
-        console.error('Error login:', err);
-        pesan.style.color = 'red';
-        pesan.textContent = '❌ Gagal terhubung ke server!';
+        modal.remove();
+        showLoginPopup('error', '❌ Gagal terhubung ke server!');
     }
 }
+
+
+// =============================================
+// FUNGSI POPUP LOGIN
+// =============================================
+function showLoginPopup(type, message) {
+    // Hapus modal lama jika ada
+    const oldModal = document.querySelector('.modal');
+    if (oldModal) oldModal.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    let icon = '';
+    let extraClass = '';
+
+    if (type === 'loading') {
+        icon = '⏳';
+    } else if (type === 'success') {
+        icon = '✅';
+        extraClass = 'success';
+    } else if (type === 'error') {
+        icon = '❌';
+        extraClass = 'error';
+    }
+
+    modal.innerHTML = `
+        <div class="modal-content ${extraClass}">
+            <div class="icon">${icon}</div>
+            <p>${message}</p>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Klik di luar modal untuk menutup (hanya untuk error/success)
+    if (type !== 'loading') {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+    }
+
+    return modal;
+}
+
 
 
 // =============================================
