@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Path relatif dari folder login ke file login.css -->
+    <link rel="stylesheet" href="login/login.css">
+</head>
+<body>
+<div class="login-wrapper">
+
+    <!-- Toggle Role -->
+    <div class="role-toggle">
+        <button class="role-btn active" id="btn-siswa" onclick="switchRole('siswa')">🎒 Siswa</button>
+        <button class="role-btn"        id="btn-guru"  onclick="switchRole('guru')">👨‍🏫 Guru</button>
+    </div>
+
+    <!-- Card Login -->
+    <div class="login-card" id="login-card">
+
+        <!-- Avatar -->
+        <div class="avatar-area">
+            <div class="avatar-icon siswa" id="avatar-icon">🎒</div>
+            <div class="login-title"    id="login-title">Halo, Siswa!</div>
+            <div class="login-subtitle" id="login-subtitle">Masuk untuk melanjutkan belajar</div>
+        </div>
+
+        <!-- Form -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+
+            <!-- Username / NIS -->
+            <div class="input-group">
+                <label class="input-label" id="label-user">NIS / Username</label>
+                <input
+                    type="text"
+                    class="input-field"
+                    id="input-user"
+                    placeholder="Masukkan NIS kamu"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <!-- Password -->
+            <div class="input-group">
+                <label class="input-label">Password</label>
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        class="input-field"
+                        id="input-pass"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="toggle-password" onclick="togglePass()">
+                        <span id="eye-icon">👁️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lupa Password -->
+            <div class="forgot-link">
+                <a href="#" onclick="hubungiGuru()">Lupa password?</a>
+            </div>
+
+            <!-- Tombol Login -->
+            <button type="submit" class="btn-login siswa" id="btn-login">
+                Masuk
+            </button>
+
+            <!-- Notifikasi -->
+            <div class="notif" id="notif-box"></div>
+
+        </form>
+
+        <!-- Divider -->
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span>info</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Info Badge -->
+        <div class="info-badge" id="info-badge">
+            <span class="icon">💡</span>
+            <span id="info-text">Gunakan NIS dan password yang diberikan oleh gurumu</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- Path relatif dari folder login ke file login-script.js -->
+<script src="login/login-script.js"></script>
+</body>
+</html>
