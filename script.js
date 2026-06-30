@@ -119,7 +119,7 @@ async function handleLogin(e) {
 
 
 // =============================================
-// FUNGSI POPUP LOGIN
+// FUNGSI POPUP LOGIN (Aesthetic Version)
 // =============================================
 function showLoginPopup(type, message) {
     // Hapus modal lama jika ada
@@ -129,29 +129,29 @@ function showLoginPopup(type, message) {
     const modal = document.createElement('div');
     modal.className = 'modal';
 
-    let icon = '';
+    let iconHTML = '';
     let extraClass = '';
 
     if (type === 'loading') {
-        icon = '⏳';
+        iconHTML = `<div class="hourglass"></div>`;
     } else if (type === 'success') {
-        icon = '✅';
+        iconHTML = `<div style="font-size: 48px;">✅</div>`;
         extraClass = 'success';
     } else if (type === 'error') {
-        icon = '❌';
+        iconHTML = `<div style="font-size: 48px;">❌</div>`;
         extraClass = 'error';
     }
 
     modal.innerHTML = `
         <div class="modal-content ${extraClass}">
-            <div class="icon">${icon}</div>
+            <div class="modal-icon">${iconHTML}</div>
             <p>${message}</p>
         </div>
     `;
 
     document.body.appendChild(modal);
 
-    // Klik di luar modal untuk menutup (hanya untuk error/success)
+    // Klik di luar untuk close (kecuali loading)
     if (type !== 'loading') {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.remove();
