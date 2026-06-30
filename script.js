@@ -181,7 +181,7 @@ function updateMenuLogin() {
         tabLogin.style.display  = 'none';
         tabLogout.style.display = '';
         const user = JSON.parse(userLogin);
-        tabLogout.innerHTML = `👤 ${user.nama} &nbsp;|&nbsp; <span style="color:#ff3b30;">Logout</span>`;
+        tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
     } else {
         tabLogin.style.display  = '';
         tabLogout.style.display = 'none';
