@@ -121,6 +121,12 @@ async function handleLogin(e) {
                 token : data.token
             }));
 
+             // Tambahkan baris ini ↓  
+                    updateMenuLogin();  
+
+                    showPopup('success', data.nama);  
+            }  
+
             showNotif('✅ Berhasil masuk! Halo, ' + data.nama, 'success');
 
             // Redirect sesuai role setelah 1.2 detik
