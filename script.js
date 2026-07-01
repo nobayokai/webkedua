@@ -263,25 +263,57 @@ window.onload = () => {
 };
 
 // Inisialisasi Peta (Leaflet)
-let map, marker;
+let mapSiswaBaru = null;
+let markerSiswaBaru = null;
 
 function initMapSiswaBaru() {
-  if (map) return; // Hindari inisialisasi ulang
+    const mapContainer = document.getElementById('map');
+    
+    if (!mapContainer) {
+        console.error('Map container tidak ditemukan');
+        return;
+    }
 
-  map = L.map('map').setView([-6.2, 106.8], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    // Hapus map lama jika sudah ada
+    if (mapSiswaBaru) {
+        mapSiswaBaru.remove();
+        mapSiswaBaru = null;
+    }
 
-  map.on('click', function(e) {
-    const lat = e.latlng.lat;
-    const lng = e.latlng.lng;
+    // Inisialisasi map baru
+    mapSiswaBaru = L.map('map', {
+        center: [-6.2, 106.8],
+        zoom: 13
+    });
 
-    if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng]).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(mapSiswaBaru);
 
-    document.getElementById('lintang').value = lat;
-    document.getElementById('bujur').value = lng;
-  });
+    // Event klik pada peta
+    mapSiswaBaru.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        // Hapus marker lama
+        if (markerSiswaBaru) {
+            mapSiswaBaru.removeLayer(markerSiswaBaru);
+        }
+
+        // Buat marker baru
+        markerSiswaBaru = L.marker([lat, lng]).addTo(mapSiswaBaru);
+
+        // Isi input
+        document.getElementById('lintang').value = lat.toFixed(6);
+        document.getElementById('bujur').value = lng.toFixed(6);
+    });
+
+    // Paksa Leaflet menghitung ulang ukuran (penting di SPA)
+    setTimeout(() => {
+        mapSiswaBaru.invalidateSize();
+    }, 300);
 }
+
 
 // Fungsi Submit
 function submitFormSiswaBaru(e) {
@@ -297,7 +329,7 @@ function submitFormSiswaBaru(e) {
     // dst...
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbw.../exec", {
+  fetch("https://script.google.com/macros/s/AKfycbx3FrVGfLdH64N_uiBKprAWg7W0nYqabg9bBcmGh94AIfoV-2hQruJk6EO2GybHNdm9xA/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -312,13 +344,27 @@ function submitFormSiswaBaru(e) {
 
 // Panggil saat tab formulir siswa baru dibuka
 function loadFormSiswaBaru() {
-  // Load partial HTML ke dalam container
-  document.getElementById('main-content').innerHTML = document.getElementById('form-siswa-baru-container').innerHTML;
-  
-  // Inisialisasi peta setelah DOM dimuat
-  setTimeout(() => {
-    initMapSiswaBaru();
-    document.getElementById('formSiswaBaru').addEventListener('submit', submitFormSiswaBaru);
-  }, 100);
+    const mainContent = document.getElementById('main-content');
+    const formTemplate = document.getElementById('form-siswa-baru-container');
+
+    if (!formTemplate) {
+        console.error('Template form tidak ditemukan');
+        return;
+    }
+
+    // Masukkan form ke halaman
+    mainContent.innerHTML = formTemplate.innerHTML;
+
+    // Inisialisasi map setelah form benar-benar muncul
+    setTimeout(() => {
+        initMapSiswaBaru();
+
+        // Pasang event submit form
+        const form = document.getElementById('formSiswaBaru');
+        if (form) {
+            form.addEventListener('submit', submitFormSiswaBaru);
+        }
+    }, 400); // Tambah delay sedikit agar lebih aman
 }
+
 
