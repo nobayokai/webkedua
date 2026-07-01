@@ -263,56 +263,34 @@ window.onload = () => {
 };
 
 // Inisialisasi Peta (Leaflet)
-let mapSiswaBaru = null;
-let markerSiswaBaru = null;
+let map;
+let marker;
 
 function initMapSiswaBaru() {
-    const mapContainer = document.getElementById('map');
-    
-    if (!mapContainer) {
-        console.error('Map container tidak ditemukan');
-        return;
-    }
+    const mapDiv = document.getElementById('map');
+    if (!mapDiv) return;
 
-    // Hapus map lama jika sudah ada
-    if (mapSiswaBaru) {
-        mapSiswaBaru.remove();
-        mapSiswaBaru = null;
-    }
-
-    // Inisialisasi map baru
-    mapSiswaBaru = L.map('map', {
-        center: [-6.2, 106.8],
-        zoom: 13
+    map = new google.maps.Map(mapDiv, {
+        center: { lat: -6.2, lng: 106.8 },
+        zoom: 13,
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(mapSiswaBaru);
+    map.addListener('click', function(e) {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
 
-    // Event klik pada peta
-    mapSiswaBaru.on('click', function(e) {
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
+        if (marker) marker.setMap(null);
 
-        // Hapus marker lama
-        if (markerSiswaBaru) {
-            mapSiswaBaru.removeLayer(markerSiswaBaru);
-        }
+        marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: map,
+        });
 
-        // Buat marker baru
-        markerSiswaBaru = L.marker([lat, lng]).addTo(mapSiswaBaru);
-
-        // Isi input
         document.getElementById('lintang').value = lat.toFixed(6);
         document.getElementById('bujur').value = lng.toFixed(6);
     });
-
-    // Paksa Leaflet menghitung ulang ukuran (penting di SPA)
-    setTimeout(() => {
-        mapSiswaBaru.invalidateSize();
-    }, 300);
 }
+
 
 
 // Fungsi Submit
