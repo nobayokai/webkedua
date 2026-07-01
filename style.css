@@ -248,13 +248,6 @@ a.tab:hover, a.tab.active {
         flex-direction: column;
     }
 
-    .right-page {
-        display: flex;
-       justify-content: center; /* Mengatur rata tengah secara horizontal */
-       align-items: center;     /* Mengatur rata tengah secara vertikal (jika container punya tinggi) */
-       width: 100%;             /* Pastikan container mengambil lebar penuh */
-       
-    }
 
     .tabs {
         width: 100vw;
