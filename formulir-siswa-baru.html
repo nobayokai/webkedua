@@ -1,0 +1,146 @@
+<div id="form-siswa-baru-container">
+  <h2>Formulir Pendaftaran Siswa Baru</h2>
+  <p><strong>Sesuai Format F-PD (Peserta Didik)</strong></p>
+
+  <form id="formSiswaBaru">
+
+    <!-- DATA PRIBADI -->
+    <h3 class="section-title">DATA PRIBADI</h3>
+    
+    <div class="form-row">
+      <div class="input-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="nama_lengkap" required>
+      </div>
+      <div class="input-group">
+        <label>Jenis Kelamin</label>
+        <select id="jenis_kelamin" required>
+          <option value="">Pilih</option>
+          <option value="Laki-laki">Laki-laki</option>
+          <option value="Perempuan">Perempuan</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group"><label>NISN</label><input type="text" id="nisn"></div>
+      <div class="input-group"><label>NIK / No. KITAS</label><input type="text" id="nik" required></div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group"><label>No KK</label><input type="text" id="no_kk"></div>
+      <div class="input-group"><label>No Registrasi Akta Lahir</label><input type="text" id="no_reg_akta"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group"><label>Tempat Lahir</label><input type="text" id="tempat_lahir" required></div>
+      <div class="input-group"><label>Tanggal Lahir</label><input type="date" id="tanggal_lahir" required></div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Agama</label>
+        <select id="agama" required>
+          <option value="">Pilih</option>
+          <option value="Islam">Islam</option>
+          <option value="Kristen/Protestan">Kristen/Protestan</option>
+          <option value="Katolik">Katolik</option>
+          <option value="Hindu">Hindu</option>
+          <option value="Budha">Budha</option>
+          <option value="Konghucu">Konghucu</option>
+          <option value="Kepercayaan Kepada Tuhan YME">Kepercayaan Kepada Tuhan YME</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Kewarganegaraan</label>
+        <select id="kewarganegaraan" required>
+          <option value="WNI">WNI</option>
+          <option value="WNA">WNA</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Berkebutuhan Khusus</label>
+      <select id="kebutuhan_khusus">
+        <option value="Tidak">Tidak</option>
+        <option value="Netra (A)">Netra (A)</option>
+        <option value="Rungu (B)">Rungu (B)</option>
+        <option value="Grahita ringan (C)">Grahita ringan (C)</option>
+        <option value="Autis (Q)">Autis (Q)</option>
+        <!-- Tambahkan opsi lain sesuai PDF jika diperlukan -->
+      </select>
+    </div>
+
+    <div class="input-group"><label>Alamat Jalan</label><input type="text" id="alamat" required></div>
+
+    <div class="form-row">
+      <div class="input-group"><label>RT</label><input type="text" id="rt"></div>
+      <div class="input-group"><label>RW</label><input type="text" id="rw"></div>
+      <div class="input-group"><label>Nama Dusun</label><input type="text" id="nama_dusun"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group"><label>Kelurahan/Desa</label><input type="text" id="kelurahan"></div>
+      <div class="input-group"><label>Kecamatan</label><input type="text" id="kecamatan"></div>
+      <div class="input-group"><label>Kode Pos</label><input type="text" id="kode_pos"></div>
+    </div>
+
+    <!-- PETA LINTANG & BUJUR -->
+    <h3 class="section-title">LOKASI TEMPAT TINGGAL</h3>
+    <p>Klik pada peta untuk menandai lokasi rumah siswa:</p>
+    <div id="map" style="height: 300px; border-radius: 10px; margin-bottom: 15px;"></div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Lintang (Latitude)</label>
+        <input type="text" id="lintang" readonly required>
+      </div>
+      <div class="input-group">
+        <label>Bujur (Longitude)</label>
+        <input type="text" id="bujur" readonly required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Tempat Tinggal</label>
+        <select id="tempat_tinggal" required>
+          <option value="">Pilih</option>
+          <option value="Bersama orang tua">Bersama orang tua</option>
+          <option value="Wali">Wali</option>
+          <option value="Kos">Kos</option>
+          <option value="Asrama">Asrama</option>
+          <option value="Panti Asuhan">Panti Asuhan</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Moda Transportasi</label>
+        <select id="moda_transportasi" required>
+          <option value="">Pilih</option>
+          <option value="Jalan kaki">Jalan kaki</option>
+          <option value="Kendaraan pribadi">Kendaraan pribadi</option>
+          <option value="Kendaraan Umum/angkot">Kendaraan Umum/angkot</option>
+          <option value="Jemputan Sekolah">Jemputan Sekolah</option>
+          <option value="Ojek">Ojek</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- DATA AYAH -->
+    <h3 class="section-title">DATA AYAH KANDUNG</h3>
+    <!-- (field ayah sama seperti sebelumnya) -->
+
+    <!-- DATA IBU -->
+    <h3 class="section-title">DATA IBU KANDUNG</h3>
+    <!-- (field ibu) -->
+
+    <!-- KONTAK & DATA PERIODIK -->
+    <h3 class="section-title">KONTAK & DATA PERIODIK</h3>
+    <!-- (field kontak & periodik) -->
+
+    <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
+    <p id="pesan-form" style="margin-top: 15px; text-align: center;"></p>
+  </form>
+</div>
