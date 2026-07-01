@@ -249,8 +249,11 @@ a.tab:hover, a.tab.active {
     }
 
     .right-page {
-        width: 100% !important;
-        flex: 1;
+        display: flex;
+       justify-content: center; /* Mengatur rata tengah secara horizontal */
+       align-items: center;     /* Mengatur rata tengah secara vertikal (jika container punya tinggi) */
+       width: 100%;             /* Pastikan container mengambil lebar penuh */
+       
     }
 
     .tabs {
