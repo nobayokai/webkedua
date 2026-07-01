@@ -196,19 +196,17 @@ function updateMenuLogin() {
 // =============================================
 // HANDLE LOGOUT
 // =============================================
-function handleLogout() {  
-    // Hapus data login  
-    localStorage.removeItem('user_login');  
+function handleLogout() {
+    localStorage.removeItem('user_login');
 
-    // Tampilkan popup logout  
-    const logoutModal = showLoginPopup('success', 'Kamu telah berhasil keluar');  
+    const logoutModal = showLoginPopup('success', 'Kamu telah berhasil keluar');
 
-    setTimeout(() => {  
-        logoutModal.remove();  
-        // Refresh halaman atau kembali ke halaman login  
-        location.reload();  
-    }, 1500);  
-}  
+    setTimeout(() => {
+        if (logoutModal) logoutModal.remove();
+        location.reload();
+    }, 1600);
+}
+
 
 
 // =============================================
