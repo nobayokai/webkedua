@@ -270,26 +270,35 @@ function initMapSiswaBaru() {
     const mapDiv = document.getElementById('map');
     if (!mapDiv) return;
 
+    // Inisialisasi Google Maps
     map = new google.maps.Map(mapDiv, {
         center: { lat: -6.2, lng: 106.8 },
         zoom: 13,
+        mapTypeControl: true,
+        streetViewControl: false
     });
 
+    // Event klik pada peta
     map.addListener('click', function(e) {
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
 
+        // Hapus marker lama
         if (marker) marker.setMap(null);
 
+        // Buat marker baru
         marker = new google.maps.Marker({
             position: { lat, lng },
             map: map,
+            animation: google.maps.Animation.DROP
         });
 
+        // Isi nilai ke input
         document.getElementById('lintang').value = lat.toFixed(6);
         document.getElementById('bujur').value = lng.toFixed(6);
     });
 }
+
 
 
 
