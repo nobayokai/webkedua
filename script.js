@@ -262,7 +262,7 @@ window.onload = () => {
     loadPage('beranda-konten.html', tabPertama);
 };
 
-// Inisialisasi Peta (Leaflet
+// Inisialisasi Peta (Leaflet)
 let map;
 let marker;
 
