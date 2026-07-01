@@ -261,3 +261,64 @@ window.onload = () => {
     const tabPertama = document.querySelector('.tab');
     loadPage('beranda-konten.html', tabPertama);
 };
+
+// Inisialisasi Peta (Leaflet)
+let map, marker;
+
+function initMapSiswaBaru() {
+  if (map) return; // Hindari inisialisasi ulang
+
+  map = L.map('map').setView([-6.2, 106.8], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  map.on('click', function(e) {
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
+
+    document.getElementById('lintang').value = lat;
+    document.getElementById('bujur').value = lng;
+  });
+}
+
+// Fungsi Submit
+function submitFormSiswaBaru(e) {
+  e.preventDefault();
+
+  const data = {
+    // ... (semua field seperti respons sebelumnya)
+    nama_lengkap: document.getElementById('nama_lengkap').value,
+    // ... tambahkan semua field lainnya
+    lintang: document.getElementById('lintang').value,
+    bujur: document.getElementById('bujur').value,
+    moda_transportasi: document.getElementById('moda_transportasi').value,
+    // dst...
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbw.../exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    document.getElementById('pesan-form').innerHTML = "✅ Data berhasil disimpan!";
+    document.getElementById('formSiswaBaru').reset();
+    if (marker) map.removeLayer(marker);
+  });
+}
+
+// Panggil saat tab formulir siswa baru dibuka
+function loadFormSiswaBaru() {
+  // Load partial HTML ke dalam container
+  document.getElementById('main-content').innerHTML = document.getElementById('form-siswa-baru-container').innerHTML;
+  
+  // Inisialisasi peta setelah DOM dimuat
+  setTimeout(() => {
+    initMapSiswaBaru();
+    document.getElementById('formSiswaBaru').addEventListener('submit', submitFormSiswaBaru);
+  }, 100);
+}
+
