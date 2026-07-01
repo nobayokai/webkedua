@@ -366,3 +366,19 @@ a.tab:hover, a.tab.active {
         transform: translateY(-5px); 
     }
 }
+
+/* Fullscreen gambar di halaman kanan */
+.right-page {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.right-page img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block;
+    border-radius: 0 !important;
+}
+
+
