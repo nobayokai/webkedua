@@ -86,21 +86,24 @@
             <div class="input-group"><label>Kode Pos</label><input type="text" id="kode_pos"></div>
         </div>
 
-        <!-- KOORDINAT (Manual) -->
-        <h3 class="section-title">LOKASI TEMPAT TINGGAL</h3>
-        <div class="form-row">
-            <div class="input-group">
-                <label>Lintang (Latitude)</label>
-                <input type="text" id="lintang" placeholder="Contoh: -6.208763" required>
-            </div>
-            <div class="input-group">
-                <label>Bujur (Longitude)</label>
-                <input type="text" id="bujur" placeholder="Contoh: 106.845599" required>
-            </div>
-        </div>
-        <p style="font-size:13px; color:#666; margin-bottom:15px;">
-            * Bisa dicek di Google Maps (klik kanan → Copy coordinates)
-        </p>
+        <!-- LOKASI TEMPAT TINGGAL -->
+<h3 class="section-title">LOKASI TEMPAT TINGGAL</h3>
+
+<p>Klik pada peta untuk menandai lokasi rumah:</p>
+
+<div id="map" style="height: 320px; width: 100%; border-radius: 16px; border: 3px solid #bba382; margin: 12px 0;"></div>
+
+<div class="form-row">
+    <div class="input-group">
+        <label>Lintang (Latitude)</label>
+        <input type="text" id="lintang" placeholder="-6.208763" required readonly>
+    </div>
+    <div class="input-group">
+        <label>Bujur (Longitude)</label>
+        <input type="text" id="bujur" placeholder="106.845599" required readonly>
+    </div>
+</div>
+
 
         <!-- TEMPAT TINGGAL & TRANSPORTASI -->
         <div class="form-row">
