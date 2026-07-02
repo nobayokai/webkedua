@@ -262,42 +262,55 @@ window.onload = () => {
     loadPage('beranda-konten.html', tabPertama);
 };
 
+// =============================================
+// VARIABEL GLOBAL GOOGLE MAPS
+// =============================================
 let googleMap;
 let googleMarker;
 
+// =============================================
+// FUNGSI INISIALISASI GOOGLE MAPS
+// =============================================
 function initMapSiswaBaru() {
     const mapContainer = document.getElementById('map');
+    
+    // Cegah error jika wadah map tidak ada atau Google Maps gagal dimuat
     if (!mapContainer || typeof google === 'undefined') return;
 
-    // Set default lokasi 
+    // Titik awal default (Area Bekasi)
     const defaultLokasi = { lat: -6.208763, lng: 106.845599 };
 
+    // Buat Peta
     googleMap = new google.maps.Map(mapContainer, {
         zoom: 15,
         center: defaultLokasi,
-        mapTypeControl: false
+        mapTypeControl: false,
+        streetViewControl: false // Sembunyikan ikon orang kuning agar lebih rapi
     });
 
+    // Buat Marker (Pin Merah)
     googleMarker = new google.maps.Marker({
         position: defaultLokasi,
         map: googleMap,
-        draggable: true // Marker bisa digeser manual
+        draggable: true // Pin bisa digeser-geser manual
     });
 
-    // Event saat peta diklik
+    // 1. Fungsi saat PETA diklik sembarang
     googleMap.addListener("click", (mapsMouseEvent) => {
         const posisi = mapsMouseEvent.latLng;
         googleMarker.setPosition(posisi);
-        updateInput(posisi.lat(), posisi.lng());
+        document.getElementById('latitude').value = posisi.lat();
+        document.getElementById('longitude').value = posisi.lng();
     });
 
-    // Event saat marker digeser
+    // 2. Fungsi saat PIN MERAH selesai DIGESER
     googleMarker.addListener("dragend", () => {
         const posisi = googleMarker.getPosition();
-        updateInput(posisi.lat(), posisi.lng());
+        document.getElementById('latitude').value = posisi.lat();
+        document.getElementById('longitude').value = posisi.lng();
     });
 
-    // Auto deteksi lokasi
+    // 3. Deteksi Lokasi Otomatis (Jika diizinkan user)
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -307,15 +320,11 @@ function initMapSiswaBaru() {
                 };
                 googleMap.setCenter(posUser);
                 googleMarker.setPosition(posUser);
-                updateInput(posUser.lat, posUser.lng);
+                document.getElementById('latitude').value = posUser.lat;
+                document.getElementById('longitude').value = posUser.lng;
             }
         );
     }
-}
-
-function updateInput(lat, lng) {
-    document.getElementById('latitude').value = lat;
-    document.getElementById('longitude').value = lng;
 }
 // =============================================
 // FUNGSI INISIALISASI MAP
