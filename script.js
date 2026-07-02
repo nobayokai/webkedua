@@ -369,3 +369,79 @@ function deteksiLokasiSaya() {
         alert("Browser Anda tidak mendukung fitur deteksi lokasi.");
     }
 }
+
+// ==========================================
+// FUNGSI SUBMIT FORMULIR SISWA BARU
+// ==========================================
+async function submitFormSiswaBaru(e) {
+    e.preventDefault(); // Mencegah halaman berkedip/refresh saat disubmit
+
+    // 1. Munculkan popup loading
+    const modal = showLoginPopup('loading', '⏳ Sedang menyimpan data pendaftaran...');
+
+    // 2. Ambil semua data dari kolom isian form
+    const dataSiswa = {
+        action: "daftar_siswa_baru", // Penanda untuk Google Apps Script
+        nama_lengkap: document.getElementById('nama_lengkap').value,
+        jenis_kelamin: document.getElementById('jenis_kelamin').value,
+        nisn: document.getElementById('nisn').value,
+        nik: document.getElementById('nik').value,
+        no_kk: document.getElementById('no_kk').value,
+        no_reg_akta: document.getElementById('no_reg_akta').value,
+        tempat_lahir: document.getElementById('tempat_lahir').value,
+        tanggal_lahir: document.getElementById('tanggal_lahir').value,
+        agama: document.getElementById('agama').value,
+        kewarganegaraan: document.getElementById('kewarganegaraan').value,
+        kebutuhan_khusus: document.getElementById('kebutuhan_khusus').value,
+        alamat: document.getElementById('alamat').value,
+        rt: document.getElementById('rt').value,
+        rw: document.getElementById('rw').value,
+        nama_dusun: document.getElementById('nama_dusun').value,
+        kelurahan: document.getElementById('kelurahan').value,
+        kecamatan: document.getElementById('kecamatan').value,
+        kode_pos: document.getElementById('kode_pos').value,
+        latitude: document.getElementById('latitude').value,
+        longitude: document.getElementById('longitude').value,
+        tempat_tinggal: document.getElementById('tempat_tinggal').value,
+        moda_transportasi: document.getElementById('moda_transportasi').value,
+        nama_ayah: document.getElementById('nama_ayah').value,
+        nik_ayah: document.getElementById('nik_ayah').value,
+        tahun_lahir_ayah: document.getElementById('tahun_lahir_ayah').value,
+        pendidikan_ayah: document.getElementById('pendidikan_ayah').value,
+        nama_ibu: document.getElementById('nama_ibu').value,
+        nik_ibu: document.getElementById('nik_ibu').value,
+        tahun_lahir_ibu: document.getElementById('tahun_lahir_ibu').value,
+        pendidikan_ibu: document.getElementById('pendidikan_ibu').value,
+        no_hp: document.getElementById('no_hp').value,
+        email: document.getElementById('email').value,
+        tinggi_badan: document.getElementById('tinggi_badan').value,
+        berat_badan: document.getElementById('berat_badan').value
+    };
+
+    try {
+        // 3. Kirim data ke Google Apps Script (menggunakan SCRIPT_URL yang ada di paling atas)
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dataSiswa)
+        });
+
+        // 4. Hilangkan loading, ganti dengan popup pesan sukses
+        modal.remove();
+        const successModal = showLoginPopup('success', '✅ Data pendaftaran berhasil disimpan!');
+
+        // Kosongkan isian form setelah sukses tersimpan
+        document.getElementById('formSiswaBaru').reset();
+
+        // Sembunyikan popup sukses secara otomatis setelah 2.5 detik
+        setTimeout(() => {
+            if (successModal) successModal.remove();
+        }, 2500);
+
+    } catch (error) {
+        // 5. Jika gagal (misal tidak ada internet), munculkan popup error
+        modal.remove();
+        showLoginPopup('error', '❌ Gagal mengirim data. Silakan periksa koneksi internet.');
+    }
+}
