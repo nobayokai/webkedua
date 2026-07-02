@@ -262,38 +262,63 @@ window.onload = () => {
     loadPage('beranda-konten.html', tabPertama);
 };
 
-// 1. Inisialisasi Peta
-var map = L.map('map').setView([-6.208763, 106.845599], 13);
+// =============================================
+// VARIABEL GLOBAL UNTUK MAP
+// =============================================
+let map;
+let marker;
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+// =============================================
+// FUNGSI INISIALISASI MAP (DIPANGGIL SETELAH HTML MUNCUL)
+// =============================================
+function initMapSiswaBaru() {
+    // Pastikan elemen map ada di HTML
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) return;
 
-var marker;
+    // Cegah error "Map already initialized" jika tab diklik berkali-kali
+    if (map !== undefined && map !== null) {
+        map.remove();
+    }
 
-// 2. Fungsi untuk mendeteksi lokasi saat ini
-map.locate({setView: true, maxZoom: 16});
+    // 1. Inisialisasi Peta
+    map = L.map('map').setView([-6.208763, 106.845599], 13); // Default area Bekasi/Jakarta
 
-function onLocationFound(e) {
-    updateMarker(e.latlng);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 2. Fungsi untuk mendeteksi lokasi saat ini
+    map.locate({setView: true, maxZoom: 16});
+
+    map.on('locationfound', function(e) {
+        updateMarker(e.latlng);
+    });
+
+    // 3. Fungsi saat peta diklik
+    map.on('click', function(e) {
+        updateMarker(e.latlng);
+    });
+    
+    // Perbaikan render map jika ada di dalam tab/hidden div
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
 }
-map.on('locationfound', onLocationFound);
 
-// 3. Fungsi saat peta diklik
-map.on('click', function(e) {
-    updateMarker(e.latlng);
-});
-
-// Fungsi untuk memperbarui marker dan input form
+// =============================================
+// FUNGSI UPDATE MARKER & INPUT
+// =============================================
 function updateMarker(latlng) {
     if (marker) {
         map.removeLayer(marker);
     }
     marker = L.marker(latlng).addTo(map);
+    
+    // Pastikan ID ini sama persis dengan yang ada di HTML Bapak
     document.getElementById('latitude').value = latlng.lat;
     document.getElementById('longitude').value = latlng.lng;
 }
-
 
 
 // Fungsi Submit
@@ -301,16 +326,17 @@ function submitFormSiswaBaru(e) {
   e.preventDefault();
 
   const data = {
-    // ... (semua field seperti respons sebelumnya)
     nama_lengkap: document.getElementById('nama_lengkap').value,
-    // ... tambahkan semua field lainnya
-    lintang: document.getElementById('lintang').value,
-    bujur: document.getElementById('bujur').value,
+    
+    // PERBAIKAN: Gunakan 'latitude' dan 'longitude' sesuai ID di HTML
+    lintang: document.getElementById('latitude').value,
+    bujur: document.getElementById('longitude').value,
+    
     moda_transportasi: document.getElementById('moda_transportasi').value,
-    // dst...
+    // ... data lainnya
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbx3FrVGfLdH64N_uiBKprAWg7W0nYqabg9bBcmGh94AIfoV-2hQruJk6EO2GybHNdm9xA/exec", {
+  fetch(SCRIPT_URL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -319,7 +345,7 @@ function submitFormSiswaBaru(e) {
   .then(() => {
     document.getElementById('pesan-form').innerHTML = "✅ Data berhasil disimpan!";
     document.getElementById('formSiswaBaru').reset();
-    if (marker) map.removeLayer(marker);
+    if (marker && map) map.removeLayer(marker);
   });
 }
 
