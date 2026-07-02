@@ -326,3 +326,46 @@ function initMapSiswaBaru() {
         );
     }
 }
+
+// =============================================
+// FUNGSI TOMBOL DETEKSI LOKASI SAAT INI
+// =============================================
+function deteksiLokasiSaya() {
+    // Pastikan Google Maps sudah siap
+    if (!googleMap || !googleMarker) {
+        alert("Peta belum siap, silakan tunggu sebentar.");
+        return;
+    }
+
+    if (navigator.geolocation) {
+        // Tampilkan teks sementara agar user tahu sistem sedang bekerja
+        document.getElementById('latitude').value = "Mendeteksi...";
+        document.getElementById('longitude').value = "Mendeteksi...";
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const posUser = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };
+                
+                // Pindahkan kamera peta dan pin merah ke lokasi user
+                googleMap.setCenter(posUser);
+                googleMap.setZoom(18); // Zoom lebih dekat agar akurat
+                googleMarker.setPosition(posUser);
+
+                // Isi otomatis kolom lintang dan bujur
+                document.getElementById('latitude').value = posUser.lat;
+                document.getElementById('longitude').value = posUser.lng;
+            },
+            (error) => {
+                alert("❌ Gagal mendapatkan lokasi. Pastikan GPS aktif dan Anda mengizinkan akses lokasi di browser.");
+                document.getElementById('latitude').value = "";
+                document.getElementById('longitude').value = "";
+            },
+            { enableHighAccuracy: true } // Minta akurasi GPS tertinggi
+        );
+    } else {
+        alert("Browser Anda tidak mendukung fitur deteksi lokasi.");
+    }
+}
