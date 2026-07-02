@@ -5,34 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portal Pembelajaran</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- PINDAHKAN LEAFLET KE SINI (DI DALAM HEAD) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />  
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  
 </head>
 <body>
     <div class="container">
+        <!-- ... (bagian book dan div kiri/kanan biarkan sama persis seperti sebelumnya) ... -->
         <div class="book">
-  <div class="page left-page" id="kiri-statis">
-
-      <script>
-    // Memuat animasi ke halaman kiri saat web pertama kali terbuka
-    fetch('animasi-kiri.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('kiri-statis').innerHTML = data;
-            // Menjalankan script yang ada di dalam file tersebut
-            const script = document.createElement('script');
-            script.innerHTML = document.querySelector('#kiri-statis script').innerHTML;
-            document.body.appendChild(script);
-        });
-</script>
-      
-  </div>
-
-  <div class="page right-page">
-    <div id="area-konten">
-      <p id="status-loading">Memuat kerangka buku...</p>
-    </div>
-  </div>
-</div>
-
+            <!-- Isi book tidak saya tulis ulang agar tidak kepanjangan, biarkan saja seperti aslinya -->
+            <div class="page left-page" id="kiri-statis">
+                <script>
+                    fetch('animasi-kiri.html')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('kiri-statis').innerHTML = data;
+                            const script = document.createElement('script');
+                            script.innerHTML = document.querySelector('#kiri-statis script').innerHTML;
+                            document.body.appendChild(script);
+                        });
+                </script>
+            </div>
+            <div class="page right-page">
+                <div id="area-konten">
+                    <p id="status-loading">Memuat kerangka buku...</p>
+                </div>
+            </div>
+        </div>
 
         <div class="tabs">
             <a href="#" class="tab active" onclick="loadPage('beranda-konten.html', this)">Beranda</a>
@@ -41,17 +41,15 @@
             <a href="#" class="tab" onclick="loadPage('materi.html', this)">Materi</a>
             <a href="#" class="tab" onclick="loadPage('posting.html', this)">Posting</a>
             <a href="#" class="tab" onclick="loadPage('formulir-siswa-baru.html', this)">Formulir</a>
-           <a href="#" class="tab" id="tab-login"  onclick="loadPage('login/login.html', this)">Login</a>  
+            <a href="#" class="tab" id="tab-login"  onclick="loadPage('login/login.html', this)">Login</a>  
             <a href="#" class="tab" id="tab-logout" onclick="handleLogout(); return false;">Logout</a>  
-
         </div>
     </div>
 
+    <!-- SCRIPT CUSTOM DI BAWAH -->
     <script src="script.js"></script>
     <script src="https://elfsightcdn.com/platform.js" async></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />  
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQSxibpze84HbcWQ2bDT3Z6LJSEj2lQDU&callback=initMap" async defer></script>
-
+    
+    <!-- SCRIPT GOOGLE MAPS SUDAH DIHAPUS -->
 </body>
 </html>
