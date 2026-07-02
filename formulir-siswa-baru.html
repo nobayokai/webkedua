@@ -191,3 +191,14 @@
         <p id="pesan-form"></p>
     </form>
 </div>
+<!-- Tambahkan di baris paling bawah formulir-siswa-baru.html -->
+<script>
+    // Beri jeda 500ms agar HTML selesai dimuat sepenuhnya oleh loadPage
+    setTimeout(() => {
+        if (typeof initMapSiswaBaru === 'function') {
+            initMapSiswaBaru();
+        } else {
+            console.error("Fungsi initMapSiswaBaru tidak ditemukan di script.js");
+        }
+    }, 500);
+</script>
