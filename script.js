@@ -311,69 +311,53 @@ function initMapSiswaBaru() {
 // =============================================
 // FUNGSI UPDATE MARKER & INPUT
 // =============================================
-function updateMarker(latlng) {
-    if (marker) {
-        map.removeLayer(marker);
-    }
-    marker = L.marker(latlng).addTo(map);
-    
-    // Pastikan ID ini sama persis dengan yang ada di HTML Bapak
-    document.getElementById('latitude').value = latlng.lat;
-    document.getElementById('longitude').value = latlng.lng;
-}
+// =============================================
+// FUNGSI INISIALISASI MAP
+// =============================================
+function initMapSiswaBaru() {
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) return;
 
-
-// Fungsi Submit
-function submitFormSiswaBaru(e) {
-  e.preventDefault();
-
-  const data = {
-    nama_lengkap: document.getElementById('nama_lengkap').value,
-    
-    // PERBAIKAN: Gunakan 'latitude' dan 'longitude' sesuai ID di HTML
-    lintang: document.getElementById('latitude').value,
-    bujur: document.getElementById('longitude').value,
-    
-    moda_transportasi: document.getElementById('moda_transportasi').value,
-    // ... data lainnya
-  };
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(() => {
-    document.getElementById('pesan-form').innerHTML = "✅ Data berhasil disimpan!";
-    document.getElementById('formSiswaBaru').reset();
-    if (marker && map) map.removeLayer(marker);
-  });
-}
-
-// Panggil saat tab formulir siswa baru dibuka
-function loadFormSiswaBaru() {
-    const mainContent = document.getElementById('main-content');
-    const formTemplate = document.getElementById('form-siswa-baru-container');
-
-    if (!formTemplate) {
-        console.error('Template form tidak ditemukan');
-        return;
+    // Cegah error jika map sudah ada
+    if (map !== undefined && map !== null) {
+        map.remove();
     }
 
-    // Masukkan form ke halaman
-    mainContent.innerHTML = formTemplate.innerHTML;
+    // 1. Inisialisasi Peta (Default koordinat sementara sebelum lokasi user ketemu)
+    map = L.map('map').setView([-6.208763, 106.845599], 13); 
 
-    // Inisialisasi map setelah form benar-benar muncul
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // ==========================================
+    // 2. DETEKSI LOKASI DEVICE PENGGUNA (OTOMATIS)
+    // ==========================================
+    // Meminta izin lokasi dan mengarahkan peta (setView: true) ke lokasi pengguna
+    map.locate({setView: true, maxZoom: 16});
+
+    // Jika user MENGIZINKAN akses lokasi dan lokasi ditemukan
+    map.on('locationfound', function(e) {
+        updateMarker(e.latlng); // Langsung pasang marker dan isi input teks
+    });
+
+    // Jika user MENOLAK akses lokasi atau GPS tidak aktif
+    map.on('locationerror', function(e) {
+        alert("Akses lokasi ditolak atau gagal mendeteksi. Peta menggunakan lokasi default, silakan klik manual pada peta.");
+    });
+
+    // ==========================================
+    // 3. EVENT KLIK MANUAL
+    // ==========================================
+    map.on('click', function(e) {
+        updateMarker(e.latlng);
+    });
+    
+    // 4. Perbaikan render map (Layar abu-abu)
     setTimeout(() => {
-        initMapSiswaBaru();
-
-        // Pasang event submit form
-        const form = document.getElementById('formSiswaBaru');
-        if (form) {
-            form.addEventListener('submit', submitFormSiswaBaru);
+        if(map) {
+            map.invalidateSize();
         }
-    }, 400); // Tambah delay sedikit agar lebih aman
+    }, 800);
 }
-
 
