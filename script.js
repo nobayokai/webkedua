@@ -269,38 +269,36 @@ let map;
 let marker;
 
 // =============================================
-// FUNGSI INISIALISASI MAP (DIPANGGIL SETELAH HTML MUNCUL)
+// FUNGSI INISIALISASI MAP
 // =============================================
 function initMapSiswaBaru() {
-    // Pastikan elemen map ada di HTML
     const mapContainer = document.getElementById('map');
     if (!mapContainer) return;
 
-    // Cegah error "Map already initialized" jika tab diklik berkali-kali
     if (map !== undefined && map !== null) {
         map.remove();
     }
 
-    // 1. Inisialisasi Peta
-    map = L.map('map').setView([-6.208763, 106.845599], 13); // Default area Bekasi/Jakarta
+    map = L.map('map').setView([-6.208763, 106.845599], 13); 
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // 2. Fungsi untuk mendeteksi lokasi saat ini
     map.locate({setView: true, maxZoom: 16});
 
     map.on('locationfound', function(e) {
         updateMarker(e.latlng);
     });
 
-    // 3. Fungsi saat peta diklik
+    map.on('locationerror', function(e) {
+        alert("Akses lokasi ditolak atau gagal mendeteksi. Peta menggunakan lokasi default, silakan klik manual pada peta.");
+    });
+
     map.on('click', function(e) {
         updateMarker(e.latlng);
     });
     
-    // Perbaikan render map jika ada di dalam tab/hidden div
     setTimeout(() => {
         if(map) {
             map.invalidateSize();
@@ -309,8 +307,17 @@ function initMapSiswaBaru() {
 }
 
 // =============================================
-// FUNGSI UPDATE MARKER & INPUT
+// FUNGSI UPDATE MARKER & INPUT (JANGAN DIHAPUS)
 // =============================================
+function updateMarker(latlng) {
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    marker = L.marker(latlng).addTo(map);
+    
+    document.getElementById('latitude').value = latlng.lat;
+    document.getElementById('longitude').value = latlng.lng;
+}
 // =============================================
 // FUNGSI INISIALISASI MAP
 // =============================================
