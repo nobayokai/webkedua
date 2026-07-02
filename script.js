@@ -262,61 +262,60 @@ window.onload = () => {
     loadPage('beranda-konten.html', tabPertama);
 };
 
-// =============================================
-// VARIABEL GLOBAL UNTUK MAP
-// =============================================
-let map;
-let marker;
+let googleMap;
+let googleMarker;
 
-// =============================================
-// FUNGSI INISIALISASI MAP
-// =============================================
 function initMapSiswaBaru() {
     const mapContainer = document.getElementById('map');
-    if (!mapContainer) return;
+    if (!mapContainer || typeof google === 'undefined') return;
 
-    if (map !== undefined && map !== null) {
-        map.remove();
+    // Set default lokasi 
+    const defaultLokasi = { lat: -6.208763, lng: 106.845599 };
+
+    googleMap = new google.maps.Map(mapContainer, {
+        zoom: 15,
+        center: defaultLokasi,
+        mapTypeControl: false
+    });
+
+    googleMarker = new google.maps.Marker({
+        position: defaultLokasi,
+        map: googleMap,
+        draggable: true // Marker bisa digeser manual
+    });
+
+    // Event saat peta diklik
+    googleMap.addListener("click", (mapsMouseEvent) => {
+        const posisi = mapsMouseEvent.latLng;
+        googleMarker.setPosition(posisi);
+        updateInput(posisi.lat(), posisi.lng());
+    });
+
+    // Event saat marker digeser
+    googleMarker.addListener("dragend", () => {
+        const posisi = googleMarker.getPosition();
+        updateInput(posisi.lat(), posisi.lng());
+    });
+
+    // Auto deteksi lokasi
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const posUser = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };
+                googleMap.setCenter(posUser);
+                googleMarker.setPosition(posUser);
+                updateInput(posUser.lat, posUser.lng);
+            }
+        );
     }
-
-    map = L.map('map').setView([-6.208763, 106.845599], 13); 
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    map.locate({setView: true, maxZoom: 16});
-
-    map.on('locationfound', function(e) {
-        updateMarker(e.latlng);
-    });
-
-    map.on('locationerror', function(e) {
-        alert("Akses lokasi ditolak atau gagal mendeteksi. Peta menggunakan lokasi default, silakan klik manual pada peta.");
-    });
-
-    map.on('click', function(e) {
-        updateMarker(e.latlng);
-    });
-    
-    setTimeout(() => {
-        if(map) {
-            map.invalidateSize();
-        }
-    }, 800);
 }
 
-// =============================================
-// FUNGSI UPDATE MARKER & INPUT (JANGAN DIHAPUS)
-// =============================================
-function updateMarker(latlng) {
-    if (marker) {
-        map.removeLayer(marker);
-    }
-    marker = L.marker(latlng).addTo(map);
-    
-    document.getElementById('latitude').value = latlng.lat;
-    document.getElementById('longitude').value = latlng.lng;
+function updateInput(lat, lng) {
+    document.getElementById('latitude').value = lat;
+    document.getElementById('longitude').value = lng;
 }
 // =============================================
 // FUNGSI INISIALISASI MAP
