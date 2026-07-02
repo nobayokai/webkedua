@@ -262,43 +262,37 @@ window.onload = () => {
     loadPage('beranda-konten.html', tabPertama);
 };
 
-// Inisialisasi Peta (Leaflet)
-let map;
-let marker;
+// 1. Inisialisasi Peta
+var map = L.map('map').setView([-6.208763, 106.845599], 13);
 
-function initMapSiswaBaru() {
-    const mapDiv = document.getElementById('map');
-    if (!mapDiv) return;
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
-    // Inisialisasi Google Maps
-    map = new google.maps.Map(mapDiv, {
-        center: { lat: -6.2, lng: 106.8 },
-        zoom: 13,
-        mapTypeControl: true,
-        streetViewControl: false
-    });
+var marker;
 
-    // Event klik pada peta
-    map.addListener('click', function(e) {
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
+// 2. Fungsi untuk mendeteksi lokasi saat ini
+map.locate({setView: true, maxZoom: 16});
 
-        // Hapus marker lama
-        if (marker) marker.setMap(null);
-
-        // Buat marker baru
-        marker = new google.maps.Marker({
-            position: { lat, lng },
-            map: map,
-            animation: google.maps.Animation.DROP
-        });
-
-        // Isi nilai ke input
-        document.getElementById('lintang').value = lat.toFixed(6);
-        document.getElementById('bujur').value = lng.toFixed(6);
-    });
+function onLocationFound(e) {
+    updateMarker(e.latlng);
 }
+map.on('locationfound', onLocationFound);
 
+// 3. Fungsi saat peta diklik
+map.on('click', function(e) {
+    updateMarker(e.latlng);
+});
+
+// Fungsi untuk memperbarui marker dan input form
+function updateMarker(latlng) {
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    marker = L.marker(latlng).addTo(map);
+    document.getElementById('latitude').value = latlng.lat;
+    document.getElementById('longitude').value = latlng.lng;
+}
 
 
 
