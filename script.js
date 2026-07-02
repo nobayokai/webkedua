@@ -302,8 +302,10 @@ function initMapSiswaBaru() {
     
     // Perbaikan render map jika ada di dalam tab/hidden div
     setTimeout(() => {
-        map.invalidateSize();
-    }, 100);
+        if(map) {
+            map.invalidateSize();
+        }
+    }, 800);
 }
 
 // =============================================
