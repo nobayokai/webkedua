@@ -90,7 +90,7 @@
 <h3 class="section-title">LOKASI TEMPAT TINGGAL</h3>
 
 <p>Klik pada peta untuk menandai lokasi rumah:</p>
-<div id="map" style="height: 320px; width: 100%;"></div>
+<div id="map" style="height: 320px; width: 100%; background: #e9e9e9; margin-bottom: 15px;"></div>
 
 <div class="form-row">
     <div class="input-group">
@@ -193,12 +193,9 @@
 </div>
 <!-- Tambahkan di baris paling bawah formulir-siswa-baru.html -->
 <script>
-    // Beri jeda 500ms agar HTML selesai dimuat sepenuhnya oleh loadPage
     setTimeout(() => {
         if (typeof initMapSiswaBaru === 'function') {
             initMapSiswaBaru();
-        } else {
-            console.error("Fungsi initMapSiswaBaru tidak ditemukan di script.js");
         }
     }, 500);
 </script>
