@@ -372,7 +372,7 @@ function deteksiLokasiSaya() {
 
 // ==========================================
 // FUNGSI SUBMIT FORMULIR SISWA BARU
-// ==========================================
+// =========================================
 async function submitFormSiswaBaru(e) {
     e.preventDefault(); // Mencegah halaman berkedip/refresh saat disubmit
 
