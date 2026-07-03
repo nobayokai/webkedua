@@ -267,13 +267,23 @@ a.tab:hover, a.tab.active {
         flex-direction: row; 
         padding: 0;
         gap: 2px;
-        justify-content: space-between;
+        justify-content: space-between; /* Bisa diubah menjadi flex-start jika ingin lebih rapat */
         align-items: stretch;
         background-color: #d1c0a8;
         flex-shrink: 0; 
         z-index: 10;
         position: relative;
         box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+
+        /* TAMBAHAN BARU AGAR BISA DIGESER (SWIPE) DI HP */
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    
+    /* Menyembunyikan scrollbar di HP */
+    .tabs::-webkit-scrollbar {
+        height: 0px;
+        background: transparent;
     }
 
     a.tab {
