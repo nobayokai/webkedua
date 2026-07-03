@@ -376,10 +376,29 @@ function deteksiLokasiSaya() {
 async function submitFormSiswaBaru(e) {
     e.preventDefault(); // Mencegah halaman berkedip/refresh saat disubmit
 
-    // 1. Munculkan popup loading
+    const form = document.getElementById('formSiswaBaru');
+    
+    // 1. Cek Validasi Bawaan HTML
+    // Jika ada input bertanda 'required' yang kosong, paksa browser menampilkannya
+    if (!form.checkValidity()) {
+        form.reportValidity(); 
+        return; // Hentikan proses jika masih ada yang kosong
+    }
+
+    // 2. Cek Khusus Koordinat Peta
+    const lat = document.getElementById('latitude').value;
+    const lng = document.getElementById('longitude').value;
+    
+    if (!lat || !lng) {
+        // Gunakan popup estetik Bapak jika peta belum diisi
+        showLoginPopup('error', '⚠️ Harap tandai LOKASI TEMPAT TINGGAL menggunakan peta atau tombol lokasi.');
+        return; 
+    }
+
+    // 3. Munculkan popup loading
     const modal = showLoginPopup('loading', '⏳ Sedang menyimpan data pendaftaran...');
 
-    // 2. Ambil semua data dari kolom isian form
+    // 4. Ambil semua data dari kolom isian form
     const dataSiswa = {
         action: "daftar_siswa_baru", // Penanda untuk Google Apps Script
         nama_lengkap: document.getElementById('nama_lengkap').value,
@@ -400,8 +419,8 @@ async function submitFormSiswaBaru(e) {
         kelurahan: document.getElementById('kelurahan').value,
         kecamatan: document.getElementById('kecamatan').value,
         kode_pos: document.getElementById('kode_pos').value,
-        latitude: document.getElementById('latitude').value,
-        longitude: document.getElementById('longitude').value,
+        latitude: lat,
+        longitude: lng,
         tempat_tinggal: document.getElementById('tempat_tinggal').value,
         moda_transportasi: document.getElementById('moda_transportasi').value,
         nama_ayah: document.getElementById('nama_ayah').value,
@@ -419,7 +438,7 @@ async function submitFormSiswaBaru(e) {
     };
 
     try {
-        // 3. Kirim data ke Google Apps Script (menggunakan SCRIPT_URL yang ada di paling atas)
+        // 5. Kirim data ke Google Apps Script
         await fetch(SCRIPT_URL, {
             method: "POST",
             mode: "no-cors",
@@ -427,20 +446,26 @@ async function submitFormSiswaBaru(e) {
             body: JSON.stringify(dataSiswa)
         });
 
-        // 4. Hilangkan loading, ganti dengan popup pesan sukses
+        // 6. Hilangkan loading, ganti dengan popup pesan sukses
         modal.remove();
         const successModal = showLoginPopup('success', '✅ Data pendaftaran berhasil disimpan!');
 
         // Kosongkan isian form setelah sukses tersimpan
         document.getElementById('formSiswaBaru').reset();
 
-        // Sembunyikan popup sukses secara otomatis setelah 2.5 detik
+        // Kembalikan pin peta ke posisi awal (jika ada)
+        if (typeof googleMap !== 'undefined' && googleMap) {
+            googleMap.setCenter({ lat: -6.208763, lng: 106.845599 });
+            googleMap.setZoom(15);
+        }
+
+        // Sembunyikan popup sukses secara otomatis
         setTimeout(() => {
             if (successModal) successModal.remove();
         }, 2500);
 
     } catch (error) {
-        // 5. Jika gagal (misal tidak ada internet), munculkan popup error
+        // 7. Jika gagal (misal tidak ada internet), munculkan popup error
         modal.remove();
         showLoginPopup('error', '❌ Gagal mengirim data. Silakan periksa koneksi internet.');
     }
