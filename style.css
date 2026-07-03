@@ -58,14 +58,26 @@ body {
 /* =============================================
    MENU TABS
    ============================================= */
+
 .tabs {
     width: 55px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding-top: 50px;
+    padding-bottom: 50px; /* Tambahan: Beri ruang di bawah agar tab paling akhir tidak nempel ke dasar */
     z-index: 1;
     background-color: transparent;
+
+    /* TAMBAHAN BARU AGAR BISA DI-SCROLL */
+    max-height: 100vh; /* Membatasi tinggi maksimal sejajar dengan tinggi layar */
+    overflow-y: auto;  /* Mengaktifkan scroll atas-bawah otomatis jika tab melebihi layar */
+}
+
+/* TAMBAHAN BARU: Menyembunyikan tampilan scrollbar agar tetap estetik / clean */
+.tabs::-webkit-scrollbar {
+    width: 0px; 
+    background: transparent; 
 }
 
 a.tab {
