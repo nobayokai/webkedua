@@ -2,7 +2,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3FrVGfLdH64N_uiBKp
 
 // ============================================
 // GLOBAL VARIABLE
-// =============================================
+// ============================================
 let currentRole = 'siswa';
 
 
