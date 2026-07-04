@@ -98,7 +98,9 @@ async function handleLogin(e) {
 
     // Tampilkan popup sukses dengan nama  
     const successModal = showLoginPopup('success', `Selamat datang, ${data.nama}`);  
-
+    if (role === 'guru') {
+    document.getElementById('tab-agenda').style.display = 'inline-block'; // Munculkan tab agenda
+}
     setTimeout(() => {  
         successModal.remove();  
         const tabBeranda = document.querySelector('.tab');  
