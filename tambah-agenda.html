@@ -29,9 +29,8 @@
         
         btn.textContent = "Menyimpan...";
         btn.disabled = true;
-        pesan.textContent = ""; // Kosongkan pesan error sebelumnya
+        pesan.textContent = "";
 
-        // Ambil data nama guru dari localStorage (sesuai script login)
         const userLoginData = localStorage.getItem('user_login');
         let namaGuru = 'Guru';
         if(userLoginData) {
@@ -47,9 +46,15 @@
         };
 
         try {
-            // Kita langsung menggunakan SCRIPT_URL dari script.js Bapak
-            const response = await fetch(SCRIPT_URL, {
+            // LINK APPS SCRIPT ASLI BAPAK DIMASUKKAN LANGSUNG DI SINI
+            const LINK_GAS = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
+
+            const response = await fetch(LINK_GAS, {
                 method: "POST",
+                headers: {
+                    // Ini penting agar Google tidak memblokir pengiriman data
+                    "Content-Type": "text/plain;charset=utf-8" 
+                },
                 body: JSON.stringify(payload)
             });
             
@@ -60,7 +65,6 @@
                 pesan.textContent = "✅ Agenda berhasil ditambahkan!";
                 document.getElementById('form-agenda').reset();
                 
-                // Minta widget kalender untuk langsung memuat ulang datanya
                 if (typeof fetchAgendaDatabase === 'function') {
                     fetchAgendaDatabase();
                 }
@@ -71,10 +75,10 @@
         } catch (error) {
             console.error("Detail Error:", error);
             pesan.style.color = "red";
-            pesan.textContent = "❌ Terjadi kesalahan jaringan. Cek koneksi atau link script.";
+            pesan.textContent = "❌ Terjadi kesalahan jaringan. Gagal menghubungi server Google.";
         }
         
-        btn.textContent = "💾 Simpan Agenda ";
+        btn.textContent = "💾 Simpan Agenda";
         btn.disabled = false;
     }
 </script>
