@@ -87,33 +87,38 @@ async function handleLogin(e) {
         modal.remove();
 
         if (data.status === 'success') {  
-    localStorage.setItem('user_login', JSON.stringify({  
-        nama  : data.nama,  
-        role  : currentRole,  
-        id    : data.id,  
-        token : data.token  
-    }));  
+            localStorage.setItem('user_login', JSON.stringify({  
+                nama  : data.nama,  
+                role  : currentRole,  
+                id    : data.id,  
+                token : data.token  
+            }));  
 
-    updateMenuLogin();  
+            updateMenuLogin();  
 
-    // Tampilkan popup sukses dengan nama  
-    const successModal = showLoginPopup('success', `Selamat datang, ${data.nama}`);  
-    if (role === 'guru') {
-    document.getElementById('tab-agenda').style.display = 'inline-block'; // Munculkan tab agenda
-}
-    setTimeout(() => {  
-        successModal.remove();  
-        const tabBeranda = document.querySelector('.tab');  
-        loadPage('beranda-konten.html', tabBeranda);  
-    }, 1500);  
+            // Tampilkan popup sukses dengan nama  
+            const successModal = showLoginPopup('success', `Selamat datang, ${data.nama}`);  
+            
+            // PERBAIKAN DI SINI: Menggunakan currentRole, bukan role
+            if (currentRole === 'guru') {
+                const tabAgenda = document.getElementById('tab-agenda');
+                if(tabAgenda) tabAgenda.style.display = 'inline-block'; 
+            }
+            
+            setTimeout(() => {  
+                successModal.remove();  
+                const tabBeranda = document.querySelector('.tab');  
+                loadPage('beranda-konten.html', tabBeranda);  
+            }, 1500);  
 
-} else {  
-    // Pesan error baru  
-    showLoginPopup('error', 'Sepertinya data yang kamu masukan salah');  
-}  
+        } else {  
+            // Pesan error baru  
+            showLoginPopup('error', 'Sepertinya data yang kamu masukan salah');  
+        }  
 
     } catch (err) {
         modal.remove();
+        console.error(err); // Tambahan untuk melihat detail error di inspect element
         showLoginPopup('error', '❌ Gagal terhubung ke server!');
     }
 }
