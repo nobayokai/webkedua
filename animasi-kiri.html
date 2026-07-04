@@ -1,6 +1,6 @@
 <style>
   :root{
-    --bg: transparent; /* ikut background in */
+    --bg: transparent; /* ikut background ind */
     --card: rgba(255,255,255,.55);
     --card-strong: rgba(255,255,255,.72);
     --stroke: rgba(0,0,0,.08);
@@ -145,7 +145,29 @@
     position: relative;
     z-index: 1;
   }
-  .cal-month{ font-weight: 1000; color: var(--text); font-size: 14px; }
+  .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
+  
+  /* Tombol Prev/Next Bulan */
+  .nav-btn {
+    background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.28);
+    color: var(--green2);
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+  .nav-btn:hover {
+    background: var(--green);
+    color: white;
+  }
+
   .cal-weekdays{
     display:grid; grid-template-columns: repeat(7, 1fr);
     gap: 6px;
@@ -282,7 +304,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-height: 80px;
+    max-height: 90px;
     overflow-y: auto;
   }
   .agenda-item {
@@ -303,7 +325,6 @@
   </div>
 
   <div class="widget-grid">
-    <!-- Clock -->
     <div class="card">
       <div class="clock-now">
         <div class="clock-time" id="clock-time">--:--:--</div>
@@ -318,7 +339,6 @@
       </div>
     </div>
 
-    <!-- Weather -->
     <div class="card">
       <div class="weather-top">
         <div>
@@ -343,7 +363,6 @@
       </div>
     </div>
 
-    <!-- Prayer -->
     <div class="card" style="grid-column: 1 / span 1;">
       <div class="prayer">
         <div class="prayer-head">
@@ -354,11 +373,14 @@
       </div>
     </div>
 
-    <!-- Kalender -->
     <div class="card" style="grid-column: 2 / span 1;">
       <div class="cal-head">
-        <div class="cal-month" id="cal-month">-</div>
-        <div style="font-weight:950;color:rgba(0,0,0,.45);font-size:12px;">Jadwal & agenda harian</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="nav-btn" id="btn-prev-month" title="Bulan Sebelumnya">❮</button>
+          <div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div>
+          <button class="nav-btn" id="btn-next-month" title="Bulan Selanjutnya">❯</button>
+        </div>
+        <div style="font-weight:950;color:rgba(0,0,0,.45);font-size:12px;">Agenda</div>
       </div>
 
       <div class="cal-weekdays">
@@ -436,7 +458,6 @@
   }
 
   function parseHHMMToDate(timeStr, baseDate){
-    // timeStr: "05:12" => Date
     const [hh, mm] = timeStr.split(':').map(Number);
     return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hh, mm, 0, 0);
   }
@@ -455,19 +476,15 @@
       time: parseHHMMToDate(prayers[n], base)
     })).filter(x => !isNaN(x.time.getTime()));
 
-    // active: waktu yang sedang berlangsung (atau terakhir sebelum sekarang)
     let active = times[0];
     for (const t of times){
       if (t.time <= now) active = t;
     }
 
-    // next: yang > now, kalau habis semua maka subuh besok
     let next = times.find(t => t.time > now);
     if (!next){
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate()+1);
-      // fallback: cari subuh pakai hari ini +1 (anggap subuh dari API hari ini sudah ada; kalau lewat semua, next cukup subuh besok)
-      // kita panggil re-fetch saat midnight kalau mau lebih presisi.
       const subuhTomorrow = parseHHMMToDate(prayers['Subuh'], tomorrow);
       next = { name: 'Subuh', time: subuhTomorrow };
     }
@@ -483,7 +500,6 @@
     const now = new Date();
     elPrayerList.innerHTML = '';
 
-    // aktif + next
     const { nextName, activeName, countdown } = getNextPrayer(prayers, now);
     elNextStrong.textContent = nextName;
     elCountdown.textContent = `⏳ ${countdown}`;
@@ -511,8 +527,21 @@
     }
   }
 
- // Kalender sederhana (minggu dimulai Senin)
-  let globalAgenda = []; // Simpan data dari database
+  // ==========================================
+  // KALENDER & AGENDA (DENGAN NAVIGASI BULAN)
+  // ==========================================
+  let globalAgenda = []; 
+  let currentNavDate = new Date(); // Menyimpan bulan yang sedang kita lihat di widget
+
+  // Event Listener untuk tombol prev/next bulan
+  document.getElementById('btn-prev-month').addEventListener('click', () => {
+      currentNavDate.setMonth(currentNavDate.getMonth() - 1);
+      renderCalendar(currentNavDate);
+  });
+  document.getElementById('btn-next-month').addEventListener('click', () => {
+      currentNavDate.setMonth(currentNavDate.getMonth() + 1);
+      renderCalendar(currentNavDate);
+  });
 
   function renderCalendar(date){
     const y = date.getFullYear();
@@ -520,7 +549,7 @@
     const first = new Date(y, m, 1);
     const last = new Date(y, m+1, 0);
 
-    elCalMonth.textContent = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
+    elCalMonth.textContent = new Intl.DateTimeFormat('id-ID', { month:'short', year:'numeric' }).format(date);
     elCalGrid.innerHTML = '';
     const today = new Date();
 
@@ -541,12 +570,12 @@
       cell.className = 'cal-day';
       cell.textContent = day;
 
+      // Cek apakah itu hari ini TEPAT di bulan dan tahun ini
       const isToday = day === today.getDate() && y === today.getFullYear() && m === today.getMonth();
       if (isToday) cell.classList.add('today');
 
       // Cek agenda untuk tanggal ini
       const tglStr = `${y}-${pad2(m+1)}-${pad2(day)}`;
-      
       const agendanya = globalAgenda.filter(a => a.tanggalBersih === tglStr);
       
       if(agendanya.length > 0) {
@@ -555,16 +584,17 @@
       elCalGrid.appendChild(cell);
     }
     
-    // Tampilkan SEMUA agenda dari hari ini dan masa depan
-    const hariIniStr = getDateYMD(today); 
-    const agendaMendatang = globalAgenda.filter(a => {
-        return a.tanggalBersih >= hariIniStr; 
+    // TAMPILKAN AGENDA HANYA UNTUK BULAN YANG SEDANG DILIHAT SAJA
+    const targetMonthStr = `${y}-${pad2(m+1)}`; // Format: YYYY-MM
+    
+    const agendaBulanIni = globalAgenda.filter(a => {
+        return a.tanggalBersih && a.tanggalBersih.startsWith(targetMonthStr); 
     }).sort((a, b) => {
         return a.tanggalBersih.localeCompare(b.tanggalBersih); 
     });
 
-    if(agendaMendatang.length > 0) {
-        agendaMendatang.forEach(ag => {
+    if(agendaBulanIni.length > 0) {
+        agendaBulanIni.forEach(ag => {
             const [thn, bln, tgl] = ag.tanggalBersih.split('-');
             
             const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -579,7 +609,7 @@
             `;
         });
     } else {
-        agendaContainer.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Belum ada agenda mendatang</div>';
+        agendaContainer.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Tidak ada agenda di bulan ini</div>';
     }
 
     const rem = elCalGrid.children.length % 7;
@@ -593,94 +623,54 @@
     }
   }
 
-  // FUNGSI BARU UNTUK FETCH AGENDA DARI APPS SCRIPT
-  async function fetchAgendaDatabase() {
+  // FUNGSI FETCH AGENDA DARI APPS SCRIPT
+  window.fetchAgendaDatabase = async function() {
     try {
         const URL_API = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda";
         const res = await fetch(URL_API);
         const json = await res.json();
         
-        console.log("Respon Database Agenda:", json); // Untuk mengecek data di Inspect Element
-
         if(json.status === 'success') {
-            // Saring dan rapikan semua format tanggal dari Google Sheets
             globalAgenda = json.data.map(item => {
                 let tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
-                
-                // Jika mengandung jam (misal 2026-07-12T15:00:00Z), potong 10 huruf pertama
                 if (tgl.length > 10 && tgl.includes('-')) {
                     tgl = tgl.substring(0, 10);
                 }
-                
-                // Jika formatnya DD/MM/YYYY dari Google Sheets
                 if (tgl.includes('/')) {
                     let p = tgl.split('/');
                     if (p.length === 3 && p[2].length === 4) {
                         tgl = `${p[2]}-${pad2(p[1])}-${pad2(p[0])}`;
                     }
                 }
-                
                 return {
                     ...item,
-                    tanggalBersih: tgl // Kita pakai properti baru yang formatnya pasti YYYY-MM-DD
+                    tanggalBersih: tgl 
                 };
             });
-
-            renderCalendar(new Date()); 
+            
+            // Re-render menggunakan bulan yang sedang aktif
+            renderCalendar(currentNavDate); 
         }
     } catch(e) {
         console.log("Gagal mengambil agenda", e);
     }
   }
-  // Weather mapping (open-meteo weather_code)
+
+  // Weather mapping
   function weatherCodeToText(code){
     const map = {
-      0: ['Cerah', '☀️'],
-      1: ['Cerah Berawan', '🌤️'],
-      2: ['Berawan', '⛅'],
-      3: ['Mendung', '☁️'],
-      45:['Kabut', '🌫️'],
-      48:['Kabut', '🌫️'],
-      51:['Gerimis', '🌦️'],
-      53:['Gerimis', '🌦️'],
-      55:['Gerimis', '🌧️'],
-      61:['Hujan Ringan', '🌧️'],
-      63:['Hujan', '🌧️'],
-      65:['Hujan Lebat', '🌧️'],
-      66:['Hujan Beku Ringan', '🌧️'],
-      67:['Hujan Beku', '🌧️'],
-      71:['Salju Ringan', '❄️'],
-      73:['Salju', '❄️'],
-      75:['Salju Lebat', '❄️'],
-      77:['Butiran Salju', '❄️'],
-      80:['Hujan Lokal', '🌦️'],
-      81:['Hujan Lokal', '🌧️'],
-      82:['Hujan Sangat', '🌧️'],
-      85:['Hujan Salju', '🌨️'],
-      86:['Hujan Salju', '🌨️'],
-      95:['Petir', '⛈️'],
-      96:['Petir', '⛈️'],
-      99:['Petir Lebat', '⛈️']
+      0: ['Cerah', '☀️'], 1: ['Cerah Berawan', '🌤️'], 2: ['Berawan', '⛅'], 3: ['Mendung', '☁️'],
+      45:['Kabut', '🌫️'], 48:['Kabut', '🌫️'], 51:['Gerimis', '🌦️'], 53:['Gerimis', '🌦️'],
+      55:['Gerimis', '🌧️'], 61:['Hujan Ringan', '🌧️'], 63:['Hujan', '🌧️'], 65:['Hujan Lebat', '🌧️'],
+      66:['Hujan Beku', '🌧️'], 67:['Hujan Beku', '🌧️'], 71:['Salju Ringan', '❄️'], 73:['Salju', '❄️'],
+      75:['Salju Lebat', '❄️'], 77:['Butiran Salju', '❄️'], 80:['Hujan Lokal', '🌦️'], 81:['Hujan Lokal', '🌧️'],
+      82:['Hujan Sangat', '🌧️'], 85:['Hujan Salju', '🌨️'], 86:['Hujan Salju', '🌨️'], 95:['Petir', '⛈️'],
+      96:['Petir', '⛈️'], 99:['Petir Lebat', '⛈️']
     };
     return map[code] || ['Cuaca', '🌈'];
   }
 
-  function getDateYMD(d){
-    const y = d.getFullYear();
-    const m = pad2(d.getMonth()+1);
-    const day = pad2(d.getDate());
-    return `${y}-${m}-${day}`;
-  }
-
-  // ==========================
-  // Konfigurasi metode Kemenag
-  // ==========================
-  // Catatan penting:
-  // Aladhan mengharuskan "method" berupa ID angka.
-  // Biasanya Kemenag ada, tapi ID bisa berubah. Kita set default dulu.
-  // Jika waktu sholat tidak sesuai Kemenag, kamu bilang ya -> nanti aku ganti ID-nya.
-  const KEMENAG_METHOD_ID = 9; // <-- sering dipakai untuk Kemenag (bisa disesuaikan)
-
+  const KEMENAG_METHOD_ID = 9; 
   const locationState = { lat: null, lon: null, place: '—', ready:false };
   let prayersCache = null;
 
@@ -691,7 +681,6 @@
       elDate.textContent = formatDate(now);
       elGreeting.textContent = greeting(now);
 
-      // Update countdown + active (pakai cache jadwal)
       if (prayersCache){
         renderPrayerTimes(prayersCache);
       }
@@ -699,41 +688,37 @@
   }
 
   async function reverseGeocode(lat, lon){
-    // Nominatim (OSM) tanpa key, tapi ada rate limit.
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' }});
     if(!res.ok) throw new Error('reverse-geocode failed');
     const data = await res.json();
     const addr = data.address || {};
-
-    // Ambil nama kota/provinsi kalau ada
     const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
     const prov = addr.state || addr.province || '';
     const label = [city, prov].filter(Boolean).join(', ') || (data.display_name || 'Lokasi');
     return label;
   }
 
-  async function fetchPrayerTimes(lat, lon){
-    // Aladhan: timings by coordinates
-    const today = new Date();
-    const dateStr = getDateYMD(today); // YYYY-MM-DD
-    // endpoint: /v1/timings?latitude=...&longitude=...&method=...&timezonestring=...
-    // timezonestring opsional; kita pakai timezone browser agar format waktu sesuai perangkat.
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  function getDateYMD(d){
+    const y = d.getFullYear();
+    const m = pad2(d.getMonth()+1);
+    const day = pad2(d.getDate());
+    return `${y}-${m}-${day}`;
+  }
 
+  async function fetchPrayerTimes(lat, lon){
+    const today = new Date();
+    const dateStr = getDateYMD(today); 
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const url = `https://api.aladhan.com/v1/timings?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&method=${encodeURIComponent(KEMENAG_METHOD_ID)}&school=0&date=${encodeURIComponent(dateStr)}&timezonestring=${encodeURIComponent(tz)}`;
 
     const res = await fetch(url);
     if(!res.ok) throw new Error('prayer-times fetch failed');
     const json = await res.json();
 
-    // data.data.timings
     const t = json?.data?.timings;
     if(!t) throw new Error('prayer-times parse failed');
 
-    // Map Aladhan -> UI
-    // Aladhan umumnya: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha
-    // (nama bisa sedikit beda; tapi biasanya ini)
     return {
       Subuh: (t.Fajr || t.FajrTime || '').slice(0,5) || '--:--',
       Terbit: (t.Sunrise || t.SunriseTime || '').slice(0,5) || '--:--',
@@ -745,7 +730,6 @@
   }
 
   async function fetchWeather(lat, lon){
-    // Open-Meteo current weather (tanpa API key)
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto`;
     const res = await fetch(url);
     if(!res.ok) throw new Error('weather fetch failed');
@@ -761,15 +745,9 @@
 
     elWeatherIcon.textContent = icon;
     elWeatherDesc.textContent = desc;
-
-    if (typeof temp === 'number') elWeatherTemp.textContent = `${Math.round(temp)}°C`;
-    else elWeatherTemp.textContent = '—';
-
-    if (typeof rainProb === 'number') elWeatherRain.textContent = `${Math.round(rainProb)}%`;
-    else elWeatherRain.textContent = '—';
-
-    if (typeof wind === 'number') elWeatherWind.textContent = `${Math.round(wind)} km/jam`;
-    else elWeatherWind.textContent = '—';
+    if (typeof temp === 'number') elWeatherTemp.textContent = `${Math.round(temp)}°C`; else elWeatherTemp.textContent = '—';
+    if (typeof rainProb === 'number') elWeatherRain.textContent = `${Math.round(rainProb)}%`; else elWeatherRain.textContent = '—';
+    if (typeof wind === 'number') elWeatherWind.textContent = `${Math.round(wind)} km/jam`; else elWeatherWind.textContent = '—';
 
     const now = new Date();
     elWeatherTime.textContent = `Update ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
@@ -780,9 +758,11 @@
     elTime.textContent = formatClock(now);
     elDate.textContent = formatDate(now);
     elGreeting.textContent = greeting(now);
-    renderCalendar(now);
+    
+    // Inisialisasi awal ke bulan ini
+    currentNavDate = new Date(); 
+    renderCalendar(currentNavDate);
 
-    // placeholder list
     elPrayerList.innerHTML = '';
     for (const n of namesOrder){
       const row = document.createElement('div');
@@ -795,77 +775,38 @@
     }
   }
 
-  
-
   function startGeolocation(){
     if(!navigator.geolocation){
       elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
-      // Default Jakarta
-      locationState.lat = -6.200000;
-      locationState.lon = 106.816666;
-      locationState.place = 'Jakarta';
-      locationState.ready = true;
+      locationState.lat = -6.200000; locationState.lon = 106.816666;
+      locationState.place = 'Jakarta'; locationState.ready = true;
 
-      // jalankan fetch
       (async () => {
-        try{
-          prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon);
-          renderPrayerTimes(prayersCache);
-        }catch(e){
-          elChipLokasi.textContent = 'Lokasi: Jakarta (default) — jadwal gagal';
-        }
-        try{
-          await fetchWeather(locationState.lat, locationState.lon);
-        }catch(e){
-          // ignore weather error
-        }
+        try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
+        try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
       })();
       return;
     }
 
     elChipLokasi.textContent = 'Mencari lokasi...';
     navigator.geolocation.getCurrentPosition(async (pos) => {
-      locationState.lat = pos.coords.latitude;
-      locationState.lon = pos.coords.longitude;
-      try{
-        locationState.place = await reverseGeocode(locationState.lat, locationState.lon);
-      }catch(e){
-        locationState.place = `(${locationState.lat.toFixed(2)}, ${locationState.lon.toFixed(2)})`;
-      }
-      elChipLokasi.textContent = `Lokasi: ${locationState.place}`;
-      locationState.ready = true;
+      locationState.lat = pos.coords.latitude; locationState.lon = pos.coords.longitude;
+      try{ locationState.place = await reverseGeocode(locationState.lat, locationState.lon); }catch(e){ locationState.place = `(${locationState.lat.toFixed(2)}, ${locationState.lon.toFixed(2)})`; }
+      elChipLokasi.textContent = `Lokasi: ${locationState.place}`; locationState.ready = true;
 
-      // fetch prayer & weather
-      try{
-        prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon);
-        renderPrayerTimes(prayersCache);
-      }catch(e){
-        elChipLokasi.textContent = `Lokasi: ${locationState.place} — jadwal gagal (CORS/akses/API)`;
-      }
-
-      try{
-        await fetchWeather(locationState.lat, locationState.lon);
-      }catch(e){
-        // ignore
-      }
+      try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
+      try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
     }, async () => {
       elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
-      locationState.lat = -6.200000;
-      locationState.lon = 106.816666;
-
-      try{
-        prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon);
-        renderPrayerTimes(prayersCache);
-      }catch(e){}
-
+      locationState.lat = -6.200000; locationState.lon = 106.816666;
+      try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
       try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
       locationState.ready = true;
     }, { enableHighAccuracy:false, timeout: 8000, maximumAge: 600000 });
   }
 
-  // init
   startInitUI();
-  fetchAgendaDatabase();
+  fetchAgendaDatabase(); // Otomatis ter-update sesuai currentNavDate
   startClockLoop();
   startGeolocation();
 })();
