@@ -544,29 +544,53 @@
       const isToday = day === today.getDate() && y === today.getFullYear() && m === today.getMonth();
       if (isToday) cell.classList.add('today');
 
-      // CEK APAKAH ADA AGENDA DI TANGGAL INI
-      // Format tanggal dari API adalah YYYY-MM-DD
+      // CEK APAKAH ADA AGENDA DI TANGGAL INI (Hanya untuk kalender bulan berjalan)
       const tglStr = `${y}-${pad2(m+1)}-${pad2(day)}`;
-      const agendanya = globalAgenda.filter(a => a.tanggal === tglStr);
+      
+      // PERBAIKAN: Hilangkan tanda kutip bawaan Google Sheets saat pengecekan
+      const agendanya = globalAgenda.filter(a => {
+          if(!a.tanggal) return false;
+          const tglBersih = a.tanggal.replace(/['"]/g, '').trim();
+          return tglBersih === tglStr;
+      });
       
       if(agendanya.length > 0) {
         cell.classList.add('has-agenda');
-        
-        // Masukkan ke daftar list di bawah kalender
-        agendanya.forEach(ag => {
-            agendaContainer.innerHTML += `
-              <div class="agenda-item">
-                <div class="tgl">${day} ${elCalMonth.textContent.split(' ')[0]}</div>
-                <div class="kgt">${ag.kegiatan}</div>
-              </div>
-            `;
-        });
       }
       elCalGrid.appendChild(cell);
     }
     
-    if(agendaContainer.innerHTML === '') {
-        agendaContainer.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Tidak ada agenda bulan ini</div>';
+    // PERBAIKAN: Tampilkan SEMUA agenda yang akan datang di list bagian bawah
+    const hariIniStr = getDateYMD(today); // "YYYY-MM-DD"
+    const agendaMendatang = globalAgenda.filter(a => {
+        if(!a.tanggal) return false;
+        const tglBersih = a.tanggal.replace(/['"]/g, '').trim();
+        return tglBersih >= hariIniStr; // Hanya ambil agenda dari hari ini dan masa depan
+    }).sort((a, b) => {
+        const tglA = a.tanggal.replace(/['"]/g, '').trim();
+        const tglB = b.tanggal.replace(/['"]/g, '').trim();
+        return tglA.localeCompare(tglB); // Urutkan dari tanggal yang paling dekat
+    });
+
+    if(agendaMendatang.length > 0) {
+        agendaMendatang.forEach(ag => {
+            const tglBersih = ag.tanggal.replace(/['"]/g, '').trim(); // "2026-12-07"
+            const [thn, bln, tgl] = tglBersih.split('-');
+            
+            // Ubah format angka bulan menjadi teks
+            const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            const blnIndex = parseInt(bln, 10) - 1;
+            const namaBulanStr = namaBulan[blnIndex] || bln;
+
+            agendaContainer.innerHTML += `
+              <div class="agenda-item">
+                <div class="tgl">${tgl} ${namaBulanStr} ${thn}</div>
+                <div class="kgt">${ag.kegiatan}</div>
+              </div>
+            `;
+        });
+    } else {
+        agendaContainer.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Belum ada agenda mendatang</div>';
     }
 
     const rem = elCalGrid.children.length % 7;
@@ -579,7 +603,6 @@
       }
     }
   }
-
   // FUNGSI BARU UNTUK FETCH AGENDA DARI APPS SCRIPT
   async function fetchAgendaDatabase() {
     try {
