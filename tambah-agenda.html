@@ -7,6 +7,15 @@
                 <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Tanggal Kegiatan</label>
                 <input type="date" id="input-tanggal-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
             </div>
+
+            <div>
+                <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Kategori Agenda</label>
+                <select id="input-kategori-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px; background: white; cursor: pointer;">
+                    <option value="Kegiatan Sekolah">🟧 Kegiatan Sekolah (Umum)</option>
+                    <option value="Ujian Sekolah">🟪 Ujian Sekolah / STS / SAS</option>
+                    <option value="Libur Nasional">🟥 Libur Nasional / Cuti Bersama</option>
+                </select>
+            </div>
             
             <div>
                 <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Nama / Deskripsi Kegiatan</label>
@@ -38,23 +47,24 @@
             namaGuru = parsedData.nama || 'Guru';
         }
         
+        // TRIK CERDAS: Menggabungkan Kategori dan Nama Kegiatan dengan pembatas "|||"
+        const kategori = document.getElementById('input-kategori-agenda').value;
+        const namaKegiatan = document.getElementById('input-nama-agenda').value;
+        const kegiatanGabungan = kategori + "|||" + namaKegiatan;
+
         const payload = {
             action: 'add_agenda',
             tanggal: document.getElementById('input-tanggal-agenda').value,
-            kegiatan: document.getElementById('input-nama-agenda').value,
+            kegiatan: kegiatanGabungan,
             pembuat: namaGuru
         };
 
         try {
-            // LINK APPS SCRIPT ASLI BAPAK DIMASUKKAN LANGSUNG DI SINI
             const LINK_GAS = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
 
             const response = await fetch(LINK_GAS, {
                 method: "POST",
-                headers: {
-                    // Ini penting agar Google tidak memblokir pengiriman data
-                    "Content-Type": "text/plain;charset=utf-8" 
-                },
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
@@ -75,7 +85,7 @@
         } catch (error) {
             console.error("Detail Error:", error);
             pesan.style.color = "red";
-            pesan.textContent = "❌ Terjadi kesalahan jaringan. Gagal menghubungi server Google.";
+            pesan.textContent = "❌ Terjadi kesalahan jaringan.";
         }
         
         btn.textContent = "💾 Simpan Agenda";
