@@ -1,0 +1,69 @@
+<div class="content-section active" style="padding: 20px;">
+    <h2 style="font-family: 'Georgia', serif; color: var(--green2); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📅 Tambah Agenda Sekolah</h2>
+    
+    <div style="background: rgba(255,255,255,0.8); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px;">
+        <form id="form-agenda" onsubmit="submitAgenda(event)" style="display: flex; flex-direction: column; gap: 15px;">
+            <div>
+                <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Tanggal Kegiatan</label>
+                <input type="date" id="input-tanggal-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
+            </div>
+            
+            <div>
+                <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Nama / Deskripsi Kegiatan</label>
+                <input type="text" id="input-nama-agenda" placeholder="Contoh: Rapat Wali Murid Kelas 1-6" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
+            </div>
+
+            <button type="submit" style="background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                💾 Simpan Agenda
+            </button>
+        </form>
+        <p id="pesan-agenda" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+</div>
+
+<script>
+    async function submitAgenda(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const pesan = document.getElementById('pesan-agenda');
+        
+        btn.textContent = "Menyimpan...";
+        btn.disabled = true;
+
+        // Ambil nama guru dari localStorage saat login
+        const namaGuru = localStorage.getItem('userNama') || 'Guru'; 
+        
+        const payload = {
+            action: 'add_agenda',
+            tanggal: document.getElementById('input-tanggal-agenda').value,
+            kegiatan: document.getElementById('input-nama-agenda').value,
+            pembuat: namaGuru
+        };
+
+        try {
+            // GANTI DENGAN URL WEB APP KAMU!
+            const SCRIPT_URL = "URL_WEB_APP_APPS_SCRIPT_KAMU"; 
+            
+            const response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                pesan.style.color = "green";
+                pesan.textContent = "✅ Agenda berhasil ditambahkan!";
+                document.getElementById('form-agenda').reset();
+            } else {
+                pesan.style.color = "red";
+                pesan.textContent = "❌ Gagal: " + result.message;
+            }
+        } catch (error) {
+            pesan.style.color = "red";
+            pesan.textContent = "❌ Terjadi kesalahan jaringan.";
+        }
+        
+        btn.textContent = "💾 Simpan Agenda";
+        btn.disabled = false;
+    }
+</script>
