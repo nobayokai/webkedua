@@ -271,6 +271,29 @@
     .clock-time{ font-size: 30px; }
     .brand .chip{ max-width: 70%; }
   }
+
+  .cal-day.has-agenda {
+    border-bottom: 3px solid var(--amber); /* Garis bawah kuning penanda agenda */
+    font-weight: 1000;
+    color: var(--text);
+  }
+  #agenda-list-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+  .agenda-item {
+    background: rgba(255,255,255,.45);
+    border-left: 3px solid var(--amber);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+  .agenda-item .tgl { font-weight: 850; color: rgba(0,0,0,.5); font-size: 9px; }
+  .agenda-item .kgt { font-weight: 950; color: var(--text); }
 </style>
 
 <div id="widget-islam">
@@ -343,6 +366,10 @@
       </div>
 
       <div class="cal-grid" id="cal-grid"></div>
+      
+      <div id="agenda-list-container">
+          <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Memuat agenda...</div>
+      </div>
     </div>
   </div>
 
@@ -485,6 +512,8 @@
   }
 
   // Kalender sederhana (minggu dimulai Senin)
+  let globalAgenda = []; // Simpan data dari database
+
   function renderCalendar(date){
     const y = date.getFullYear();
     const m = date.getMonth();
@@ -492,47 +521,79 @@
     const last = new Date(y, m+1, 0);
 
     elCalMonth.textContent = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
-
     elCalGrid.innerHTML = '';
     const today = new Date();
 
-    function jsToMondayIndex(jsDay){
-      // Sun->6, Mon->0, Tue->1 ... Sat->5
-      return (jsDay + 6) % 7;
-    }
+    function jsToMondayIndex(jsDay){ return (jsDay + 6) % 7; }
 
-    const startIndex = jsToMondayIndex(first.getDay()); // 0..6
+    const startIndex = jsToMondayIndex(first.getDay()); 
     for(let i=0;i<startIndex;i++){
       const cell = document.createElement('div');
       cell.className = 'cal-day muted';
-      cell.textContent = '';
       elCalGrid.appendChild(cell);
     }
+
+    const agendaContainer = document.getElementById('agenda-list-container');
+    agendaContainer.innerHTML = ''; // bersihkan list agenda
 
     for(let day=1; day<=last.getDate(); day++){
       const cell = document.createElement('div');
       cell.className = 'cal-day';
       cell.textContent = day;
 
-      const isToday =
-        day === today.getDate() &&
-        y === today.getFullYear() &&
-        m === today.getMonth();
+      const isToday = day === today.getDate() && y === today.getFullYear() && m === today.getMonth();
       if (isToday) cell.classList.add('today');
 
+      // CEK APAKAH ADA AGENDA DI TANGGAL INI
+      // Format tanggal dari API adalah YYYY-MM-DD
+      const tglStr = `${y}-${pad2(m+1)}-${pad2(day)}`;
+      const agendanya = globalAgenda.filter(a => a.tanggal === tglStr);
+      
+      if(agendanya.length > 0) {
+        cell.classList.add('has-agenda');
+        
+        // Masukkan ke daftar list di bawah kalender
+        agendanya.forEach(ag => {
+            agendaContainer.innerHTML += `
+              <div class="agenda-item">
+                <div class="tgl">${day} ${elCalMonth.textContent.split(' ')[0]}</div>
+                <div class="kgt">${ag.kegiatan}</div>
+              </div>
+            `;
+        });
+      }
       elCalGrid.appendChild(cell);
     }
+    
+    if(agendaContainer.innerHTML === '') {
+        agendaContainer.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Tidak ada agenda bulan ini</div>';
+    }
 
-    // isi sisa biar rapi
     const rem = elCalGrid.children.length % 7;
     if(rem !== 0){
       const add = 7 - rem;
       for(let i=0;i<add;i++){
         const cell = document.createElement('div');
         cell.className = 'cal-day muted';
-        cell.textContent = '';
         elCalGrid.appendChild(cell);
       }
+    }
+  }
+
+  // FUNGSI BARU UNTUK FETCH AGENDA DARI APPS SCRIPT
+  async function fetchAgendaDatabase() {
+    try {
+        // GANTI DENGAN URL WEB APP KAMU!
+        const URL_API = "URL_WEB_APP_APPS_SCRIPT_KAMU?action=get_agenda";
+        const res = await fetch(URL_API);
+        const json = await res.json();
+        
+        if(json.status === 'success') {
+            globalAgenda = json.data;
+            renderCalendar(new Date()); // Refresh kalender setelah data didapat
+        }
+    } catch(e) {
+        console.log("Gagal mengambil agenda", e);
     }
   }
 
@@ -699,6 +760,8 @@
     }
   }
 
+  
+
   function startGeolocation(){
     if(!navigator.geolocation){
       elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
@@ -767,6 +830,7 @@
 
   // init
   startInitUI();
+  fetchAgendaDatabase();
   startClockLoop();
   startGeolocation();
 })();
