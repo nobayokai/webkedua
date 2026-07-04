@@ -29,9 +29,15 @@
         
         btn.textContent = "Menyimpan...";
         btn.disabled = true;
+        pesan.textContent = ""; // Kosongkan pesan error sebelumnya
 
-        // Ambil nama guru dari localStorage saat login
-        const namaGuru = localStorage.getItem('userNama') || 'Guru'; 
+        // Ambil data nama guru dari localStorage (sesuai script login)
+        const userLoginData = localStorage.getItem('user_login');
+        let namaGuru = 'Guru';
+        if(userLoginData) {
+            const parsedData = JSON.parse(userLoginData);
+            namaGuru = parsedData.nama || 'Guru';
+        }
         
         const payload = {
             action: 'add_agenda',
@@ -41,26 +47,31 @@
         };
 
         try {
-            // GANTI DENGAN URL WEB APP KAMU!
-            const SCRIPT_URL = "URL_WEB_APP_APPS_SCRIPT_KAMU"; 
-            
+            // Kita langsung menggunakan SCRIPT_URL dari script.js Bapak
             const response = await fetch(SCRIPT_URL, {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
+            
             const result = await response.json();
             
             if (result.status === 'success') {
                 pesan.style.color = "green";
                 pesan.textContent = "✅ Agenda berhasil ditambahkan!";
                 document.getElementById('form-agenda').reset();
+                
+                // Minta widget kalender untuk langsung memuat ulang datanya
+                if (typeof fetchAgendaDatabase === 'function') {
+                    fetchAgendaDatabase();
+                }
             } else {
                 pesan.style.color = "red";
                 pesan.textContent = "❌ Gagal: " + result.message;
             }
         } catch (error) {
+            console.error("Detail Error:", error);
             pesan.style.color = "red";
-            pesan.textContent = "❌ Terjadi kesalahan jaringan.";
+            pesan.textContent = "❌ Terjadi kesalahan jaringan. Cek koneksi atau link script.";
         }
         
         btn.textContent = "💾 Simpan Agenda";
