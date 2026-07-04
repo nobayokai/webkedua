@@ -1,6 +1,6 @@
 <style>
   :root{
-    --bg: transparent; /* ikut background ind */
+    --bg: transparent; 
     --card: rgba(255,255,255,.55);
     --card-strong: rgba(255,255,255,.72);
     --stroke: rgba(0,0,0,.08);
@@ -15,307 +15,111 @@
   }
 
   #widget-islam{
-    width: 100%;
-    height: 100%;
-    display:flex;
-    flex-direction: column;
-    padding: 10px 10px;
-    box-sizing: border-box;
-    gap: 10px;
-    background: var(--bg);
+    width: 100%; height: 100%; display:flex; flex-direction: column;
+    padding: 10px 10px; box-sizing: border-box; gap: 10px; background: var(--bg);
   }
 
-  .widget-grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    flex: 1;
-    min-height: 0;
-  }
+  .widget-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
 
   .card{
-    background: var(--card);
-    border: 1px solid var(--stroke);
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,.06);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding: 12px;
-    overflow:hidden;
-    position: relative;
+    background: var(--card); border: 1px solid var(--stroke); border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    padding: 12px; overflow:hidden; position: relative;
   }
   .card::after{
-    content:"";
-    position:absolute;
-    inset:-40px -60px auto -60px;
-    height: 90px;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%);
-    pointer-events:none;
+    content:""; position:absolute; inset:-40px -60px auto -60px; height: 90px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%); pointer-events:none;
   }
 
-  .brand{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 2px;
-  }
-  .brand .title{
-    font-family: Georgia, serif;
-    font-weight: 950;
-    color: var(--green2);
-    font-size: 13px;
-    letter-spacing: .2px;
-  }
+  .brand{ display:flex; align-items:center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+  .brand .title{ font-family: Georgia, serif; font-weight: 950; color: var(--green2); font-size: 13px; letter-spacing: .2px; }
   .brand .chip{
-    font-size: 11px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(16,185,129,.12);
-    border: 1px solid rgba(16,185,129,.25);
-    color: rgba(4,120,87,.95);
-    font-weight: 900;
-    white-space: nowrap;
-    max-width: 45%;
-    overflow:hidden;
-    text-overflow: ellipsis;
+    font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900;
+    white-space: nowrap; max-width: 45%; overflow:hidden; text-overflow: ellipsis;
   }
 
-  /* Clock */
+  /* Clock & Cuaca CSS ... (Disingkat agar ringkas, tapi tetap lengkap) */
   .clock-now{ display:flex; flex-direction: column; gap: 8px; }
-  .clock-time{
-    font-size: 34px; font-weight: 950; color:#1f2937;
-    line-height: 1; letter-spacing: .4px;
-  }
-  .clock-date{
-    color: rgba(31,41,55,.75);
-    font-weight: 850;
-    font-size: 13px;
-    display:flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .clock-dot{
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 0 6px rgba(16,185,129,.12);
-    margin-top: 4px; flex: 0 0 auto;
-  }
+  .clock-time{ font-size: 34px; font-weight: 950; color:#1f2937; line-height: 1; letter-spacing: .4px; }
+  .clock-date{ color: rgba(31,41,55,.75); font-weight: 850; font-size: 13px; display:flex; gap: 10px; flex-wrap: wrap; }
+  .clock-dot{ width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 6px rgba(16,185,129,.12); margin-top: 4px; flex: 0 0 auto; }
+  
+  .weather-top{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .weather-temp{ font-size: 26px; font-weight: 1000; color:#0f172a; line-height: 1; }
+  .weather-desc{ color: rgba(31,41,55,.75); font-weight: 900; font-size: 12px; display:flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .weather-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .weather-pill{ background: rgba(255,255,255,.35); border: 1px solid rgba(0,0,0,.06); border-radius: 14px; padding: 8px 10px; }
+  .weather-pill .k{ font-size: 10.5px; font-weight: 950; color: rgba(0,0,0,.45); text-transform: uppercase; letter-spacing: .2px; }
+  .weather-pill .v{ font-size: 12px; font-weight: 1000; color: rgba(0,0,0,.72); margin-top: 4px; white-space: nowrap; }
 
-  /* Cuaca */
-  .weather-top{
-    display:flex; align-items:center; justify-content: space-between; gap: 10px;
-    margin-bottom: 8px;
-  }
-  .weather-temp{
-    font-size: 26px; font-weight: 1000; color:#0f172a;
-    line-height: 1;
-  }
-  .weather-desc{
-    color: rgba(31,41,55,.75);
-    font-weight: 900; font-size: 12px;
-    display:flex; gap: 8px; align-items: center; flex-wrap: wrap;
-  }
-  .weather-row{
-    display:grid; grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .weather-pill{
-    background: rgba(255,255,255,.35);
-    border: 1px solid rgba(0,0,0,.06);
-    border-radius: 14px;
-    padding: 8px 10px;
-  }
-  .weather-pill .k{
-    font-size: 10.5px; font-weight: 950; color: rgba(0,0,0,.45);
-    text-transform: uppercase;
-    letter-spacing: .2px;
-  }
-  .weather-pill .v{
-    font-size: 12px; font-weight: 1000; color: rgba(0,0,0,.72);
-    margin-top: 4px;
-    white-space: nowrap;
-  }
-
-  /* Kalender */
-  .cal-head{
-    display:flex; align-items:center; justify-content: space-between; gap: 10px;
-    margin-bottom: 10px;
-    position: relative;
-    z-index: 1;
-  }
+  /* Kalender Utama */
+  .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
   .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
   
-  /* Tombol Prev/Next Bulan */
   .nav-btn {
-    background: rgba(16,185,129,.12);
-    border: 1px solid rgba(16,185,129,.28);
-    color: var(--green2);
-    border-radius: 6px;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-    transition: 0.2s;
+    background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2);
+    border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;
   }
-  .nav-btn:hover {
-    background: var(--green);
-    color: white;
-  }
+  .nav-btn:hover { background: var(--green); color: white; }
 
-  .cal-weekdays{
-    display:grid; grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 1000;
-    color: rgba(0,0,0,.45);
-    margin-bottom: 6px;
-    position: relative;
-    z-index: 1;
-  }
-  .cal-grid{
-    display:grid; grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 1000;
-    position: relative;
-    z-index: 1;
-  }
-  .cal-day{
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color: rgba(0,0,0,.55);
-    background: rgba(255,255,255,.25);
-    border: 1px solid rgba(0,0,0,.05);
-    min-height: 0;
-    overflow:hidden;
-  }
+  .cal-weekdays{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 11px; font-weight: 1000; color: rgba(0,0,0,.45); margin-bottom: 6px; position: relative; z-index: 1; }
+  .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 12px; font-weight: 1000; position: relative; z-index: 1; }
+  .cal-day{ width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,.55); background: rgba(255,255,255,.25); border: 1px solid rgba(0,0,0,.05); overflow:hidden; }
   .cal-day.muted{ opacity: .35; }
-  .cal-day.today{
-    background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.08));
-    border: 1px solid rgba(16,185,129,.35);
-    color: rgba(4,120,87,.98);
-    box-shadow: 0 10px 18px rgba(16,185,129,.18);
-  }
+  .cal-day.today{ background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.08)); border: 1px solid rgba(16,185,129,.35); color: rgba(4,120,87,.98); box-shadow: 0 10px 18px rgba(16,185,129,.18); }
 
-  /* Sholat */
-  .prayer{
-    display:flex; flex-direction: column;
-    height: 100%;
-    min-height: 0;
+  /* CSS BARU UNTUK KATEGORI & HARI LIBUR */
+  .cal-day.is-libur {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
   }
-  .prayer-head{
-    display:flex; align-items:center; justify-content: space-between; gap: 10px;
-    margin-bottom: 10px;
-    position: relative;
-    z-index: 1;
-  }
-  .next{
-    font-size: 11px; font-weight: 950; color: rgba(0,0,0,.55);
-    line-height: 1.2;
-  }
-  .next strong{ color: var(--green2); font-size: 12px; }
-  .countdown{
-    font-weight: 1000; font-size: 12px;
-    padding: 7px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(16,185,129,.28);
-    background: rgba(16,185,129,.12);
-    color: rgba(4,120,87,.95);
-    white-space: nowrap;
-  }
-
-  .prayer-list{
-    display:flex;
-    flex-direction: column;
-    gap: 8px;
-    overflow:auto;
-    padding-right: 4px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .prayer-item{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 9px 10px;
-    border-radius: 14px;
-    background: rgba(255,255,255,.38);
-    border: 1px solid rgba(0,0,0,.05);
-  }
-  .prayer-item .name{
-    font-weight: 1000;
-    font-size: 12px;
-    color: rgba(0,0,0,.62);
-    display:flex;
-    align-items:center;
-    gap: 8px;
-  }
-  .badge{
-    width: 10px; height: 10px; border-radius: 3px;
-    background: var(--green);
-  }
-  .prayer-item .time{
-    font-weight: 1100;
-    font-size: 12px;
-    color: rgba(0,0,0,.72);
-    white-space: nowrap;
-  }
-  .prayer-item.active{
-    background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.10));
-    border: 1px solid rgba(16,185,129,.33);
-    box-shadow: 0 14px 22px rgba(16,185,129,.14);
-  }
-  .prayer-item.active .time{ color: rgba(4,120,87,.98); }
-
-  .footer-note{
-    font-size: 11px;
-    color: rgba(0,0,0,.45);
-    font-weight: 850;
-    text-align:center;
-    padding: 2px 0;
-  }
-
-  @media (max-width: 768px){
-    .widget-grid{ grid-template-columns: 1fr; }
-    .card{ padding: 10px; }
-    .clock-time{ font-size: 30px; }
-    .brand .chip{ max-width: 70%; }
-  }
-
   .cal-day.has-agenda {
-    border-bottom: 3px solid var(--amber); /* Garis bawah kuning penanda agenda */
-    font-weight: 1000;
-    color: var(--text);
+    border-bottom: 3px solid var(--amber); font-weight: 1000; color: var(--text);
   }
-  #agenda-list-container {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 90px;
-    overflow-y: auto;
+  .cal-day.has-ujian {
+    border-bottom: 3px solid var(--pink); font-weight: 1000; color: var(--text);
   }
+
+  #agenda-list-container { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 90px; overflow-y: auto; }
+  
   .agenda-item {
-    background: rgba(255,255,255,.45);
-    border-left: 3px solid var(--amber);
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 11px;
+    background: rgba(255,255,255,.45); padding: 6px 10px; border-radius: 6px; font-size: 11px;
+    border-left: 3px solid; /* Default diatur di class spesifik */
   }
+  .agenda-item.kat-kegiatan { border-left-color: var(--amber); }
+  .agenda-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.12); }
+  .agenda-item.kat-libur    { border-left-color: #ef4444; background: rgba(239,68,68,0.12); }
+
   .agenda-item .tgl { font-weight: 850; color: rgba(0,0,0,.5); font-size: 9px; }
-  .agenda-item .kgt { font-weight: 950; color: var(--text); }
+  .agenda-item .kgt { font-weight: 950; color: var(--text); line-height: 1.4; margin-top: 3px;}
+  
+  .badge-kategori {
+    font-size: 8px; padding: 2px 6px; border-radius: 4px; color: white;
+    display: inline-block; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge-kategori.kegiatan { background: var(--amber); }
+  .badge-kategori.ujian    { background: var(--pink); }
+  .badge-kategori.libur    { background: #ef4444; }
+
+  /* Prayer List CSS */
+  .prayer{ display:flex; flex-direction: column; height: 100%; min-height: 0; }
+  .prayer-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
+  .next{ font-size: 11px; font-weight: 950; color: rgba(0,0,0,.55); line-height: 1.2; }
+  .next strong{ color: var(--green2); font-size: 12px; }
+  .countdown{ font-weight: 1000; font-size: 12px; padding: 7px 10px; border-radius: 999px; border: 1px solid rgba(16,185,129,.28); background: rgba(16,185,129,.12); color: rgba(4,120,87,.95); white-space: nowrap; }
+  .prayer-list{ display:flex; flex-direction: column; gap: 8px; overflow:auto; padding-right: 4px; position: relative; z-index: 1; }
+  .prayer-item{ display:flex; align-items:center; justify-content: space-between; gap: 10px; padding: 9px 10px; border-radius: 14px; background: rgba(255,255,255,.38); border: 1px solid rgba(0,0,0,.05); }
+  .prayer-item .name{ font-weight: 1000; font-size: 12px; color: rgba(0,0,0,.62); display:flex; align-items:center; gap: 8px; }
+  .badge{ width: 10px; height: 10px; border-radius: 3px; background: var(--green); }
+  .prayer-item .time{ font-weight: 1100; font-size: 12px; color: rgba(0,0,0,.72); white-space: nowrap; }
+  .prayer-item.active{ background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.10)); border: 1px solid rgba(16,185,129,.33); box-shadow: 0 14px 22px rgba(16,185,129,.14); }
+  .prayer-item.active .time{ color: rgba(4,120,87,.98); }
+  .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
+
+  @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
 </style>
 
 <div id="widget-islam">
@@ -352,14 +156,8 @@
       </div>
 
       <div class="weather-row">
-        <div class="weather-pill">
-          <div class="k">Hujan</div>
-          <div class="v" id="weather-rain">—</div>
-        </div>
-        <div class="weather-pill">
-          <div class="k">Angin</div>
-          <div class="v" id="weather-wind">—</div>
-        </div>
+        <div class="weather-pill"><div class="k">Hujan</div><div class="v" id="weather-rain">—</div></div>
+        <div class="weather-pill"><div class="k">Angin</div><div class="v" id="weather-wind">—</div></div>
       </div>
     </div>
 
@@ -421,23 +219,13 @@
   const elWeatherTime = document.getElementById('weather-time');
   const elWeatherIcon = document.getElementById('weather-icon');
 
-  const dotColors = {
-    Subuh: 'var(--blue)',
-    Terbit:'var(--amber)',
-    Dzuhur:'var(--green)',
-    Ashar:'var(--purple)',
-    Maghrib:'var(--pink)',
-    Isya:'var(--blue)'
-  };
-
+  const dotColors = { Subuh: 'var(--blue)', Terbit:'var(--amber)', Dzuhur:'var(--green)', Ashar:'var(--purple)', Maghrib:'var(--pink)', Isya:'var(--blue)' };
   const namesOrder = ['Subuh','Terbit','Dzuhur','Ashar','Maghrib','Isya'];
 
   function pad2(n){ return String(n).padStart(2,'0'); }
 
   function formatClock(d){
-    const h = d.getHours();
-    const isPM = h >= 12;
-    const hh = h % 12 || 12;
+    const h = d.getHours(); const isPM = h >= 12; const hh = h % 12 || 12;
     return `${hh}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${isPM ? 'PM' : 'AM'}`;
   }
   function formatDate(d){
@@ -449,12 +237,9 @@
   }
   function greeting(d){
     const h = d.getHours();
-    if (h < 5) return 'Masuk waktu malam 🌙';
-    if (h < 11) return 'Semangat pagi! ☀️';
-    if (h < 15) return 'Waktu belajar & berdzikir ✨';
-    if (h < 18) return 'Hati tetap sejuk 🤲';
-    if (h < 20) return 'Mari siapkan ibadah maghrib 🌿';
-    return 'Tenanglah, istirahat sebentar 🕌';
+    if (h < 5) return 'Masuk waktu malam 🌙'; if (h < 11) return 'Semangat pagi! ☀️';
+    if (h < 15) return 'Waktu belajar & berdzikir ✨'; if (h < 18) return 'Hati tetap sejuk 🤲';
+    if (h < 20) return 'Mari siapkan ibadah maghrib 🌿'; return 'Tenanglah, istirahat sebentar 🕌';
   }
 
   function parseHHMMToDate(timeStr, baseDate){
@@ -463,77 +248,54 @@
   }
 
   function minutesToHHMM(totalMinutes){
-    const hh = Math.floor(totalMinutes / 60);
-    const mm = totalMinutes % 60;
+    const hh = Math.floor(totalMinutes / 60); const mm = totalMinutes % 60;
     return `${hh}j ${pad2(mm)}m`;
   }
 
   function getNextPrayer(prayers, now){
     const base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0,0);
-
-    const times = namesOrder.map(n => ({
-      name: n,
-      time: parseHHMMToDate(prayers[n], base)
-    })).filter(x => !isNaN(x.time.getTime()));
+    const times = namesOrder.map(n => ({ name: n, time: parseHHMMToDate(prayers[n], base) })).filter(x => !isNaN(x.time.getTime()));
 
     let active = times[0];
-    for (const t of times){
-      if (t.time <= now) active = t;
-    }
+    for (const t of times) { if (t.time <= now) active = t; }
 
     let next = times.find(t => t.time > now);
     if (!next){
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate()+1);
+      const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate()+1);
       const subuhTomorrow = parseHHMMToDate(prayers['Subuh'], tomorrow);
       next = { name: 'Subuh', time: subuhTomorrow };
     }
 
-    const diffMs = next.time - now;
-    const diffMin = Math.max(0, Math.floor(diffMs / 60000));
+    const diffMs = next.time - now; const diffMin = Math.max(0, Math.floor(diffMs / 60000));
     const countdown = minutesToHHMM(diffMin);
-
     return { nextName: next.name, activeName: active.name, countdown };
   }
 
   function renderPrayerTimes(prayers){
-    const now = new Date();
-    elPrayerList.innerHTML = '';
-
+    const now = new Date(); elPrayerList.innerHTML = '';
     const { nextName, activeName, countdown } = getNextPrayer(prayers, now);
-    elNextStrong.textContent = nextName;
-    elCountdown.textContent = `⏳ ${countdown}`;
+    elNextStrong.textContent = nextName; elCountdown.textContent = `⏳ ${countdown}`;
 
     for (const name of namesOrder){
       const t = prayers[name] || '--:--';
       const row = document.createElement('div');
       row.className = 'prayer-item' + (name === activeName ? ' active' : '');
 
-      const left = document.createElement('div');
-      left.className = 'name';
-      const dot = document.createElement('span');
-      dot.className = 'badge';
-      dot.style.background = dotColors[name] || 'var(--green)';
-      left.appendChild(dot);
-      left.appendChild(document.createTextNode(name));
+      const left = document.createElement('div'); left.className = 'name';
+      const dot = document.createElement('span'); dot.className = 'badge'; dot.style.background = dotColors[name] || 'var(--green)';
+      left.appendChild(dot); left.appendChild(document.createTextNode(name));
 
-      const right = document.createElement('div');
-      right.className = 'time';
-      right.textContent = t;
-
-      row.appendChild(left);
-      row.appendChild(right);
-      elPrayerList.appendChild(row);
+      const right = document.createElement('div'); right.className = 'time'; right.textContent = t;
+      row.appendChild(left); row.appendChild(right); elPrayerList.appendChild(row);
     }
   }
 
   // ==========================================
-  // KALENDER & AGENDA (DENGAN NAVIGASI BULAN)
+  // KALENDER & AGENDA BERWARNA KATEGORI
   // ==========================================
   let globalAgenda = []; 
-  let currentNavDate = new Date(); // Menyimpan bulan yang sedang kita lihat di widget
+  let currentNavDate = new Date(); 
 
-  // Event Listener untuk tombol prev/next bulan
   document.getElementById('btn-prev-month').addEventListener('click', () => {
       currentNavDate.setMonth(currentNavDate.getMonth() - 1);
       renderCalendar(currentNavDate);
@@ -544,48 +306,64 @@
   });
 
   function renderCalendar(date){
-    const y = date.getFullYear();
-    const m = date.getMonth();
-    const first = new Date(y, m, 1);
-    const last = new Date(y, m+1, 0);
+    const y = date.getFullYear(); const m = date.getMonth();
+    const first = new Date(y, m, 1); const last = new Date(y, m+1, 0);
 
     elCalMonth.textContent = new Intl.DateTimeFormat('id-ID', { month:'short', year:'numeric' }).format(date);
-    elCalGrid.innerHTML = '';
-    const today = new Date();
+    elCalGrid.innerHTML = ''; const today = new Date();
 
     function jsToMondayIndex(jsDay){ return (jsDay + 6) % 7; }
-
     const startIndex = jsToMondayIndex(first.getDay()); 
+    
     for(let i=0;i<startIndex;i++){
-      const cell = document.createElement('div');
-      cell.className = 'cal-day muted';
-      elCalGrid.appendChild(cell);
+      const cell = document.createElement('div'); cell.className = 'cal-day muted'; elCalGrid.appendChild(cell);
     }
 
     const agendaContainer = document.getElementById('agenda-list-container');
-    agendaContainer.innerHTML = ''; // bersihkan list agenda
+    agendaContainer.innerHTML = ''; 
 
     for(let day=1; day<=last.getDate(); day++){
       const cell = document.createElement('div');
       cell.className = 'cal-day';
       cell.textContent = day;
 
-      // Cek apakah itu hari ini TEPAT di bulan dan tahun ini
+      const currentDate = new Date(y, m, day);
+      const dayOfWeek = currentDate.getDay();
+      
+      // 1. MERAHKAN HARI SABTU (6) DAN MINGGU (0)
+      if(dayOfWeek === 0 || dayOfWeek === 6) {
+          cell.classList.add('is-libur');
+      }
+
       const isToday = day === today.getDate() && y === today.getFullYear() && m === today.getMonth();
       if (isToday) cell.classList.add('today');
 
-      // Cek agenda untuk tanggal ini
       const tglStr = `${y}-${pad2(m+1)}-${pad2(day)}`;
       const agendanya = globalAgenda.filter(a => a.tanggalBersih === tglStr);
       
       if(agendanya.length > 0) {
-        cell.classList.add('has-agenda');
+        let isLiburNasional = false;
+        let isUjian = false;
+        let isKegiatan = false;
+
+        agendanya.forEach(a => {
+            const parts = (a.kegiatan || "").split('|||');
+            const kat = parts.length > 1 ? parts[0] : 'Kegiatan Sekolah';
+            
+            if(kat === 'Libur Nasional') isLiburNasional = true;
+            else if(kat === 'Ujian Sekolah') isUjian = true;
+            else isKegiatan = true;
+        });
+
+        // Terapkan penyorotan (highlight) di angka kalender
+        if(isLiburNasional) cell.classList.add('is-libur'); // Libur timpa segalanya jadi merah
+        else if(isUjian) cell.classList.add('has-ujian');  // Garis bawah pink
+        else if(isKegiatan) cell.classList.add('has-agenda'); // Garis bawah oranye
       }
       elCalGrid.appendChild(cell);
     }
     
-    // TAMPILKAN AGENDA HANYA UNTUK BULAN YANG SEDANG DILIHAT SAJA
-    const targetMonthStr = `${y}-${pad2(m+1)}`; // Format: YYYY-MM
+    const targetMonthStr = `${y}-${pad2(m+1)}`; 
     
     const agendaBulanIni = globalAgenda.filter(a => {
         return a.tanggalBersih && a.tanggalBersih.startsWith(targetMonthStr); 
@@ -596,15 +374,27 @@
     if(agendaBulanIni.length > 0) {
         agendaBulanIni.forEach(ag => {
             const [thn, bln, tgl] = ag.tanggalBersih.split('-');
-            
             const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             const blnIndex = parseInt(bln, 10) - 1;
             const namaBulanStr = namaBulan[blnIndex] || bln;
 
+            // Memecah kode rahasia "|||" yang kita buat di form
+            const parts = (ag.kegiatan || "").split('|||');
+            const kategori = parts.length > 1 ? parts[0] : 'Kegiatan Sekolah';
+            const namaKgt = parts.length > 1 ? parts.slice(1).join('|||') : ag.kegiatan;
+
+            let katClass = 'kat-kegiatan';
+            let badgeClass = 'kegiatan';
+            if(kategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
+            if(kategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
+
             agendaContainer.innerHTML += `
-              <div class="agenda-item">
+              <div class="agenda-item ${katClass}">
                 <div class="tgl">${tgl} ${namaBulanStr} ${thn}</div>
-                <div class="kgt">${ag.kegiatan}</div>
+                <div class="kgt">
+                    <span class="badge-kategori ${badgeClass}">${kategori}</span><br>
+                    ${namaKgt}
+                </div>
               </div>
             `;
         });
@@ -616,14 +406,11 @@
     if(rem !== 0){
       const add = 7 - rem;
       for(let i=0;i<add;i++){
-        const cell = document.createElement('div');
-        cell.className = 'cal-day muted';
-        elCalGrid.appendChild(cell);
+        const cell = document.createElement('div'); cell.className = 'cal-day muted'; elCalGrid.appendChild(cell);
       }
     }
   }
 
-  // FUNGSI FETCH AGENDA DARI APPS SCRIPT
   window.fetchAgendaDatabase = async function() {
     try {
         const URL_API = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda";
@@ -633,30 +420,19 @@
         if(json.status === 'success') {
             globalAgenda = json.data.map(item => {
                 let tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
-                if (tgl.length > 10 && tgl.includes('-')) {
-                    tgl = tgl.substring(0, 10);
-                }
+                if (tgl.length > 10 && tgl.includes('-')) tgl = tgl.substring(0, 10);
                 if (tgl.includes('/')) {
                     let p = tgl.split('/');
-                    if (p.length === 3 && p[2].length === 4) {
-                        tgl = `${p[2]}-${pad2(p[1])}-${pad2(p[0])}`;
-                    }
+                    if (p.length === 3 && p[2].length === 4) tgl = `${p[2]}-${pad2(p[1])}-${pad2(p[0])}`;
                 }
-                return {
-                    ...item,
-                    tanggalBersih: tgl 
-                };
+                return { ...item, tanggalBersih: tgl };
             });
-            
-            // Re-render menggunakan bulan yang sedang aktif
             renderCalendar(currentNavDate); 
         }
-    } catch(e) {
-        console.log("Gagal mengambil agenda", e);
-    }
+    } catch(e) { console.log("Gagal mengambil agenda", e); }
   }
 
-  // Weather mapping
+  // Sisa fungsi bawaan (Cuaca & Jadwal Sholat)
   function weatherCodeToText(code){
     const map = {
       0: ['Cerah', '☀️'], 1: ['Cerah Berawan', '🌤️'], 2: ['Berawan', '⛅'], 3: ['Mendung', '☁️'],
@@ -677,13 +453,8 @@
   function startClockLoop(){
     setInterval(() => {
       const now = new Date();
-      elTime.textContent = formatClock(now);
-      elDate.textContent = formatDate(now);
-      elGreeting.textContent = greeting(now);
-
-      if (prayersCache){
-        renderPrayerTimes(prayersCache);
-      }
+      elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now);
+      if (prayersCache) renderPrayerTimes(prayersCache);
     }, 1000);
   }
 
@@ -691,123 +462,67 @@
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' }});
     if(!res.ok) throw new Error('reverse-geocode failed');
-    const data = await res.json();
-    const addr = data.address || {};
+    const data = await res.json(); const addr = data.address || {};
     const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
     const prov = addr.state || addr.province || '';
-    const label = [city, prov].filter(Boolean).join(', ') || (data.display_name || 'Lokasi');
-    return label;
+    return [city, prov].filter(Boolean).join(', ') || (data.display_name || 'Lokasi');
   }
 
-  function getDateYMD(d){
-    const y = d.getFullYear();
-    const m = pad2(d.getMonth()+1);
-    const day = pad2(d.getDate());
-    return `${y}-${m}-${day}`;
-  }
+  function getDateYMD(d){ return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
 
   async function fetchPrayerTimes(lat, lon){
-    const today = new Date();
-    const dateStr = getDateYMD(today); 
+    const dateStr = getDateYMD(new Date()); 
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const url = `https://api.aladhan.com/v1/timings?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&method=${encodeURIComponent(KEMENAG_METHOD_ID)}&school=0&date=${encodeURIComponent(dateStr)}&timezonestring=${encodeURIComponent(tz)}`;
-
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('prayer-times fetch failed');
-    const json = await res.json();
-
-    const t = json?.data?.timings;
+    const res = await fetch(url); if(!res.ok) throw new Error('prayer-times fetch failed');
+    const json = await res.json(); const t = json?.data?.timings;
     if(!t) throw new Error('prayer-times parse failed');
-
-    return {
-      Subuh: (t.Fajr || t.FajrTime || '').slice(0,5) || '--:--',
-      Terbit: (t.Sunrise || t.SunriseTime || '').slice(0,5) || '--:--',
-      Dzuhur: (t.Dhuhr || t.DhuhrTime || '').slice(0,5) || '--:--',
-      Ashar: (t.Asr || t.AsrTime || '').slice(0,5) || '--:--',
-      Maghrib: (t.Maghrib || t.MaghribTime || '').slice(0,5) || '--:--',
-      Isya: (t.Isha || t.IshaTime || '').slice(0,5) || '--:--'
-    };
+    return { Subuh: (t.Fajr||'').slice(0,5)||'--:--', Terbit: (t.Sunrise||'').slice(0,5)||'--:--', Dzuhur: (t.Dhuhr||'').slice(0,5)||'--:--', Ashar: (t.Asr||'').slice(0,5)||'--:--', Maghrib: (t.Maghrib||'').slice(0,5)||'--:--', Isya: (t.Isha||'').slice(0,5)||'--:--' };
   }
 
   async function fetchWeather(lat, lon){
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto`;
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('weather fetch failed');
-
-    const json = await res.json();
-    const cur = json.current || {};
-    const temp = cur.temperature_2m;
-    const code = cur.weather_code;
-    const rainProb = cur.precipitation_probability;
-    const wind = cur.wind_speed_10m;
-
-    const [desc, icon] = weatherCodeToText(code);
-
-    elWeatherIcon.textContent = icon;
-    elWeatherDesc.textContent = desc;
-    if (typeof temp === 'number') elWeatherTemp.textContent = `${Math.round(temp)}°C`; else elWeatherTemp.textContent = '—';
-    if (typeof rainProb === 'number') elWeatherRain.textContent = `${Math.round(rainProb)}%`; else elWeatherRain.textContent = '—';
-    if (typeof wind === 'number') elWeatherWind.textContent = `${Math.round(wind)} km/jam`; else elWeatherWind.textContent = '—';
-
-    const now = new Date();
-    elWeatherTime.textContent = `Update ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+    const res = await fetch(url); if(!res.ok) throw new Error('weather fetch failed');
+    const json = await res.json(); const cur = json.current || {};
+    const [desc, icon] = weatherCodeToText(cur.weather_code);
+    elWeatherIcon.textContent = icon; elWeatherDesc.textContent = desc;
+    elWeatherTemp.textContent = typeof cur.temperature_2m === 'number' ? `${Math.round(cur.temperature_2m)}°C` : '—';
+    elWeatherRain.textContent = typeof cur.precipitation_probability === 'number' ? `${Math.round(cur.precipitation_probability)}%` : '—';
+    elWeatherWind.textContent = typeof cur.wind_speed_10m === 'number' ? `${Math.round(cur.wind_speed_10m)} km/jam` : '—';
+    const now = new Date(); elWeatherTime.textContent = `Update ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
   }
 
   function startInitUI(){
-    const now = new Date();
-    elTime.textContent = formatClock(now);
-    elDate.textContent = formatDate(now);
-    elGreeting.textContent = greeting(now);
-    
-    // Inisialisasi awal ke bulan ini
-    currentNavDate = new Date(); 
-    renderCalendar(currentNavDate);
-
+    const now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now);
+    currentNavDate = new Date(); renderCalendar(currentNavDate);
     elPrayerList.innerHTML = '';
     for (const n of namesOrder){
-      const row = document.createElement('div');
-      row.className = 'prayer-item';
-      row.innerHTML = `
-        <div class="name"><span class="badge" style="background:${dotColors[n]||'var(--green)'}"></span>${n}</div>
-        <div class="time">—</div>
-      `;
+      const row = document.createElement('div'); row.className = 'prayer-item';
+      row.innerHTML = `<div class="name"><span class="badge" style="background:${dotColors[n]||'var(--green)'}"></span>${n}</div><div class="time">—</div>`;
       elPrayerList.appendChild(row);
     }
   }
 
   function startGeolocation(){
     if(!navigator.geolocation){
-      elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
-      locationState.lat = -6.200000; locationState.lon = 106.816666;
-      locationState.place = 'Jakarta'; locationState.ready = true;
-
-      (async () => {
-        try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
-        try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
-      })();
-      return;
+      elChipLokasi.textContent = 'Lokasi: Jakarta (default)'; locationState.lat = -6.200000; locationState.lon = 106.816666; locationState.place = 'Jakarta'; locationState.ready = true;
+      (async () => { try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){} try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){} })(); return;
     }
-
     elChipLokasi.textContent = 'Mencari lokasi...';
     navigator.geolocation.getCurrentPosition(async (pos) => {
       locationState.lat = pos.coords.latitude; locationState.lon = pos.coords.longitude;
       try{ locationState.place = await reverseGeocode(locationState.lat, locationState.lon); }catch(e){ locationState.place = `(${locationState.lat.toFixed(2)}, ${locationState.lon.toFixed(2)})`; }
       elChipLokasi.textContent = `Lokasi: ${locationState.place}`; locationState.ready = true;
-
       try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
       try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
     }, async () => {
-      elChipLokasi.textContent = 'Lokasi: Jakarta (default)';
-      locationState.lat = -6.200000; locationState.lon = 106.816666;
+      elChipLokasi.textContent = 'Lokasi: Jakarta (default)'; locationState.lat = -6.200000; locationState.lon = 106.816666;
       try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
       try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
       locationState.ready = true;
     }, { enableHighAccuracy:false, timeout: 8000, maximumAge: 600000 });
   }
 
-  startInitUI();
-  fetchAgendaDatabase(); // Otomatis ter-update sesuai currentNavDate
-  startClockLoop();
-  startGeolocation();
+  startInitUI(); fetchAgendaDatabase(); startClockLoop(); startGeolocation();
 })();
 </script>
