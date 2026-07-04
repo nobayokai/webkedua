@@ -511,7 +511,7 @@
     }
   }
 
-  // Kalender sederhana (minggu dimulai Senin)
+ // Kalender sederhana (minggu dimulai Senin)
   let globalAgenda = []; // Simpan data dari database
 
   function renderCalendar(date){
@@ -544,15 +544,10 @@
       const isToday = day === today.getDate() && y === today.getFullYear() && m === today.getMonth();
       if (isToday) cell.classList.add('today');
 
-      // CEK APAKAH ADA AGENDA DI TANGGAL INI (Hanya untuk kalender bulan berjalan)
+      // Cek agenda untuk tanggal ini
       const tglStr = `${y}-${pad2(m+1)}-${pad2(day)}`;
       
-      // PERBAIKAN: Hilangkan tanda kutip bawaan Google Sheets saat pengecekan
-      const agendanya = globalAgenda.filter(a => {
-          if(!a.tanggal) return false;
-          const tglBersih = a.tanggal.replace(/['"]/g, '').trim();
-          return tglBersih === tglStr;
-      });
+      const agendanya = globalAgenda.filter(a => a.tanggalBersih === tglStr);
       
       if(agendanya.length > 0) {
         cell.classList.add('has-agenda');
@@ -560,24 +555,18 @@
       elCalGrid.appendChild(cell);
     }
     
-    // PERBAIKAN: Tampilkan SEMUA agenda yang akan datang di list bagian bawah
-    const hariIniStr = getDateYMD(today); // "YYYY-MM-DD"
+    // Tampilkan SEMUA agenda dari hari ini dan masa depan
+    const hariIniStr = getDateYMD(today); 
     const agendaMendatang = globalAgenda.filter(a => {
-        if(!a.tanggal) return false;
-        const tglBersih = a.tanggal.replace(/['"]/g, '').trim();
-        return tglBersih >= hariIniStr; // Hanya ambil agenda dari hari ini dan masa depan
+        return a.tanggalBersih >= hariIniStr; 
     }).sort((a, b) => {
-        const tglA = a.tanggal.replace(/['"]/g, '').trim();
-        const tglB = b.tanggal.replace(/['"]/g, '').trim();
-        return tglA.localeCompare(tglB); // Urutkan dari tanggal yang paling dekat
+        return a.tanggalBersih.localeCompare(b.tanggalBersih); 
     });
 
     if(agendaMendatang.length > 0) {
         agendaMendatang.forEach(ag => {
-            const tglBersih = ag.tanggal.replace(/['"]/g, '').trim(); // "2026-12-07"
-            const [thn, bln, tgl] = tglBersih.split('-');
+            const [thn, bln, tgl] = ag.tanggalBersih.split('-');
             
-            // Ubah format angka bulan menjadi teks
             const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             const blnIndex = parseInt(bln, 10) - 1;
             const namaBulanStr = namaBulan[blnIndex] || bln;
@@ -603,23 +592,46 @@
       }
     }
   }
+
   // FUNGSI BARU UNTUK FETCH AGENDA DARI APPS SCRIPT
   async function fetchAgendaDatabase() {
     try {
-        // GANTI DENGAN URL WEB APP KAMU!
         const URL_API = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda";
         const res = await fetch(URL_API);
         const json = await res.json();
         
+        console.log("Respon Database Agenda:", json); // Untuk mengecek data di Inspect Element
+
         if(json.status === 'success') {
-            globalAgenda = json.data;
-            renderCalendar(new Date()); // Refresh kalender setelah data didapat
+            // Saring dan rapikan semua format tanggal dari Google Sheets
+            globalAgenda = json.data.map(item => {
+                let tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
+                
+                // Jika mengandung jam (misal 2026-07-12T15:00:00Z), potong 10 huruf pertama
+                if (tgl.length > 10 && tgl.includes('-')) {
+                    tgl = tgl.substring(0, 10);
+                }
+                
+                // Jika formatnya DD/MM/YYYY dari Google Sheets
+                if (tgl.includes('/')) {
+                    let p = tgl.split('/');
+                    if (p.length === 3 && p[2].length === 4) {
+                        tgl = `${p[2]}-${pad2(p[1])}-${pad2(p[0])}`;
+                    }
+                }
+                
+                return {
+                    ...item,
+                    tanggalBersih: tgl // Kita pakai properti baru yang formatnya pasti YYYY-MM-DD
+                };
+            });
+
+            renderCalendar(new Date()); 
         }
     } catch(e) {
         console.log("Gagal mengambil agenda", e);
     }
   }
-
   // Weather mapping (open-meteo weather_code)
   function weatherCodeToText(code){
     const map = {
