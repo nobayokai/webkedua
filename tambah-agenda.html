@@ -47,16 +47,13 @@
             namaGuru = parsedData.nama || 'Guru';
         }
         
-        // TRIK CERDAS: Menggabungkan Kategori dan Nama Kegiatan dengan pembatas "|||"
-        const kategori = document.getElementById('input-kategori-agenda').value;
-        const namaKegiatan = document.getElementById('input-nama-agenda').value;
-        const kegiatanGabungan = kategori + "|||" + namaKegiatan;
-
+        // KINI DATA DIKIRIM TERPISAH (TIDAK DIGABUNG LAGI)
         const payload = {
             action: 'add_agenda',
             tanggal: document.getElementById('input-tanggal-agenda').value,
-            kegiatan: kegiatanGabungan,
-            pembuat: namaGuru
+            kegiatan: document.getElementById('input-nama-agenda').value,
+            pembuat: namaGuru,
+            kategori: document.getElementById('input-kategori-agenda').value // <-- Parameter Kategori Baru
         };
 
         try {
