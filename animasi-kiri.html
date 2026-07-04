@@ -305,7 +305,7 @@
       renderCalendar(currentNavDate);
   });
 
-  function renderCalendar(date){
+function renderCalendar(date){
     const y = date.getFullYear(); const m = date.getMonth();
     const first = new Date(y, m, 1); const last = new Date(y, m+1, 0);
 
@@ -330,7 +330,7 @@
       const currentDate = new Date(y, m, day);
       const dayOfWeek = currentDate.getDay();
       
-      // 1. MERAHKAN HARI SABTU (6) DAN MINGGU (0)
+      // MERAHKAN HARI SABTU (6) DAN MINGGU (0)
       if(dayOfWeek === 0 || dayOfWeek === 6) {
           cell.classList.add('is-libur');
       }
@@ -347,8 +347,12 @@
         let isKegiatan = false;
 
         agendanya.forEach(a => {
-            const parts = (a.kegiatan || "").split('|||');
-            const kat = parts.length > 1 ? parts[0] : 'Kegiatan Sekolah';
+            // Kita prioritaskan kolom Kategori (a.kategori) yang baru
+            // Jika kosong, kita cek barangkali ada data lama yang pakai "|||"
+            let kat = a.kategori || 'Kegiatan Sekolah';
+            if (a.kegiatan && a.kegiatan.includes('|||')) {
+                 kat = a.kegiatan.split('|||')[0];
+            }
             
             if(kat === 'Libur Nasional') isLiburNasional = true;
             else if(kat === 'Ujian Sekolah') isUjian = true;
@@ -356,9 +360,9 @@
         });
 
         // Terapkan penyorotan (highlight) di angka kalender
-        if(isLiburNasional) cell.classList.add('is-libur'); // Libur timpa segalanya jadi merah
-        else if(isUjian) cell.classList.add('has-ujian');  // Garis bawah pink
-        else if(isKegiatan) cell.classList.add('has-agenda'); // Garis bawah oranye
+        if(isLiburNasional) cell.classList.add('is-libur');
+        else if(isUjian) cell.classList.add('has-ujian'); 
+        else if(isKegiatan) cell.classList.add('has-agenda'); 
       }
       elCalGrid.appendChild(cell);
     }
@@ -378,21 +382,27 @@
             const blnIndex = parseInt(bln, 10) - 1;
             const namaBulanStr = namaBulan[blnIndex] || bln;
 
-            // Memecah kode rahasia "|||" yang kita buat di form
-            const parts = (ag.kegiatan || "").split('|||');
-            const kategori = parts.length > 1 ? parts[0] : 'Kegiatan Sekolah';
-            const namaKgt = parts.length > 1 ? parts.slice(1).join('|||') : ag.kegiatan;
+            // Baca Kategori dari kolom database terbaru
+            let finalKategori = ag.kategori || 'Kegiatan Sekolah';
+            let namaKgt = ag.kegiatan || '';
+
+            // Penyelamat data testing lama (kalau masih ada yang pakai |||)
+            if(namaKgt.includes('|||')) {
+                const parts = namaKgt.split('|||');
+                finalKategori = parts[0];
+                namaKgt = parts.slice(1).join('|||');
+            }
 
             let katClass = 'kat-kegiatan';
             let badgeClass = 'kegiatan';
-            if(kategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
-            if(kategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
+            if(finalKategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
+            if(finalKategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
 
             agendaContainer.innerHTML += `
               <div class="agenda-item ${katClass}">
                 <div class="tgl">${tgl} ${namaBulanStr} ${thn}</div>
                 <div class="kgt">
-                    <span class="badge-kategori ${badgeClass}">${kategori}</span><br>
+                    <span class="badge-kategori ${badgeClass}">${finalKategori}</span><br>
                     ${namaKgt}
                 </div>
               </div>
