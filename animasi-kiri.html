@@ -93,6 +93,18 @@
   .badge-kategori.ujian    { background: var(--pink); }
   .badge-kategori.libur    { background: #ef4444; }
 
+  /* CSS BARU: ANIMASI LOADING SPINNER */
+  .agenda-loader {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800;
+  }
+  .spinner-circle {
+      width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2);
+      border-top: 3px solid var(--green); border-radius: 50%;
+      animation: spin 1s linear infinite;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
   /* Prayer List CSS */
   .prayer{ display:flex; flex-direction: column; height: 100%; min-height: 0; }
   .prayer-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
@@ -108,7 +120,7 @@
   .prayer-item.active .time{ color: rgba(4,120,87,.98); }
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
-  /* CSS BARU MODAL POPUP ALAT IPHONE GLASSMORPHISM (DIKUNCI FIX) */
+  /* CSS MODAL POPUP ALAT IPHONE GLASSMORPHISM */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.45); 
@@ -122,24 +134,14 @@
   .modal-calendar-card {
     background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
-    
-    /* FIX KUNCI LEBAR & TINGGI KALENDER AGAR PRESISI DI HP */
-    box-sizing: border-box; 
-    width: 92vw; /* Persentase pasti ngikut layar HP */
-    max-width: 380px; 
-    max-height: 85vh; 
-    overflow-y: auto; 
-    overflow-x: hidden; 
-    
-    padding: 15px; /* Padding ditipiskan agar grid tidak berdesakan */
-    position: relative; transform: scale(0.9); transition: transform 0.3s ease;
+    box-sizing: border-box; width: 92vw; max-width: 380px; max-height: 85vh; 
+    overflow-y: auto; overflow-x: hidden; 
+    padding: 15px; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
   }
   .modal-overlay.active .modal-calendar-card { transform: scale(1); }
   
   .modal-close-btn {
-    position: absolute; 
-    top: 12px; right: 12px; 
-    background: #ef4444; border: none;
+    position: absolute; top: 12px; right: 12px; background: #ef4444; border: none;
     border-radius: 50%; width: 30px; height: 30px; font-size: 14px; font-weight: bold;
     color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); z-index: 10; transition: 0.2s;
@@ -211,8 +213,7 @@
       </div>
       <div class="cal-grid" id="cal-grid"></div>
       <div class="agenda-list-wrap" id="agenda-list-container" style="max-height: 90px;">
-          <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Memuat agenda...</div>
-      </div>
+          </div>
     </div>
   </div>
 
@@ -241,8 +242,7 @@
         <div class="cal-grid" id="modal-cal-grid" style="gap:5px; font-size:12px;"></div>
         
         <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px;">
-            <div style="text-align:center; font-size:12px; color:rgba(0,0,0,0.5);">Memuat agenda...</div>
-        </div>
+            </div>
     </div>
 </div>
 
@@ -342,7 +342,6 @@
   const btnCloseModal = document.getElementById('btn-close-modal');
   const sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
   
-  // TRIK SAKTI: Pindahkan Modal keluar dari kerangka buku agar bisa Fullscreen penuh
   if (modalOverlay) {
       document.body.appendChild(modalOverlay);
   }
@@ -362,10 +361,13 @@
 
 
   // ==========================================
-  // KALENDER & AGENDA (MERENDER 2 KALENDER SEKALIGUS)
+  // KALENDER & AGENDA (DENGAN STATUS LOADING)
   // ==========================================
   let globalAgenda = []; 
   let currentNavDate = new Date(); 
+  
+  // VARIABEL STATUS LOADING (BARU)
+  let isAgendaLoading = true; 
 
   document.getElementById('btn-prev-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('btn-next-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
@@ -429,7 +431,7 @@
           const tglStr = `${y}-${pad2(m+1)}-${pad2(day)}`;
           const agendanya = globalAgenda.filter(a => a.tanggalBersih === tglStr);
           
-          if(agendanya.length > 0) {
+          if(agendanya.length > 0 && !isAgendaLoading) {
             let isLiburNasional = false, isUjian = false, isKegiatan = false;
 
             agendanya.forEach(a => {
@@ -448,7 +450,17 @@
           t.gridEl.appendChild(cell);
         }
         
-        if(agendaBulanIni.length > 0) {
+        // PENGATURAN TAMPILAN LIST AGENDA (LOADING VS DATA VS KOSONG)
+        if (isAgendaLoading) {
+            // Tampilkan animasi spinner saat sedang fetch data
+            t.listEl.innerHTML = `
+              <div class="agenda-loader">
+                <div class="spinner-circle"></div>
+                <div>Sinkronisasi data...</div>
+              </div>
+            `;
+        } else if (agendaBulanIni.length > 0) {
+            // Tampilkan data agenda jika ada
             agendaBulanIni.forEach(ag => {
                 const [thn, bln, tgl] = ag.tanggalBersih.split('-');
                 const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -479,7 +491,8 @@
                 `;
             });
         } else {
-            t.listEl.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Tidak ada agenda di bulan ini</div>';
+            // Tampilkan teks kosong jika memang tidak ada data di bulan tersebut
+            t.listEl.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top: 15px;">Tidak ada agenda di bulan ini</div>';
         }
 
         const rem = t.gridEl.children.length % 7;
@@ -492,7 +505,11 @@
     });
   }
 
+  // FUNGSI FETCH DENGAN SISTEM LOADING TERBARU
   window.fetchAgendaDatabase = async function() {
+    isAgendaLoading = true; // Nyalakan status loading
+    renderCalendar(currentNavDate); // Tampilkan animasi di layar
+
     try {
         const URL_API = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda";
         const res = await fetch(URL_API);
@@ -508,9 +525,14 @@
                 }
                 return { ...item, tanggalBersih: tgl };
             });
-            renderCalendar(currentNavDate); 
         }
-    } catch(e) { console.log("Gagal mengambil agenda", e); }
+    } catch(e) { 
+        console.log("Gagal mengambil agenda", e); 
+    } finally {
+        // Apapun hasilnya (sukses/gagal), matikan loading dan render ulang!
+        isAgendaLoading = false; 
+        renderCalendar(currentNavDate); 
+    }
   }
 
   // Sisa fungsi bawaan (Cuaca & Jadwal Sholat)
