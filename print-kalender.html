@@ -17,72 +17,73 @@
             --text: #2c2c2c;
         }
 
-        @page { size: 210mm 330mm; margin: 10mm 15mm; }
+        /* PERBAIKAN 1: Perkecil margin paksa dari printer browser menjadi 5mm */
+        @page { size: 210mm 330mm; margin: 8mm 10mm; }
         
         body { font-family: 'Arial', sans-serif; background: white; margin: 0; padding: 0; color: var(--text); }
         
-        /* KUNCI HALAMAN AGAR TIDAK TUMPAH KE BAWAH */
+        /* PERBAIKAN 2: Kunci tinggi total, jangan biarkan tumpah. F4 = 330mm. Sisa 314mm. */
         .halaman-f4 { 
-            width: 180mm; margin: 0 auto; 
-            height: 310mm; max-height: 310mm; /* Kunci tinggi maksimal F4 */
+            width: 100%; 
+            height: 314mm; max-height: 314mm; 
             display: flex; flex-direction: column; 
-            page-break-after: always; padding-top: 5mm;
-            overflow: hidden; 
+            page-break-after: always; 
+            overflow: hidden; /* Menggunting apapun yang melewati batas ini */
+            box-sizing: border-box;
         }
         
-        .header { text-align: center; border-bottom: 4px double var(--green2); margin-bottom: 6mm; padding-bottom: 4mm; flex-shrink: 0; }
-        .header h1 { color: var(--green2); margin:0; font-size: 24px; font-family: 'Georgia', serif; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;}
-        .header h2 { color: var(--green); margin: 4px 0 0 0; font-size: 16px; letter-spacing: 2px; }
+        .header { text-align: center; border-bottom: 3px double var(--green2); margin-bottom: 4mm; padding-bottom: 2mm; flex-shrink: 0; }
+        .header h1 { color: var(--green2); margin:0; font-size: 20px; font-family: 'Georgia', serif; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;}
+        .header h2 { color: var(--green); margin: 2px 0 0 0; font-size: 13px; letter-spacing: 2px; }
 
-        /* GRID KALENDER DI BAGIAN ATAS */
-        .grid-kalender { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm 8mm; margin-bottom: 6mm; }
+        /* GRID KALENDER DI BAGIAN ATAS (DIPADATKAN) */
+        .grid-kalender { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 6mm; margin-bottom: 4mm; }
         
-        .kotak-bulan { border: 2px solid #e5e7eb; border-radius: 12px; padding: 4mm; background: #fafafa; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02); overflow: hidden; }
-        .kotak-bulan h3 { text-align: center; margin: 0 0 3mm 0; color: var(--green2); font-family: 'Georgia', serif; font-size: 16px; font-weight: 900; text-transform: uppercase;}
+        .kotak-bulan { border: 2px solid #e5e7eb; border-radius: 10px; padding: 2.5mm; background: #fafafa; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02); overflow: hidden; }
+        .kotak-bulan h3 { text-align: center; margin: 0 0 2mm 0; color: var(--green2); font-family: 'Georgia', serif; font-size: 13px; font-weight: 900; text-transform: uppercase;}
         
-        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: bold; color: #6b7280; margin-bottom: 4px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; font-size: 12px; font-weight: bold; text-align: center; }
+        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9.5px; font-weight: bold; color: #6b7280; margin-bottom: 2px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 10.5px; font-weight: bold; text-align: center; }
         
-        .cal-day { padding: 4px 0; border-radius: 6px; background: white; border: 1px solid #f3f4f6; color: #4b5563; }
+        .cal-day { padding: 2px 0; border-radius: 4px; background: white; border: 1px solid #f3f4f6; color: #4b5563; }
         .cal-day.muted { background: transparent; border: none; }
         
-        /* Kategori Tanggalan */
         .cal-day.is-libur { background: #fee2e2 !important; color: #dc2626 !important; border-color: #fca5a5 !important; }
-        .cal-day.has-agenda { border-bottom: 3px solid var(--amber) !important; color: var(--text); }
-        .cal-day.has-ujian { border-bottom: 3px solid var(--pink) !important; color: var(--text); }
+        .cal-day.has-agenda { border-bottom: 2.5px solid var(--amber) !important; color: var(--text); }
+        .cal-day.has-ujian { border-bottom: 2.5px solid var(--pink) !important; color: var(--text); }
 
-        /* REKAP AGENDA DI BAGIAN BAWAH (MULTI-KOLOM) */
-        .rekap-agenda-container { flex: 1; border-top: 3px double var(--green2); padding-top: 4mm; display: flex; flex-direction: column; overflow: hidden;}
-        .rekap-title { text-align: center; color: var(--green2); font-family: 'Georgia', serif; font-size: 14px; font-weight: 900; margin-bottom: 3mm; text-transform: uppercase; letter-spacing: 1px;}
+        /* REKAP AGENDA DI BAGIAN BAWAH (UKURAN DIPERKECIL & DIPADATKAN) */
+        .rekap-agenda-container { flex: 1; border-top: 2px dashed var(--green2); padding-top: 2.5mm; display: flex; flex-direction: column; overflow: hidden;}
+        .rekap-title { text-align: center; color: var(--green2); font-family: 'Georgia', serif; font-size: 12px; font-weight: 900; margin-bottom: 2.5mm; text-transform: uppercase; letter-spacing: 1px;}
         
-        /* TRIK SAKTI: Otomatis membagi jadi 3-4 kolom menyesuaikan data */
         .rekap-grid { 
             flex: 1; 
-            column-width: 42mm; /* Lebar minimal 1 kolom */
-            column-gap: 5mm; 
+            column-width: 38mm; /* Diperkecil agar bisa memuat hingga 4 kolom jika penuh */
+            column-gap: 4mm; 
             overflow: hidden; 
         }
         
         .rekap-item { 
-            background: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid; 
-            padding: 2.5mm 3mm; border-radius: 6px; 
-            display: inline-block; /* Cegah terpotong di tengah-tengah item */
-            width: 100%; box-sizing: border-box; margin-bottom: 3mm; 
+            background: #f9fafb; border: 1px solid #e5e7eb; border-left: 3px solid; 
+            padding: 1.5mm 2.5mm; border-radius: 5px; 
+            display: inline-block; 
+            width: 100%; box-sizing: border-box; margin-bottom: 2mm; 
             break-inside: avoid; page-break-inside: avoid; 
         }
         .rekap-item.kat-kegiatan { border-left-color: var(--amber); }
         .rekap-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.05) !important; }
         .rekap-item.kat-libur    { border-left-color: #ef4444; background: rgba(239,68,68,0.05) !important; }
         
-        .rekap-date { font-weight: 900; font-size: 9.5px; color: #4b5563; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;}
-        .rekap-name { font-weight: bold; font-size: 11.5px; color: var(--text); line-height: 1.2;}
+        /* Font dan jarak diperkecil ekstrim tapi tetap tajam */
+        .rekap-date { font-weight: 900; font-size: 8px; color: #4b5563; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1px;}
+        .rekap-name { font-weight: bold; font-size: 9.5px; color: var(--text); line-height: 1.1;}
         
-        .badge-kategori { font-size: 7px; padding: 2px 4px; border-radius: 3px; color: white; display: inline-block; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;}
+        .badge-kategori { font-size: 6px; padding: 1.5px 3px; border-radius: 2px; color: white; display: inline-block; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;}
         .badge-kategori.kegiatan { background: var(--amber) !important; }
         .badge-kategori.ujian    { background: var(--pink) !important; }
         .badge-kategori.libur    { background: #ef4444 !important; }
 
-        .btn-print { position:fixed; top:20px; right:20px; padding:12px 24px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 12px rgba(16,185,129,0.3); z-index: 999; }
+        .btn-print { position:fixed; top:20px; right:20px; padding:10px 20px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 12px rgba(16,185,129,0.3); z-index: 999; }
         .btn-print:hover { background: #059669; }
         
         #loading-screen { position: fixed; top:0; left:0; width: 100vw; height: 100vh; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
@@ -259,7 +260,7 @@
                             `;
                         });
                     } else {
-                        rekapGrid.innerHTML = `<div style="text-align: center; color: #9ca3af; font-style: italic;">Tidak ada agenda di rentang bulan ini.</div>`;
+                        rekapGrid.innerHTML = `<div style="text-align: center; color: #9ca3af; font-style: italic; font-size: 10px;">Tidak ada agenda di rentang bulan ini.</div>`;
                     }
 
                     rekapContainer.appendChild(rekapGrid);
@@ -268,6 +269,10 @@
                 });
 
                 document.getElementById('loading-screen').style.display = 'none';
+
+                // Trik: Langsung memicu jendela print saat load selesai 
+                // Jika dirasa mengganggu, hapus/comment saja baris ini.
+                setTimeout(() => { window.print(); }, 500);
 
             } catch (err) {
                 document.getElementById('loading-screen').innerHTML = `<h2 style="color:red;">❌ Gagal mengambil data. Periksa koneksi internet.</h2>`;
@@ -283,10 +288,7 @@
             
             let html = `<div class="kotak-bulan">`;
             html += `<h3>${monthName}</h3>`;
-            
-            // PERBAIKAN URUTAN HARI: Dimulai dari Senin, diakhiri Sabtu & Minggu (Merah)
             html += `<div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>`;
-            
             html += `<div class="cal-grid">`;
 
             for(let i=0; i<firstDayIdx; i++) { html += `<div class="cal-day muted"></div>`; }
