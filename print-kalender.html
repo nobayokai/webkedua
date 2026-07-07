@@ -4,58 +4,249 @@
     <meta charset="UTF-8">
     <title>Print Kalender Sekolah</title>
     <style>
-        @page { size: 210mm 330mm; margin: 15mm; }
-        body { font-family: 'Arial', sans-serif; background: white; margin: 0; padding: 0; }
-        .halaman-f4 { width: 180mm; margin: 0 auto; }
-        .header { text-align: center; border-bottom: 4px double #047857; margin-bottom: 8mm; padding-bottom: 4mm; }
-        .grid-kalender { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
-        .kotak-bulan { border: 2px solid #e5e7eb; border-radius: 12px; padding: 4mm; }
-        h3 { text-align: center; color: #047857; font-family: 'Georgia', serif; }
-        .grid-tgl { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; }
-        @media print { .btn-print { display: none; } }
+        /* WAJIB AGAR WARNA BACKGROUND IKUT TERCETAK DI PDF */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        :root {
+            --green: #10b981; --green2: #047857;
+            --pink: #f472b6; --purple: #a78bfa;
+            --blue: #38bdf8; --amber: #f59e0b;
+            --text: #2c2c2c;
+        }
+
+        @page { size: 210mm 330mm; margin: 10mm 15mm; }
+        
+        body { font-family: 'Arial', sans-serif; background: white; margin: 0; padding: 0; color: var(--text); }
+        
+        .halaman-f4 { width: 180mm; margin: 0 auto; height: 310mm; display: flex; flex-direction: column; page-break-after: always; padding-top: 5mm;}
+        
+        .header { text-align: center; border-bottom: 4px double var(--green2); margin-bottom: 6mm; padding-bottom: 4mm; flex-shrink: 0; }
+        .header h1 { color: var(--green2); margin:0; font-size: 24px; font-family: 'Georgia', serif; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;}
+        .header h2 { color: var(--green); margin: 4px 0 0 0; font-size: 16px; letter-spacing: 2px; }
+
+        .grid-kalender { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 6mm; flex: 1; }
+        
+        .kotak-bulan { border: 2px solid #e5e7eb; border-radius: 16px; padding: 5mm; background: #fafafa; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.03); overflow: hidden; }
+        .kotak-bulan h3 { text-align: center; margin: 0 0 4mm 0; color: var(--green2); font-family: 'Georgia', serif; font-size: 16px; font-weight: 900; }
+        
+        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: bold; color: #6b7280; margin-bottom: 4px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; font-size: 12px; font-weight: bold; text-align: center; }
+        
+        .cal-day { padding: 4px 0; border-radius: 6px; background: white; border: 1px solid #f3f4f6; color: #4b5563; }
+        .cal-day.muted { background: transparent; border: none; }
+        
+        /* Kategori Tanggalan */
+        .cal-day.is-libur { background: #fee2e2 !important; color: #dc2626 !important; border-color: #fca5a5 !important; }
+        .cal-day.has-agenda { border-bottom: 3px solid var(--amber) !important; color: var(--text); }
+        .cal-day.has-ujian { border-bottom: 3px solid var(--pink) !important; color: var(--text); }
+
+        /* List Agenda */
+        .agenda-list-wrap { margin-top: 4mm; border-top: 1.5px dashed #d1d5db; padding-top: 3mm; display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; }
+        .agenda-item { background: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; border-left: 3px solid; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .agenda-item.kat-kegiatan { border-left-color: var(--amber); }
+        .agenda-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.1) !important; }
+        .agenda-item.kat-libur    { border-left-color: #ef4444; background: rgba(239,68,68,0.1) !important; }
+        
+        .agenda-item .tgl { font-weight: bold; color: #6b7280; font-size: 8px; margin-bottom: 2px;}
+        .agenda-item .kgt { font-weight: bold; color: var(--text); line-height: 1.3; }
+        
+        .badge-kategori { font-size: 7px; padding: 2px 4px; border-radius: 3px; color: white; display: inline-block; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+        .badge-kategori.kegiatan { background: var(--amber) !important; }
+        .badge-kategori.ujian    { background: var(--pink) !important; }
+        .badge-kategori.libur    { background: #ef4444 !important; }
+
+        .btn-print { position:fixed; top:20px; right:20px; padding:12px 24px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 12px rgba(16,185,129,0.3); z-index: 999; }
+        .btn-print:hover { background: #059669; }
+        
+        /* Loading Screen */
+        #loading-screen { position: fixed; top:0; left:0; width: 100vw; height: 100vh; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        
+        @media print { 
+            .btn-print { display: none !important; } 
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
-    <button class="btn-print" onclick="window.print()" style="position:fixed; top:20px; right:20px; padding:10px 20px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer;">🖨️ CETAK / SAVE AS PDF</button>
     
-    <div class="halaman-f4" id="print-area">
-        <div class="header">
-            <h1 style="color: #047857; margin:0; font-size: 26px;">Kalender Kegiatan Sekolah</h1>
-            <h2 style="color: #10b981; margin: 0; font-size: 18px;">SDIT HIDAYATUT TAUFIQ</h2>
-        </div>
-        <div class="grid-kalender" id="konten-kalender"></div>
+    <div id="loading-screen">
+        <h2 style="color: #047857; font-family: 'Georgia', serif;">⏳ Menyiapkan Dokumen Kalender...</h2>
+        <p style="color: #6b7280;">Mengambil data dari server, mohon tunggu sebentar.</p>
+    </div>
+
+    <button class="btn-print" onclick="window.print()">🖨️ CETAK / SAVE AS PDF</button>
+    
+    <div id="cetak-area">
+        <!-- Halaman akan di-generate otomatis oleh JS -->
     </div>
 
     <script>
-        // Ambil data agenda dari localStorage atau fetch langsung
-        async function loadPrintData() {
-            const res = await fetch('https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda');
-            const json = await res.json();
-            const globalAgenda = json.data.map(item => {
-                let tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
-                if (tgl.length > 10) tgl = tgl.substring(0, 10);
-                return { ...item, tanggalBersih: tgl };
-            });
+        function pad2(n){ return String(n).padStart(2,'0'); }
 
-            // Simulasi render 6 bulan (Bapak bisa ubah rentang ini sesuai kebutuhan)
-            const konten = document.getElementById('konten-kalender');
-            for(let i=0; i<6; i++) {
-                let d = new Date(); d.setMonth(d.getMonth() + i);
-                renderBulan(d, globalAgenda, konten);
+        async function loadPrintData() {
+            // Tangkap parameter dari URL (Bulan Mulai & Selesai)
+            const urlParams = new URLSearchParams(window.location.search);
+            let start = urlParams.get('start');
+            let end = urlParams.get('end');
+            
+            // Default jika tidak ada parameter (Bulan ini sampai 5 bulan ke depan)
+            if(!start || !end) {
+                const today = new Date();
+                start = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+                today.setMonth(today.getMonth() + 5);
+                end = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+            }
+
+            let currDate = new Date(start + '-01');
+            let endDate = new Date(end + '-01');
+
+            // Susun array bulan yang akan dicetak
+            let monthsData = [];
+            while(currDate <= endDate) {
+                monthsData.push(new Date(currDate));
+                currDate.setMonth(currDate.getMonth() + 1);
+            }
+
+            // Ambil data agenda dari Apps Script
+            try {
+                const res = await fetch('https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda');
+                const json = await res.json();
+                
+                const globalAgenda = json.data.map(item => {
+                    let tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
+                    if (tgl.length > 10) tgl = tgl.substring(0, 10);
+                    return { ...item, tanggalBersih: tgl };
+                });
+
+                // Pecah menjadi per halaman (1 halaman = 6 bulan)
+                const chunks = [];
+                for(let i=0; i<monthsData.length; i+=6) {
+                    chunks.push(monthsData.slice(i, i+6));
+                }
+
+                const cetakArea = document.getElementById('cetak-area');
+                cetakArea.innerHTML = ''; // Bersihkan
+
+                chunks.forEach(chunk => {
+                    // Buat 1 Halaman F4
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'halaman-f4';
+                    
+                    // Header Sekolah
+                    pageDiv.innerHTML = `
+                        <div class="header">
+                            <h1>Kalender Kegiatan Sekolah</h1>
+                            <h2>SDIT HIDAYATUT TAUFIQ</h2>
+                        </div>
+                    `;
+
+                    // Grid Kalender
+                    const gridKalender = document.createElement('div');
+                    gridKalender.className = 'grid-kalender';
+
+                    chunk.forEach(dateObj => {
+                        renderBulan(dateObj, globalAgenda, gridKalender);
+                    });
+
+                    pageDiv.appendChild(gridKalender);
+                    cetakArea.appendChild(pageDiv);
+                });
+
+                // Hilangkan Loading Screen
+                document.getElementById('loading-screen').style.display = 'none';
+                
+                // Opsional: Langsung panggil menu print otomatis
+                // window.print(); 
+
+            } catch (err) {
+                document.getElementById('loading-screen').innerHTML = `<h2 style="color:red;">❌ Gagal mengambil data. Periksa koneksi internet.</h2>`;
             }
         }
 
         function renderBulan(date, agenda, container) {
             const y = date.getFullYear(); const m = date.getMonth();
             const lastDay = new Date(y, m+1, 0).getDate();
-            const monthName = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
+            const firstDayIdx = (new Date(y, m, 1).getDay() + 6) % 7; // Mulai Senin (jsToMondayIndex)
             
-            let html = `<div class="kotak-bulan"><h3>${monthName}</h3><div class="grid-tgl">`;
-            for(let d=1; d<=lastDay; d++) { html += `<div>${d}</div>`; }
-            html += `</div></div>`;
+            const monthName = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
+            const targetMonthStr = `${y}-${pad2(m+1)}`;
+            const agendanya = agenda.filter(a => a.tanggalBersih && a.tanggalBersih.startsWith(targetMonthStr)).sort((a,b) => a.tanggalBersih.localeCompare(b.tanggalBersih));
+            
+            let html = `<div class="kotak-bulan">`;
+            html += `<h3>${monthName}</h3>`;
+            html += `<div class="cal-weekdays"><div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div></div>`;
+            html += `<div class="cal-grid">`;
+
+            // Offset hari kosong
+            for(let i=0; i<firstDayIdx; i++) { html += `<div class="cal-day muted"></div>`; }
+
+            // Tanggalan
+            for(let d=1; d<=lastDay; d++) {
+                const dayOfWeek = new Date(y, m, d).getDay();
+                let extraClass = '';
+                if(dayOfWeek === 0 || dayOfWeek === 6) extraClass = 'is-libur';
+
+                const tglStr = `${y}-${pad2(m+1)}-${pad2(d)}`;
+                const hasAgenda = agendanya.some(a => a.tanggalBersih === tglStr);
+                
+                if(hasAgenda) {
+                    let isLiburNasional = false, isUjian = false, isKegiatan = false;
+                    agendanya.forEach(a => {
+                        let kat = a.kategori || 'Kegiatan Sekolah';
+                        if (a.kegiatan && a.kegiatan.includes('|||')) kat = a.kegiatan.split('|||')[0];
+                        if(kat === 'Libur Nasional') isLiburNasional = true;
+                        else if(kat === 'Ujian Sekolah') isUjian = true;
+                        else isKegiatan = true;
+                    });
+                    if(isLiburNasional) extraClass = 'is-libur';
+                    else if(isUjian) extraClass += ' has-ujian';
+                    else extraClass += ' has-agenda';
+                }
+                
+                html += `<div class="cal-day ${extraClass}">${d}</div>`;
+            }
+            html += `</div>`; // End cal-grid
+
+            // List Agenda
+            html += `<div class="agenda-list-wrap">`;
+            if(agendanya.length > 0) {
+                agendanya.forEach(ag => {
+                    const tglNum = ag.tanggalBersih.split('-')[2];
+                    let finalKategori = ag.kategori || 'Kegiatan Sekolah';
+                    let namaKgt = ag.kegiatan || '';
+                    if(namaKgt.includes('|||')) {
+                        const parts = namaKgt.split('|||');
+                        finalKategori = parts[0];
+                        namaKgt = parts.slice(1).join('|||');
+                    }
+
+                    let katClass = 'kat-kegiatan', badgeClass = 'kegiatan';
+                    if(finalKategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
+                    if(finalKategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
+
+                    html += `
+                        <div class="agenda-item ${katClass}">
+                            <div class="tgl">${parseInt(tglNum,10)} ${monthName}</div>
+                            <div class="kgt">
+                                <span class="badge-kategori ${badgeClass}">${finalKategori}</span><br>
+                                ${namaKgt}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<div style="text-align:center; color:#9ca3af; font-size:10px; font-style:italic; margin-top:5px;">Tidak ada agenda</div>`;
+            }
+            html += `</div>`; // End agenda-list-wrap
+
+            html += `</div>`; // End kotak-bulan
             container.innerHTML += html;
         }
 
+        // Panggil fungsi utama
         loadPrintData();
     </script>
 </body>
