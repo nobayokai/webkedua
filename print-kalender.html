@@ -158,9 +158,6 @@
                 // Hilangkan Loading Screen
                 document.getElementById('loading-screen').style.display = 'none';
                 
-                // Opsional: Langsung panggil menu print otomatis
-                // window.print(); 
-
             } catch (err) {
                 document.getElementById('loading-screen').innerHTML = `<h2 style="color:red;">❌ Gagal mengambil data. Periksa koneksi internet.</h2>`;
             }
@@ -169,7 +166,7 @@
         function renderBulan(date, agenda, container) {
             const y = date.getFullYear(); const m = date.getMonth();
             const lastDay = new Date(y, m+1, 0).getDate();
-            const firstDayIdx = (new Date(y, m, 1).getDay() + 6) % 7; // Mulai Senin (jsToMondayIndex)
+            const firstDayIdx = (new Date(y, m, 1).getDay() + 6) % 7; 
             
             const monthName = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
             const targetMonthStr = `${y}-${pad2(m+1)}`;
@@ -190,17 +187,20 @@
                 if(dayOfWeek === 0 || dayOfWeek === 6) extraClass = 'is-libur';
 
                 const tglStr = `${y}-${pad2(m+1)}-${pad2(d)}`;
-                const hasAgenda = agendanya.some(a => a.tanggalBersih === tglStr);
+
+                // PERBAIKAN: Hanya cek kategori untuk agenda di HARI INI saja, bukan sebulan penuh
+                const agendaHariIni = agendanya.filter(a => a.tanggalBersih === tglStr);
                 
-                if(hasAgenda) {
+                if(agendaHariIni.length > 0) {
                     let isLiburNasional = false, isUjian = false, isKegiatan = false;
-                    agendanya.forEach(a => {
+                    agendaHariIni.forEach(a => {
                         let kat = a.kategori || 'Kegiatan Sekolah';
                         if (a.kegiatan && a.kegiatan.includes('|||')) kat = a.kegiatan.split('|||')[0];
                         if(kat === 'Libur Nasional') isLiburNasional = true;
                         else if(kat === 'Ujian Sekolah') isUjian = true;
                         else isKegiatan = true;
                     });
+                    
                     if(isLiburNasional) extraClass = 'is-libur';
                     else if(isUjian) extraClass += ' has-ujian';
                     else extraClass += ' has-agenda';
