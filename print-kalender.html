@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Kalender Sekolah</title>
+    <style>
+        @page { size: 210mm 330mm; margin: 15mm; }
+        body { font-family: 'Arial', sans-serif; background: white; margin: 0; padding: 0; }
+        .halaman-f4 { width: 180mm; margin: 0 auto; }
+        .header { text-align: center; border-bottom: 4px double #047857; margin-bottom: 8mm; padding-bottom: 4mm; }
+        .grid-kalender { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+        .kotak-bulan { border: 2px solid #e5e7eb; border-radius: 12px; padding: 4mm; }
+        h3 { text-align: center; color: #047857; font-family: 'Georgia', serif; }
+        .grid-tgl { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; }
+        @media print { .btn-print { display: none; } }
+    </style>
+</head>
+<body>
+    <button class="btn-print" onclick="window.print()" style="position:fixed; top:20px; right:20px; padding:10px 20px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer;">🖨️ CETAK / SAVE AS PDF</button>
+    
+    <div class="halaman-f4" id="print-area">
+        <div class="header">
+            <h1 style="color: #047857; margin:0; font-size: 26px;">Kalender Kegiatan Sekolah</h1>
+            <h2 style="color: #10b981; margin: 0; font-size: 18px;">SDIT HIDAYATUT TAUFIQ</h2>
+        </div>
+        <div class="grid-kalender" id="konten-kalender"></div>
+    </div>
+
+    <script>
+        // Ambil data agenda dari localStorage atau fetch langsung
+        async function loadPrintData() {
+            const res = await fetch('https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda');
+            const json = await res.json();
+            const globalAgenda = json.data.map(item => {
+                let tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
+                if (tgl.length > 10) tgl = tgl.substring(0, 10);
+                return { ...item, tanggalBersih: tgl };
+            });
+
+            // Simulasi render 6 bulan (Bapak bisa ubah rentang ini sesuai kebutuhan)
+            const konten = document.getElementById('konten-kalender');
+            for(let i=0; i<6; i++) {
+                let d = new Date(); d.setMonth(d.getMonth() + i);
+                renderBulan(d, globalAgenda, konten);
+            }
+        }
+
+        function renderBulan(date, agenda, container) {
+            const y = date.getFullYear(); const m = date.getMonth();
+            const lastDay = new Date(y, m+1, 0).getDate();
+            const monthName = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(date);
+            
+            let html = `<div class="kotak-bulan"><h3>${monthName}</h3><div class="grid-tgl">`;
+            for(let d=1; d<=lastDay; d++) { html += `<div>${d}</div>`; }
+            html += `</div></div>`;
+            container.innerHTML += html;
+        }
+
+        loadPrintData();
+    </script>
+</body>
+</html>
