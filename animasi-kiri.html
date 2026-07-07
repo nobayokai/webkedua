@@ -66,6 +66,15 @@
     cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;
   }
   .nav-btn:hover { background: var(--green); color: white; }
+  
+  /* TOMBOL DOWNLOAD KHUSUS */
+  .btn-download-pdf {
+      background: var(--pink); color: white; border: none; padding: 4px 10px; 
+      border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; 
+      display: flex; align-items: center; gap: 4px; transition: 0.2s;
+      box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3);
+  }
+  .btn-download-pdf:hover { transform: scale(1.05); background: #db2777; }
 
   .cal-weekdays{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 11px; font-weight: 1000; color: rgba(0,0,0,.45); margin-bottom: 6px; position: relative; z-index: 1; }
   .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 12px; font-weight: 1000; position: relative; z-index: 1; }
@@ -93,16 +102,9 @@
   .badge-kategori.ujian    { background: var(--pink); }
   .badge-kategori.libur    { background: #ef4444; }
 
-  /* CSS BARU: ANIMASI LOADING SPINNER */
-  .agenda-loader {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800;
-  }
-  .spinner-circle {
-      width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2);
-      border-top: 3px solid var(--green); border-radius: 50%;
-      animation: spin 1s linear infinite;
-  }
+  /* ANIMASI LOADING SPINNER */
+  .agenda-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800; }
+  .spinner-circle { width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2); border-top: 3px solid var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   /* Prayer List CSS */
@@ -120,22 +122,18 @@
   .prayer-item.active .time{ color: rgba(4,120,87,.98); }
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
-  /* CSS MODAL POPUP ALAT IPHONE GLASSMORPHISM */
+  /* CSS MODAL (FULLSCREEN & DOWNLOAD) */
   .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.45); 
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); 
-    z-index: 999999; display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    overflow: hidden; 
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); 
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; 
+    display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; overflow: hidden; 
   }
   .modal-overlay.active { opacity: 1; pointer-events: auto; }
   
   .modal-calendar-card {
     background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
-    box-sizing: border-box; width: 92vw; max-width: 380px; max-height: 85vh; 
-    overflow-y: auto; overflow-x: hidden; 
+    border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); box-sizing: border-box; 
+    width: 92vw; max-width: 380px; max-height: 85vh; overflow-y: auto; overflow-x: hidden; 
     padding: 15px; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
   }
   .modal-overlay.active .modal-calendar-card { transform: scale(1); }
@@ -147,6 +145,15 @@
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); z-index: 10; transition: 0.2s;
   }
   .modal-close-btn:hover { background: #dc2626; transform: scale(1.1); }
+
+  /* MODAL DOWNLOAD SPECIFIC (Diatas Modal Biasa) */
+  #download-modal { z-index: 9999999; }
+  .modal-download-card {
+    background: white; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
+    width: 90vw; max-width: 340px; padding: 25px; position: relative; 
+    transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box;
+  }
+  .modal-overlay.active .modal-download-card { transform: scale(1); }
 
   @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
 </style>
@@ -201,12 +208,15 @@
 
     <div class="card" id="sidebar-calendar-card" style="grid-column: 2 / span 1;" title="Klik untuk memperbesar kalender">
       <div class="cal-head">
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px;">
           <button class="nav-btn" id="btn-prev-month" title="Bulan Sebelumnya">❮</button>
           <div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div>
           <button class="nav-btn" id="btn-next-month" title="Bulan Selanjutnya">❯</button>
         </div>
-        <div style="font-weight:950;color:rgba(0,0,0,.45);font-size:12px;">Agenda</div>
+        
+        <div style="display:flex; align-items:center; gap:6px;">
+            <button class="btn-download-pdf" id="btn-open-download-1" title="Unduh Kalender PDF">📥 PDF</button>
+        </div>
       </div>
       <div class="cal-weekdays">
         <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
@@ -216,35 +226,61 @@
           </div>
     </div>
   </div>
-
   <div class="footer-note">
     Data: Jadwal sholat (Aladhan) + Metode Kemenag (via parameter) & Cuaca (Open-Meteo).
   </div>
 </div>
+
 
 <div class="modal-overlay" id="calendar-modal">
     <div class="modal-calendar-card">
         <button class="modal-close-btn" id="btn-close-modal">✕</button>
         
         <div class="cal-head">
-            <div style="display:flex; align-items:center; gap:6px;">
+            <div style="display:flex; align-items:center; gap:4px;">
                 <button class="nav-btn" id="modal-btn-prev" title="Bulan Sebelumnya">❮</button>
                 <div class="cal-month" id="modal-cal-month" style="min-width:85px; text-align:center; font-size:14px;">-</div>
                 <button class="nav-btn" id="modal-btn-next" title="Bulan Selanjutnya">❯</button>
             </div>
-            <div style="font-weight:950;color:var(--green2);font-size:13px;">Agenda Sekolah</div>
+            
+            <div style="display:flex; align-items:center; gap:6px;">
+                <button class="btn-download-pdf" id="btn-open-download-2" style="background:#38bdf8;" title="Unduh Kalender PDF">📥 Print PDF</button>
+            </div>
         </div>
 
         <div class="cal-weekdays" style="font-size:11px; margin-top:10px;">
             <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
         </div>
-
         <div class="cal-grid" id="modal-cal-grid" style="gap:5px; font-size:12px;"></div>
         
         <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px;">
             </div>
     </div>
 </div>
+
+<div class="modal-overlay" id="download-modal">
+    <div class="modal-download-card">
+        <button class="modal-close-btn" id="btn-close-download">✕</button>
+        <h3 style="text-align:center; color:var(--green2); margin-top:0; font-family:'Georgia',serif;">📥 Cetak Kalender</h3>
+        <p style="font-size:11px; text-align:center; color:#666; line-height:1.4;">Atur rentang bulan untuk diunduh<br>*(Desain Otomatis: Kertas F4, 6 Bulan/Halaman)*</p>
+        
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <div style="flex:1;">
+                <label style="font-size:11px; font-weight:bold; color:var(--text);">Mulai Bulan:</label>
+                <input type="month" id="pdf-start-month" required style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; margin-top:4px;">
+            </div>
+            <div style="flex:1;">
+                <label style="font-size:11px; font-weight:bold; color:var(--text);">Sampai Bulan:</label>
+                <input type="month" id="pdf-end-month" required style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; margin-top:4px;">
+            </div>
+        </div>
+        
+        <button id="btn-proses-pdf" style="width:100%; margin-top:20px; background:var(--green); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; transition:0.2s;">
+            🖨️ Generate & Download PDF
+        </button>
+    </div>
+</div>
+
 
 <script>
 (async function(){
@@ -342,31 +378,268 @@
   const btnCloseModal = document.getElementById('btn-close-modal');
   const sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
   
-  if (modalOverlay) {
-      document.body.appendChild(modalOverlay);
-  }
+  // Pindahkan Modal keluar dari kerangka agar Fullscreen penuh
+  if (modalOverlay) document.body.appendChild(modalOverlay);
+  
+  const modalDownload = document.getElementById('download-modal');
+  if (modalDownload) document.body.appendChild(modalDownload);
   
   sidebarCalendarCard.addEventListener('click', (e) => {
-      if (e.target.classList.contains('nav-btn')) return;
+      // Abaikan jika yang diklik adalah tombol navigasi atau tombol PDF
+      if (e.target.classList.contains('nav-btn') || e.target.classList.contains('btn-download-pdf')) return;
       modalOverlay.classList.add('active');
   });
 
-  btnCloseModal.addEventListener('click', () => {
-      modalOverlay.classList.remove('active');
+  btnCloseModal.addEventListener('click', () => { modalOverlay.classList.remove('active'); });
+  modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
+
+
+  // ==========================================
+  // LOGIKA TOMBOL & MODAL DOWNLOAD PDF 
+  // ==========================================
+  // Set default form download (Tahun & Bulan ini hingga 6 bulan ke depan)
+  const todayYMD = new Date();
+  const defStart = `${todayYMD.getFullYear()}-${pad2(todayYMD.getMonth()+1)}`;
+  todayYMD.setMonth(todayYMD.getMonth() + 5); 
+  const defEnd = `${todayYMD.getFullYear()}-${pad2(todayYMD.getMonth()+1)}`;
+  
+  document.getElementById('pdf-start-month').value = defStart;
+  document.getElementById('pdf-end-month').value = defEnd;
+
+  // Tombol buka modal download di Sidebar
+  document.getElementById('btn-open-download-1').addEventListener('click', (e) => {
+      e.stopPropagation(); 
+      modalDownload.classList.add('active');
   });
 
-  modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+  // Tombol buka modal download di Kalender Fullscreen
+  document.getElementById('btn-open-download-2').addEventListener('click', () => {
+      modalDownload.classList.add('active');
+  });
+
+  // Tutup Modal Download
+  document.getElementById('btn-close-download').addEventListener('click', () => {
+      modalDownload.classList.remove('active');
+  });
+  modalDownload.addEventListener('click', (e) => {
+      if (e.target === modalDownload) modalDownload.classList.remove('active');
+  });
+
+  // FUNGSI UTAMA GENERATE PDF
+  document.getElementById('btn-proses-pdf').addEventListener('click', async function() {
+      const start = document.getElementById('pdf-start-month').value;
+      const end = document.getElementById('pdf-end-month').value;
+      
+      if(!start || !end) {
+          alert('⚠️ Harap pilih rentang bulan "Mulai" dan "Sampai"!');
+          return;
+      }
+
+      let currDate = new Date(start + '-01');
+      let endDate = new Date(end + '-01');
+      
+      if(currDate > endDate) {
+          alert('⚠️ Bulan "Mulai" tidak boleh lebih besar dari bulan "Sampai"!');
+          return;
+      }
+
+      const btn = this;
+      btn.innerHTML = "⏳ Memuat modul PDF...";
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+
+      // 1. Suntik library html2pdf secara diam-diam tanpa memberatkan web di awal
+      if (typeof html2pdf === 'undefined') {
+          try {
+              await new Promise((resolve, reject) => {
+                  const script = document.createElement('script');
+                  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                  script.onload = resolve;
+                  script.onerror = reject;
+                  document.head.appendChild(script);
+              });
+          } catch(e) {
+              alert("❌ Gagal memuat library PDF. Pastikan internet Anda stabil.");
+              btn.innerHTML = "🖨️ Generate & Download PDF";
+              btn.disabled = false; btn.style.opacity = "1";
+              return;
+          }
+      }
+
+      btn.innerHTML = "⚙️ Menyusun Desain Kertas...";
+
+      // 2. Buat wadah rendering sementara (Tersembunyi di luar layar)
+      const printContainer = document.createElement('div');
+      printContainer.id = "wadah-print-pdf";
+      printContainer.style.position = 'absolute';
+      printContainer.style.left = '-9999px';
+      printContainer.style.width = '210mm'; // Ukuran Fix Kertas F4 Width
+      printContainer.style.background = '#ffffff';
+      document.body.appendChild(printContainer);
+
+      let monthsData = [];
+      while(currDate <= endDate) {
+          monthsData.push(new Date(currDate));
+          currDate.setMonth(currDate.getMonth() + 1);
+      }
+      
+      // Bagi 6 bulan per halaman (Sesuai Permintaan)
+      const chunks = [];
+      for(let i=0; i<monthsData.length; i+=6) {
+          chunks.push(monthsData.slice(i, i+6));
+      }
+
+      let htmlContent = '';
+
+      chunks.forEach((chunk, pageIndex) => {
+          htmlContent += `
+          <div style="width: 210mm; height: 330mm; padding: 15mm 15mm; box-sizing: border-box; background: white; display:flex; flex-direction:column; position:relative; overflow:hidden; page-break-after: always;">
+              
+              <div style="text-align: center; border-bottom: 4px double #047857; margin-bottom: 8mm; padding-bottom: 4mm;">
+                  <h1 style="font-family: 'Georgia', serif; color: #047857; margin:0; font-size: 26px; font-weight: 900; letter-spacing: 1.5px; text-transform:uppercase;">Kalender Kegiatan Sekolah</h1>
+                  <h2 style="font-family: 'Arial', sans-serif; color: #10b981; margin: 4px 0 0 0; font-size: 18px; font-weight: bold; letter-spacing: 2px;">SDIT HIDAYATUT TAUFIQ</h2>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 6mm; flex: 1;">
+          `;
+          
+          chunk.forEach(dateObj => {
+              const y = dateObj.getFullYear();
+              const m = dateObj.getMonth();
+              const lastDay = new Date(y, m+1, 0).getDate();
+              const firstDayIdx = (new Date(y, m, 1).getDay() + 6) % 7; // Mulai Senin
+              
+              const monthName = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(dateObj);
+              
+              htmlContent += `
+                  <div style="border: 2px solid #e5e7eb; border-radius: 12px; padding: 4mm; display:flex; flex-direction:column; background:#f9fafb; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                      <h3 style="text-align:center; margin:0 0 4mm 0; color:#047857; font-size:15px; font-family:'Georgia',serif; font-weight:900; text-transform:uppercase;">${monthName}</h3>
+                      
+                      <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center; font-weight:900; font-size:10px; color:#4b5563; margin-bottom:4px; font-family:sans-serif;">
+                          <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div>
+                      </div>
+                      
+                      <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; text-align:center; font-size:12px; font-weight:bold; font-family:sans-serif;">
+              `;
+              
+              // Kotak kosong awal bulan
+              for(let i=0; i<firstDayIdx; i++){ htmlContent += `<div></div>`; }
+              
+              const targetMonthStr = `${y}-${pad2(m+1)}`;
+              const agendanya = globalAgenda.filter(a => a.tanggalBersih && a.tanggalBersih.startsWith(targetMonthStr));
+              
+              for(let d=1; d<=lastDay; d++){
+                  const dayOfWeek = new Date(y, m, d).getDay();
+                  const isLibur = (dayOfWeek === 0 || dayOfWeek === 6);
+                  let color = isLibur ? '#ef4444' : '#1f2937';
+                  let bg = isLibur ? '#fee2e2' : 'transparent';
+                  
+                  const tglStr = `${y}-${pad2(m+1)}-${pad2(d)}`;
+                  const hasAgenda = agendanya.some(a => a.tanggalBersih === tglStr);
+                  
+                  let borderBottom = "none";
+                  if(hasAgenda) {
+                      borderBottom = "2.5px solid #f59e0b"; // Oranye (Kegiatan)
+                      agendanya.forEach(a => {
+                          if(a.tanggalBersih === tglStr) {
+                              let kat = a.kategori || 'Kegiatan Sekolah';
+                              if (a.kegiatan && a.kegiatan.includes('|||')) kat = a.kegiatan.split('|||')[0];
+                              
+                              if(kat === 'Libur Nasional') { color = '#ef4444'; bg = '#fee2e2'; borderBottom = "2.5px solid #ef4444"; }
+                              else if(kat === 'Ujian Sekolah') borderBottom = "2.5px solid #f472b6";
+                          }
+                      });
+                      htmlContent += `<div style="color:${color}; background:${bg}; border-bottom:${borderBottom}; border-radius:4px; padding:3px 0;">${d}</div>`;
+                  } else {
+                      htmlContent += `<div style="color:${color}; background:${bg}; border-radius:4px; padding:3px 0;">${d}</div>`;
+                  }
+              }
+              
+              htmlContent += `
+                      </div>
+                      
+                      <div style="margin-top:4mm; border-top:1.5px dashed #d1d5db; padding-top:2mm; font-size:10px; color:#374151; font-family:sans-serif; flex:1; overflow:hidden;">
+              `;
+              
+              if(agendanya.length > 0){
+                  agendanya.forEach(ag => {
+                      const tglNum = ag.tanggalBersih.split('-')[2];
+                      let finalKategori = ag.kategori || 'Kegiatan Sekolah';
+                      let namaKgt = ag.kegiatan || '';
+                      if(namaKgt.includes('|||')) {
+                          const parts = namaKgt.split('|||');
+                          finalKategori = parts[0];
+                          namaKgt = parts.slice(1).join('|||');
+                      }
+                      
+                      let dotColor = '#f59e0b';
+                      if(finalKategori === 'Ujian Sekolah') dotColor = '#f472b6';
+                      if(finalKategori === 'Libur Nasional') dotColor = '#ef4444';
+                      
+                      htmlContent += `
+                          <div style="margin-bottom:4px; display:flex; align-items:flex-start; gap:4px;">
+                              <div style="background:${dotColor}; color:white; padding:1.5px 5px; border-radius:4px; font-size:9px; font-weight:bold; min-width:14px; text-align:center;">${parseInt(tglNum,10)}</div>
+                              <div style="line-height:1.3; font-weight:600;">${namaKgt}</div>
+                          </div>
+                      `;
+                  });
+              } else {
+                  htmlContent += `<div style="text-align:center; color:#9ca3af; margin-top:2mm; font-style:italic; font-size:9px;">Belum ada agenda</div>`;
+              }
+              
+              htmlContent += `
+                      </div>
+                  </div>
+              `;
+          });
+          
+          // Pengisi kosong jika bulan di halaman terakhir kurang dari 6 (agar tata letak tidak berantakan)
+          if (chunk.length < 6) {
+              const emptyBlocksCount = 6 - chunk.length;
+              for(let i=0; i<emptyBlocksCount; i++) {
+                  htmlContent += `<div style="border: 2px dashed #e5e7eb; border-radius: 12px; background:#f9fafb; opacity:0.3;"></div>`;
+              }
+          }
+
+          htmlContent += `
+              </div>
+          </div>
+          `;
+      });
+      
+      printContainer.innerHTML = htmlContent;
+      
+      btn.innerHTML = "🖨️ Mengonversi File ke PDF...";
+
+      // 3. Konfigurasi Resolusi Tinggi dan Kertas F4 (Portrait)
+      const opt = {
+        margin:       0,
+        filename:     `Kalender_SDIT_Hidayatut_Taufiq_${start}_sd_${end}.pdf`,
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: [210, 330], orientation: 'portrait' }, // Kertas F4
+        pagebreak:    { mode: 'css' }
+      };
+      
+      html2pdf().set(opt).from(printContainer).save().then(() => {
+          document.body.removeChild(printContainer); // Bersihkan sisa render
+          btn.innerHTML = "🖨️ Generate & Download PDF";
+          btn.disabled = false; btn.style.opacity = "1";
+          modalDownload.classList.remove('active'); // Tutup modal saat selesai
+      }).catch(err => {
+          alert("Terjadi kesalahan sistem saat membuat PDF.");
+          btn.innerHTML = "🖨️ Generate & Download PDF";
+          btn.disabled = false; btn.style.opacity = "1";
+          document.body.removeChild(printContainer);
+      });
   });
 
 
   // ==========================================
-  // KALENDER & AGENDA (DENGAN STATUS LOADING)
+  // KALENDER UTAMA WEB (DENGAN STATUS LOADING)
   // ==========================================
   let globalAgenda = []; 
   let currentNavDate = new Date(); 
-  
-  // VARIABEL STATUS LOADING (BARU)
   let isAgendaLoading = true; 
 
   document.getElementById('btn-prev-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
@@ -450,9 +723,7 @@
           t.gridEl.appendChild(cell);
         }
         
-        // PENGATURAN TAMPILAN LIST AGENDA (LOADING VS DATA VS KOSONG)
         if (isAgendaLoading) {
-            // Tampilkan animasi spinner saat sedang fetch data
             t.listEl.innerHTML = `
               <div class="agenda-loader">
                 <div class="spinner-circle"></div>
@@ -460,7 +731,6 @@
               </div>
             `;
         } else if (agendaBulanIni.length > 0) {
-            // Tampilkan data agenda jika ada
             agendaBulanIni.forEach(ag => {
                 const [thn, bln, tgl] = ag.tanggalBersih.split('-');
                 const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -491,7 +761,6 @@
                 `;
             });
         } else {
-            // Tampilkan teks kosong jika memang tidak ada data di bulan tersebut
             t.listEl.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top: 15px;">Tidak ada agenda di bulan ini</div>';
         }
 
@@ -505,10 +774,9 @@
     });
   }
 
-  // FUNGSI FETCH DENGAN SISTEM LOADING TERBARU
   window.fetchAgendaDatabase = async function() {
-    isAgendaLoading = true; // Nyalakan status loading
-    renderCalendar(currentNavDate); // Tampilkan animasi di layar
+    isAgendaLoading = true; 
+    renderCalendar(currentNavDate); 
 
     try {
         const URL_API = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_agenda";
@@ -529,7 +797,6 @@
     } catch(e) { 
         console.log("Gagal mengambil agenda", e); 
     } finally {
-        // Apapun hasilnya (sukses/gagal), matikan loading dan render ulang!
         isAgendaLoading = false; 
         renderCalendar(currentNavDate); 
     }
