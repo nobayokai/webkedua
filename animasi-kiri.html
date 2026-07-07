@@ -114,25 +114,33 @@
   .prayer-item.active .time{ color: rgba(4,120,87,.98); }
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
-  /* CSS BARU MODAL POPUP ALAT IPHONE GLASSMORPHISM */
+/* CSS BARU MODAL POPUP ALAT IPHONE GLASSMORPHISM */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.3); /* Transparansi 30% */
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); /* Blur ala iPhone */
-    z-index: 99999; display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); 
+    z-index: 999999; display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    overflow: hidden; /* Kunci total area luar popup kalender */
   }
   .modal-overlay.active { opacity: 1; pointer-events: auto; }
   
   .modal-calendar-card {
     background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); width: 90%; max-width: 450px;
+    border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); 
+    
+    /* FIX KUNCI LEBAR KALENDER BESAR */
+    box-sizing: border-box; /* KUNCI PENTING: Agar jarak tidak keluar layar */
+    width: calc(100vw - 40px); /* Ukuran layar pas dikurangi margin aman */
+    max-width: 420px;
+    overflow-x: hidden; /* Hilangkan kemampuan geser kanan-kiri */
+    
     padding: 20px; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
   }
   .modal-overlay.active .modal-calendar-card { transform: scale(1); }
   
   .modal-close-btn {
-    position: absolute; top: -15px; right: -15px; background: #ef4444; border: none;
+    position: absolute; top: -12px; right: -12px; background: #ef4444; border: none;
     border-radius: 50%; width: 36px; height: 36px; font-size: 18px; font-weight: bold;
     color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); z-index: 10; transition: 0.2s;
@@ -140,6 +148,8 @@
   .modal-close-btn:hover { background: #dc2626; transform: scale(1.1); }
 
   @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
+
+  
 </style>
 
 <div id="widget-islam">
