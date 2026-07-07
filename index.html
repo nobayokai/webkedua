@@ -41,7 +41,11 @@
                 box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
             }
 
-            /* TRIK RAHASIA: Mengangkat derajat buku ke atas kaca saat tombol diklik */
+           /* TRIK RAHASIA: Mengangkat derajat buku ke atas kaca saat tombol diklik */
+            body.widget-terbuka {
+                overflow: hidden !important; /* MENGUNCI LAYAR BACKGROUND AGAR TIDAK BISA DIGESER */
+                touch-action: none !important; /* Mengunci total gestur usap di background */
+            }
             body.widget-terbuka .container, 
             body.widget-terbuka .book {
                 z-index: 99999 !important;
@@ -49,11 +53,20 @@
 
             /* Paksa Page Kiri muncul dan menjadi Popup Modal di tengah layar */
             .page.left-page {
-                display: block !important; /* Paksa muncul (melawan style.css) */
-                visibility: hidden; /* Sembunyikan halus sebelum dipanggil */
-                position: fixed !important; top: 50% !important; left: 50% !important;
+                display: block !important; 
+                visibility: hidden; 
+                position: fixed !important; 
+                top: 50% !important; 
+                left: 50% !important;
                 transform: translate(-50%, -50%) scale(0.8) !important; 
-                width: 90% !important; max-width: 420px; height: 85vh !important;
+                
+                /* FIX KUNCI LEBAR AGAR FIXED DI LAYAR HP */
+                width: calc(100vw - 40px) !important; /* Ambil lebar layar dikurangi jarak aman 40px */
+                max-width: 400px !important; 
+                height: 85vh !important;
+                box-sizing: border-box !important; /* KUNCI PENTING: Agar padding tidak meluberkan lebar */
+                overflow-x: hidden !important; /* KUNCI MATI geser kanan kiri */
+                
                 z-index: 100000 !important; opacity: 0; pointer-events: none;
                 transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; 
                 border-radius: 20px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.4) !important;
