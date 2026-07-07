@@ -14,8 +14,8 @@
         /* Overlay Kaca (Glassmorphism) */
         .mobile-glass-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.3); /* Transparansi 30% hitam */
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); /* Efek blur kaca */
+            background: rgba(0, 0, 0, 0.4); /* Transparansi sedikit digelapkan agar widget menonjol */
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); 
             z-index: 99998; opacity: 0; pointer-events: none;
             transition: opacity 0.3s ease;
         }
@@ -23,7 +23,6 @@
 
         /* PENGATURAN KHUSUS MODE HANDPHONE (Lebar layar maksimal 768px) */
         @media (max-width: 768px) {
-            /* Tombol untuk membuka widget di pojok kanan atas page kanan */
             .btn-mobile-widget {
                 display: flex; align-items: center; justify-content: center;
                 position: fixed; top: 15px; right: 15px; 
@@ -34,30 +33,37 @@
             }
             .btn-mobile-widget:active { transform: scale(0.95); }
 
-            /* Tombol X untuk menutup popup widget */
             .btn-close-mobile {
                 display: flex; align-items: center; justify-content: center;
-                position: absolute; top: -12px; right: -12px; width: 35px; height: 35px;
+                position: absolute; top: 15px; right: 15px; width: 35px; height: 35px;
                 background: #ef4444; color: white; border: none; border-radius: 50%;
-                font-size: 16px; font-weight: bold; z-index: 999999; cursor: pointer;
+                font-size: 16px; font-weight: bold; z-index: 100005; cursor: pointer;
                 box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
             }
 
-            /* Ubah Page Kiri (Widget) menjadi Popup Modal di tengah layar */
+            /* TRIK RAHASIA: Mengangkat derajat buku ke atas kaca saat tombol diklik */
+            body.widget-terbuka .container, 
+            body.widget-terbuka .book {
+                z-index: 99999 !important;
+            }
+
+            /* Paksa Page Kiri muncul dan menjadi Popup Modal di tengah layar */
             .page.left-page {
+                display: block !important; /* Paksa muncul (melawan style.css) */
+                visibility: hidden; /* Sembunyikan halus sebelum dipanggil */
                 position: fixed !important; top: 50% !important; left: 50% !important;
-                transform: translate(-50%, -50%) scale(0.8) !important; /* Efek mengecil sebelum muncul */
-                width: 90% !important; max-width: 400px; height: 85vh !important;
-                z-index: 99999 !important; opacity: 0; pointer-events: none;
-                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; /* Animasi mulus ala iOS */
-                border-radius: 20px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.3) !important;
+                transform: translate(-50%, -50%) scale(0.8) !important; 
+                width: 90% !important; max-width: 420px; height: 85vh !important;
+                z-index: 100000 !important; opacity: 0; pointer-events: none;
+                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; 
+                border-radius: 20px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.4) !important;
                 background: rgba(255, 255, 255, 0.95) !important; overflow-y: auto !important;
             }
             
-            /* Class ini akan ditambahkan lewat JS saat tombol diklik (Memunculkan Popup) */
+            /* Class pemicu animasi popup */
             .page.left-page.show-popup {
-                opacity: 1 !important; pointer-events: auto !important;
-                transform: translate(-50%, -50%) scale(1) !important; /* Efek membesar/zoom-in */
+                opacity: 1 !important; pointer-events: auto !important; visibility: visible !important;
+                transform: translate(-50%, -50%) scale(1) !important; 
             }
         }
     </style>
@@ -67,7 +73,7 @@
 
     <div class="container">
         <div class="book">
-            <div class="page left-page" id="kiri-statis" style="position: relative;">
+            <div class="page left-page" id="kiri-statis" style="position: relative; padding-top: 25px;">
                 <script>
                     fetch('animasi-kiri.html')
                         .then(response => response.text())
@@ -75,12 +81,14 @@
                             // Masukkan isi kalender
                             document.getElementById('kiri-statis').innerHTML = data;
                             
-                            // Tambahkan tombol Close (X) secara otomatis ke dalam widget
+                            // Tambahkan tombol Close (X) ke dalam popup kalender
                             const btnClose = document.createElement('button');
                             btnClose.className = 'btn-close-mobile';
                             btnClose.innerHTML = '✕';
                             btnClose.onclick = toggleMobileWidget;
-                            document.getElementById('kiri-statis').appendChild(btnClose);
+                            
+                            // Letakkan tombol silang ini di paling atas widget
+                            document.getElementById('kiri-statis').prepend(btnClose);
 
                             // Jalankan ulang script bawaan widgetnya
                             const script = document.createElement('script');
@@ -91,7 +99,7 @@
             </div>
             
             <div class="page right-page">
-                <button class="btn-mobile-widget" onclick="toggleMobileWidget()"> Tampilkan Widget</button>
+                <button class="btn-mobile-widget" onclick="toggleMobileWidget()">🕌 Tampilkan Widget</button>
                 
                 <div id="area-konten">
                     <p id="status-loading">Memuat kerangka buku...</p>
@@ -114,11 +122,12 @@
 
     <script>
         function toggleMobileWidget() {
+            // Trik jitu untuk mengangkat posisi buku saat di HP
+            document.body.classList.toggle('widget-terbuka'); 
+            
             const leftPage = document.getElementById('kiri-statis');
             const overlay = document.getElementById('mobile-overlay');
             
-            // Sistem akan menambah/menghapus class 'show-popup' & 'active' 
-            // untuk memicu animasi CSS yang sudah kita buat di atas
             leftPage.classList.toggle('show-popup');
             overlay.classList.toggle('active');
         }
