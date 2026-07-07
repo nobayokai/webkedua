@@ -53,15 +53,9 @@
   .weather-pill .k{ font-size: 10.5px; font-weight: 950; color: rgba(0,0,0,.45); text-transform: uppercase; letter-spacing: .2px; }
   .weather-pill .v{ font-size: 12px; font-weight: 1000; color: rgba(0,0,0,.72); margin-top: 4px; white-space: nowrap; }
 
-  /* Kalender Utama */
-  #sidebar-calendar-card {
-      cursor: pointer;
-      transition: transform 0.2s;
-  }
-  #sidebar-calendar-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(0,0,0,.1);
-  }
+  /* Kalender Utama (Sidebar) */
+  #sidebar-calendar-card { cursor: pointer; transition: transform 0.2s; }
+  #sidebar-calendar-card:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0,0,0,.1); }
 
   .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
   .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
@@ -114,10 +108,10 @@
   .prayer-item.active .time{ color: rgba(4,120,87,.98); }
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
-/* CSS BARU MODAL POPUP ALAT IPHONE GLASSMORPHISM */
+  /* CSS BARU MODAL POPUP ALAT IPHONE GLASSMORPHISM (DIKUNCI FIX) */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.4); 
+    background: rgba(0, 0, 0, 0.45); 
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); 
     z-index: 999999; display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
@@ -126,34 +120,33 @@
   .modal-overlay.active { opacity: 1; pointer-events: auto; }
   
   .modal-calendar-card {
-    background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); 
+    background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
     
-    /* FIX KUNCI LEBAR & TINGGI KALENDER */
+    /* FIX KUNCI LEBAR & TINGGI KALENDER AGAR PRESISI DI HP */
     box-sizing: border-box; 
-    width: calc(100vw - 40px); /* Jarak aman kanan-kiri */
-    max-width: 420px;
-    max-height: 85vh; /* KUNCI TINGGI: Maksimal 85% dari tinggi layar HP */
-    overflow-y: auto; /* Munculkan scroll di dalam kalender jika isinya panjang */
+    width: 92vw; /* Persentase pasti ngikut layar HP */
+    max-width: 380px; 
+    max-height: 85vh; 
+    overflow-y: auto; 
     overflow-x: hidden; 
     
-    padding: 20px; padding-top: 25px; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
+    padding: 15px; /* Padding ditipiskan agar grid tidak berdesakan */
+    position: relative; transform: scale(0.9); transition: transform 0.3s ease;
   }
   .modal-overlay.active .modal-calendar-card { transform: scale(1); }
   
   .modal-close-btn {
     position: absolute; 
-    top: 12px; right: 12px; /* Digeser ke dalam kotak agar tidak ikut terpotong scroll */
+    top: 12px; right: 12px; 
     background: #ef4444; border: none;
-    border-radius: 50%; width: 32px; height: 32px; font-size: 16px; font-weight: bold;
+    border-radius: 50%; width: 30px; height: 30px; font-size: 14px; font-weight: bold;
     color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); z-index: 10; transition: 0.2s;
   }
   .modal-close-btn:hover { background: #dc2626; transform: scale(1.1); }
 
   @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
-
-  
 </style>
 
 <div id="widget-islam">
@@ -163,7 +156,6 @@
   </div>
 
   <div class="widget-grid">
-    <!-- Clock -->
     <div class="card">
       <div class="clock-now">
         <div class="clock-time" id="clock-time">--:--:--</div>
@@ -178,7 +170,6 @@
       </div>
     </div>
 
-    <!-- Weather -->
     <div class="card">
       <div class="weather-top">
         <div>
@@ -196,7 +187,6 @@
       </div>
     </div>
 
-    <!-- Prayer -->
     <div class="card" style="grid-column: 1 / span 1;">
       <div class="prayer">
         <div class="prayer-head">
@@ -207,7 +197,6 @@
       </div>
     </div>
 
-    <!-- Kalender Kiri (Sidebar) -->
     <div class="card" id="sidebar-calendar-card" style="grid-column: 2 / span 1;" title="Klik untuk memperbesar kalender">
       <div class="cal-head">
         <div style="display:flex; align-items:center; gap:8px;">
@@ -232,29 +221,26 @@
   </div>
 </div>
 
-<!-- ============================================== -->
-<!-- WADAH POPUP KALENDER FULLSCREEN (GLASSMORPHISM) -->
-<!-- ============================================== -->
 <div class="modal-overlay" id="calendar-modal">
     <div class="modal-calendar-card">
         <button class="modal-close-btn" id="btn-close-modal">✕</button>
         
         <div class="cal-head">
-            <div style="display:flex; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:6px;">
                 <button class="nav-btn" id="modal-btn-prev" title="Bulan Sebelumnya">❮</button>
-                <div class="cal-month" id="modal-cal-month" style="min-width:90px; text-align:center; font-size:15px;">-</div>
+                <div class="cal-month" id="modal-cal-month" style="min-width:85px; text-align:center; font-size:14px;">-</div>
                 <button class="nav-btn" id="modal-btn-next" title="Bulan Selanjutnya">❯</button>
             </div>
-            <div style="font-weight:950;color:var(--green2);font-size:14px;">Agenda Sekolah</div>
+            <div style="font-weight:950;color:var(--green2);font-size:13px;">Agenda Sekolah</div>
         </div>
 
-        <div class="cal-weekdays" style="font-size:13px; margin-top:10px;">
+        <div class="cal-weekdays" style="font-size:11px; margin-top:10px;">
             <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
         </div>
 
-        <div class="cal-grid" id="modal-cal-grid" style="gap:8px; font-size:14px;"></div>
+        <div class="cal-grid" id="modal-cal-grid" style="gap:5px; font-size:12px;"></div>
         
-        <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 300px;">
+        <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px;">
             <div style="text-align:center; font-size:12px; color:rgba(0,0,0,0.5);">Memuat agenda...</div>
         </div>
     </div>
@@ -356,19 +342,20 @@
   const btnCloseModal = document.getElementById('btn-close-modal');
   const sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
   
-  // Buka popup ketika kalender sidebar di-klik
+  // TRIK SAKTI: Pindahkan Modal keluar dari kerangka buku agar bisa Fullscreen penuh
+  if (modalOverlay) {
+      document.body.appendChild(modalOverlay);
+  }
+  
   sidebarCalendarCard.addEventListener('click', (e) => {
-      // Cegah popup terbuka jika user sengaja klik tombol navigasi bulan (< atau >)
       if (e.target.classList.contains('nav-btn')) return;
       modalOverlay.classList.add('active');
   });
 
-  // Tutup popup dari tombol X
   btnCloseModal.addEventListener('click', () => {
       modalOverlay.classList.remove('active');
   });
 
-  // Tutup popup saat mengklik area luar kalender (area gelap)
   modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) modalOverlay.classList.remove('active');
   });
@@ -380,11 +367,9 @@
   let globalAgenda = []; 
   let currentNavDate = new Date(); 
 
-  // Navigasi untuk kalender kecil
   document.getElementById('btn-prev-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('btn-next-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
 
-  // Navigasi untuk kalender popup besar
   document.getElementById('modal-btn-prev').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('modal-btn-next').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
 
@@ -403,7 +388,6 @@
         return a.tanggalBersih.localeCompare(b.tanggalBersih); 
     });
 
-    // Kita render langsung ke KEDUA tempat (Sidebar dan Popup Modal)
     const targets = [
         {
             monthEl: document.getElementById('cal-month'),
@@ -425,12 +409,10 @@
         t.gridEl.innerHTML = ''; 
         t.listEl.innerHTML = ''; 
 
-        // Kotak kosong awal bulan
         for(let i=0;i<startIndex;i++){
           const cell = document.createElement('div'); cell.className = 'cal-day muted'; t.gridEl.appendChild(cell);
         }
 
-        // Tanggal dalam bulan
         for(let day=1; day<=last.getDate(); day++){
           const cell = document.createElement('div');
           cell.className = 'cal-day';
@@ -466,7 +448,6 @@
           t.gridEl.appendChild(cell);
         }
         
-        // Daftar Agenda di bawah
         if(agendaBulanIni.length > 0) {
             agendaBulanIni.forEach(ag => {
                 const [thn, bln, tgl] = ag.tanggalBersih.split('-');
@@ -501,7 +482,6 @@
             t.listEl.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5);">Tidak ada agenda di bulan ini</div>';
         }
 
-        // Kotak kosong sisa
         const rem = t.gridEl.children.length % 7;
         if(rem !== 0){
           const add = 7 - rem;
