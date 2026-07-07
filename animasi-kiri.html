@@ -425,12 +425,29 @@
       if (e.target === modalDownload) modalDownload.classList.remove('active');
   });
 
-// Ganti fungsi klik tombol download menjadi ini:
+// FUNGSI UTAMA GENERATE PDF (DIARAHKAN KE HALAMAN PRINT)
   document.getElementById('btn-proses-pdf').addEventListener('click', function() {
-      // Membuka halaman print khusus
-      window.open('print-kalender.html', '_blank');
-      // Tutup modal download setelah diklik
+      const start = document.getElementById('pdf-start-month').value;
+      const end = document.getElementById('pdf-end-month').value;
+      
+      if(!start || !end) {
+          alert('⚠️ Harap pilih rentang bulan "Mulai" dan "Sampai"!');
+          return;
+      }
+      
+      let currDate = new Date(start + '-01');
+      let endDate = new Date(end + '-01');
+      if(currDate > endDate) {
+          alert('⚠️ Bulan "Mulai" tidak boleh lebih besar dari bulan "Sampai"!');
+          return;
+      }
+
+      // Tutup modal popup downloadnya
       document.getElementById('download-modal').classList.remove('active');
+      
+      // Buka halaman print dengan membawa data bulan di URL
+      const urlCetak = `print-kalender.html?start=${start}&end=${end}`;
+      window.open(urlCetak, '_blank');
   });
 
 
