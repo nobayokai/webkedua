@@ -1,91 +1,106 @@
-<div class="content-section active" style="padding: 20px;">
-    <h2 style="font-family: 'Georgia', serif; color: var(--green2); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📅 Tambah Agenda Sekolah</h2>
+<style>
+    .absen-panel { background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(16,185,129,0.2); margin-bottom: 20px; font-family: 'Arial', sans-serif;}
+    .absen-header { border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+    .absen-header h2 { margin: 0; color: #047857; font-family: 'Georgia', serif; font-size: 20px; font-weight: 900;}
     
-    <div style="background: rgba(255,255,255,0.8); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px;">
-        <form id="form-agenda" onsubmit="submitAgenda(event)" style="display: flex; flex-direction: column; gap: 15px;">
-            <div>
-                <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Tanggal Kegiatan</label>
-                <input type="date" id="input-tanggal-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
-            </div>
+    .absen-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
+    .input-box { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-weight: bold; color: #374151; outline: none; }
+    .btn-action { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; display: flex; align-items: center; gap: 6px; font-size: 13px;}
+    .btn-green { background: #10b981; } .btn-green:hover { background: #059669; }
+    .btn-blue { background: #3b82f6; } .btn-blue:hover { background: #2563eb; }
+    .btn-red { background: #ef4444; } .btn-red:hover { background: #dc2626; }
 
-            <div>
-                <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Kategori Agenda</label>
-                <select id="input-kategori-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px; background: white; cursor: pointer;">
-                    <option value="Kegiatan Sekolah">🟧 Kegiatan Sekolah (Umum)</option>
-                    <option value="Ujian Sekolah">🟪 Ujian Sekolah / STS / SAS</option>
-                    <option value="Libur Nasional">🟥 Libur Nasional / Cuti Bersama</option>
-                </select>
-            </div>
-            
-            <div>
-                <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Nama / Deskripsi Kegiatan</label>
-                <input type="text" id="input-nama-agenda" placeholder="Contoh: Rapat Wali Murid Kelas 1-6" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
-            </div>
+    /* CARD SISWA UNTUK ABSEN */
+    .siswa-card { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
+    .siswa-info { display: flex; flex-direction: column; }
+    .siswa-nama { font-weight: 900; font-size: 15px; color: #1f2937; }
+    .siswa-nis { font-size: 11px; color: #6b7280; font-weight: bold; margin-top: 2px; }
+    
+    /* RADIO BUTTON GAYA TOGGLE (H-I-S-A) */
+    .radio-group { display: flex; gap: 5px; background: #e5e7eb; padding: 3px; border-radius: 8px; }
+    .radio-group label { cursor: pointer; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; color: #4b5563; transition: 0.2s; user-select: none;}
+    .radio-group input[type="radio"] { display: none; }
+    
+    /* Warna Status saat aktif */
+    .radio-group input[value="Hadir"]:checked + label { background: #10b981; color: white; box-shadow: 0 2px 5px rgba(16,185,129,0.3); }
+    .radio-group input[value="Izin"]:checked + label { background: #3b82f6; color: white; box-shadow: 0 2px 5px rgba(59,130,246,0.3); }
+    .radio-group input[value="Sakit"]:checked + label { background: #f59e0b; color: white; box-shadow: 0 2px 5px rgba(245,158,11,0.3); }
+    .radio-group input[value="Alpa"]:checked + label { background: #ef4444; color: white; box-shadow: 0 2px 5px rgba(239,68,68,0.3); }
 
-            <button type="submit" style="background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
-                💾 Simpan Agenda
-            </button>
-        </form>
-        <p id="pesan-agenda" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
+    .btn-hapus-siswa { background: transparent; border: none; color: #ef4444; font-size: 16px; cursor: pointer; padding: 5px; transition: 0.2s; }
+    .btn-hapus-siswa:hover { transform: scale(1.2); }
+
+    /* MODAL TAMBAH SISWA */
+    .modal-add { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px);}
+    .modal-add.active { opacity: 1; pointer-events: auto; }
+    .modal-add-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #374151; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; }
+</style>
+
+<div class="absen-panel" id="panel-absen" style="display: none;">
+    <div class="absen-header">
+        <div>
+            <h2>📝 Absensi Kehadiran Siswa</h2>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280; font-weight: bold;">SDIT Hidayatut Taufiq</p>
+        </div>
+        <div class="absen-controls">
+            <input type="date" id="tgl-absen" class="input-box" required>
+            <select id="pilih-kelas" class="input-box" onchange="loadDaftarSiswa()">
+                <option value="">-- Pilih Kelas --</option>
+                <option value="Kelas 1">Kelas 1</option>
+                <option value="Kelas 2">Kelas 2</option>
+                <option value="Kelas 3">Kelas 3</option>
+                <option value="Kelas 4">Kelas 4</option>
+                <option value="Kelas 5">Kelas 5</option>
+                <option value="Kelas 6">Kelas 6</option>
+            </select>
+            <button class="btn-action btn-blue" onclick="bukaModalTambah()">➕ Tambah Siswa</button>
+        </div>
+    </div>
+
+    <div id="loader-siswa" style="text-align: center; padding: 30px; display: none;">
+        <h3 style="color: #10b981;">⏳ Memuat Daftar Siswa...</h3>
+    </div>
+
+    <form id="form-absensi" onsubmit="submitAbsensi(event)">
+        <div id="daftar-siswa-container">
+            <div style="text-align: center; color: #9ca3af; padding: 30px; font-weight: bold; border: 2px dashed #d1d5db; border-radius: 12px;">
+                Silakan pilih kelas terlebih dahulu.
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: right; border-top: 2px dashed #e5e7eb; padding-top: 15px;">
+            <button type="submit" id="btn-submit-absen" class="btn-action btn-green" style="padding: 12px 25px; font-size: 15px; display: inline-flex;" disabled>✅ Simpan Data Absensi</button>
+        </div>
+    </form>
+</div>
+
+<div class="modal-add" id="modal-tambah">
+    <div class="modal-add-content">
+        <h3 style="margin-top:0; color: #047857; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">👤 Tambah Data Siswa</h3>
+        <div class="form-group">
+            <label>Pilih Kelas</label>
+            <input type="text" id="add-kelas" readonly style="background: #f3f4f6;">
+        </div>
+        <div class="form-group">
+            <label>Nomor Induk Siswa (NIS)</label>
+            <input type="text" id="add-nis" placeholder="Contoh: 2601001" required>
+        </div>
+        <div class="form-group">
+            <label>Nama Lengkap Siswa</label>
+            <input type="text" id="add-nama" placeholder="Masukkan nama lengkap" required>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-action btn-red" style="flex: 1; justify-content: center;" onclick="tutupModalTambah()">Batal</button>
+            <button type="button" class="btn-action btn-green" style="flex: 1; justify-content: center;" onclick="simpanSiswaBaru()">Simpan</button>
+        </div>
     </div>
 </div>
 
 <script>
-    async function submitAgenda(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button');
-        const pesan = document.getElementById('pesan-agenda');
-        
-        btn.textContent = "Menyimpan...";
-        btn.disabled = true;
-        pesan.textContent = "";
-
-        const userLoginData = localStorage.getItem('user_login');
-        let namaGuru = 'Guru';
-        if(userLoginData) {
-            const parsedData = JSON.parse(userLoginData);
-            namaGuru = parsedData.nama || 'Guru';
-        }
-        
-        // KINI DATA DIKIRIM TERPISAH (TIDAK DIGABUNG LAGI)
-        const payload = {
-            action: 'add_agenda',
-            tanggal: document.getElementById('input-tanggal-agenda').value,
-            kegiatan: document.getElementById('input-nama-agenda').value,
-            pembuat: namaGuru,
-            kategori: document.getElementById('input-kategori-agenda').value // <-- Parameter Kategori Baru
-        };
-
-        try {
-            const LINK_GAS = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
-
-            const response = await fetch(LINK_GAS, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            });
-            
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                pesan.style.color = "green";
-                pesan.textContent = "✅ Agenda berhasil ditambahkan!";
-                document.getElementById('form-agenda').reset();
-                
-                if (typeof fetchAgendaDatabase === 'function') {
-                    fetchAgendaDatabase();
-                }
-            } else {
-                pesan.style.color = "red";
-                pesan.textContent = "❌ Gagal: " + result.message;
-            }
-        } catch (error) {
-            console.error("Detail Error:", error);
-            pesan.style.color = "red";
-            pesan.textContent = "❌ Terjadi kesalahan jaringan.";
-        }
-        
-        btn.textContent = "💾 Simpan Agenda";
-        btn.disabled = false;
-    }
+    // Panggil fungsi inisialisasi yang ada di script.js
+    // Ini akan menjalankan cek login dan mengatur tanggal tanpa terjadi error
+    initAbsensi();
 </script>
