@@ -481,7 +481,7 @@ async function submitFormSiswaBaru(e) {
 // =============================================
 // FITUR ABSENSI GURU (LMS)
 // =============================================
-let globalSiswa = [];
+var globalSiswa = [];
 
 // Fungsi untuk menyiapkan tampilan saat menu Absensi diklik
 function initAbsensi() {
