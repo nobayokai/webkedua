@@ -67,7 +67,6 @@
   }
   .nav-btn:hover { background: var(--green); color: white; }
   
-  /* TOMBOL DOWNLOAD KHUSUS */
   .btn-download-pdf {
       background: var(--pink); color: white; border: none; padding: 4px 10px; 
       border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; 
@@ -102,27 +101,28 @@
   .badge-kategori.ujian    { background: var(--pink); }
   .badge-kategori.libur    { background: #ef4444; }
 
+  /* CSS BARU: ABSENSI LIST CSS (PENGGANTI JADWAL SHOLAT) */
+  .absensi-item {
+      display: flex; flex-direction: column; gap: 6px; 
+      padding: 10px 12px; border-radius: 12px; 
+      background: rgba(255,255,255,.45); border: 1px solid rgba(0,0,0,.05);
+      margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  }
+  .absensi-item .kelas-name { font-weight: 1000; font-size: 13px; color: var(--green2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
+  .absensi-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; }
+  .stat-box { display: flex; flex-direction: column; background: white; border-radius: 6px; padding: 4px 0; border: 1px solid rgba(0,0,0,0.04); }
+  .stat-label { font-size: 9px; font-weight: 900; color: rgba(0,0,0,0.4); text-transform: uppercase; }
+  .stat-value { font-size: 14px; font-weight: 1000; }
+  .val-h { color: var(--green); } .val-i { color: var(--blue); } .val-s { color: var(--amber); } .val-a { color: #ef4444; }
+
   /* ANIMASI LOADING SPINNER */
   .agenda-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800; }
   .spinner-circle { width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2); border-top: 3px solid var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  /* Prayer List CSS */
-  .prayer{ display:flex; flex-direction: column; height: 100%; min-height: 0; }
-  .prayer-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
-  .next{ font-size: 11px; font-weight: 950; color: rgba(0,0,0,.55); line-height: 1.2; }
-  .next strong{ color: var(--green2); font-size: 12px; }
-  .countdown{ font-weight: 1000; font-size: 12px; padding: 7px 10px; border-radius: 999px; border: 1px solid rgba(16,185,129,.28); background: rgba(16,185,129,.12); color: rgba(4,120,87,.95); white-space: nowrap; }
-  .prayer-list{ display:flex; flex-direction: column; gap: 8px; overflow:auto; padding-right: 4px; position: relative; z-index: 1; }
-  .prayer-item{ display:flex; align-items:center; justify-content: space-between; gap: 10px; padding: 9px 10px; border-radius: 14px; background: rgba(255,255,255,.38); border: 1px solid rgba(0,0,0,.05); }
-  .prayer-item .name{ font-weight: 1000; font-size: 12px; color: rgba(0,0,0,.62); display:flex; align-items:center; gap: 8px; }
-  .badge{ width: 10px; height: 10px; border-radius: 3px; background: var(--green); }
-  .prayer-item .time{ font-weight: 1100; font-size: 12px; color: rgba(0,0,0,.72); white-space: nowrap; }
-  .prayer-item.active{ background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.10)); border: 1px solid rgba(16,185,129,.33); box-shadow: 0 14px 22px rgba(16,185,129,.14); }
-  .prayer-item.active .time{ color: rgba(4,120,87,.98); }
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
-  /* CSS MODAL (FULLSCREEN & DOWNLOAD) */
+  /* CSS MODAL POPUP */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); 
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; 
@@ -146,7 +146,6 @@
   }
   .modal-close-btn:hover { background: #dc2626; transform: scale(1.1); }
 
-  /* MODAL DOWNLOAD SPECIFIC (Diatas Modal Biasa) */
   #download-modal { z-index: 9999999; }
   .modal-download-card {
     background: white; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
@@ -196,13 +195,16 @@
       </div>
     </div>
 
-    <div class="card" style="grid-column: 1 / span 1;">
-      <div class="prayer">
-        <div class="prayer-head">
-          <div class="next" id="next-prayer">Berikutnya: <strong>—</strong></div>
-          <div class="countdown" id="countdown">—</div>
+    <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;">
+      <div class="cal-head" style="margin-bottom:8px;">
+        <div style="font-weight:950;color:var(--green2);font-size:13px;">📊 Kehadiran Siswa</div>
+        <div style="font-size:10px; color:rgba(0,0,0,0.5); font-weight:bold;" id="absensi-bulan">-</div>
+      </div>
+      <div id="absensi-list-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; padding-right:4px;">
+        <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px;">
+           <div class="spinner-circle" style="margin: 0 auto 8px auto;"></div>
+           Merekap data...
         </div>
-        <div class="prayer-list" id="prayer-list"></div>
       </div>
     </div>
 
@@ -213,24 +215,23 @@
           <div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div>
           <button class="nav-btn" id="btn-next-month" title="Bulan Selanjutnya">❯</button>
         </div>
-        
         <div style="display:flex; align-items:center; gap:6px;">
             <button class="btn-download-pdf" id="btn-open-download-1" title="Unduh Kalender PDF">📥 PDF</button>
         </div>
       </div>
+      
       <div class="cal-weekdays">
-        <div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div><div>Min</div>
+        <div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div>
       </div>
+      
       <div class="cal-grid" id="cal-grid"></div>
-      <div class="agenda-list-wrap" id="agenda-list-container" style="max-height: 90px;">
-          </div>
+      <div class="agenda-list-wrap" id="agenda-list-container" style="max-height: 90px;"></div>
     </div>
   </div>
   <div class="footer-note">
-    Data: Jadwal sholat (Aladhan) + Metode Kemenag (via parameter) & Cuaca (Open-Meteo).
+    Data: Cuaca (Open-Meteo) & Sistem Absensi SDIT Hidayatut Taufiq.
   </div>
 </div>
-
 
 <div class="modal-overlay" id="calendar-modal">
     <div class="modal-calendar-card">
@@ -242,19 +243,17 @@
                 <div class="cal-month" id="modal-cal-month" style="min-width:85px; text-align:center; font-size:14px;">-</div>
                 <button class="nav-btn" id="modal-btn-next" title="Bulan Selanjutnya">❯</button>
             </div>
-            
             <div style="display:flex; align-items:center; gap:6px;">
                 <button class="btn-download-pdf" id="btn-open-download-2" style="background:#38bdf8;" title="Unduh Kalender PDF">📥 Print PDF</button>
             </div>
         </div>
 
         <div class="cal-weekdays" style="font-size:11px; margin-top:10px;">
-            <div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div><div>Min</div>
+            <div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div>
         </div>
-        <div class="cal-grid" id="modal-cal-grid" style="gap:5px; font-size:12px;"></div>
         
-        <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px;">
-            </div>
+        <div class="cal-grid" id="modal-cal-grid" style="gap:5px; font-size:12px;"></div>
+        <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px;"></div>
     </div>
 </div>
 
@@ -276,7 +275,7 @@
         </div>
         
         <button id="btn-proses-pdf" style="width:100%; margin-top:20px; background:var(--green); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; transition:0.2s;">
-            🖨️ Generate & Download PDF
+            🖨️ Generate & Print PDF
         </button>
     </div>
 </div>
@@ -289,19 +288,12 @@
   const elGreeting = document.getElementById('clock-greeting');
   const elChipLokasi = document.getElementById('chip-lokasi');
 
-  const elPrayerList = document.getElementById('prayer-list');
-  const elNextStrong = document.querySelector('#next-prayer strong');
-  const elCountdown = document.getElementById('countdown');
-
   const elWeatherTemp = document.getElementById('weather-temp');
   const elWeatherDesc = document.getElementById('weather-desc');
   const elWeatherRain = document.getElementById('weather-rain');
   const elWeatherWind = document.getElementById('weather-wind');
   const elWeatherTime = document.getElementById('weather-time');
   const elWeatherIcon = document.getElementById('weather-icon');
-
-  const dotColors = { Subuh: 'var(--blue)', Terbit:'var(--amber)', Dzuhur:'var(--green)', Ashar:'var(--purple)', Maghrib:'var(--pink)', Isya:'var(--blue)' };
-  const namesOrder = ['Subuh','Terbit','Dzuhur','Ashar','Maghrib','Isya'];
 
   function pad2(n){ return String(n).padStart(2,'0'); }
 
@@ -320,55 +312,7 @@
     const h = d.getHours();
     if (h < 5) return 'Masuk waktu malam 🌙'; if (h < 11) return 'Semangat pagi! ☀️';
     if (h < 15) return 'Waktu belajar & berdzikir ✨'; if (h < 18) return 'Hati tetap sejuk 🤲';
-    if (h < 20) return 'Mari siapkan ibadah maghrib 🌿'; return 'Tenanglah, istirahat sebentar 🕌';
-  }
-
-  function parseHHMMToDate(timeStr, baseDate){
-    const [hh, mm] = timeStr.split(':').map(Number);
-    return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hh, mm, 0, 0);
-  }
-
-  function minutesToHHMM(totalMinutes){
-    const hh = Math.floor(totalMinutes / 60); const mm = totalMinutes % 60;
-    return `${hh}j ${pad2(mm)}m`;
-  }
-
-  function getNextPrayer(prayers, now){
-    const base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0,0);
-    const times = namesOrder.map(n => ({ name: n, time: parseHHMMToDate(prayers[n], base) })).filter(x => !isNaN(x.time.getTime()));
-
-    let active = times[0];
-    for (const t of times) { if (t.time <= now) active = t; }
-
-    let next = times.find(t => t.time > now);
-    if (!next){
-      const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate()+1);
-      const subuhTomorrow = parseHHMMToDate(prayers['Subuh'], tomorrow);
-      next = { name: 'Subuh', time: subuhTomorrow };
-    }
-
-    const diffMs = next.time - now; const diffMin = Math.max(0, Math.floor(diffMs / 60000));
-    const countdown = minutesToHHMM(diffMin);
-    return { nextName: next.name, activeName: active.name, countdown };
-  }
-
-  function renderPrayerTimes(prayers){
-    const now = new Date(); elPrayerList.innerHTML = '';
-    const { nextName, activeName, countdown } = getNextPrayer(prayers, now);
-    elNextStrong.textContent = nextName; elCountdown.textContent = `⏳ ${countdown}`;
-
-    for (const name of namesOrder){
-      const t = prayers[name] || '--:--';
-      const row = document.createElement('div');
-      row.className = 'prayer-item' + (name === activeName ? ' active' : '');
-
-      const left = document.createElement('div'); left.className = 'name';
-      const dot = document.createElement('span'); dot.className = 'badge'; dot.style.background = dotColors[name] || 'var(--green)';
-      left.appendChild(dot); left.appendChild(document.createTextNode(name));
-
-      const right = document.createElement('div'); right.className = 'time'; right.textContent = t;
-      row.appendChild(left); row.appendChild(right); elPrayerList.appendChild(row);
-    }
+    if (h < 20) return 'Mari siapkan istirahat 🌿'; return 'Tenanglah, selamat malam 🕌';
   }
 
   // ==========================================
@@ -378,14 +322,12 @@
   const btnCloseModal = document.getElementById('btn-close-modal');
   const sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
   
-  // Pindahkan Modal keluar dari kerangka agar Fullscreen penuh
   if (modalOverlay) document.body.appendChild(modalOverlay);
   
   const modalDownload = document.getElementById('download-modal');
   if (modalDownload) document.body.appendChild(modalDownload);
   
   sidebarCalendarCard.addEventListener('click', (e) => {
-      // Abaikan jika yang diklik adalah tombol navigasi atau tombol PDF
       if (e.target.classList.contains('nav-btn') || e.target.classList.contains('btn-download-pdf')) return;
       modalOverlay.classList.add('active');
   });
@@ -397,7 +339,6 @@
   // ==========================================
   // LOGIKA TOMBOL & MODAL DOWNLOAD PDF 
   // ==========================================
-  // Set default form download (Tahun & Bulan ini hingga 6 bulan ke depan)
   const todayYMD = new Date();
   const defStart = `${todayYMD.getFullYear()}-${pad2(todayYMD.getMonth()+1)}`;
   todayYMD.setMonth(todayYMD.getMonth() + 5); 
@@ -406,53 +347,30 @@
   document.getElementById('pdf-start-month').value = defStart;
   document.getElementById('pdf-end-month').value = defEnd;
 
-  // Tombol buka modal download di Sidebar
-  document.getElementById('btn-open-download-1').addEventListener('click', (e) => {
-      e.stopPropagation(); 
-      modalDownload.classList.add('active');
-  });
+  document.getElementById('btn-open-download-1').addEventListener('click', (e) => { e.stopPropagation(); modalDownload.classList.add('active'); });
+  document.getElementById('btn-open-download-2').addEventListener('click', () => { modalDownload.classList.add('active'); });
 
-  // Tombol buka modal download di Kalender Fullscreen
-  document.getElementById('btn-open-download-2').addEventListener('click', () => {
-      modalDownload.classList.add('active');
-  });
+  document.getElementById('btn-close-download').addEventListener('click', () => { modalDownload.classList.remove('active'); });
+  modalDownload.addEventListener('click', (e) => { if (e.target === modalDownload) modalDownload.classList.remove('active'); });
 
-  // Tutup Modal Download
-  document.getElementById('btn-close-download').addEventListener('click', () => {
-      modalDownload.classList.remove('active');
-  });
-  modalDownload.addEventListener('click', (e) => {
-      if (e.target === modalDownload) modalDownload.classList.remove('active');
-  });
-
-// FUNGSI UTAMA GENERATE PDF (DIARAHKAN KE HALAMAN PRINT)
+  // PRINT KALENDER KE HALAMAN CETAK
   document.getElementById('btn-proses-pdf').addEventListener('click', function() {
       const start = document.getElementById('pdf-start-month').value;
       const end = document.getElementById('pdf-end-month').value;
       
-      if(!start || !end) {
-          alert('⚠️ Harap pilih rentang bulan "Mulai" dan "Sampai"!');
-          return;
-      }
+      if(!start || !end) { alert('⚠️ Harap pilih rentang bulan!'); return; }
       
       let currDate = new Date(start + '-01');
       let endDate = new Date(end + '-01');
-      if(currDate > endDate) {
-          alert('⚠️ Bulan "Mulai" tidak boleh lebih besar dari bulan "Sampai"!');
-          return;
-      }
+      if(currDate > endDate) { alert('⚠️ Bulan Mulai tidak boleh lebih besar!'); return; }
 
-      // Tutup modal popup downloadnya
       document.getElementById('download-modal').classList.remove('active');
-      
-      // Buka halaman print dengan membawa data bulan di URL
-      const urlCetak = `print-kalender.html?start=${start}&end=${end}`;
-      window.open(urlCetak, '_blank');
+      window.open(`print-kalender.html?start=${start}&end=${end}`, '_blank');
   });
 
 
   // ==========================================
-  // KALENDER UTAMA WEB (DENGAN STATUS LOADING)
+  // KALENDER & AGENDA (DENGAN STATUS LOADING)
   // ==========================================
   let globalAgenda = []; 
   let currentNavDate = new Date(); 
@@ -460,7 +378,6 @@
 
   document.getElementById('btn-prev-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('btn-next-month').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
-
   document.getElementById('modal-btn-prev').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('modal-btn-next').addEventListener('click', () => { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
 
@@ -480,16 +397,8 @@
     });
 
     const targets = [
-        {
-            monthEl: document.getElementById('cal-month'),
-            gridEl: document.getElementById('cal-grid'),
-            listEl: document.getElementById('agenda-list-container')
-        },
-        {
-            monthEl: document.getElementById('modal-cal-month'),
-            gridEl: document.getElementById('modal-cal-grid'),
-            listEl: document.getElementById('modal-agenda-list')
-        }
+        { monthEl: document.getElementById('cal-month'), gridEl: document.getElementById('cal-grid'), listEl: document.getElementById('agenda-list-container') },
+        { monthEl: document.getElementById('modal-cal-month'), gridEl: document.getElementById('modal-cal-grid'), listEl: document.getElementById('modal-agenda-list') }
     ];
 
     const namaBulanTampil = new Intl.DateTimeFormat('id-ID', { month:'short', year:'numeric' }).format(date);
@@ -497,8 +406,7 @@
     targets.forEach(t => {
         if(!t.monthEl) return;
         t.monthEl.textContent = namaBulanTampil;
-        t.gridEl.innerHTML = ''; 
-        t.listEl.innerHTML = ''; 
+        t.gridEl.innerHTML = ''; t.listEl.innerHTML = ''; 
 
         for(let i=0;i<startIndex;i++){
           const cell = document.createElement('div'); cell.className = 'cal-day muted'; t.gridEl.appendChild(cell);
@@ -506,12 +414,10 @@
 
         for(let day=1; day<=last.getDate(); day++){
           const cell = document.createElement('div');
-          cell.className = 'cal-day';
-          cell.textContent = day;
+          cell.className = 'cal-day'; cell.textContent = day;
 
           const currentDate = new Date(y, m, day);
           const dayOfWeek = currentDate.getDay();
-          
           if(dayOfWeek === 0 || dayOfWeek === 6) cell.classList.add('is-libur');
 
           const isToday = day === today.getDate() && y === today.getFullYear() && m === today.getMonth();
@@ -540,12 +446,7 @@
         }
         
         if (isAgendaLoading) {
-            t.listEl.innerHTML = `
-              <div class="agenda-loader">
-                <div class="spinner-circle"></div>
-                <div>Sinkronisasi data...</div>
-              </div>
-            `;
+            t.listEl.innerHTML = `<div class="agenda-loader"><div class="spinner-circle"></div><div>Sinkronisasi data...</div></div>`;
         } else if (agendaBulanIni.length > 0) {
             agendaBulanIni.forEach(ag => {
                 const [thn, bln, tgl] = ag.tanggalBersih.split('-');
@@ -590,6 +491,7 @@
     });
   }
 
+  // FUNGSI FETCH AGENDA API GOOGLE SCRIPT
   window.fetchAgendaDatabase = async function() {
     isAgendaLoading = true; 
     renderCalendar(currentNavDate); 
@@ -618,7 +520,59 @@
     }
   }
 
-  // Sisa fungsi bawaan (Cuaca & Jadwal Sholat)
+  // ==========================================
+  // FUNGSI FETCH REKAP ABSENSI TERBARU
+  // ==========================================
+  window.fetchRekapAbsensi = async function() {
+      const container = document.getElementById('absensi-list-container');
+      
+      try {
+          // GANTI LINK DI BAWAH INI SESUAI DENGAN LINK API SCRIPT ABSENSI BAPAK NANTI
+          // Sementara kita buat animasi simulasi agar UI berjalan
+          const URL_API = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec?action=get_absensi"; 
+          
+          // Simulasi Fetch
+          // const res = await fetch(URL_API);
+          // const json = await res.json();
+          
+          setTimeout(() => {
+              // Simulasi Data Absensi (Nanti diganti dengan data asli dari json.data)
+              const dataSimulasi = [
+                  { kelas: "Kelas 1", hadir: 28, sakit: 1, izin: 1, alpa: 0 },
+                  { kelas: "Kelas 2", hadir: 30, sakit: 0, izin: 0, alpa: 0 },
+                  { kelas: "Kelas 3", hadir: 27, sakit: 2, izin: 0, alpa: 1 },
+                  { kelas: "Kelas 4", hadir: 29, sakit: 0, izin: 1, alpa: 0 },
+                  { kelas: "Kelas 5", hadir: 26, sakit: 3, izin: 1, alpa: 0 },
+                  { kelas: "Kelas 6", hadir: 30, sakit: 0, izin: 0, alpa: 0 }
+              ];
+              
+              document.getElementById('absensi-bulan').textContent = "Bulan Ini";
+              container.innerHTML = "";
+              
+              dataSimulasi.forEach(d => {
+                  container.innerHTML += `
+                      <div class="absensi-item">
+                          <div class="kelas-name">
+                            <span>📚 ${d.kelas}</span>
+                          </div>
+                          <div class="absensi-stats">
+                              <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.hadir}</span></div>
+                              <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.sakit}</span></div>
+                              <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.izin}</span></div>
+                              <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.alpa}</span></div>
+                          </div>
+                      </div>
+                  `;
+              });
+          }, 1500); // Simulasi delay 1.5 detik
+          
+      } catch(e) {
+          container.innerHTML = '<div style="text-align:center; color:red; font-size:10px; margin-top:15px;">Gagal memuat rekap absensi.</div>';
+      }
+  }
+
+
+  // Sisa fungsi Cuaca & Lokasi (Tanpa Aladhan)
   function weatherCodeToText(code){
     const map = {
       0: ['Cerah', '☀️'], 1: ['Cerah Berawan', '🌤️'], 2: ['Berawan', '⛅'], 3: ['Mendung', '☁️'],
@@ -632,15 +586,10 @@
     return map[code] || ['Cuaca', '🌈'];
   }
 
-  const KEMENAG_METHOD_ID = 9; 
-  const locationState = { lat: null, lon: null, place: '—', ready:false };
-  let prayersCache = null;
-
   function startClockLoop(){
     setInterval(() => {
       const now = new Date();
       elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now);
-      if (prayersCache) renderPrayerTimes(prayersCache);
     }, 1000);
   }
 
@@ -652,18 +601,6 @@
     const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
     const prov = addr.state || addr.province || '';
     return [city, prov].filter(Boolean).join(', ') || (data.display_name || 'Lokasi');
-  }
-
-  function getDateYMD(d){ return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
-
-  async function fetchPrayerTimes(lat, lon){
-    const dateStr = getDateYMD(new Date()); 
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const url = `https://api.aladhan.com/v1/timings?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&method=${encodeURIComponent(KEMENAG_METHOD_ID)}&school=0&date=${encodeURIComponent(dateStr)}&timezonestring=${encodeURIComponent(tz)}`;
-    const res = await fetch(url); if(!res.ok) throw new Error('prayer-times fetch failed');
-    const json = await res.json(); const t = json?.data?.timings;
-    if(!t) throw new Error('prayer-times parse failed');
-    return { Subuh: (t.Fajr||'').slice(0,5)||'--:--', Terbit: (t.Sunrise||'').slice(0,5)||'--:--', Dzuhur: (t.Dhuhr||'').slice(0,5)||'--:--', Ashar: (t.Asr||'').slice(0,5)||'--:--', Maghrib: (t.Maghrib||'').slice(0,5)||'--:--', Isya: (t.Isha||'').slice(0,5)||'--:--' };
   }
 
   async function fetchWeather(lat, lon){
@@ -681,34 +618,31 @@
   function startInitUI(){
     const now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now);
     currentNavDate = new Date(); renderCalendar(currentNavDate);
-    elPrayerList.innerHTML = '';
-    for (const n of namesOrder){
-      const row = document.createElement('div'); row.className = 'prayer-item';
-      row.innerHTML = `<div class="name"><span class="badge" style="background:${dotColors[n]||'var(--green)'}"></span>${n}</div><div class="time">—</div>`;
-      elPrayerList.appendChild(row);
-    }
   }
 
   function startGeolocation(){
+    const locationState = { lat: null, lon: null, place: '—', ready:false };
     if(!navigator.geolocation){
       elChipLokasi.textContent = 'Lokasi: Jakarta (default)'; locationState.lat = -6.200000; locationState.lon = 106.816666; locationState.place = 'Jakarta'; locationState.ready = true;
-      (async () => { try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){} try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){} })(); return;
+      (async () => { try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){} })(); return;
     }
     elChipLokasi.textContent = 'Mencari lokasi...';
     navigator.geolocation.getCurrentPosition(async (pos) => {
       locationState.lat = pos.coords.latitude; locationState.lon = pos.coords.longitude;
       try{ locationState.place = await reverseGeocode(locationState.lat, locationState.lon); }catch(e){ locationState.place = `(${locationState.lat.toFixed(2)}, ${locationState.lon.toFixed(2)})`; }
       elChipLokasi.textContent = `Lokasi: ${locationState.place}`; locationState.ready = true;
-      try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
       try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
     }, async () => {
       elChipLokasi.textContent = 'Lokasi: Jakarta (default)'; locationState.lat = -6.200000; locationState.lon = 106.816666;
-      try{ prayersCache = await fetchPrayerTimes(locationState.lat, locationState.lon); renderPrayerTimes(prayersCache); }catch(e){}
       try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){}
       locationState.ready = true;
     }, { enableHighAccuracy:false, timeout: 8000, maximumAge: 600000 });
   }
 
-  startInitUI(); fetchAgendaDatabase(); startClockLoop(); startGeolocation();
+  startInitUI(); 
+  fetchAgendaDatabase(); 
+  fetchRekapAbsensi(); // <--- Menjalankan Rekap Absensi
+  startClockLoop(); 
+  startGeolocation();
 })();
 </script>
