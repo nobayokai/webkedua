@@ -1,0 +1,280 @@
+<style>
+    .absen-panel { background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(16,185,129,0.2); margin-bottom: 20px; font-family: 'Arial', sans-serif;}
+    .absen-header { border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+    .absen-header h2 { margin: 0; color: #047857; font-family: 'Georgia', serif; font-size: 20px; font-weight: 900;}
+    
+    .absen-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
+    .input-box { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-weight: bold; color: #374151; outline: none; }
+    .btn-action { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; display: flex; align-items: center; gap: 6px; font-size: 13px;}
+    .btn-green { background: #10b981; } .btn-green:hover { background: #059669; }
+    .btn-blue { background: #3b82f6; } .btn-blue:hover { background: #2563eb; }
+    .btn-red { background: #ef4444; } .btn-red:hover { background: #dc2626; }
+
+    /* CARD SISWA UNTUK ABSEN */
+    .siswa-card { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
+    .siswa-info { display: flex; flex-direction: column; }
+    .siswa-nama { font-weight: 900; font-size: 15px; color: #1f2937; }
+    .siswa-nis { font-size: 11px; color: #6b7280; font-weight: bold; margin-top: 2px; }
+    
+    /* RADIO BUTTON GAYA TOGGLE (H-I-S-A) */
+    .radio-group { display: flex; gap: 5px; background: #e5e7eb; padding: 3px; border-radius: 8px; }
+    .radio-group label { cursor: pointer; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; color: #4b5563; transition: 0.2s; user-select: none;}
+    .radio-group input[type="radio"] { display: none; }
+    
+    /* Warna Status saat aktif */
+    .radio-group input[value="Hadir"]:checked + label { background: #10b981; color: white; box-shadow: 0 2px 5px rgba(16,185,129,0.3); }
+    .radio-group input[value="Izin"]:checked + label { background: #3b82f6; color: white; box-shadow: 0 2px 5px rgba(59,130,246,0.3); }
+    .radio-group input[value="Sakit"]:checked + label { background: #f59e0b; color: white; box-shadow: 0 2px 5px rgba(245,158,11,0.3); }
+    .radio-group input[value="Alpa"]:checked + label { background: #ef4444; color: white; box-shadow: 0 2px 5px rgba(239,68,68,0.3); }
+
+    .btn-hapus-siswa { background: transparent; border: none; color: #ef4444; font-size: 16px; cursor: pointer; padding: 5px; transition: 0.2s; }
+    .btn-hapus-siswa:hover { transform: scale(1.2); }
+
+    /* MODAL TAMBAH SISWA */
+    .modal-add { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px);}
+    .modal-add.active { opacity: 1; pointer-events: auto; }
+    .modal-add-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #374151; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; }
+</style>
+
+<div class="absen-panel" id="panel-absen" style="display: none;">
+    <div class="absen-header">
+        <div>
+            <h2>📝 Absensi Kehadiran Siswa</h2>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280; font-weight: bold;">SDIT Hidayatut Taufiq</p>
+        </div>
+        <div class="absen-controls">
+            <input type="date" id="tgl-absen" class="input-box" required>
+            <select id="pilih-kelas" class="input-box" onchange="loadDaftarSiswa()">
+                <option value="">-- Pilih Kelas --</option>
+                <option value="Kelas 1">Kelas 1</option>
+                <option value="Kelas 2">Kelas 2</option>
+                <option value="Kelas 3">Kelas 3</option>
+                <option value="Kelas 4">Kelas 4</option>
+                <option value="Kelas 5">Kelas 5</option>
+                <option value="Kelas 6">Kelas 6</option>
+            </select>
+            <button class="btn-action btn-blue" onclick="bukaModalTambah()">➕ Tambah Siswa</button>
+        </div>
+    </div>
+
+    <div id="loader-siswa" style="text-align: center; padding: 30px; display: none;">
+        <h3 style="color: #10b981;">⏳ Memuat Daftar Siswa...</h3>
+    </div>
+
+    <form id="form-absensi" onsubmit="submitAbsensi(event)">
+        <div id="daftar-siswa-container">
+            <div style="text-align: center; color: #9ca3af; padding: 30px; font-weight: bold; border: 2px dashed #d1d5db; border-radius: 12px;">
+                Silakan pilih kelas terlebih dahulu.
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: right; border-top: 2px dashed #e5e7eb; padding-top: 15px;">
+            <button type="submit" id="btn-submit-absen" class="btn-action btn-green" style="padding: 12px 25px; font-size: 15px; display: inline-flex;" disabled>✅ Simpan Data Absensi</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal Tambah Siswa Baru -->
+<div class="modal-add" id="modal-tambah">
+    <div class="modal-add-content">
+        <h3 style="margin-top:0; color: #047857; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">👤 Tambah Data Siswa</h3>
+        <div class="form-group">
+            <label>Pilih Kelas</label>
+            <input type="text" id="add-kelas" readonly style="background: #f3f4f6;">
+        </div>
+        <div class="form-group">
+            <label>Nomor Induk Siswa (NIS)</label>
+            <input type="text" id="add-nis" placeholder="Contoh: 2601001" required>
+        </div>
+        <div class="form-group">
+            <label>Nama Lengkap Siswa</label>
+            <input type="text" id="add-nama" placeholder="Masukkan nama lengkap" required>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn-action btn-red" style="flex: 1; justify-content: center;" onclick="tutupModalTambah()">Batal</button>
+            <button class="btn-action btn-green" style="flex: 1; justify-content: center;" onclick="simpanSiswaBaru()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL Web App Bapak (GANTI DENGAN LINK DEPLOY TERBARU)
+    const API_URL = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
+
+    // Set default tanggal hari ini
+    document.getElementById('tgl-absen').valueAsDate = new Date();
+
+    // Verifikasi Akses Guru
+    const userLog = JSON.parse(localStorage.getItem("userLogin"));
+    if (!userLog || userLog.role !== 'guru') {
+        document.getElementById("panel-absen").style.display = "block";
+        document.getElementById("panel-absen").innerHTML = `<div style="text-align:center; padding: 50px;"><h2 style="color:#ef4444;">⛔ Akses Ditolak</h2><p>Hanya Guru yang dapat mengakses menu absensi ini.</p></div>`;
+    } else {
+        document.getElementById("panel-absen").style.display = "block";
+    }
+
+    let globalSiswa = [];
+
+    // Ambil Data Siswa dari Server
+    async function loadDaftarSiswa() {
+        const kelas = document.getElementById('pilih-kelas').value;
+        const container = document.getElementById('daftar-siswa-container');
+        const btnSubmit = document.getElementById('btn-submit-absen');
+        
+        if(!kelas) {
+            container.innerHTML = `<div style="text-align: center; color: #9ca3af; padding: 30px; font-weight: bold; border: 2px dashed #d1d5db; border-radius: 12px;">Silakan pilih kelas terlebih dahulu.</div>`;
+            btnSubmit.disabled = true;
+            return;
+        }
+
+        document.getElementById('loader-siswa').style.display = "block";
+        container.innerHTML = "";
+        btnSubmit.disabled = true;
+
+        try {
+            const res = await fetch(API_URL + "?action=get_siswa");
+            const json = await res.json();
+            
+            if(json.status === 'success') {
+                globalSiswa = json.data;
+                const siswaKelasIni = globalSiswa.filter(s => s.kelas === kelas);
+                
+                if(siswaKelasIni.length === 0) {
+                    container.innerHTML = `<div style="text-align: center; color: #ef4444; padding: 30px; font-weight: bold; border: 2px dashed #fca5a5; border-radius: 12px;">Belum ada data siswa di ${kelas}.<br><br>Klik tombol "Tambah Siswa" di atas.</div>`;
+                } else {
+                    renderTableSiswa(siswaKelasIni);
+                    btnSubmit.disabled = false;
+                }
+            }
+        } catch(e) {
+            container.innerHTML = `<h3 style="color:red; text-align:center;">Gagal memuat data. Periksa koneksi internet.</h3>`;
+        } finally {
+            document.getElementById('loader-siswa').style.display = "none";
+        }
+    }
+
+    function renderTableSiswa(dataSiswa) {
+        const container = document.getElementById('daftar-siswa-container');
+        container.innerHTML = "";
+        
+        // Urutkan berdasarkan nama abjad
+        dataSiswa.sort((a,b) => a.nama.localeCompare(b.nama));
+
+        dataSiswa.forEach((s, index) => {
+            container.innerHTML += `
+                <div class="siswa-card" id="card-${s.nis}">
+                    <div class="siswa-info">
+                        <div class="siswa-nama">${index + 1}. ${s.nama}</div>
+                        <div class="siswa-nis">NIS: ${s.nis}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 15px;">
+                        <div class="radio-group">
+                            <input type="radio" id="h-${s.nis}" name="absen_${s.nis}" value="Hadir" checked>
+                            <label for="h-${s.nis}">H</label>
+                            
+                            <input type="radio" id="i-${s.nis}" name="absen_${s.nis}" value="Izin">
+                            <label for="i-${s.nis}">I</label>
+                            
+                            <input type="radio" id="s-${s.nis}" name="absen_${s.nis}" value="Sakit">
+                            <label for="s-${s.nis}">S</label>
+                            
+                            <input type="radio" id="a-${s.nis}" name="absen_${s.nis}" value="Alpa">
+                            <label for="a-${s.nis}">A</label>
+                        </div>
+                        <button type="button" class="btn-hapus-siswa" title="Hapus Siswa" onclick="hapusSiswa('${s.nis}', '${s.nama}')">🗑️</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // FUNGSI MODAL TAMBAH SISWA
+    function bukaModalTambah() {
+        const kelas = document.getElementById('pilih-kelas').value;
+        if(!kelas) return alert("Pilih kelas terlebih dahulu sebelum menambah siswa!");
+        document.getElementById('add-kelas').value = kelas;
+        document.getElementById('add-nis').value = "";
+        document.getElementById('add-nama').value = "";
+        document.getElementById('modal-tambah').classList.add('active');
+    }
+    function tutupModalTambah() { document.getElementById('modal-tambah').classList.remove('active'); }
+
+    async function simpanSiswaBaru() {
+        const kelas = document.getElementById('add-kelas').value;
+        const nis = document.getElementById('add-nis').value;
+        const nama = document.getElementById('add-nama').value;
+        if(!nis || !nama) return alert("NIS dan Nama wajib diisi!");
+
+        const btn = document.querySelector('.btn-green');
+        btn.innerHTML = "Menyimpan..."; btn.disabled = true;
+
+        const payload = { action: "add_siswa_kelas", kelas: kelas, nis: nis, nama: nama };
+        
+        try {
+            const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            const result = await res.json();
+            if(result.status === "success") {
+                alert("Berhasil! Siswa ditambahkan.");
+                tutupModalTambah();
+                loadDaftarSiswa(); // Refresh daftar otomatis
+            }
+        } catch(e) { alert("Gagal menyimpan data!"); } 
+        finally { btn.innerHTML = "Simpan"; btn.disabled = false; }
+    }
+
+    // FUNGSI HAPUS SISWA
+    async function hapusSiswa(nis, nama) {
+        if(!confirm(`Apakah Anda yakin ingin MENGHAPUS data siswa bernama: ${nama} (NIS: ${nis}) dari database?`)) return;
+
+        document.getElementById(`card-${nis}`).style.opacity = "0.5";
+
+        try {
+            const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete_siswa", nis: nis }) });
+            const result = await res.json();
+            if(result.status === "success") {
+                alert("Siswa berhasil dihapus.");
+                loadDaftarSiswa();
+            } else { alert("Gagal: " + result.message); }
+        } catch(e) { alert("Gagal terhubung ke server."); document.getElementById(`card-${nis}`).style.opacity = "1"; }
+    }
+
+    // FUNGSI SUBMIT ABSENSI KE SERVER
+    async function submitAbsensi(e) {
+        e.preventDefault();
+        const tanggal = document.getElementById('tgl-absen').value;
+        const kelas = document.getElementById('pilih-kelas').value;
+        const btn = document.getElementById('btn-submit-absen');
+        
+        // Kumpulkan data dari semua radio button yang terceklis di layar
+        const kelasSiswa = globalSiswa.filter(s => s.kelas === kelas);
+        let dataAbsen = [];
+
+        kelasSiswa.forEach(s => {
+            const radioTerpilih = document.querySelector(`input[name="absen_${s.nis}"]:checked`);
+            if(radioTerpilih) {
+                dataAbsen.push({ nis: s.nis, nama: s.nama, status: radioTerpilih.value });
+            }
+        });
+
+        if(dataAbsen.length === 0) return alert("Tidak ada data siswa untuk diabsen.");
+        if(!confirm(`Kirim data absensi ${kelas} untuk tanggal ${tanggal}?`)) return;
+
+        btn.innerHTML = "⏳ Sedang Mengirim Data..."; btn.disabled = true;
+
+        const payload = { action: "submit_absensi", tanggal: tanggal, kelas: kelas, data_absen: dataAbsen };
+
+        try {
+            const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            const result = await res.json();
+            if(result.status === "success") {
+                alert("Absensi berhasil disimpan ke Database!");
+                // Refresh widget rekap absensi di sebelah kiri (memanggil fungsi dari file animasi-kiri.html)
+                if(typeof fetchRekapAbsensi === "function") { fetchRekapAbsensi(); }
+            }
+        } catch(e) { alert("Terjadi kesalahan sistem saat mengirim data."); }
+        finally { btn.innerHTML = "✅ Simpan Data Absensi"; btn.disabled = false; }
+    }
+</script>
