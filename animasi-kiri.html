@@ -415,7 +415,7 @@ window.jalankanWidgetKiri = function() {
               listKelas.forEach(function(kls) {
                   var d = rekapHariIni[kls];
                   container.innerHTML += `
-                      <div class="absensi-item" onclick="window.bukaModalPengaturanAbsen('${kls}')">
+                     <div class="absensi-item" onclick="window.bukaChartKelas('${kls}')">
                           <div class="kelas-name"><span>📚 ${kls}</span><span style="font-size:10px; color:#6b7280; font-weight:bold;">Total: ${d.Total} Siswa</span></div>
                           <div class="absensi-stats">
                               <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
@@ -432,10 +432,75 @@ window.jalankanWidgetKiri = function() {
       }
   };
 
-  // MUNCULKAN POPUP PENGATURAN CETAK LANGSUNG SAAT KLIK KELAS
-  window.bukaModalPengaturanAbsen = function(kelas) {
-      window.currentKelasAbsen = kelas;
-      
+  // 1. MUNCULKAN CHART DENGAN MODEL BERDAMPINGAN SAAT DIKLIK
+  window.bukaChartKelas = function(kelas) {
+      window.currentKelasAbsen = kelas; // Simpan memori kelas yang diklik
+      document.getElementById('chart-kelas-title').textContent = kelas;
+      document.getElementById('chart-modal').classList.add('active');
+
+      var absenKelas = window.globalDataAbsensi.filter(function(a) { return a.kelas === kelas; });
+      var monthsNumber = ['07', '08', '09', '10', '11', '12', '01', '02', '03', '04', '05', '06'];
+      var labelsChart  = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
+
+      var dataS = Array(12).fill(0); var dataI = Array(12).fill(0); var dataA = Array(12).fill(0);
+      var totals = Array(12).fill(0);
+
+      // Hitung mentah jumlah S, I, A per bulan
+      absenKelas.forEach(function(a) {
+          if(!a.tanggal) return;
+          var monthStr = String(a.tanggal).replace(/['"]/g, '').trim().substring(5, 7);
+          var idx = monthsNumber.indexOf(monthStr);
+          if(idx !== -1) {
+              var stat = (a.status || "").toUpperCase().trim();
+              totals[idx]++;
+              if(stat === 'SAKIT') dataS[idx]++;
+              else if(stat === 'IZIN') dataI[idx]++;
+              else if(stat === 'ALPA' || stat === 'ALFA') dataA[idx]++;
+          }
+      });
+
+      var jmlSiswaArray = window.globalDataSemuaSiswa ? window.globalDataSemuaSiswa.filter(function(s){ return s.kelas === kelas; }) : [];
+      var jmlSiswa = jmlSiswaArray.length || 1;
+
+      var dataS_pct = [], dataI_pct = [], dataA_pct = [];
+
+      // Konversi ke Persentase dengan Rumus Bapak: (Jml * 100) / (Siswa * Hari Efektif)
+      for(var i=0; i<12; i++){
+          var hariEfektif = Math.round(totals[i] / jmlSiswa) || 0; // Estimasi hari efektif dari jumlah record
+          var denominator = jmlSiswa * hariEfektif;
+          
+          if(denominator > 0) {
+              dataS_pct.push(((dataS[i] * 100) / denominator).toFixed(2));
+              dataI_pct.push(((dataI[i] * 100) / denominator).toFixed(2));
+              dataA_pct.push(((dataA[i] * 100) / denominator).toFixed(2));
+          } else {
+              dataS_pct.push(0); dataI_pct.push(0); dataA_pct.push(0);
+          }
+      }
+
+      if(window.grafikAbsensiInstance) window.grafikAbsensiInstance.destroy();
+
+      var ctx = document.getElementById('absenChart').getContext('2d');
+      window.grafikAbsensiInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labelsChart,
+              datasets: [
+                  { label: 'Sakit', data: dataS_pct, backgroundColor: '#4472c4', categoryPercentage: 0.8, barPercentage: 0.9 },
+                  { label: 'Izin', data: dataI_pct, backgroundColor: '#ed7d31', categoryPercentage: 0.8, barPercentage: 0.9 },
+                  { label: 'Alfa', data: dataA_pct, backgroundColor: '#a5a5a5', categoryPercentage: 0.8, barPercentage: 0.9 }
+              ]
+          },
+          options: {
+              responsive: true,
+              plugins: { legend: { position: 'bottom' } },
+              scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100 } }
+          }
+      });
+  };
+
+  // 2. MUNCULKAN POPUP PENGATURAN CETAK (Dipanggil dari tombol di dalam Chart)
+  window.bukaModalPengaturanAbsen = function() {
       var d = new Date();
       var endStr = d.getFullYear() + '-' + pad2(d.getMonth()+1);
       d.setMonth(d.getMonth() - 5);
