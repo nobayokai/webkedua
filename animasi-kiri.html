@@ -168,8 +168,22 @@ var isAgendaLoading = true;
 var modalsLama = document.querySelectorAll('.modal-overlay');
 modalsLama.forEach(function(m) { m.remove(); });
 
-// INJEKSI HTML MODAL
+// INJEKSI HTML MODAL (Sudah dikembalikan wadah Grafiknya!)
 var htmlModal = `
+<!-- 1. Modal Preview Grafik -->
+<div class="modal-overlay" id="chart-modal">
+    <div class="modal-calendar-card" style="max-width: 600px; width: 95vw;">
+        <button class="modal-close-btn" onclick="document.getElementById('chart-modal').classList.remove('active');">✕</button>
+        <h3 style="color:var(--green2); text-align:center; font-family:'Georgia',serif; margin-top:0;">📊 Persentase Kehadiran <span id="chart-kelas-title"></span></h3>
+        <p style="text-align:center; font-size:11px; color:#6b7280; margin-top:-10px; font-weight:bold;">Tahun Ajaran Berjalan</p>
+        <div style="width:100%; overflow-x:auto; background:white; padding:10px; border-radius:10px; border:1px solid #e5e7eb;">
+            <canvas id="absenChart"></canvas>
+        </div>
+        <button class="btn-green-large" onclick="window.bukaModalPengaturanAbsen()">📥 Download Laporan Absensi (PDF)</button>
+    </div>
+</div>
+
+<!-- 2. Modal Setting Download Absensi -->
 <div class="modal-overlay" id="download-absen-modal">
     <div class="modal-download-card">
         <button class="modal-close-btn" onclick="document.getElementById('download-absen-modal').classList.remove('active');">✕</button>
@@ -206,6 +220,7 @@ var htmlModal = `
     </div>
 </div>
 
+<!-- 3. Modal Kalender & Download Kalender -->
 <div class="modal-overlay" id="calendar-modal">
     <div class="modal-calendar-card">
         <button class="modal-close-btn" id="btn-close-modal">✕</button>
