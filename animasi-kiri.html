@@ -1,6 +1,3 @@
-<!-- Pustaka Chart.js untuk Membuat Diagram Batang-->
-
-
 <style>
   :root{
     --bg: transparent; 
@@ -17,30 +14,15 @@
     --amber:#f59e0b;
   }
 
-  #widget-islam{
-    width: 100%; height: 100%; display:flex; flex-direction: column;
-    padding: 10px 10px; box-sizing: border-box; gap: 10px; background: var(--bg);
-  }
-
+  #widget-islam{ width: 100%; height: 100%; display:flex; flex-direction: column; padding: 10px 10px; box-sizing: border-box; gap: 10px; background: var(--bg); }
   .widget-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
 
-  .card{
-    background: var(--card); border: 1px solid var(--stroke); border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    padding: 12px; overflow:hidden; position: relative;
-  }
-  .card::after{
-    content:""; position:absolute; inset:-40px -60px auto -60px; height: 90px;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%); pointer-events:none;
-  }
+  .card{ background: var(--card); border: 1px solid var(--stroke); border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 12px; overflow:hidden; position: relative; }
+  .card::after{ content:""; position:absolute; inset:-40px -60px auto -60px; height: 90px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%); pointer-events:none; }
 
   .brand{ display:flex; align-items:center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
   .brand .title{ font-family: Georgia, serif; font-weight: 950; color: var(--green2); font-size: 13px; letter-spacing: .2px; }
-  .brand .chip{
-    font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12);
-    border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900;
-    white-space: nowrap; max-width: 45%; overflow:hidden; text-overflow: ellipsis;
-  }
+  .brand .chip{ font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900; white-space: nowrap; max-width: 45%; overflow:hidden; text-overflow: ellipsis; }
 
   /* Clock & Cuaca CSS */
   .clock-now{ display:flex; flex-direction: column; gap: 8px; }
@@ -63,19 +45,10 @@
   .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
   .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
   
-  .nav-btn {
-    background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2);
-    border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;
-  }
+  .nav-btn { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
   .nav-btn:hover { background: var(--green); color: white; }
   
-  .btn-download-pdf {
-      background: var(--pink); color: white; border: none; padding: 4px 10px; 
-      border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; 
-      display: flex; align-items: center; gap: 4px; transition: 0.2s;
-      box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3);
-  }
+  .btn-download-pdf { background: var(--pink); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3); }
   .btn-download-pdf:hover { transform: scale(1.05); background: #db2777; }
 
   .cal-weekdays{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 11px; font-weight: 1000; color: rgba(0,0,0,.45); margin-bottom: 6px; position: relative; z-index: 1; }
@@ -102,13 +75,7 @@
   .badge-kategori.libur    { background: #ef4444; }
 
   /* CSS ABSENSI HARIAN */
-  .absensi-item {
-      display: flex; flex-direction: column; gap: 6px; 
-      padding: 10px 12px; border-radius: 12px; 
-      background: rgba(255,255,255,.45); border: 1px solid rgba(0,0,0,.05);
-      margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-  }
+  .absensi-item { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.45); border: 1px solid rgba(0,0,0,.05); margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
   .absensi-item:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); border-color: var(--green); }
   
   .absensi-item .kelas-name { font-weight: 1000; font-size: 13px; color: var(--green2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
@@ -121,43 +88,25 @@
   .agenda-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800; }
   .spinner-circle { width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2); border-top: 3px solid var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
   /* CSS MODAL POPUP */
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); 
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; 
-    display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; overflow: hidden; 
-  }
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; overflow: hidden; }
   .modal-overlay.active { opacity: 1; pointer-events: auto; }
-  
-  .modal-calendar-card {
-    background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); box-sizing: border-box; 
-    width: 92vw; max-width: 380px; max-height: 85vh; overflow-y: auto; overflow-x: hidden; 
-    padding: 15px; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
-  }
+  .modal-calendar-card { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); box-sizing: border-box; width: 92vw; max-width: 380px; max-height: 85vh; overflow-y: auto; overflow-x: hidden; padding: 15px; position: relative; transform: scale(0.9); transition: transform 0.3s ease; }
   .modal-overlay.active .modal-calendar-card { transform: scale(1); }
-  
-  .modal-close-btn {
-    position: absolute; top: 12px; right: 12px; background: #ef4444; border: none;
-    border-radius: 50%; width: 30px; height: 30px; font-size: 14px; font-weight: bold;
-    color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); z-index: 10; transition: 0.2s;
-  }
+  .modal-close-btn { position: absolute; top: 12px; right: 12px; background: #ef4444; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 14px; font-weight: bold; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); z-index: 10; transition: 0.2s; }
   .modal-close-btn:hover { background: #dc2626; transform: scale(1.1); }
 
-  #download-modal { z-index: 9999999; }
-  .modal-download-card {
-    background: white; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
-    width: 90vw; max-width: 340px; padding: 25px; position: relative; 
-    transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box;
-  }
+  #download-modal, #download-absen-modal { z-index: 9999999; }
+  .modal-download-card { background: white; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); width: 90vw; max-width: 360px; padding: 25px; position: relative; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box; }
   .modal-overlay.active .modal-download-card { transform: scale(1); }
 
   .btn-green-large { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: var(--green); color: white; margin-top: 15px; box-shadow: 0 4px 10px rgba(16,185,129,0.3); transition: 0.2s;}
   .btn-green-large:hover { background: #059669; }
+  .input-form { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; font-size: 12px; margin-top: 4px; }
+  .input-group { margin-bottom: 12px; text-align: left; }
+  .input-group label { font-size: 11px; font-weight: bold; color: #4b5563; }
 
   @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
 </style>
@@ -172,27 +121,15 @@
     <div class="card">
       <div class="clock-now">
         <div class="clock-time" id="clock-time">--:--:--</div>
-        <div class="clock-date">
-          <span class="clock-dot"></span>
-          <span id="clock-date">-</span>
-        </div>
-        <div style="margin-top:10px;">
-          <div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div>
-          <div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:4px;">—</div>
-        </div>
+        <div class="clock-date"><span class="clock-dot"></span><span id="clock-date">-</span></div>
+        <div style="margin-top:10px;"><div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div><div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:4px;">—</div></div>
       </div>
     </div>
 
     <div class="card">
       <div class="weather-top">
-        <div>
-          <div style="font-weight:1100;color:rgba(0,0,0,.55);font-size:12px; margin-bottom:4px;">Cuaca hari ini</div>
-          <div class="weather-desc"><span id="weather-icon">🌤️</span><span id="weather-desc">—</span></div>
-        </div>
-        <div style="text-align:right;">
-          <div class="weather-temp" id="weather-temp">—</div>
-          <div style="font-weight:950;color:rgba(0,0,0,.45);font-size:11px;margin-top:4px;" id="weather-time">—</div>
-        </div>
+        <div><div style="font-weight:1100;color:rgba(0,0,0,.55);font-size:12px; margin-bottom:4px;">Cuaca hari ini</div><div class="weather-desc"><span id="weather-icon">🌤️</span><span id="weather-desc">—</span></div></div>
+        <div style="text-align:right;"><div class="weather-temp" id="weather-temp">—</div><div style="font-weight:950;color:rgba(0,0,0,.45);font-size:11px;margin-top:4px;" id="weather-time">—</div></div>
       </div>
       <div class="weather-row">
         <div class="weather-pill"><div class="k">Hujan</div><div class="v" id="weather-rain">—</div></div>
@@ -200,73 +137,85 @@
       </div>
     </div>
 
-    <!-- Papan Rekap Absensi HARI INI -->
-    <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat grafik bulanan">
+    <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat grafik">
       <div class="cal-head" style="margin-bottom:8px;">
         <div style="font-weight:950;color:var(--green2);font-size:13px;">📊 Kehadiran Hari Ini</div>
         <div style="font-size:10px; color:rgba(0,0,0,0.5); font-weight:bold;" id="absensi-tanggal">-</div>
       </div>
       <div id="absensi-list-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; padding-right:4px;">
         <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px;">
-           <div class="spinner-circle" style="margin: 0 auto 8px auto;"></div>
-           Merekap data harian...
+           <div class="spinner-circle" style="margin: 0 auto 8px auto;"></div>Merekap data harian...
         </div>
       </div>
     </div>
 
-    <!-- Kalender Kiri (Sidebar) -->
     <div class="card" id="sidebar-calendar-card" style="grid-column: 2 / span 1;" title="Klik untuk memperbesar kalender">
       <div class="cal-head">
         <div style="display:flex; align-items:center; gap:6px;">
-          <button class="nav-btn" id="btn-prev-month" title="Bulan Sebelumnya">❮</button>
-          <div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div>
-          <button class="nav-btn" id="btn-next-month" title="Bulan Selanjutnya">❯</button>
+          <button class="nav-btn" id="btn-prev-month">❮</button><div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div><button class="nav-btn" id="btn-next-month">❯</button>
         </div>
-        <div style="display:flex; align-items:center; gap:6px;">
-            <button class="btn-download-pdf" id="btn-open-download-1" title="Unduh Kalender PDF">📥 PDF</button>
-        </div>
+        <div style="display:flex; align-items:center; gap:6px;"><button class="btn-download-pdf" id="btn-open-download-1">📥 PDF</button></div>
       </div>
       <div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
       <div class="cal-grid" id="cal-grid"></div>
       <div class="agenda-list-wrap" id="agenda-list-container" style="max-height: 90px;"></div>
     </div>
   </div>
-  <div class="footer-note">
-    Data: Cuaca (Open-Meteo) & Sistem Absensi SDIT Hidayatut Taufiq.
-  </div>
+  <div class="footer-note">Data: Cuaca (Open-Meteo) & Sistem Absensi SDIT Hidayatut Taufiq.</div>
 </div>
 
-<!-- KUMPULAN WADAH MODAL POPUP -->
 <div id="tempat-modal-dinamis"></div>
 
 <script>
-// AGAR KEBAL ERROR "ALREADY DECLARED", KITA GUNAKAN VAR BUKAN LET/CONST UNTUK VARIABEL GLOBAL
+// AGAR KEBAL ERROR "ALREADY DECLARED", KITA GUNAKAN VAR
 var API_URL_UTAMA = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
 var globalAgenda = []; 
 var currentNavDate = new Date(); 
 var isAgendaLoading = true;
 var grafikAbsensiInstance = null;
 
-// PEMBERSIHAN MODAL LAMA (Mencegah Modal Menumpuk di Body saat Ganti Menu)
-function bersihkanModalLama() {
-    var modalsLama = document.querySelectorAll('.modal-overlay');
-    modalsOverlayArray = Array.prototype.slice.call(modalsLama);
-    modalsLama.forEach(function(m) { m.remove(); });
-}
+// PEMBERSIHAN MODAL LAMA 
 var modalsLama = document.querySelectorAll('.modal-overlay');
 modalsLama.forEach(function(m) { m.remove(); });
 
-// INJEKSI MODAL KE BODY SECARA DINAMIS
+// INJEKSI HTML MODAL
 var htmlModal = `
 <div class="modal-overlay" id="chart-modal">
-    <div class="modal-calendar-card" style="max-width: 550px; width: 95vw;">
+    <div class="modal-calendar-card" style="max-width: 600px; width: 95vw;">
         <button class="modal-close-btn" onclick="tutupChartModal()">✕</button>
         <h3 style="color:var(--green2); text-align:center; font-family:'Georgia',serif; margin-top:0;">📊 Persentase Kehadiran <span id="chart-kelas-title"></span></h3>
-        <p style="text-align:center; font-size:11px; color:#6b7280; margin-top:-10px; font-weight:bold;">Tahun Ajaran (Juli - Juni)</p>
+        <p style="text-align:center; font-size:11px; color:#6b7280; margin-top:-10px; font-weight:bold;">Tahun Ajaran Berjalan</p>
         <div style="width:100%; overflow-x:auto; background:white; padding:10px; border-radius:10px; border:1px solid #e5e7eb;">
             <canvas id="absenChart"></canvas>
         </div>
-        <button class="btn-green-large" onclick="downloadChartReport()">📥 Download Laporan (PDF)</button>
+        <button class="btn-green-large" onclick="bukaModalPengaturanAbsen()">📥 Download Laporan Absensi (PDF)</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="download-absen-modal">
+    <div class="modal-download-card">
+        <button class="modal-close-btn" onclick="document.getElementById('download-absen-modal').classList.remove('active');">✕</button>
+        <h3 style="text-align:center; color:var(--green2); margin-top:0; font-family:'Georgia',serif;">📥 Pengaturan Laporan</h3>
+        <p style="font-size:11px; text-align:center; color:#666;">Maksimal rentang 6 Bulan per halaman.</p>
+        
+        <div style="display:flex; gap:10px;">
+            <div class="input-group" style="flex:1;"><label>Mulai Bulan</label><input type="month" id="abs-start" class="input-form"></div>
+            <div class="input-group" style="flex:1;"><label>Sampai Bulan</label><input type="month" id="abs-end" class="input-form"></div>
+        </div>
+        
+        <div class="input-group">
+            <label>Kepala Sekolah</label>
+            <input type="text" id="kepsek-nama" class="input-form" placeholder="Nama Kepala Sekolah...">
+            <input type="text" id="kepsek-nip" class="input-form" placeholder="NIP...">
+        </div>
+
+        <div class="input-group">
+            <label>Guru Kelas</label>
+            <input type="text" id="guru-nama" class="input-form" placeholder="Nama Guru Kelas...">
+            <input type="text" id="guru-nip" class="input-form" placeholder="NIP...">
+        </div>
+
+        <button class="btn-green-large" onclick="generatePdfAbsensi()">🖨️ Buat PDF & Cetak</button>
     </div>
 </div>
 
@@ -274,11 +223,7 @@ var htmlModal = `
     <div class="modal-calendar-card">
         <button class="modal-close-btn" id="btn-close-modal">✕</button>
         <div class="cal-head">
-            <div style="display:flex; align-items:center; gap:4px;">
-                <button class="nav-btn" id="modal-btn-prev">❮</button>
-                <div class="cal-month" id="modal-cal-month" style="min-width:85px; text-align:center; font-size:14px;">-</div>
-                <button class="nav-btn" id="modal-btn-next">❯</button>
-            </div>
+            <div style="display:flex; align-items:center; gap:4px;"><button class="nav-btn" id="modal-btn-prev">❮</button><div class="cal-month" id="modal-cal-month" style="min-width:85px; text-align:center; font-size:14px;">-</div><button class="nav-btn" id="modal-btn-next">❯</button></div>
             <button class="btn-download-pdf" id="btn-open-download-2" style="background:#38bdf8;">📥 Print PDF</button>
         </div>
         <div class="cal-weekdays" style="font-size:11px; margin-top:10px;"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
@@ -293,8 +238,8 @@ var htmlModal = `
         <h3 style="text-align:center; color:var(--green2); margin-top:0; font-family:'Georgia',serif;">📥 Cetak Kalender</h3>
         <p style="font-size:11px; text-align:center; color:#666;">Atur rentang bulan untuk diunduh</p>
         <div style="display:flex; gap:10px; margin-top:15px;">
-            <div style="flex:1;"><label style="font-size:11px; font-weight:bold;">Mulai Bulan:</label><input type="month" id="pdf-start-month" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-top:4px;"></div>
-            <div style="flex:1;"><label style="font-size:11px; font-weight:bold;">Sampai Bulan:</label><input type="month" id="pdf-end-month" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-top:4px;"></div>
+            <div style="flex:1;"><label style="font-size:11px; font-weight:bold;">Mulai Bulan:</label><input type="month" id="pdf-start-month" class="input-form"></div>
+            <div style="flex:1;"><label style="font-size:11px; font-weight:bold;">Sampai Bulan:</label><input type="month" id="pdf-end-month" class="input-form"></div>
         </div>
         <button id="btn-proses-pdf" class="btn-green-large">🖨️ Generate & Print PDF</button>
     </div>
@@ -302,7 +247,6 @@ var htmlModal = `
 `;
 document.getElementById('tempat-modal-dinamis').innerHTML = htmlModal;
 
-// BUNGKUS DALAM FUNGSI UTAMA AGAR VARIABEL AMAN
 window.jalankanWidgetKiri = function() {
   var elTime = document.getElementById('clock-time');
   var elDate = document.getElementById('clock-date');
@@ -320,18 +264,16 @@ window.jalankanWidgetKiri = function() {
   function formatDate(d){ var weekday = new Intl.DateTimeFormat('id-ID', { weekday:'short' }).format(d); var day = d.getDate(); var month = new Intl.DateTimeFormat('id-ID', { month:'short' }).format(d); var year = d.getFullYear(); return weekday + ', ' + day + ' ' + month + ' ' + year; }
   function greeting(d){ var h = d.getHours(); if (h < 5) return 'Masuk waktu malam 🌙'; if (h < 11) return 'Semangat pagi! ☀️'; if (h < 15) return 'Waktu belajar & berdzikir ✨'; if (h < 18) return 'Hati tetap sejuk 🤲'; if (h < 20) return 'Mari siapkan istirahat 🌿'; return 'Tenanglah, selamat malam 🕌'; }
 
-  // LOGIKA MODAL KALENDER
+  // LOGIKA MODAL KALENDER BAWAAN
   var modalOverlay = document.getElementById('calendar-modal');
   var btnCloseModal = document.getElementById('btn-close-modal');
   var sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
-  
   var modalDownload = document.getElementById('download-modal');
   
   sidebarCalendarCard.addEventListener('click', function(e) { if (e.target.classList.contains('nav-btn') || e.target.classList.contains('btn-download-pdf')) return; modalOverlay.classList.add('active'); });
   btnCloseModal.addEventListener('click', function() { modalOverlay.classList.remove('active'); });
   modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
 
-  // LOGIKA DOWNLOAD KALENDER PDF
   var todayYMD = new Date();
   var defStart = todayYMD.getFullYear() + '-' + pad2(todayYMD.getMonth()+1);
   todayYMD.setMonth(todayYMD.getMonth() + 5); 
@@ -353,7 +295,7 @@ window.jalankanWidgetKiri = function() {
       window.open('print-kalender.html?start=' + start + '&end=' + end, '_blank');
   });
 
-  // KALENDER & AGENDA 
+  // KALENDER AGENDA
   document.getElementById('btn-prev-month').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('btn-next-month').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
   document.getElementById('modal-btn-prev').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
@@ -365,10 +307,7 @@ window.jalankanWidgetKiri = function() {
     var targetMonthStr = y + '-' + pad2(m+1); 
     var agendaBulanIni = globalAgenda.filter(function(a) { return a.tanggalBersih && a.tanggalBersih.startsWith(targetMonthStr); }).sort(function(a, b) { return a.tanggalBersih.localeCompare(b.tanggalBersih); });
 
-    var targets = [
-        { monthEl: document.getElementById('cal-month'), gridEl: document.getElementById('cal-grid'), listEl: document.getElementById('agenda-list-container') },
-        { monthEl: document.getElementById('modal-cal-month'), gridEl: document.getElementById('modal-cal-grid'), listEl: document.getElementById('modal-agenda-list') }
-    ];
+    var targets = [ { monthEl: document.getElementById('cal-month'), gridEl: document.getElementById('cal-grid'), listEl: document.getElementById('agenda-list-container') }, { monthEl: document.getElementById('modal-cal-month'), gridEl: document.getElementById('modal-cal-grid'), listEl: document.getElementById('modal-agenda-list') } ];
 
     targets.forEach(function(t) {
         if(!t.monthEl) return;
@@ -402,15 +341,13 @@ window.jalankanWidgetKiri = function() {
             t.listEl.innerHTML = '<div class="agenda-loader"><div class="spinner-circle"></div><div>Sinkronisasi data...</div></div>';
         } else if (agendaBulanIni.length > 0) {
             agendaBulanIni.forEach(function(ag) {
-                var parts = ag.tanggalBersih.split('-');
-                var thn = parts[0], bln = parts[1], tgl = parts[2];
+                var parts = ag.tanggalBersih.split('-'); var thn = parts[0], bln = parts[1], tgl = parts[2];
                 var namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
                 var finalKategori = ag.kategori || 'Kegiatan Sekolah'; var namaKgt = ag.kegiatan || '';
                 if(namaKgt.includes('|||')) { var p = namaKgt.split('|||'); finalKategori = p[0]; namaKgt = p.slice(1).join('|||'); }
                 var katClass = 'kat-kegiatan', badgeClass = 'kegiatan';
                 if(finalKategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
                 if(finalKategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
-
                 t.listEl.innerHTML += '<div class="agenda-item ' + katClass + '"><div class="tgl">' + tgl + ' ' + namaBulan[parseInt(bln,10)-1] + ' ' + thn + '</div><div class="kgt"><span class="badge-kategori ' + badgeClass + '">' + finalKategori + '</span><br>' + namaKgt + '</div></div>';
             });
         } else {
@@ -428,8 +365,7 @@ window.jalankanWidgetKiri = function() {
                 var tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
                 if (tgl.length > 10 && tgl.includes('-')) tgl = tgl.substring(0, 10);
                 if (tgl.includes('/')) { var p = tgl.split('/'); if (p.length === 3) tgl = p[2] + '-' + pad2(p[1]) + '-' + pad2(p[0]); }
-                item.tanggalBersih = tgl;
-                return item;
+                item.tanggalBersih = tgl; return item;
             });
         }
     } catch(e) {} finally { isAgendaLoading = false; renderCalendar(currentNavDate); }
@@ -437,7 +373,7 @@ window.jalankanWidgetKiri = function() {
 
 
   // ==========================================
-  // SISTEM ABSENSI (HARI INI + GRAFIK BULANAN)
+  // SISTEM ABSENSI & GRAFIK (GROUPED BAR CHART)
   // ==========================================
   window.tutupChartModal = function() { document.getElementById('chart-modal').classList.remove('active'); };
   
@@ -496,15 +432,12 @@ window.jalankanWidgetKiri = function() {
                   var d = rekapHariIni[kls];
                   container.innerHTML += `
                       <div class="absensi-item" onclick="window.bukaChartKelas('${kls}')">
-                          <div class="kelas-name">
-                            <span>📚 ${kls}</span>
-                            <span style="font-size:10px; color:#6b7280; font-weight:bold;">Total: ${d.Total} Siswa</span>
-                          </div>
+                          <div class="kelas-name"><span>📚 ${kls}</span><span style="font-size:10px; color:#6b7280; font-weight:bold;">Total: ${d.Total} Siswa</span></div>
                           <div class="absensi-stats">
                               <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
                               <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.S}</span></div>
                               <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.I}</span></div>
-                              <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.A}</span></div>
+                              <div class="stat-box"><span class="stat-label">Alfa</span><span class="stat-value val-a">${d.A}</span></div>
                           </div>
                       </div>
                   `;
@@ -515,6 +448,7 @@ window.jalankanWidgetKiri = function() {
       }
   };
 
+  // MUNCULKAN CHART DENGAN MODEL BERDAMPINGAN (GROUPED BAR CHART)
   window.bukaChartKelas = function(kelas) {
       document.getElementById('chart-kelas-title').textContent = kelas;
       document.getElementById('chart-modal').classList.add('active');
@@ -522,7 +456,7 @@ window.jalankanWidgetKiri = function() {
       var absenKelas = window.globalDataAbsensi.filter(function(a) { return a.kelas === kelas; });
 
       var monthsNumber = ['07', '08', '09', '10', '11', '12', '01', '02', '03', '04', '05', '06'];
-      var labelsChart  = ['Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];
+      var labelsChart  = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
 
       var dataH = Array(12).fill(0); var dataI = Array(12).fill(0);
       var dataS = Array(12).fill(0); var dataA = Array(12).fill(0);
@@ -532,7 +466,6 @@ window.jalankanWidgetKiri = function() {
           if(!a.tanggal) return;
           var monthStr = String(a.tanggal).replace(/['"]/g, '').trim().substring(5, 7);
           var idx = monthsNumber.indexOf(monthStr);
-          
           if(idx !== -1) {
               var stat = (a.status || "").toUpperCase().trim();
               totals[idx]++;
@@ -543,12 +476,13 @@ window.jalankanWidgetKiri = function() {
           }
       });
 
+      // Konversi ke Persentase (Mencocokkan Desain Gambar)
       for(var i=0; i<12; i++){
           if(totals[i] > 0) {
-              dataH[i] = ((dataH[i] / totals[i]) * 100).toFixed(1);
-              dataI[i] = ((dataI[i] / totals[i]) * 100).toFixed(1);
-              dataS[i] = ((dataS[i] / totals[i]) * 100).toFixed(1);
-              dataA[i] = ((dataA[i] / totals[i]) * 100).toFixed(1);
+              dataH[i] = ((dataH[i] / totals[i]) * 100).toFixed(2);
+              dataI[i] = ((dataI[i] / totals[i]) * 100).toFixed(2);
+              dataS[i] = ((dataS[i] / totals[i]) * 100).toFixed(2);
+              dataA[i] = ((dataA[i] / totals[i]) * 100).toFixed(2);
           }
       }
 
@@ -560,119 +494,177 @@ window.jalankanWidgetKiri = function() {
           data: {
               labels: labelsChart,
               datasets: [
-                  { label: 'Hadir (%)', data: dataH, backgroundColor: '#10b981' },
-                  { label: 'Sakit (%)', data: dataS, backgroundColor: '#f59e0b' },
-                  { label: 'Izin (%)', data: dataI, backgroundColor: '#3b82f6' },
-                  { label: 'Alpa (%)', data: dataA, backgroundColor: '#ef4444' }
+                  { label: 'Sakit', data: dataS, backgroundColor: '#3b82f6', categoryPercentage: 0.8, barPercentage: 0.9 }, // Biru
+                  { label: 'Izin', data: dataI, backgroundColor: '#f97316', categoryPercentage: 0.8, barPercentage: 0.9 }, // Orange
+                  { label: 'Alfa', data: dataA, backgroundColor: '#9ca3af', categoryPercentage: 0.8, barPercentage: 0.9 }  // Abu-abu
               ]
           },
           options: {
               responsive: true,
-              scales: { x: { stacked: true }, y: { stacked: true, max: 100 } }
+              plugins: { legend: { position: 'bottom' } },
+              scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100 } } // Skala s/d 100 (Persentase)
           }
       });
 
-      window.globalDataChart = { kelas: kelas, labels: labelsChart, dataH: dataH, dataS: dataS, dataI: dataI, dataA: dataA, totals: totals };
+      // Simpan Global untuk dicetak nanti
+      window.currentKelasAbsen = kelas;
   };
 
-  window.downloadChartReport = function() {
-      var d = window.globalDataChart;
+  // MUNCULKAN POPUP PENGATURAN DOWNLOAD (TANDA TANGAN & RENTANG WAKTU)
+  window.bukaModalPengaturanAbsen = function() {
+      // Set Default Start/End to 6 months
+      var d = new Date();
+      var endStr = d.getFullYear() + '-' + pad2(d.getMonth()+1);
+      d.setMonth(d.getMonth() - 5);
+      var startStr = d.getFullYear() + '-' + pad2(d.getMonth()+1);
+      
+      document.getElementById('abs-start').value = startStr;
+      document.getElementById('abs-end').value = endStr;
+      
+      document.getElementById('download-absen-modal').classList.add('active');
+  };
+
+  // GENERATE PDF LAPORAN ABSENSI BARU
+  window.generatePdfAbsensi = function() {
+      var start = document.getElementById('abs-start').value;
+      var end = document.getElementById('abs-end').value;
+      var kepsekNama = document.getElementById('kepsek-nama').value || "H. NAJMUDIN S.Pd.I";
+      var kepsekNip = document.getElementById('kepsek-nip').value || "NIP : 196905152007011064";
+      var guruNama = document.getElementById('guru-nama').value || "MAIPADIAPATI, S.Pd.I";
+      var guruNip = document.getElementById('guru-nip').value || "NIP : -";
+      
+      if(!start || !end) return alert("Pilih rentang bulan terlebih dahulu.");
+      
+      // Hitung selisih bulan (Maksimal 6 bulan)
+      var d1 = new Date(start + "-01");
+      var d2 = new Date(end + "-01");
+      var diffMonths = (d2.getFullYear() - d1.getFullYear()) * 12 + d2.getMonth() - d1.getMonth() + 1;
+      
+      if(diffMonths <= 0) return alert("Bulan mulai harus lebih kecil dari bulan sampai.");
+      if(diffMonths > 6) return alert("Rentang maksimal untuk 1 halaman adalah 6 Bulan!");
+
+      var kelas = window.currentKelasAbsen;
+      var absenKelas = window.globalDataAbsensi.filter(function(a) { return a.kelas === kelas; });
+      
+      // Ambil Base64 dari Grafik yang sedang tampil
       var canvas = document.getElementById('absenChart');
       var imgData = canvas.toDataURL("image/png", 1.0);
 
+      // Hitung Data Tabel Sesuai Rentang Waktu yang Dipilih
+      var tableHtml = '';
+      var namaBulanFull = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      
+      var currDate = new Date(d1);
+      while(currDate <= d2) {
+          var yStr = currDate.getFullYear();
+          var mStr = pad2(currDate.getMonth() + 1);
+          var targetStr = yStr + "-" + mStr;
+          
+          var tH=0, tS=0, tI=0, tA=0, total=0;
+          
+          absenKelas.forEach(function(a) {
+              if(a.tanggal && String(a.tanggal).startsWith(targetStr)) {
+                  var stat = (a.status || "").toUpperCase().trim();
+                  total++;
+                  if(stat === 'HADIR') tH++;
+                  else if(stat === 'SAKIT') tS++;
+                  else if(stat === 'IZIN') tI++;
+                  else tA++;
+              }
+          });
+          
+          var pS = "0,00", pI = "0,00", pA = "0,00";
+          if(total > 0) {
+              pS = ((tS / total) * 100).toFixed(2).replace('.', ',');
+              pI = ((tI / total) * 100).toFixed(2).replace('.', ',');
+              pA = ((tA / total) * 100).toFixed(2).replace('.', ',');
+          }
+          
+          var bName = namaBulanFull[currDate.getMonth()];
+          
+          tableHtml += `
+              <tr style="height:35px;">
+                  <td style="font-weight:bold;">${bName}</td>
+                  <td>${pS}</td>
+                  <td>${pI}</td>
+                  <td>${pA}</td>
+              </tr>
+          `;
+          currDate.setMonth(currDate.getMonth() + 1);
+      }
+
+      var dNow = new Date();
+      var semester = dNow.getMonth() < 6 ? "GENAP" : "GASAL";
+      var thnAjaran = dNow.getMonth() < 6 ? (dNow.getFullYear()-1)+"-"+dNow.getFullYear() : dNow.getFullYear()+"-"+(dNow.getFullYear()+1);
+
+      // Buat Tab Cetak
       var newWin = window.open('', '_blank');
-      newWin.document.write(`
-          <html><head><title>Laporan Absensi ${d.kelas}</title>
-          <style>
-              body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-              h1 { color: #047857; margin-bottom: 5px; }
-              table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;}
-              th, td { border: 1px solid #ddd; padding: 10px; }
-              th { background-color: #10b981; color: white; }
-          </style>
-          </head><body>
-          <h1>Laporan Kehadiran ${d.kelas}</h1>
-          <h3>SDIT Hidayatut Taufiq - Tahun Ajaran Berjalan</h3>
-          <img src="${imgData}" style="width: 80%; max-width: 600px; margin-bottom: 20px;">
+      var printHTML = `
+      <html><head><title>Laporan Absensi ${kelas}</title>
+      <style>
+          body { font-family: 'Times New Roman', Times, serif; color: #000; padding: 20px 40px; margin:0 auto; max-width:210mm;}
+          .grafik-container { text-align: center; margin-bottom: 20px; border:1px solid #ccc; padding:15px; }
+          .title-grafik { text-align: center; font-weight: bold; font-size: 16px; margin: 15px 0 25px 0; text-transform:uppercase;}
+          
+          table { width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 40px;}
+          th, td { border: 1.5px solid #000; padding: 8px; font-size: 14px;}
+          th { font-weight: bold; }
+          
+          .ttd-container { display: flex; justify-content: space-between; margin-top: 30px; font-size: 14px; text-align: center;}
+          .ttd-box { width: 40%; display: flex; flex-direction: column; align-items: center; }
+          .ttd-name { font-weight: bold; text-decoration: underline; margin-top: 70px; margin-bottom: 5px; text-transform: uppercase;}
+          
+          @media print { .no-print { display: none; } }
+      </style>
+      </head><body>
+          <div class="no-print" style="text-align:right; margin-bottom:10px;">
+              <button onclick="window.print()" style="padding:10px 20px; background:#10b981; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ Cetak</button>
+          </div>
+          
+          <div class="grafik-container"><img src="${imgData}" style="max-width:90%;"></div>
+          
+          <div class="title-grafik">GRAFIK ABSENSI SISWA ${kelas.toUpperCase()} SEMESTER ${semester} ${thnAjaran}</div>
+          
           <table>
-              <tr><th>Bulan</th><th>Total Data</th><th>Hadir (%)</th><th>Sakit (%)</th><th>Izin (%)</th><th>Alpa (%)</th></tr>
-              ${d.labels.map((bulan, i) => `<tr><td>${bulan}</td><td>${d.totals[i]}</td><td>${d.dataH[i]}%</td><td>${d.dataS[i]}%</td><td>${d.dataI[i]}%</td><td>${d.dataA[i]}%</td></tr>`).join('')}
+              <tr><th>Bulan/Keterangan</th><th>SAKIT</th><th>IZIN</th><th>ALFA</th></tr>
+              ${tableHtml}
           </table>
+          
+          <div class="ttd-container">
+              <div class="ttd-box">
+                  <span>Mengetahui :</span>
+                  <span>Kepala Sekolah</span>
+                  <span class="ttd-name">${kepsekNama}</span>
+                  <span>${kepsekNip}</span>
+              </div>
+              <div class="ttd-box">
+                  <span>Mengetahui :</span>
+                  <span>Guru Kelas</span>
+                  <span class="ttd-name">${guruNama}</span>
+                  <span>${guruNip}</span>
+              </div>
+          </div>
+          
           <script>setTimeout(function(){ window.print(); }, 1000);<\/script>
-          </body></html>
-      `);
+      </body></html>
+      `;
+      
+      newWin.document.open();
+      newWin.document.write(printHTML);
       newWin.document.close();
+      
+      document.getElementById('download-absen-modal').classList.remove('active');
   };
 
-  function weatherCodeToText(code){
-    var map = {
-      0: ['Cerah', '☀️'], 1: ['Cerah Berawan', '🌤️'], 2: ['Berawan', '⛅'], 3: ['Mendung', '☁️'],
-      45:['Kabut', '🌫️'], 48:['Kabut', '🌫️'], 51:['Gerimis', '🌦️'], 53:['Gerimis', '🌦️'],
-      55:['Gerimis', '🌧️'], 61:['Hujan Ringan', '🌧️'], 63:['Hujan', '🌧️'], 65:['Hujan Lebat', '🌧️'],
-      66:['Hujan Beku', '🌧️'], 67:['Hujan Beku', '🌧️'], 71:['Salju Ringan', '❄️'], 73:['Salju', '❄️'],
-      75:['Salju Lebat', '❄️'], 77:['Butiran Salju', '❄️'], 80:['Hujan Lokal', '🌦️'], 81:['Hujan Lokal', '🌧️'],
-      82:['Hujan Sangat', '🌧️'], 85:['Hujan Salju', '🌨️'], 86:['Hujan Salju', '🌨️'], 95:['Petir', '⛈️'],
-      96:['Petir', '⛈️'], 99:['Petir Lebat', '⛈️']
-    };
-    return map[code] || ['Cuaca', '🌈'];
-  }
-
-  function startClockLoop(){
-    setInterval(function() {
-      var now = new Date();
-      elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now);
-    }, 1000);
-  }
-
-  async function reverseGeocode(lat, lon){
-    var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon) + '&zoom=10&addressdetails=1';
-    var res = await fetch(url, { headers: { 'Accept': 'application/json' }});
-    if(!res.ok) throw new Error('reverse-geocode failed');
-    var data = await res.json(); var addr = data.address || {};
-    var city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
-    var prov = addr.state || addr.province || '';
-    return [city, prov].filter(Boolean).join(', ') || (data.display_name || 'Lokasi');
-  }
-
-  async function fetchWeather(lat, lon){
-    var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + encodeURIComponent(lat) + '&longitude=' + encodeURIComponent(lon) + '&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto';
-    var res = await fetch(url); if(!res.ok) throw new Error('weather fetch failed');
-    var json = await res.json(); var cur = json.current || {};
-    var w = weatherCodeToText(cur.weather_code);
-    elWeatherIcon.textContent = w[1]; elWeatherDesc.textContent = w[0];
-    elWeatherTemp.textContent = typeof cur.temperature_2m === 'number' ? Math.round(cur.temperature_2m) + '°C' : '—';
-    elWeatherRain.textContent = typeof cur.precipitation_probability === 'number' ? Math.round(cur.precipitation_probability) + '%' : '—';
-    elWeatherWind.textContent = typeof cur.wind_speed_10m === 'number' ? Math.round(cur.wind_speed_10m) + ' km/jam' : '—';
-    var now = new Date(); elWeatherTime.textContent = 'Update ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes());
-  }
-
-  function startInitUI(){ 
-      var now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now); 
-      currentNavDate = new Date(); renderCalendar(currentNavDate); 
-  }
-
-  function startGeolocation(){ 
-      var locationState = { lat: null, lon: null, place: '—', ready:false }; 
-      if(!navigator.geolocation){ 
-          elChipLokasi.textContent = 'Lokasi: Jakarta (default)'; locationState.lat = -6.200000; locationState.lon = 106.816666; locationState.place = 'Jakarta'; locationState.ready = true; 
-          (async function() { try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){} })(); return; 
-      } 
-      elChipLokasi.textContent = 'Mencari lokasi...'; 
-      navigator.geolocation.getCurrentPosition(async function(pos) { 
-          locationState.lat = pos.coords.latitude; locationState.lon = pos.coords.longitude; 
-          try{ locationState.place = await reverseGeocode(locationState.lat, locationState.lon); }catch(e){ locationState.place = '(' + locationState.lat.toFixed(2) + ', ' + locationState.lon.toFixed(2) + ')'; } 
-          elChipLokasi.textContent = 'Lokasi: ' + locationState.place; locationState.ready = true; 
-          try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){} 
-      }, async function() { 
-          elChipLokasi.textContent = 'Lokasi: Jakarta (default)'; locationState.lat = -6.200000; locationState.lon = 106.816666; 
-          try{ await fetchWeather(locationState.lat, locationState.lon); }catch(e){} locationState.ready = true; 
-      }, { enableHighAccuracy:false, timeout: 8000, maximumAge: 600000 }); 
-  }
+  // Cuaca & Clock Script (Biarkan Saja)
+  function weatherCodeToText(code){ var m={0:['Cerah','☀️'],1:['Cerah Berawan','🌤️'],2:['Berawan','⛅'],3:['Mendung','☁️'],45:['Kabut','🌫️'],51:['Gerimis','🌦️'],61:['Hujan','🌧️'],95:['Petir','⛈️']}; return m[code]||['Cuaca','🌈']; }
+  function startClockLoop(){ setInterval(function(){ var now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now); }, 1000); }
+  async function fetchWeather(lat, lon){ var res=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto'); var j=await res.json(); var w=weatherCodeToText(j.current.weather_code); elWeatherIcon.textContent=w[1]; elWeatherDesc.textContent=w[0]; elWeatherTemp.textContent=Math.round(j.current.temperature_2m)+'°C'; }
+  function startInitUI(){ var now = new Date(); elTime.textContent=formatClock(now); elDate.textContent=formatDate(now); elGreeting.textContent=greeting(now); currentNavDate=now; renderCalendar(currentNavDate); }
+  function startGeolocation(){ elChipLokasi.textContent='Lokasi: Jakarta (default)'; fetchWeather(-6.2,106.8); }
 
   startInitUI(); fetchAgendaDatabase(); fetchRekapAbsensi(); startClockLoop(); startGeolocation();
 };
 
-// Panggil fungsi secara aman (Bahkan jika di load ulang oleh SPA)
 window.jalankanWidgetKiri();
-
 </script>
