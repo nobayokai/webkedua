@@ -24,7 +24,6 @@
   .brand .title{ font-family: Georgia, serif; font-weight: 950; color: var(--green2); font-size: 13px; letter-spacing: .2px; }
   .brand .chip{ font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900; white-space: nowrap; max-width: 45%; overflow:hidden; text-overflow: ellipsis; }
 
-  /* Clock & Cuaca CSS */
   .clock-now{ display:flex; flex-direction: column; gap: 8px; }
   .clock-time{ font-size: 34px; font-weight: 950; color:#1f2937; line-height: 1; letter-spacing: .4px; }
   .clock-date{ color: rgba(31,41,55,.75); font-weight: 850; font-size: 13px; display:flex; gap: 10px; flex-wrap: wrap; }
@@ -38,16 +37,13 @@
   .weather-pill .k{ font-size: 10.5px; font-weight: 950; color: rgba(0,0,0,.45); text-transform: uppercase; letter-spacing: .2px; }
   .weather-pill .v{ font-size: 12px; font-weight: 1000; color: rgba(0,0,0,.72); margin-top: 4px; white-space: nowrap; }
 
-  /* Kalender Utama */
   #sidebar-calendar-card { cursor: pointer; transition: transform 0.2s; }
   #sidebar-calendar-card:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0,0,0,.1); }
 
   .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
   .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
-  
   .nav-btn { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
   .nav-btn:hover { background: var(--green); color: white; }
-  
   .btn-download-pdf { background: var(--pink); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3); }
   .btn-download-pdf:hover { transform: scale(1.05); background: #db2777; }
 
@@ -56,7 +52,6 @@
   .cal-day{ width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,.55); background: rgba(255,255,255,.25); border: 1px solid rgba(0,0,0,.05); overflow:hidden; }
   .cal-day.muted{ opacity: .35; }
   .cal-day.today{ background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.08)); border: 1px solid rgba(16,185,129,.35); color: rgba(4,120,87,.98); box-shadow: 0 10px 18px rgba(16,185,129,.18); }
-
   .cal-day.is-libur { background: rgba(239, 68, 68, 0.15) !important; color: #dc2626 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
   .cal-day.has-agenda { border-bottom: 3px solid var(--amber); font-weight: 1000; color: var(--text); }
   .cal-day.has-ujian { border-bottom: 3px solid var(--pink); font-weight: 1000; color: var(--text); }
@@ -74,23 +69,20 @@
   .badge-kategori.ujian    { background: var(--pink); }
   .badge-kategori.libur    { background: #ef4444; }
 
-  /* CSS ABSENSI HARIAN */
   .absensi-item { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.45); border: 1px solid rgba(0,0,0,.05); margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
   .absensi-item:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); border-color: var(--green); }
-  
   .absensi-item .kelas-name { font-weight: 1000; font-size: 13px; color: var(--green2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
   .absensi-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; }
   .stat-box { display: flex; flex-direction: column; background: white; border-radius: 6px; padding: 4px 0; border: 1px solid rgba(0,0,0,0.04); }
   .stat-label { font-size: 9px; font-weight: 900; color: rgba(0,0,0,0.4); text-transform: uppercase; }
   .stat-value { font-size: 14px; font-weight: 1000; }
-  .val-h { color: var(--green); } .val-i { color: var(--blue); } .val-s { color: var(--amber); } .val-a { color: #ef4444; }
+  .val-h { color: var(--green); } .val-i { color: var(--amber); } .val-s { color: var(--blue); } .val-a { color: #9ca3af; }
 
   .agenda-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800; }
   .spinner-circle { width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2); border-top: 3px solid var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   .footer-note{ font-size: 11px; color: rgba(0,0,0,.45); font-weight: 850; text-align:center; padding: 2px 0; }
 
-  /* CSS MODAL POPUP */
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; overflow: hidden; }
   .modal-overlay.active { opacity: 1; pointer-events: auto; }
   .modal-calendar-card { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); box-sizing: border-box; width: 92vw; max-width: 380px; max-height: 85vh; overflow-y: auto; overflow-x: hidden; padding: 15px; position: relative; transform: scale(0.9); transition: transform 0.3s ease; }
@@ -99,7 +91,7 @@
   .modal-close-btn:hover { background: #dc2626; transform: scale(1.1); }
 
   #download-modal, #download-absen-modal { z-index: 9999999; }
-  .modal-download-card { background: white; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); width: 90vw; max-width: 360px; padding: 25px; position: relative; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box; }
+  .modal-download-card { background: white; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); width: 90vw; max-width: 420px; padding: 25px; position: relative; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box; }
   .modal-overlay.active .modal-download-card { transform: scale(1); }
 
   .btn-green-large { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: var(--green); color: white; margin-top: 15px; box-shadow: 0 4px 10px rgba(16,185,129,0.3); transition: 0.2s;}
@@ -137,7 +129,7 @@
       </div>
     </div>
 
-    <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat grafik">
+    <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat opsi cetak laporan">
       <div class="cal-head" style="margin-bottom:8px;">
         <div style="font-weight:950;color:var(--green2);font-size:13px;">📊 Kehadiran Hari Ini</div>
         <div style="font-size:10px; color:rgba(0,0,0,0.5); font-weight:bold;" id="absensi-tanggal">-</div>
@@ -167,12 +159,10 @@
 <div id="tempat-modal-dinamis"></div>
 
 <script>
-// AGAR KEBAL ERROR "ALREADY DECLARED", KITA GUNAKAN VAR
 var API_URL_UTAMA = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
 var globalAgenda = []; 
 var currentNavDate = new Date(); 
 var isAgendaLoading = true;
-var grafikAbsensiInstance = null;
 
 // PEMBERSIHAN MODAL LAMA 
 var modalsLama = document.querySelectorAll('.modal-overlay');
@@ -180,42 +170,39 @@ modalsLama.forEach(function(m) { m.remove(); });
 
 // INJEKSI HTML MODAL
 var htmlModal = `
-<div class="modal-overlay" id="chart-modal">
-    <div class="modal-calendar-card" style="max-width: 600px; width: 95vw;">
-        <button class="modal-close-btn" onclick="tutupChartModal()">✕</button>
-        <h3 style="color:var(--green2); text-align:center; font-family:'Georgia',serif; margin-top:0;">📊 Persentase Kehadiran <span id="chart-kelas-title"></span></h3>
-        <p style="text-align:center; font-size:11px; color:#6b7280; margin-top:-10px; font-weight:bold;">Tahun Ajaran Berjalan</p>
-        <div style="width:100%; overflow-x:auto; background:white; padding:10px; border-radius:10px; border:1px solid #e5e7eb;">
-            <canvas id="absenChart"></canvas>
-        </div>
-        <button class="btn-green-large" onclick="bukaModalPengaturanAbsen()">📥 Download Laporan Absensi (PDF)</button>
-    </div>
-</div>
-
 <div class="modal-overlay" id="download-absen-modal">
     <div class="modal-download-card">
         <button class="modal-close-btn" onclick="document.getElementById('download-absen-modal').classList.remove('active');">✕</button>
-        <h3 style="text-align:center; color:var(--green2); margin-top:0; font-family:'Georgia',serif;">📥 Pengaturan Laporan</h3>
-        <p style="font-size:11px; text-align:center; color:#666;">Maksimal rentang 6 Bulan per halaman.</p>
+        <h3 style="text-align:center; color:var(--green2); margin-top:0; font-family:'Georgia',serif;">📥 Laporan Rekap Absensi</h3>
+        <p style="font-size:11px; text-align:center; color:#666; margin-bottom:15px;">Grafik & Tabel menyesuaikan bulan pilihan.</p>
         
         <div style="display:flex; gap:10px;">
             <div class="input-group" style="flex:1;"><label>Mulai Bulan</label><input type="month" id="abs-start" class="input-form"></div>
             <div class="input-group" style="flex:1;"><label>Sampai Bulan</label><input type="month" id="abs-end" class="input-form"></div>
         </div>
         
+        <div style="display:flex; gap:10px;">
+            <div class="input-group" style="flex:1;"><label>Semester</label><input type="text" id="abs-semester" class="input-form" placeholder="Contoh: Gasal / Genap"></div>
+            <div class="input-group" style="flex:1;"><label>Tahun Ajaran</label><input type="text" id="abs-tahun" class="input-form" placeholder="Contoh: 2026-2027"></div>
+        </div>
+
         <div class="input-group">
             <label>Kepala Sekolah</label>
-            <input type="text" id="kepsek-nama" class="input-form" placeholder="Nama Kepala Sekolah...">
-            <input type="text" id="kepsek-nip" class="input-form" placeholder="NIP...">
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="kepsek-nama" class="input-form" placeholder="Nama..." style="flex:2;">
+                <input type="text" id="kepsek-nip" class="input-form" placeholder="NIP..." style="flex:1.5;">
+            </div>
         </div>
 
         <div class="input-group">
             <label>Guru Kelas</label>
-            <input type="text" id="guru-nama" class="input-form" placeholder="Nama Guru Kelas...">
-            <input type="text" id="guru-nip" class="input-form" placeholder="NIP...">
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="guru-nama" class="input-form" placeholder="Nama..." style="flex:2;">
+                <input type="text" id="guru-nip" class="input-form" placeholder="NIP..." style="flex:1.5;">
+            </div>
         </div>
 
-        <button class="btn-green-large" onclick="generatePdfAbsensi()">🖨️ Buat PDF & Cetak</button>
+        <button class="btn-green-large" onclick="window.generatePdfAbsensi()">🖨️ Buat PDF & Cetak</button>
     </div>
 </div>
 
@@ -233,7 +220,7 @@ var htmlModal = `
 </div>
 
 <div class="modal-overlay" id="download-modal">
-    <div class="modal-download-card">
+    <div class="modal-download-card" style="max-width:340px;">
         <button class="modal-close-btn" id="btn-close-download">✕</button>
         <h3 style="text-align:center; color:var(--green2); margin-top:0; font-family:'Georgia',serif;">📥 Cetak Kalender</h3>
         <p style="font-size:11px; text-align:center; color:#666;">Atur rentang bulan untuk diunduh</p>
@@ -264,7 +251,6 @@ window.jalankanWidgetKiri = function() {
   function formatDate(d){ var weekday = new Intl.DateTimeFormat('id-ID', { weekday:'short' }).format(d); var day = d.getDate(); var month = new Intl.DateTimeFormat('id-ID', { month:'short' }).format(d); var year = d.getFullYear(); return weekday + ', ' + day + ' ' + month + ' ' + year; }
   function greeting(d){ var h = d.getHours(); if (h < 5) return 'Masuk waktu malam 🌙'; if (h < 11) return 'Semangat pagi! ☀️'; if (h < 15) return 'Waktu belajar & berdzikir ✨'; if (h < 18) return 'Hati tetap sejuk 🤲'; if (h < 20) return 'Mari siapkan istirahat 🌿'; return 'Tenanglah, selamat malam 🕌'; }
 
-  // LOGIKA MODAL KALENDER BAWAAN
   var modalOverlay = document.getElementById('calendar-modal');
   var btnCloseModal = document.getElementById('btn-close-modal');
   var sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
@@ -295,7 +281,6 @@ window.jalankanWidgetKiri = function() {
       window.open('print-kalender.html?start=' + start + '&end=' + end, '_blank');
   });
 
-  // KALENDER AGENDA
   document.getElementById('btn-prev-month').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('btn-next-month').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
   document.getElementById('modal-btn-prev').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
@@ -373,10 +358,8 @@ window.jalankanWidgetKiri = function() {
 
 
   // ==========================================
-  // SISTEM ABSENSI & GRAFIK (GROUPED BAR CHART)
+  // SISTEM ABSENSI (HARI INI)
   // ==========================================
-  window.tutupChartModal = function() { document.getElementById('chart-modal').classList.remove('active'); };
-  
   window.fetchRekapAbsensi = async function() {
       var elTgl = document.getElementById('absensi-tanggal');
       var container = document.getElementById('absensi-list-container');
@@ -394,11 +377,12 @@ window.jalankanWidgetKiri = function() {
           var jsonSiswa = await responses[1].json();
 
           window.globalDataAbsensi = jsonAbsen.data || [];
-          var dataSiswa = jsonSiswa.data || [];
+          window.globalDataSemuaSiswa = jsonSiswa.data || []; // Simpan semua siswa di memori
 
           var rekapHariIni = {};
           var kelasSet = new Set();
-          dataSiswa.forEach(function(s) {
+          
+          window.globalDataSemuaSiswa.forEach(s => {
               if(s.kelas) {
                   kelasSet.add(s.kelas);
                   if(!rekapHariIni[s.kelas]) rekapHariIni[s.kelas] = { H:0, I:0, S:0, A:0, Total: 0 };
@@ -406,7 +390,7 @@ window.jalankanWidgetKiri = function() {
               }
           });
 
-          window.globalDataAbsensi.forEach(function(absen) {
+          window.globalDataAbsensi.forEach(absen => {
               if(!absen.tanggal) return;
               var tglBersih = String(absen.tanggal).replace(/['"]/g, '').trim().substring(0, 10);
               
@@ -431,13 +415,13 @@ window.jalankanWidgetKiri = function() {
               listKelas.forEach(function(kls) {
                   var d = rekapHariIni[kls];
                   container.innerHTML += `
-                      <div class="absensi-item" onclick="window.bukaChartKelas('${kls}')">
+                      <div class="absensi-item" onclick="window.bukaModalPengaturanAbsen('${kls}')">
                           <div class="kelas-name"><span>📚 ${kls}</span><span style="font-size:10px; color:#6b7280; font-weight:bold;">Total: ${d.Total} Siswa</span></div>
                           <div class="absensi-stats">
                               <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
                               <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.S}</span></div>
                               <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.I}</span></div>
-                              <div class="stat-box"><span class="stat-label">Alfa</span><span class="stat-value val-a">${d.A}</span></div>
+                              <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.A}</span></div>
                           </div>
                       </div>
                   `;
@@ -448,71 +432,10 @@ window.jalankanWidgetKiri = function() {
       }
   };
 
-  // MUNCULKAN CHART DENGAN MODEL BERDAMPINGAN (GROUPED BAR CHART)
-  window.bukaChartKelas = function(kelas) {
-      document.getElementById('chart-kelas-title').textContent = kelas;
-      document.getElementById('chart-modal').classList.add('active');
-
-      var absenKelas = window.globalDataAbsensi.filter(function(a) { return a.kelas === kelas; });
-
-      var monthsNumber = ['07', '08', '09', '10', '11', '12', '01', '02', '03', '04', '05', '06'];
-      var labelsChart  = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
-
-      var dataH = Array(12).fill(0); var dataI = Array(12).fill(0);
-      var dataS = Array(12).fill(0); var dataA = Array(12).fill(0);
-      var totals = Array(12).fill(0);
-
-      absenKelas.forEach(function(a) {
-          if(!a.tanggal) return;
-          var monthStr = String(a.tanggal).replace(/['"]/g, '').trim().substring(5, 7);
-          var idx = monthsNumber.indexOf(monthStr);
-          if(idx !== -1) {
-              var stat = (a.status || "").toUpperCase().trim();
-              totals[idx]++;
-              if(stat === 'HADIR') dataH[idx]++;
-              else if(stat === 'IZIN') dataI[idx]++;
-              else if(stat === 'SAKIT') dataS[idx]++;
-              else dataA[idx]++;
-          }
-      });
-
-      // Konversi ke Persentase (Mencocokkan Desain Gambar)
-      for(var i=0; i<12; i++){
-          if(totals[i] > 0) {
-              dataH[i] = ((dataH[i] / totals[i]) * 100).toFixed(2);
-              dataI[i] = ((dataI[i] / totals[i]) * 100).toFixed(2);
-              dataS[i] = ((dataS[i] / totals[i]) * 100).toFixed(2);
-              dataA[i] = ((dataA[i] / totals[i]) * 100).toFixed(2);
-          }
-      }
-
-      if(grafikAbsensiInstance) grafikAbsensiInstance.destroy();
-
-      var ctx = document.getElementById('absenChart').getContext('2d');
-      grafikAbsensiInstance = new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: labelsChart,
-              datasets: [
-                  { label: 'Sakit', data: dataS, backgroundColor: '#3b82f6', categoryPercentage: 0.8, barPercentage: 0.9 }, // Biru
-                  { label: 'Izin', data: dataI, backgroundColor: '#f97316', categoryPercentage: 0.8, barPercentage: 0.9 }, // Orange
-                  { label: 'Alfa', data: dataA, backgroundColor: '#9ca3af', categoryPercentage: 0.8, barPercentage: 0.9 }  // Abu-abu
-              ]
-          },
-          options: {
-              responsive: true,
-              plugins: { legend: { position: 'bottom' } },
-              scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100 } } // Skala s/d 100 (Persentase)
-          }
-      });
-
-      // Simpan Global untuk dicetak nanti
+  // MUNCULKAN POPUP PENGATURAN CETAK LANGSUNG SAAT KLIK KELAS
+  window.bukaModalPengaturanAbsen = function(kelas) {
       window.currentKelasAbsen = kelas;
-  };
-
-  // MUNCULKAN POPUP PENGATURAN DOWNLOAD (TANDA TANGAN & RENTANG WAKTU)
-  window.bukaModalPengaturanAbsen = function() {
-      // Set Default Start/End to 6 months
+      
       var d = new Date();
       var endStr = d.getFullYear() + '-' + pad2(d.getMonth()+1);
       d.setMonth(d.getMonth() - 5);
@@ -524,7 +447,7 @@ window.jalankanWidgetKiri = function() {
       document.getElementById('download-absen-modal').classList.add('active');
   };
 
-  // GENERATE PDF LAPORAN ABSENSI BARU
+  // GENERATE PDF LAPORAN ABSENSI (TAB BARU DENGAN CHART.JS)
   window.generatePdfAbsensi = function() {
       var start = document.getElementById('abs-start').value;
       var end = document.getElementById('abs-end').value;
@@ -535,9 +458,7 @@ window.jalankanWidgetKiri = function() {
       
       if(!start || !end) return alert("Pilih rentang bulan terlebih dahulu.");
       
-      // Hitung selisih bulan (Maksimal 6 bulan)
-      var d1 = new Date(start + "-01");
-      var d2 = new Date(end + "-01");
+      var d1 = new Date(start + "-01"); var d2 = new Date(end + "-01");
       var diffMonths = (d2.getFullYear() - d1.getFullYear()) * 12 + d2.getMonth() - d1.getMonth() + 1;
       
       if(diffMonths <= 0) return alert("Bulan mulai harus lebih kecil dari bulan sampai.");
@@ -545,91 +466,157 @@ window.jalankanWidgetKiri = function() {
 
       var kelas = window.currentKelasAbsen;
       var absenKelas = window.globalDataAbsensi.filter(function(a) { return a.kelas === kelas; });
-      
-      // Ambil Base64 dari Grafik yang sedang tampil
-      var canvas = document.getElementById('absenChart');
-      var imgData = canvas.toDataURL("image/png", 1.0);
+      var jmlSiswaArray = window.globalDataSemuaSiswa ? window.globalDataSemuaSiswa.filter(function(s){ return s.kelas === kelas; }) : [];
+      var jmlSiswa = jmlSiswaArray.length;
+      if(jmlSiswa === 0) jmlSiswa = 1; 
 
-      // Hitung Data Tabel Sesuai Rentang Waktu yang Dipilih
       var tableHtml = '';
+      var labelsChart = [];
+      var dataS_pct = []; var dataI_pct = []; var dataA_pct = [];
+      var totalS = 0, totalI = 0, totalA = 0;
+      var totalHariEfektif = 0;
       var namaBulanFull = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
       
       var currDate = new Date(d1);
       while(currDate <= d2) {
-          var yStr = currDate.getFullYear();
-          var mStr = pad2(currDate.getMonth() + 1);
+          var yStr = currDate.getFullYear(); var mStr = pad2(currDate.getMonth() + 1);
           var targetStr = yStr + "-" + mStr;
+          var bName = namaBulanFull[currDate.getMonth()];
+          labelsChart.push(bName);
           
-          var tH=0, tS=0, tI=0, tA=0, total=0;
+          var s_jml=0, i_jml=0, a_jml=0;
+          var uniqueDates = new Set();
           
           absenKelas.forEach(function(a) {
               if(a.tanggal && String(a.tanggal).startsWith(targetStr)) {
+                  uniqueDates.add(String(a.tanggal).substring(0,10));
                   var stat = (a.status || "").toUpperCase().trim();
-                  total++;
-                  if(stat === 'HADIR') tH++;
-                  else if(stat === 'SAKIT') tS++;
-                  else if(stat === 'IZIN') tI++;
-                  else tA++;
+                  if(stat === 'SAKIT') s_jml++;
+                  else if(stat === 'IZIN') i_jml++;
+                  else if(stat === 'ALPA' || stat === 'ALFA') a_jml++;
               }
           });
           
-          var pS = "0,00", pI = "0,00", pA = "0,00";
-          if(total > 0) {
-              pS = ((tS / total) * 100).toFixed(2).replace('.', ',');
-              pI = ((tI / total) * 100).toFixed(2).replace('.', ',');
-              pA = ((tA / total) * 100).toFixed(2).replace('.', ',');
+          var hariEfektif = uniqueDates.size;
+          totalHariEfektif += hariEfektif;
+          totalS += s_jml; totalI += i_jml; totalA += a_jml;
+          
+          var s_pct = 0, i_pct = 0, a_pct = 0;
+          var denominator = jmlSiswa * hariEfektif;
+          
+          if(denominator > 0) {
+              s_pct = (s_jml * 100) / denominator;
+              i_pct = (i_jml * 100) / denominator;
+              a_pct = (a_jml * 100) / denominator;
           }
           
-          var bName = namaBulanFull[currDate.getMonth()];
+          var jmlBulan = s_jml + i_jml + a_jml;
+          var pctBulan = 0;
+          if(denominator > 0) { pctBulan = (jmlBulan * 100) / denominator; }
+          
+          dataS_pct.push(s_pct.toFixed(2)); dataI_pct.push(i_pct.toFixed(2)); dataA_pct.push(a_pct.toFixed(2));
           
           tableHtml += `
-              <tr style="height:35px;">
-                  <td style="font-weight:bold;">${bName}</td>
-                  <td>${pS}</td>
-                  <td>${pI}</td>
-                  <td>${pA}</td>
+              <tr style="height:25px;">
+                  <td style="text-align:left; padding-left:5px;">${bName}</td>
+                  <td>${s_jml}</td><td>${s_pct.toFixed(2).replace('.', ',')}</td>
+                  <td>${i_jml}</td><td>${i_pct.toFixed(2).replace('.', ',')}</td>
+                  <td>${a_jml}</td><td>${a_pct.toFixed(2).replace('.', ',')}</td>
+                  <td>${jmlBulan}</td><td>${pctBulan.toFixed(2).replace('.', ',')}</td>
               </tr>
           `;
           currDate.setMonth(currDate.getMonth() + 1);
       }
 
-      var dNow = new Date();
-      var semester = dNow.getMonth() < 6 ? "GENAP" : "GASAL";
-      var thnAjaran = dNow.getMonth() < 6 ? (dNow.getFullYear()-1)+"-"+dNow.getFullYear() : dNow.getFullYear()+"-"+(dNow.getFullYear()+1);
+      var grandDenominator = jmlSiswa * totalHariEfektif;
+      var totS_pct = 0, totI_pct = 0, totA_pct = 0, tot_all_pct = 0;
+      var tot_all = totalS + totalI + totalA;
+      if(grandDenominator > 0) {
+          totS_pct = (totalS * 100) / grandDenominator;
+          totI_pct = (totalI * 100) / grandDenominator;
+          totA_pct = (totalA * 100) / grandDenominator;
+          tot_all_pct = (tot_all * 100) / grandDenominator;
+      }
 
-      // Buat Tab Cetak
+      tableHtml += `
+          <tr style="font-weight:bold; height:25px;">
+              <td style="text-align:left; padding-left:5px;">Jumlah</td>
+              <td>${totalS}</td><td>${totS_pct.toFixed(2).replace('.', ',')}</td>
+              <td>${totalI}</td><td>${totI_pct.toFixed(2).replace('.', ',')}</td>
+              <td>${totalA}</td><td>${totA_pct.toFixed(2).replace('.', ',')}</td>
+              <td>${tot_all}</td><td>${tot_all_pct.toFixed(2).replace('.', ',')}</td>
+          </tr>
+      `;
+
+      var semester = document.getElementById('abs-semester').value || "GASAL";
+      var tahunAjaran = document.getElementById('abs-tahun').value || "2026-2027";
+
       var newWin = window.open('', '_blank');
       var printHTML = `
-      <html><head><title>Laporan Absensi ${kelas}</title>
-      <style>
-          body { font-family: 'Times New Roman', Times, serif; color: #000; padding: 20px 40px; margin:0 auto; max-width:210mm;}
-          .grafik-container { text-align: center; margin-bottom: 20px; border:1px solid #ccc; padding:15px; }
-          .title-grafik { text-align: center; font-weight: bold; font-size: 16px; margin: 15px 0 25px 0; text-transform:uppercase;}
-          
-          table { width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 40px;}
-          th, td { border: 1.5px solid #000; padding: 8px; font-size: 14px;}
-          th { font-weight: bold; }
-          
-          .ttd-container { display: flex; justify-content: space-between; margin-top: 30px; font-size: 14px; text-align: center;}
-          .ttd-box { width: 40%; display: flex; flex-direction: column; align-items: center; }
-          .ttd-name { font-weight: bold; text-decoration: underline; margin-top: 70px; margin-bottom: 5px; text-transform: uppercase;}
-          
-          @media print { .no-print { display: none; } }
-      </style>
-      </head><body>
+      <html>
+      <head>
+          <title>Laporan Absensi ${kelas}</title>
+          <style>
+              body { font-family: 'Times New Roman', Times, serif; color: #000; padding: 20px 40px; margin:0 auto; max-width:210mm;}
+              .chart-container { width: 100%; height: 300px; margin-bottom: 20px; border:1px solid #ccc; padding:15px; box-sizing:border-box;}
+              .title-grafik { text-align: center; font-weight: bold; font-size: 14px; margin: 15px 0 25px 0; text-transform:uppercase;}
+              
+              table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; font-family: Arial, sans-serif; margin-bottom: 20px;}
+              th, td { border: 2px solid #000; padding: 4px; }
+              .bg-peach { background-color: #fbd4b4; }
+              .bg-blue { background-color: #d9e1f2; font-style: italic; }
+              
+              .ttd-container { display: flex; justify-content: space-between; margin-top: 30px; font-size: 14px; text-align: center;}
+              .ttd-box { width: 40%; display: flex; flex-direction: column; align-items: center; }
+              .ttd-name { font-weight: bold; text-decoration: underline; margin-top: 60px; margin-bottom: 5px; text-transform: uppercase;}
+              
+              @media print { .no-print { display: none; } }
+          </style>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"><\\/script>
+      </head>
+      <body>
           <div class="no-print" style="text-align:right; margin-bottom:10px;">
               <button onclick="window.print()" style="padding:10px 20px; background:#10b981; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ Cetak</button>
           </div>
           
-          <div class="grafik-container"><img src="${imgData}" style="max-width:90%;"></div>
+          <div class="chart-container">
+              <canvas id="printChart"></canvas>
+          </div>
           
-          <div class="title-grafik">GRAFIK ABSENSI SISWA ${kelas.toUpperCase()} SEMESTER ${semester} ${thnAjaran}</div>
+          <div class="title-grafik">GRAFIK ABSENSI SISWA ${kelas.toUpperCase()} SEMESTER ${semester.toUpperCase()} ${tahunAjaran}</div>
           
           <table>
-              <tr><th>Bulan/Keterangan</th><th>SAKIT</th><th>IZIN</th><th>ALFA</th></tr>
-              ${tableHtml}
+              <thead>
+                  <tr>
+                      <th rowspan="2" class="bg-peach" style="width: 15%;">Bulan</th>
+                      <th colspan="6" class="bg-peach">Absensi</th>
+                      <th rowspan="2" class="bg-peach" style="width: 10%;">Jumlah</th>
+                      <th rowspan="2" class="bg-peach" style="width: 12%;">Persentase<br>%</th>
+                  </tr>
+                  <tr>
+                      <th colspan="2" class="bg-peach">Sakit</th>
+                      <th colspan="2" class="bg-peach">Ijin</th>
+                      <th colspan="2" class="bg-peach">Alpa</th>
+                  </tr>
+                  <tr class="bg-blue">
+                      <th>1</th>
+                      <th>Jml</th><th>%</th>
+                      <th>Jml</th><th>%</th>
+                      <th>Jml</th><th>%</th>
+                      <th>8</th>
+                      <th>9</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  ${tableHtml}
+              </tbody>
           </table>
           
+          <div style="font-size:13px; font-family:Arial, sans-serif;">
+              Keterangan :<br>
+              Jumlah siswa ${jmlSiswa} orang
+          </div>
+
           <div class="ttd-container">
               <div class="ttd-box">
                   <span>Mengetahui :</span>
@@ -638,15 +625,37 @@ window.jalankanWidgetKiri = function() {
                   <span>${kepsekNip}</span>
               </div>
               <div class="ttd-box">
-                  <span>Mengetahui :</span>
-                  <span>Guru Kelas</span>
+                  <span>..................., ........................ 20...</span>
+                  <span>Guru Kelas ,</span>
                   <span class="ttd-name">${guruNama}</span>
                   <span>${guruNip}</span>
               </div>
           </div>
           
-          <script>setTimeout(function(){ window.print(); }, 1000);<\/script>
-      </body></html>
+          <script>
+              var ctx = document.getElementById('printChart').getContext('2d');
+              new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels: ${JSON.stringify(labelsChart)},
+                      datasets: [
+                          { label: 'Sakit', data: ${JSON.stringify(dataS_pct)}, backgroundColor: '#4472c4', categoryPercentage: 0.8, barPercentage: 0.9 },
+                          { label: 'Izin', data: ${JSON.stringify(dataI_pct)}, backgroundColor: '#ed7d31', categoryPercentage: 0.8, barPercentage: 0.9 },
+                          { label: 'Alfa', data: ${JSON.stringify(dataA_pct)}, backgroundColor: '#a5a5a5', categoryPercentage: 0.8, barPercentage: 0.9 }
+                      ]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom' } },
+                      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100 } },
+                      animation: { duration: 0 } // Matikan animasi agar langsung siap dicetak
+                  }
+              });
+              setTimeout(function(){ window.print(); }, 1200);
+          <\\/script>
+      </body>
+      </html>
       `;
       
       newWin.document.open();
@@ -656,7 +665,6 @@ window.jalankanWidgetKiri = function() {
       document.getElementById('download-absen-modal').classList.remove('active');
   };
 
-  // Cuaca & Clock Script (Biarkan Saja)
   function weatherCodeToText(code){ var m={0:['Cerah','☀️'],1:['Cerah Berawan','🌤️'],2:['Berawan','⛅'],3:['Mendung','☁️'],45:['Kabut','🌫️'],51:['Gerimis','🌦️'],61:['Hujan','🌧️'],95:['Petir','⛈️']}; return m[code]||['Cuaca','🌈']; }
   function startClockLoop(){ setInterval(function(){ var now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now); }, 1000); }
   async function fetchWeather(lat, lon){ var res=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto'); var j=await res.json(); var w=weatherCodeToText(j.current.weather_code); elWeatherIcon.textContent=w[1]; elWeatherDesc.textContent=w[0]; elWeatherTemp.textContent=Math.round(j.current.temperature_2m)+'°C'; }
