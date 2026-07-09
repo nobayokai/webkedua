@@ -436,7 +436,7 @@ window.jalankanWidgetKiri = function() {
                               <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
                               <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.S}</span></div>
                               <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.I}</span></div>
-                              <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.A}</span></div>
+                              <div class="stat-box"><span class="stat-label">Tanpa Keterangan</span><span class="stat-value val-a">${d.A}</span></div>
                           </div>
                       </div>
                   `;
@@ -509,7 +509,7 @@ window.jalankanWidgetKiri = function() {
           options: {
               responsive: true,
               plugins: { legend: { position: 'bottom' } },
-              scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100 } }
+              scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 10 } }
           }
       });
   };
@@ -705,7 +705,7 @@ window.jalankanWidgetKiri = function() {
                   <span>${kepsekNip}</span>
               </div>
               <div class="ttd-box">
-                  <span>..................., ........................ 20...</span>
+                  <span></span>
                   <span>Guru Kelas ,</span>
                   <span class="ttd-name">${guruNama}</span>
                   <span>${guruNip}</span>
@@ -723,14 +723,14 @@ window.jalankanWidgetKiri = function() {
                       datasets: [
                           { label: 'Sakit', data: ${JSON.stringify(dataS_pct)}, backgroundColor: '#4472c4', categoryPercentage: 0.8, barPercentage: 0.9 },
                           { label: 'Izin', data: ${JSON.stringify(dataI_pct)}, backgroundColor: '#ed7d31', categoryPercentage: 0.8, barPercentage: 0.9 },
-                          { label: 'Alfa', data: ${JSON.stringify(dataA_pct)}, backgroundColor: '#a5a5a5', categoryPercentage: 0.8, barPercentage: 0.9 }
+                          { label: 'Tanpa Keterangan', data: ${JSON.stringify(dataA_pct)}, backgroundColor: '#a5a5a5', categoryPercentage: 0.8, barPercentage: 0.9 }
                       ]
                   },
                   options: {
                       responsive: true,
                       maintainAspectRatio: false,
                       plugins: { legend: { position: 'bottom' } },
-                      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 100 } },
+                      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 10 } },
                       animation: { duration: 0 } 
                   }
               });
