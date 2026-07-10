@@ -30,9 +30,12 @@
     .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; background:rgba(255,255,255,0.8);}
     .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; cursor: pointer; font-size: 12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
 
-    /* NAVIGASI BULAN & HALAMAN PDF */
     .pdf-controls { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
     .pdf-controls span { font-weight: 800; color: #1e293b; font-size: 13px; }
+
+    /* ANIMASI SPINNER LOCAL */
+    .sup-db-spinner { border: 4px solid #f3f4f6; border-top: 4px solid #3b82f6; border-radius: 50%; width: 35px; height: 35px; animation: sup-spin-anime 1s linear infinite; margin: 0 auto 12px; }
+    @keyframes sup-spin-anime { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 
 <div class="sup-container">
@@ -118,14 +121,12 @@
     var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
     var activeDocId = "", activeDocUrl = "";
     
-    // Variabel Penampung Data Multi-Halaman
     window.tempPdfBase64 = null; 
     window.pdfDocProxy = null;
     window.currentPdfPage = 1;
     window.totalPdfPages = 1;
-    window.signaturesByPage = {}; // Menyimpan TTD per halaman: {1: [...], 3: [...]}
+    window.signaturesByPage = {}; 
 
-    // FUNGSI UTAMA INDIKATOR LOADING IPHONE
     function ubahTeksLoading(teks) {
         var loading = document.getElementById('ios-loading');
         var loadingText = document.querySelector('#ios-loading .ios-loading-text');
@@ -146,19 +147,28 @@
         document.getElementById('area-upload-guru').style.display = 'block';
     }
 
-    // MEMBACA DATABASE SUPERVISI
     window.loadDaftarSupervisi = async function() {
+        var container = document.getElementById('list-dokumen-sup');
+        if(!container) return;
+
+        // FITUR BARU: MEMUNCULKAN SPINNER LOADING DI DALAM DASHBOARD MENU
+        container.innerHTML = `
+            <div style="text-align:center; padding:50px; width:100%; grid-column:1/-1;">
+                <div class="sup-db-spinner"></div>
+                <span style="color:#64748b; font-weight:bold; font-size:13px;">Menghubungkan ke database sekolah...</span>
+            </div>
+        `;
+
         window.ubahTeksLoading("Membaca Berkas Supervisi...");
         try {
             var res = await fetch(API_URL + "?action=get_supervisi");
             var json = await res.json();
-            var container = document.getElementById('list-dokumen-sup');
             container.innerHTML = "";
 
             if(json.status === 'success') {
                 var dataFiltered = isKepsek ? json.data : json.data.filter(d => d.nama === curUser.nama);
                 if(dataFiltered.length === 0) {
-                    container.innerHTML = "<p style='color:#9ca3af; text-align:center; width:100%;'>Belum ada dokumen supervisi.</p>"; 
+                    container.innerHTML = "<p style='color:#9ca3af; text-align:center; width:100%; grid-column:1/-1;'>Belum ada dokumen supervisi.</p>"; 
                     tutupLoading(); return;
                 }
 
@@ -200,8 +210,12 @@
                         </div>`;
                 });
             }
-        } catch(e) { console.error(e); } 
-        finally { tutupLoading(); }
+        } catch(e) { 
+            console.error(e); 
+            container.innerHTML = "<p style='color:#ef4444; text-align:center; width:100%;'>Gagal terhubung ke database sheet sekolah.</p>";
+        } finally { 
+            tutupLoading(); 
+        }
     };
 
     window.prosesUploadDokumen = function(e) {
@@ -253,16 +267,13 @@
         } catch(e) { alert("Gagal menolak dokumen."); tutupLoading(); }
     };
 
-    // ========================================================
-    // LOGIKA MULTI-HALAMAN & RESOLUSI ANTI-CRASH
-    // ========================================================
     window.bukaModalAcc = async function(id, url) {
         if(!localStorage.getItem('ttd_kepsek')) return alert("⚠️ Anda belum menyimpan gambar Stempel/TTD Lokal!");
         activeDocId = id; activeDocUrl = url;
-        window.signaturesByPage = {}; // Reset data koordinat TTD lama
+        window.signaturesByPage = {}; 
         
         var area = document.getElementById('pdf-virtual-area');
-        area.style.height = "250px"; // Default height saat memuat
+        area.style.height = "250px"; 
         area.innerHTML = '<div id="pdf-loading-text" style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">⏳ Menarik Data Dokumen PDF...</div>';
         document.getElementById('modal-acc').style.display = 'flex';
 
@@ -271,7 +282,6 @@
             var jsonPdf = await resPdf.json();
             if(jsonPdf.status !== 'success') throw new Error("Gagal mengambil PDF asli.");
             
-            // Bersihkan base64 dari spasi/baris baru agar tidak memicu crash atob
             window.tempPdfBase64 = jsonPdf.base64.replace(/\s/g, '');
             
             var pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -288,7 +298,8 @@
             await window.renderPdfPage(window.currentPdfPage);
         } catch(e) {
             console.error(e);
-            area.innerHTML = '<div style='padding:40px; text-align:center; color:#ef4444; font-weight:bold;'>❌ Gagal memuat pratinjau dokumen.</div>';
+            // PERBAIKAN TANDA PETIK TUNGGAL DI BAWAH INI AGAR TIDAK SYNTAX ERROR LAGI
+            area.innerHTML = '<div style="padding:40px; text-align:center; color:#ef4444; font-weight:bold;">❌ Gagal memuat pratinjau dokumen.</div>';
         }
     };
 
@@ -312,16 +323,14 @@
         area.innerHTML = '';
         area.appendChild(canvas);
         
-        // Atur tinggi kontainer mengikuti aspek rasio kertas asli secara dinamis
         setTimeout(() => {
             area.style.height = canvas.offsetHeight + 'px';
-            window.loadPageSignatures(pageNum); // Munculkan kembali TTD yang pernah ditaruh di halaman ini
+            window.loadPageSignatures(pageNum); 
         }, 120);
         
         document.getElementById('pdf-page-info').textContent = "Halaman " + pageNum + " dari " + window.totalPdfPages;
     };
 
-    // FUNGSI MANAJEMEN MEMORI MULTI-HALAMAN
     window.saveCurrentPageSignatures = function() {
         var items = document.querySelectorAll('.drag-ttd-item');
         var pageSigs = [];
@@ -343,7 +352,6 @@
         });
     };
 
-    // NAVIGASI DENGAN REKAM JEJAK OTOMATIS
     window.prevPdfPage = function() {
         if (window.currentPdfPage <= 1) return;
         window.saveCurrentPageSignatures();
@@ -362,7 +370,6 @@
         window.buatElemenTtd('35%', '35%', 100, 100);
     };
 
-    // CORE DRAG ELEMENT SAKTI
     window.buatElemenTtd = function(left, top, w, h) {
         var area = document.getElementById('pdf-virtual-area');
         var wrapper = document.createElement('div');
@@ -401,11 +408,9 @@
         };
     };
 
-    // PROSES EKSEKUSI ACC (MENCETAK MULTI-HALAMAN SECARA PRESISI)
     window.eksekusiAccDokumen = async function() {
-        window.saveCurrentPageSignatures(); // Ambil TTD dari halaman aktif terakhir
+        window.saveCurrentPageSignatures(); 
 
-        // Hitung total tanda tangan di seluruh halaman
         var totalSignatures = 0;
         for (var p in window.signaturesByPage) { totalSignatures += window.signaturesByPage[p].length; }
         if(totalSignatures === 0) return alert("⚠️ Anda belum membubuhkan tanda tangan di halaman manapun.");
@@ -416,7 +421,6 @@
         try {
             if(!window.tempPdfBase64) throw new Error("Memori data PDF kosong.");
 
-            // Ganti parsing string langsung menjadi Uint8Array untuk menjamin 100% bebas error atob window
             var binaryString = atob(window.tempPdfBase64);
             var len = binaryString.length;
             var bytes = new Uint8Array(len);
@@ -430,7 +434,6 @@
             var ttdBytes = await fetch(localStorage.getItem('ttd_kepsek')).then(res => res.arrayBuffer());
             var embedTtd = await pdfDoc.embedPng(ttdBytes);
 
-            // LOOPING HALAMAN: Cetak semua TTD sesuai halaman masing-masing
             for (var pageKey in window.signaturesByPage) {
                 var pageNum = parseInt(pageKey);
                 var sigList = window.signaturesByPage[pageKey];
@@ -467,7 +470,7 @@
                 throw new Error(jsonAcc.message);
             }
         } catch(e) { alert("❌ Gagal Memproses PDF: " + e.message); } 
-        finally { tutupLoading(); }
+        finally { tuthupLoading(); }
     };
 
     window.loadDaftarSupervisi();
