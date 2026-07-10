@@ -1,107 +1,123 @@
 <style>
-    .absen-panel { background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(16,185,129,0.2); margin-bottom: 20px; font-family: 'Arial', sans-serif;}
-    .absen-header { border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
-    .absen-header h2 { margin: 0; color: #047857; font-family: 'Georgia', serif; font-size: 20px; font-weight: 900;}
-    
-    .absen-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
-    .input-box { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-weight: bold; color: #374151; outline: none; }
-    .btn-action { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; display: flex; align-items: center; gap: 6px; font-size: 13px;}
-    .btn-green { background: #10b981; } .btn-green:hover { background: #059669; }
-    .btn-blue { background: #3b82f6; } .btn-blue:hover { background: #2563eb; }
-    .btn-red { background: #ef4444; } .btn-red:hover { background: #dc2626; }
+    /* CSS Dashboard Absensi */
+    .absen-toolbar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 16px; border: 1px solid rgba(16,185,129,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .absen-toolbar select { padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; flex: 1; min-width: 150px; font-weight: bold; color: #374151; outline: none; }
+    .btn-tambah { padding: 10px 15px; border-radius: 8px; border: none; background: #38bdf8; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(56,189,248,0.3); }
+    .btn-tambah:hover { transform: translateY(-2px); }
+    .btn-tambah.kelas { background: #f59e0b; box-shadow: 0 2px 8px rgba(245,158,11,0.3); }
 
-    /* CARD SISWA UNTUK ABSEN */
-    .siswa-card { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
-    .siswa-info { display: flex; flex-direction: column; }
-    .siswa-nama { font-weight: 900; font-size: 15px; color: #1f2937; }
-    .siswa-nis { font-size: 11px; color: #6b7280; font-weight: bold; margin-top: 2px; }
-    
-    /* RADIO BUTTON GAYA TOGGLE (H-I-S-A) */
-    .radio-group { display: flex; gap: 5px; background: #e5e7eb; padding: 3px; border-radius: 8px; }
-    .radio-group label { cursor: pointer; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; color: #4b5563; transition: 0.2s; user-select: none;}
-    .radio-group input[type="radio"] { display: none; }
-    
-    /* Warna Status saat aktif */
-    .radio-group input[value="Hadir"]:checked + label { background: #10b981; color: white; box-shadow: 0 2px 5px rgba(16,185,129,0.3); }
-    .radio-group input[value="Izin"]:checked + label { background: #3b82f6; color: white; box-shadow: 0 2px 5px rgba(59,130,246,0.3); }
-    .radio-group input[value="Sakit"]:checked + label { background: #f59e0b; color: white; box-shadow: 0 2px 5px rgba(245,158,11,0.3); }
-    .radio-group input[value="Alpa"]:checked + label { background: #ef4444; color: white; box-shadow: 0 2px 5px rgba(239,68,68,0.3); }
+    /* CSS Kalender Absensi */
+    .absen-cal-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
+    .absen-cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 900; font-size: 18px; color: #047857; font-family: 'Georgia', serif; text-transform: uppercase; letter-spacing: 1px;}
+    .absen-cal-nav { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; width: 35px; height: 35px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+    .absen-cal-nav:hover { background: #10b981; color: white; }
 
-    .btn-hapus-siswa { background: transparent; border: none; color: #ef4444; font-size: 16px; cursor: pointer; padding: 5px; transition: 0.2s; }
-    .btn-hapus-siswa:hover { transform: scale(1.2); }
+    .absen-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; font-weight: 900; color: #6b7280; margin-bottom: 10px; }
+    .absen-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .absen-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb; cursor: pointer; font-weight: 900; font-size: 14px; color: #374151; transition: 0.2s; position: relative;}
+    .absen-day:hover { background: #10b981; color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(16,185,129,0.3); border-color: #10b981; }
+    .absen-day.muted { opacity: 0; pointer-events: none; }
+    .absen-day.today { border: 2px solid #10b981; background: #ecfdf5; color: #047857; }
 
-    /* MODAL TAMBAH SISWA */
-    .modal-add { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px);}
-    .modal-add.active { opacity: 1; pointer-events: auto; }
-    .modal-add-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #374151; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; }
+    /* CSS Popup Interaktif & Radio Button */
+    .absen-modal { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: 0.3s; z-index: 99999; padding: 15px; box-sizing: border-box;}
+    .absen-modal.active { opacity:1; pointer-events:auto; }
+    .absen-modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+    
+    .siswa-card-absen { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+    .radio-group-absen { display: flex; gap: 4px; background: #e5e7eb; padding: 4px; border-radius: 10px; }
+    .radio-group-absen label { cursor: pointer; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 8px; color: #4b5563; transition: 0.2s; user-select: none;}
+    .radio-group-absen input[type="radio"] { display: none; }
+    
+    .radio-group-absen input[value="Hadir"]:checked + label { background: #10b981; color: white; }
+    .radio-group-absen input[value="Sakit"]:checked + label { background: #3b82f6; color: white; }
+    .radio-group-absen input[value="Izin"]:checked + label { background: #f59e0b; color: white; }
+    .radio-group-absen input[value="Alpa"]:checked + label { background: #ef4444; color: white; }
+
+    /* ANIMASI LOADING iPHONE (iOS) */
+    .ios-loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999999; opacity: 0; pointer-events: none; transition: 0.3s; }
+    .ios-loading-overlay.active { opacity: 1; pointer-events: auto; }
+    .ios-loading-box { background: rgba(250,250,250,0.95); padding: 30px 40px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    .ios-spinner { width: 40px; height: 40px; border: 4px solid #d1d5db; border-top-color: #3b82f6; border-radius: 50%; animation: ios-spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 15px; }
+    @keyframes ios-spin { 100% { transform: rotate(360deg); } }
+    .ios-loading-text { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold; color: #374151; font-size: 15px; }
+
+    .form-group-abs { margin-bottom: 15px; text-align: left;}
+    .form-group-abs label { display: block; font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 5px;}
+    .form-group-abs input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none;}
 </style>
 
-<div class="absen-panel" id="panel-absen" style="display: none;">
-    <div class="absen-header">
-        <div>
-            <h2>📝 Absensi Kehadiran Siswa</h2>
-            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280; font-weight: bold;">SDIT Hidayatut Taufiq</p>
-        </div>
-        <div class="absen-controls">
-            <input type="date" id="tgl-absen" class="input-box" required>
-            <select id="pilih-kelas" class="input-box" onchange="loadDaftarSiswa()">
-                <option value="">-- Pilih Kelas --</option>
-                <option value="Kelas 1">Kelas 1</option>
-                <option value="Kelas 2">Kelas 2</option>
-                <option value="Kelas 3">Kelas 3</option>
-                <option value="Kelas 4">Kelas 4</option>
-                <option value="Kelas 5">Kelas 5</option>
-                <option value="Kelas 6">Kelas 6</option>
-            </select>
-            <button class="btn-action btn-blue" onclick="bukaModalTambah()">➕ Tambah Siswa</button>
-        </div>
-    </div>
+<div id="panel-absen">
+   <div id="main-absen-ui" style="display:none;">
+       
+       <div class="absen-toolbar">
+           <select id="pilih-kelas-absen" onchange="window.gantiKelasAbsen()"></select>
+           <button class="btn-tambah kelas" onclick="window.bukaModalTambahKelas()">➕ Tambah Kelas</button>
+           <button class="btn-tambah" onclick="window.bukaModalTambahSiswa()">👤 Tambah Siswa</button>
+       </div>
 
-    <div id="loader-siswa" style="text-align: center; padding: 30px; display: none;">
-        <h3 style="color: #10b981;">⏳ Memuat Daftar Siswa...</h3>
-    </div>
+       <div id="absen-loading-teks" style="text-align:center; font-weight:bold; color:#10b981; display:none; margin-bottom:15px;">⏳ Menyinkronkan Data...</div>
 
-    <form id="form-absensi" onsubmit="submitAbsensi(event)">
-        <div id="daftar-siswa-container">
-            <div style="text-align: center; color: #9ca3af; padding: 30px; font-weight: bold; border: 2px dashed #d1d5db; border-radius: 12px;">
-                Silakan pilih kelas terlebih dahulu.
-            </div>
-        </div>
-        
-        <div style="margin-top: 20px; text-align: right; border-top: 2px dashed #e5e7eb; padding-top: 15px;">
-            <button type="submit" id="btn-submit-absen" class="btn-action btn-green" style="padding: 12px 25px; font-size: 15px; display: inline-flex;" disabled>✅ Simpan Data Absensi</button>
-        </div>
-    </form>
+       <div class="absen-cal-card">
+           <div class="absen-cal-head">
+               <button class="absen-cal-nav" onclick="window.navAbsenBulan(-1)">❮</button>
+               <span id="absen-bulan-label">Bulan Tahun</span>
+               <button class="absen-cal-nav" onclick="window.navAbsenBulan(1)">❯</button>
+           </div>
+           <div class="absen-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
+           <div class="absen-grid" id="absen-cal-grid"></div>
+       </div>
+   </div>
 </div>
 
-<div class="modal-add" id="modal-tambah">
-    <div class="modal-add-content">
-        <h3 style="margin-top:0; color: #047857; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">👤 Tambah Data Siswa</h3>
-        <div class="form-group">
-            <label>Pilih Kelas</label>
-            <input type="text" id="add-kelas" readonly style="background: #f3f4f6;">
+<div class="absen-modal" id="modal-absen-harian">
+    <div class="absen-modal-content">
+        <h3 id="judul-absen-tgl" style="margin-top:0; color:#047857; text-align:center; border-bottom:2px dashed #e5e7eb; padding-bottom:10px;">Absensi Kelas</h3>
+        <div id="list-siswa-absen" style="flex:1; overflow-y:auto; margin-bottom:15px; padding-right:5px;"></div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-absen-harian')">Batal</button>
+            <button class="btn-tambah" style="flex:1; background:#10b981;" onclick="window.simpanAbsenHarian()">✅ Simpan</button>
         </div>
-        <div class="form-group">
-            <label>Nomor Induk Siswa (NIS)</label>
-            <input type="text" id="add-nis" placeholder="Contoh: 2601001" required>
+    </div>
+</div>
+
+<div class="absen-modal" id="modal-tambah-kelas">
+    <div class="absen-modal-content" style="max-height: max-content;">
+        <h3 style="margin-top:0; color:#047857;">🏫 Tambah Kelas Baru</h3>
+        <div class="form-group-abs">
+            <label>Nama Kelas</label>
+            <input type="text" id="input-kelas-baru" placeholder="Contoh: Kelas 1A">
         </div>
-        <div class="form-group">
-            <label>Nama Lengkap Siswa</label>
-            <input type="text" id="add-nama" placeholder="Masukkan nama lengkap" required>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-tambah-kelas')">Batal</button>
+            <button class="btn-tambah" style="flex:1; background:#10b981;" onclick="window.simpanKelasBaru()">Simpan</button>
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button type="button" class="btn-action btn-red" style="flex: 1; justify-content: center;" onclick="tutupModalTambah()">Batal</button>
-            <button type="button" class="btn-action btn-green" style="flex: 1; justify-content: center;" onclick="simpanSiswaBaru()">Simpan</button>
+    </div>
+</div>
+
+<div class="absen-modal" id="modal-tambah-siswa">
+    <div class="absen-modal-content" style="max-height: max-content;">
+        <h3 style="margin-top:0; color:#047857;">👤 Tambah Siswa</h3>
+        <div class="form-group-abs"><label>Pilih Kelas</label><input type="text" id="add-kelas" readonly style="background:#f3f4f6;"></div>
+        <div class="form-group-abs"><label>NIS</label><input type="text" id="add-nis" placeholder="Nomor Induk Siswa"></div>
+        <div class="form-group-abs"><label>Nama Lengkap</label><input type="text" id="add-nama" placeholder="Nama Siswa"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-tambah-siswa')">Batal</button>
+            <button class="btn-tambah" style="flex:1; background:#10b981;" onclick="window.simpanSiswaBaru()">Simpan</button>
         </div>
+    </div>
+</div>
+
+<div class="ios-loading-overlay" id="ios-loading">
+    <div class="ios-loading-box">
+        <div class="ios-spinner"></div>
+        <div class="ios-loading-text">Menyimpan...</div>
     </div>
 </div>
 
 <script>
-    // Gunakan pengecekan agar tidak error jika fungsi terlambat dimuat
-    if (typeof initAbsensi === "function") {
-        initAbsensi();
+    // Validasi aman dari SPA
+    if (typeof window.initAbsensi === "function") {
+        window.initAbsensi();
     }
 </script>
