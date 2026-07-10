@@ -509,13 +509,20 @@ window.initAbsensi = async function() {
 window.loadDataAbsensiUtama = async function() {
     document.getElementById('absen-loading-teks').style.display = 'block';
     try {
-        var resSiswa = await fetch(SCRIPT_URL + "?action=get_siswa");
+        // Tarik data siswa DAN riwayat absen secara bersamaan
+        var [resSiswa, resAbsen] = await Promise.all([
+            fetch(SCRIPT_URL + "?action=get_siswa"),
+            fetch(SCRIPT_URL + "?action=get_rekap_absensi")
+        ]);
+        
         var jsonSiswa = await resSiswa.json();
+        var jsonAbsen = await resAbsen.json();
+        
         if(jsonSiswa.status === 'success') {
             globalSiswaAbsen = jsonSiswa.data;
-            var kelasSet = new Set();
+            window.globalDataAbsensi = jsonAbsen.data || []; // Simpan riwayat absen di memori
             
-            // Filter agar dummy sistem untuk pendaftaran kelas tidak muncul di layar
+            var kelasSet = new Set();
             globalSiswaAbsen.forEach(function(s) {
                 if(s.kelas && s.nis !== "DUMMY_KELAS") kelasSet.add(s.kelas);
             });
@@ -528,7 +535,7 @@ window.loadDataAbsensiUtama = async function() {
             });
             if(curr && kelasSet.has(curr)) sel.value = curr;
         }
-    } catch(e) { console.log("Gagal load siswa"); }
+    } catch(e) { console.log("Gagal load data", e); }
     document.getElementById('absen-loading-teks').style.display = 'none';
     window.renderKalenderAbsensi();
 };
@@ -574,18 +581,42 @@ window.bukaModalAbsenTgl = function(tgl) {
     var siswaKelas = globalSiswaAbsen.filter(function(s) { return s.kelas === kelas && s.nis !== "DUMMY_KELAS"; });
     siswaKelas.sort(function(a,b){ return a.nama.localeCompare(b.nama); });
 
+    // CARI RIWAYAT ABSEN UNTUK TANGGAL DAN KELAS INI
+    var riwayatAbsen = window.globalDataAbsensi ? window.globalDataAbsensi.filter(function(a) {
+        var tglBersih = a.tanggal ? String(a.tanggal).replace(/['"]/g, '').trim().substring(0, 10) : "";
+        return tglBersih === tgl && a.kelas === kelas;
+    }) : [];
+
     if(siswaKelas.length === 0) {
         container.innerHTML = "<p style='text-align:center; color:#6b7280; font-weight:bold; padding:20px;'>Belum ada siswa di kelas ini.</p>";
     } else {
         siswaKelas.forEach(function(s, index) {
+            // Tentukan status bawaan (Hadir) jika belum pernah diabsen
+            var statusSiswa = "Hadir"; 
+            
+            // Jika sudah ada datanya di Database, ambil status lamanya
+            var absenSiswaIni = riwayatAbsen.find(function(a) { return String(a.nis) === String(s.nis) || a.nama === s.nama; });
+            if(absenSiswaIni) {
+                var statDb = (absenSiswaIni.status || "").toUpperCase().trim();
+                if(statDb === 'SAKIT') statusSiswa = "Sakit";
+                else if(statDb === 'IZIN') statusSiswa = "Izin";
+                else if(statDb === 'ALPA' || statDb === 'ALFA') statusSiswa = "Alpa";
+            }
+
+            // Atur radio button mana yang menyala otomatis
+            var chkH = statusSiswa === "Hadir" ? "checked" : "";
+            var chkS = statusSiswa === "Sakit" ? "checked" : "";
+            var chkI = statusSiswa === "Izin" ? "checked" : "";
+            var chkA = statusSiswa === "Alpa"  ? "checked" : "";
+
             container.innerHTML += `
                 <div class="siswa-card-absen">
                     <div><b style="color:#1f2937;">${index+1}. ${s.nama}</b><br><small style="color:#6b7280;">NIS: ${s.nis}</small></div>
                     <div class="radio-group-absen">
-                        <input type="radio" id="h-${s.nis}" name="absen_${s.nis}" value="Hadir" checked><label for="h-${s.nis}">H</label>
-                        <input type="radio" id="s-${s.nis}" name="absen_${s.nis}" value="Sakit"><label for="s-${s.nis}">S</label>
-                        <input type="radio" id="i-${s.nis}" name="absen_${s.nis}" value="Izin"><label for="i-${s.nis}">I</label>
-                        <input type="radio" id="a-${s.nis}" name="absen_${s.nis}" value="Alpa"><label for="a-${s.nis}">A</label>
+                        <input type="radio" id="h-${s.nis}" name="absen_${s.nis}" value="Hadir" ${chkH}><label for="h-${s.nis}">H</label>
+                        <input type="radio" id="s-${s.nis}" name="absen_${s.nis}" value="Sakit" ${chkS}><label for="s-${s.nis}">S</label>
+                        <input type="radio" id="i-${s.nis}" name="absen_${s.nis}" value="Izin" ${chkI}><label for="i-${s.nis}">I</label>
+                        <input type="radio" id="a-${s.nis}" name="absen_${s.nis}" value="Alpa" ${chkA}><label for="a-${s.nis}">A</label>
                     </div>
                 </div>
             `;
@@ -607,18 +638,20 @@ window.simpanAbsenHarian = async function() {
     if(dataAbsen.length === 0) return alert("Tidak ada data siswa untuk diabsen.");
 
     document.getElementById('modal-absen-harian').classList.remove('active');
-    document.getElementById('ios-loading').classList.add('active'); // MUNCULKAN IPHONE LOADING
+    document.getElementById('ios-loading').classList.add('active'); 
 
     var payload = { action: "submit_absensi", tanggal: tglPilihanAbsen, kelas: kelas, data_absen: dataAbsen };
 
     try {
         await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-        if(typeof fetchRekapAbsensi === "function") { fetchRekapAbsensi(); } // Refresh chart di home
+        // REFRESH DATA ABSEN DI MEMORI AGAR LANGSUNG BISA DIEDIT LAGI
+        await window.loadDataAbsensiUtama();
+        if(typeof fetchRekapAbsensi === "function") { fetchRekapAbsensi(); } 
     } catch(e) {
         alert("Gagal menyimpan data!");
     } finally {
-        document.getElementById('ios-loading').classList.remove('active'); // TUTUP IPHONE LOADING
-        alert("✅ Absensi berhasil disimpan ke Database!");
+        document.getElementById('ios-loading').classList.remove('active'); 
+        alert("✅ Absensi berhasil disimpan/diperbarui!");
     }
 };
 
