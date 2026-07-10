@@ -213,7 +213,7 @@ function handleLogout() {
 
 
 // =============================================
-// LOAD PAGE
+// LOAD PAGE (DENGAN ANTI-CACHE)
 // =============================================
 async function loadPage(namaFile, elemenTab) {
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -224,11 +224,15 @@ async function loadPage(namaFile, elemenTab) {
     try {
         areaKonten.innerHTML = '<p id="status-loading">Memuat halaman...</p>';
 
-        const response = await fetch(namaFile);
+        // PERBAIKAN: Tambahkan parameter waktu agar browser selalu memuat file HTML terbaru!
+        const urlBebasCache = namaFile + '?v=' + new Date().getTime();
+        const response = await fetch(urlBebasCache);
+        
         if (!response.ok) throw new Error('Halaman tidak ditemukan');
 
         const htmlContent = await response.text();
         areaKonten.innerHTML = '';
+
 
         const temp = document.createElement('div');
         temp.innerHTML = htmlContent;
