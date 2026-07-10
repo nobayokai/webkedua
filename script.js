@@ -43,9 +43,10 @@ function switchRole(role, elBtn) {
         inputNis.placeholder  = 'Masukkan NIS kamu';
         if (btnLogin) btnLogin.className = 'btn-login siswa';
     } else {
-        labelNis.textContent  = 'NIP';
+        // PERBAIKAN: Ubah tulisan NIP menjadi Email agar selaras dengan Database
+        labelNis.textContent  = 'Email Guru';
         labelPass.textContent = 'Password';
-        inputNis.placeholder  = 'Masukkan NIP kamu';
+        inputNis.placeholder  = 'Masukkan Email kamu';
         if (btnLogin) btnLogin.className = 'btn-login guru';
     }
 
@@ -55,6 +56,9 @@ function switchRole(role, elBtn) {
 }
 
 
+// =============================================
+// HANDLE LOGIN DENGAN POPUP
+// =============================================
 // =============================================
 // HANDLE LOGIN DENGAN POPUP
 // =============================================
@@ -69,21 +73,13 @@ async function handleLogin(e) {
         return;
     }
 
-    // Tampilkan popup loading
     const modal = showLoginPopup('loading', '⏳ Sedang verifikasi...');
 
     try {
-        const params = new URLSearchParams({
-            action : 'login',
-            role   : currentRole,
-            nis    : nis,
-            pass   : pass
-        });
-
+        const params = new URLSearchParams({ action : 'login', role : currentRole, nis : nis, pass : pass });
         const res  = await fetch(`${SCRIPT_URL}?${params}`);
         const data = await res.json();
 
-        // Hapus popup loading
         modal.remove();
 
         if (data.status === 'success') {  
@@ -96,18 +92,7 @@ async function handleLogin(e) {
 
             updateMenuLogin();  
 
-            // Tampilkan popup sukses dengan nama  
             const successModal = showLoginPopup('success', `Selamat datang, ${data.nama}`);  
-            
-            // PERBAIKAN DI SINI: Menggunakan currentRole, bukan role
-            if (currentRole === 'guru') {
-                // GANTI BAGIAN INI DI DALAM FUNGSI updateMenuLogin()
-        // Munculkan menu HANYA sesuai role
-        const tabAbsensi = document.getElementById('tab-absensi');
-        const tabSupervisi = document.getElementById('tab-supervisi');
-        if (tabAbsensi) tabAbsensi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
-        if (tabSupervisi) tabSupervisi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
-            }
             
             setTimeout(() => {  
                 successModal.remove();  
@@ -116,13 +101,12 @@ async function handleLogin(e) {
             }, 1500);  
 
         } else {  
-            // Pesan error baru  
             showLoginPopup('error', 'Sepertinya data yang kamu masukan salah');  
         }  
 
     } catch (err) {
         modal.remove();
-        console.error(err); // Tambahan untuk melihat detail error di inspect element
+        console.error(err); 
         showLoginPopup('error', '❌ Gagal terhubung ke server!');
     }
 }
@@ -180,28 +164,33 @@ function showLoginPopup(type, message) {
 
 
 // =============================================
-// UPDATE MENU LOGIN/LOGOUT (Otomatis memunculkan Absensi untuk Guru)
+// UPDATE MENU LOGIN/LOGOUT (Memunculkan Absensi & Supervisi)
 // =============================================
 function updateMenuLogin() {
     const userLogin = localStorage.getItem('user_login');
     const tabLogin  = document.getElementById('tab-login');
     const tabLogout = document.getElementById('tab-logout');
-    const tabAbsensi = document.getElementById('tab-absensi'); // Target Menu Absensi
+    
+    // Target Menu
+    const tabAbsensi = document.getElementById('tab-absensi'); 
+    const tabSupervisi = document.getElementById('tab-supervisi'); 
 
     if (userLogin) {
         if(tabLogin) tabLogin.style.display  = 'none';
         if(tabLogout) tabLogout.style.display = '';
+        
         const user = JSON.parse(userLogin);
         if(tabLogout) tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
         
-        // Munculkan menu absensi HANYA jika role adalah guru
-        if (tabAbsensi) {
-            tabAbsensi.style.display = (user.role === 'guru') ? 'inline-block' : 'none';
-        }
+        // Munculkan menu HANYA sesuai role (Guru / Kepsek)
+        if (tabAbsensi) tabAbsensi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
+        if (tabSupervisi) tabSupervisi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
+        
     } else {
         if(tabLogin) tabLogin.style.display  = '';
         if(tabLogout) tabLogout.style.display = 'none';
-        if(tabAbsensi) tabAbsensi.style.display = 'none'; // Sembunyikan jika belum login
+        if(tabAbsensi) tabAbsensi.style.display = 'none'; 
+        if(tabSupervisi) tabSupervisi.style.display = 'none'; 
     }
 }
 
