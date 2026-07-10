@@ -117,7 +117,7 @@
         document.getElementById('area-upload-guru').style.display = 'block';
     }
 
-    // 2. LOAD DATA DARI GOOGLE SHEET
+    // 2. LOAD DATA DARI GOOGLE SHEET (SUDAH DIPERBAIKI)
     window.loadDaftarSupervisi = async function() {
         try {
             var res = await fetch(API_URL + "?action=get_supervisi");
@@ -132,7 +132,8 @@
                 }
 
                 dataFiltered.reverse().forEach(d => {
-                    var isAcc = d.status.includes('ACC');
+                    // PERBAIKAN FATAL DI SINI: Deteksi harus 'Sudah ACC', bukan cuma 'ACC'
+                    var isAcc = d.status.includes('Sudah ACC'); 
                     var isReject = d.status.includes('Ditolak');
                     var badgeClass = isAcc ? 'acc' : (isReject ? 'reject' : 'wait');
                     
