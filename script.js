@@ -84,10 +84,11 @@ async function handleLogin(e) {
 
         if (data.status === 'success') {  
             localStorage.setItem('user_login', JSON.stringify({  
-                nama  : data.nama,  
-                role  : currentRole,  
-                id    : data.id,  
-                token : data.token  
+                nama    : data.nama,  
+                role    : currentRole,
+                jabatan : data.jabatan, // Menyimpan jabatan (kepsek/guru_kelas/dll)
+                id      : data.id,  
+                token   : data.token  
             }));  
 
             updateMenuLogin();  
