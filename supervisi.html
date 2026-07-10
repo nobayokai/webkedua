@@ -129,13 +129,24 @@
     window.totalPdfPages = 1;
     window.signaturesByPage = {}; 
 
-    // Loading sederhana (karena #ios-loading tidak ada)
-    function ubahTeksLoading(teks) {
-        console.log("%c[LOADING] " + teks, "color: #3b82f6; font-weight: bold");
+   window.ubahTeksLoading = function(teks){
+
+    var loading = document.getElementById('ios-loading');
+    var loadingText = document.querySelector('#ios-loading .ios-loading-text');
+
+    if(loading){
+        if(loadingText) loadingText.textContent = teks;
+        loading.classList.add('active');
     }
-    function tutupLoading() {
-        console.log("%c[LOADING] Selesai", "color: #10b981");
-    }
+}
+
+window.tutupLoading = function(){
+
+    var loading = document.getElementById('ios-loading');
+
+    if(loading)
+        loading.classList.remove('active');
+}
 
     // Inisialisasi tampilan
     if (isKepsek) {
