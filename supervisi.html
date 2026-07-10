@@ -1,3 +1,6 @@
+<!-- TAMBAHKAN LIBRARY PDF.JS UNTUK RENDER PRATINJAU -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
 <style>
     /* DESAIN DASHBOARD SUPERVISI PREMIUM */
     .sup-container { background: #ffffff; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); font-family: 'Arial', sans-serif; }
@@ -22,11 +25,13 @@
 
     /* VIRTUAL AREA & MULTI-SIGNATURE */
     #pdf-virtual-area { position: relative; width: 100%; max-width: 400px; height: 565px; background: white; border: 2px solid #e2e8f0; margin: 0 auto; overflow: hidden; border-radius: 8px; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
-    .drag-ttd-item { position: absolute; width: 110px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed transparent; }
-    .drag-ttd-item:active { cursor: grabbing; border-color: #3b82f6; }
-    .btn-delete-ttd { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 12px; display: none; }
-    .drag-ttd-item:hover { border-color: #cbd5e1; }
-    .drag-ttd-item:hover .btn-delete-ttd { display: block; }
+    
+    /* STYLE UNTUK CANVAS PRATINJAU PDF */
+    #pdf-canvas-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.9; }
+    
+    .drag-ttd-item { position: absolute; width: 110px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed #3b82f6; border-radius:6px; background:rgba(255,255,255,0.3);}
+    .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; background:rgba(255,255,255,0.7);}
+    .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; cursor: pointer; font-size: 12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
 </style>
 
 <div class="sup-container">
@@ -35,6 +40,7 @@
         <button class="sup-btn outline" id="btn-show-ttd" style="display:none;" onclick="document.getElementById('modal-set-ttd').style.display='flex'">⚙️ Stempel & TTD Lokal</button>
     </div>
 
+    <!-- FORM UPLOAD (HANYA GURU) -->
     <div id="area-upload-guru" style="display:none;">
         <div class="sup-upload-box">
             <h3 style="margin-top:0;">⬆️ Upload Berkas</h3>
@@ -55,10 +61,12 @@
         </div>
     </div>
 
+    <!-- DAFTAR DOKUMEN -->
     <h3 style="color:#334155; border-bottom: 2px dashed #e2e8f0; padding-bottom:10px;">📄 Daftar Berkas Supervisi</h3>
     <div class="sup-grid" id="list-dokumen-sup"></div>
 </div>
 
+<!-- MODAL ACC & MULTI-SIGNATURE -->
 <div class="modal" id="modal-acc" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
     <div style="background:white; padding:20px; border-radius:12px; max-width:450px; width:90%; max-height:95vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
         <h3 style="text-align:center; color:#047857; margin-top:0;">✍️ Papan Tanda Tangan</h3>
@@ -66,7 +74,13 @@
         
         <button class="sup-btn blue" style="display:block; margin:0 auto 15px; width:100%;" onclick="window.tambahTtdKeCanvas()">➕ Tambah TTD / Stempel</button>
         
-        <div id="pdf-virtual-area"></div>
+        <!-- AREA VIRTUAL (SEKARANG BISA MENAMPILKAN PDF) -->
+        <div id="pdf-virtual-area">
+            <div id="pdf-loading-text" style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">
+                ⏳ Memuat Pratinjau Dokumen...
+            </div>
+            <!-- Canvas PDF.js akan masuk ke sini -->
+        </div>
         
         <div style="display:flex; gap:10px; margin-top:15px;">
             <button class="sup-btn gray" style="flex:1;" onclick="document.getElementById('modal-acc').style.display='none'">Batal</button>
@@ -75,6 +89,7 @@
     </div>
 </div>
 
+<!-- MODAL TOLAK DOKUMEN -->
 <div class="modal" id="modal-tolak" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:white; padding:25px; border-radius:12px; max-width:400px; width:90%; text-align:center;">
         <h3 style="color:#ef4444; margin-top:0;">❌ Tolak Dokumen</h3>
@@ -87,6 +102,7 @@
     </div>
 </div>
 
+<!-- MODAL SETTING TTD LOKAL -->
 <div class="modal" id="modal-set-ttd" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:white; padding:25px; border-radius:12px; text-align:center; max-width:350px; width:90%;">
         <h3 style="color:#3b82f6; margin-top:0;">⚙️ Upload TTD Lokal</h3>
@@ -103,8 +119,8 @@
     var curUser = JSON.parse(localStorage.getItem('user_login'));
     var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
     var activeDocId = "", activeDocUrl = "";
+    window.tempPdfBase64 = null; // Menyimpan memori PDF sementara agar lebih cepat
 
-    // 1. ATUR TAMPILAN BERDASARKAN ROLE
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
         document.getElementById('area-upload-guru').style.display = 'none';
@@ -112,7 +128,6 @@
         document.getElementById('area-upload-guru').style.display = 'block';
     }
 
-    // 2. LOAD DATA DARI GOOGLE SHEET (DENGAN LOGIKA SUPER KETAT)
     window.loadDaftarSupervisi = async function() {
         try {
             var res = await fetch(API_URL + "?action=get_supervisi");
@@ -127,7 +142,6 @@
                 }
 
                 dataFiltered.reverse().forEach(d => {
-                    // Pengecekan status yang sangat presisi, tidak pakai .includes() lagi
                     var statusBersih = String(d.status).trim();
                     var isAcc = (statusBersih === 'Sudah ACC');
                     var isReject = (statusBersih === 'Ditolak');
@@ -136,7 +150,6 @@
                     var badgeClass = isAcc ? 'acc' : (isReject ? 'reject' : 'wait');
                     var actionsHTML = "";
                     
-                    // JIKA KEPSEK & MENUNGGU
                     if (isKepsek && isWait) {
                         actionsHTML = `
                             <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
@@ -145,17 +158,12 @@
                                 <button class="sup-btn red" style="flex:1;" onclick="window.bukaModalTolak('${d.id_dokumen}')">❌ Tolak</button>
                             </div>
                         `;
-                    } 
-                    // JIKA SUDAH ACC
-                    else if (isAcc) {
+                    } else if (isAcc) {
                         actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_acc}" target="_blank" class="sup-btn" style="width:100%; text-decoration:none;">📄 Download PDF Final</a></div>`;
-                    } 
-                    // JIKA DITOLAK ATAU GURU & MENUNGGU
-                    else {
+                    } else {
                         actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="width:100%; text-decoration:none;">👀 Lihat Draft Dokumen</a></div>`;
                     }
 
-                    // Tampilkan Alasan jika ditolak
                     var alasanHTML = (isReject && d.alasan) ? `<div class="alasan-box"><b>Alasan Ditolak:</b> ${d.alasan}</div>` : "";
 
                     container.innerHTML += `
@@ -175,7 +183,6 @@
         } catch(e) { console.error(e); }
     };
 
-    // 3. UPLOAD DOKUMEN (GURU)
     window.prosesUploadDokumen = function(e) {
         e.preventDefault();
         var fileInput = document.getElementById('sup-file');
@@ -197,7 +204,6 @@
         reader.readAsDataURL(fileInput.files[0]);
     };
 
-    // 4. SIMPAN TTD LOKAL
     window.simpanTtdLokal = function() {
         var f = document.getElementById('file-ttd');
         if (f.files.length === 0) return alert("Pilih gambar PNG terlebih dahulu!");
@@ -210,14 +216,12 @@
         r.readAsDataURL(f.files[0]);
     };
 
-    // 5. BUKA MODAL TOLAK
     window.bukaModalTolak = function(id) {
         activeDocId = id;
         document.getElementById('alasan-tolak').value = "";
         document.getElementById('modal-tolak').style.display = 'flex';
     };
 
-    // 6. EKSEKUSI TOLAK
     window.eksekusiTolakDokumen = async function() {
         var alasan = document.getElementById('alasan-tolak').value;
         if (!alasan) return alert("Harap isi keterangan alasan mengapa dokumen ini ditolak!");
@@ -237,15 +241,56 @@
         finally { if(loading) loading.classList.remove('active'); }
     };
 
-    // 7. BUKA MODAL SIGN DOKUMEN (ACC)
-    window.bukaModalAcc = function(id, url) {
+    // ========================================================
+    // LOGIKA BARU: BUKA MODAL ACC & RENDER PREVIEW PDF.JS
+    // ========================================================
+    window.bukaModalAcc = async function(id, url) {
         if(!localStorage.getItem('ttd_kepsek')) return alert("⚠️ Anda belum menyimpan gambar Stempel/TTD. Klik tombol '⚙️ Stempel & TTD Lokal' di atas terlebih dahulu.");
         activeDocId = id; activeDocUrl = url;
-        document.getElementById('pdf-virtual-area').innerHTML = '<div style="position:absolute; top:45%; width:100%; text-align:center; color:#ccc; font-weight:bold; font-size:18px;">HALAMAN TERAKHIR PDF</div>';
+        
+        var area = document.getElementById('pdf-virtual-area');
+        area.innerHTML = '<div id="pdf-loading-text" style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">⏳ Memuat Pratinjau Dokumen...</div>';
         document.getElementById('modal-acc').style.display = 'flex';
+
+        try {
+            // 1. Tarik Data PDF Asli
+            var resPdf = await fetch(API_URL + "?action=get_pdf_base64&url=" + encodeURIComponent(activeDocUrl.trim()));
+            var jsonPdf = await resPdf.json();
+            if(jsonPdf.status !== 'success') throw new Error("Gagal mengambil PDF asli.");
+            
+            // Simpan ke memori sementara agar pas klik Terapkan tidak usah loading lama lagi
+            window.tempPdfBase64 = jsonPdf.base64;
+
+            // 2. Render Halaman Terakhir Pakai PDF.js
+            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+            var pdfData = atob(jsonPdf.base64);
+            var uint8Array = new Uint8Array(pdfData.length);
+            for (var i = 0; i < pdfData.length; i++) { uint8Array[i] = pdfData.charCodeAt(i); }
+
+            var pdfDoc = await pdfjsLib.getDocument({data: uint8Array}).promise;
+            var page = await pdfDoc.getPage(pdfDoc.numPages); // Ambil halaman paling akhir
+            
+            var viewport = page.getViewport({scale: 1.5}); 
+            var canvas = document.createElement('canvas');
+            canvas.id = "pdf-canvas-preview";
+            var context = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({canvasContext: context, viewport: viewport}).promise;
+
+            // Hapus teks loading dan masukkan canvas
+            area.innerHTML = '';
+            area.appendChild(canvas);
+
+        } catch(e) {
+            console.error(e);
+            area.innerHTML = '<div style="position:absolute; top:45%; width:100%; text-align:center; color:#ef4444; font-weight:bold; z-index:2;">Gagal memuat pratinjau visual.<br><small style="color:#6b7280;">Bapak tetap bisa menempelkan TTD secara manual.</small></div>';
+        }
     };
 
-    // 8. TAMBAH TTD MULTIPLE
     window.tambahTtdKeCanvas = function() {
         var area = document.getElementById('pdf-virtual-area');
         var wrapper = document.createElement('div');
@@ -264,6 +309,7 @@
 
         var p1=0, p2=0, p3=0, p4=0;
         wrapper.onmousedown = function(e) {
+            if(e.target === delBtn) return; // Jangan drag kalau ngeklik tombol hapus
             e.preventDefault(); p3 = e.clientX; p4 = e.clientY;
             document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
             document.onmousemove = function(e) {
@@ -274,7 +320,6 @@
         };
     };
 
-    // 9. PROSES PENEMPELAN FINAL PDF
     window.eksekusiAccDokumen = async function() {
         var items = document.querySelectorAll('.drag-ttd-item');
         if(items.length === 0) return alert("⚠️ Anda belum membubuhkan tanda tangan. Klik 'Tambah TTD' terlebih dahulu.");
@@ -284,11 +329,10 @@
         if(loading) loading.classList.add('active');
         
         try {
-            var resPdf = await fetch(API_URL + "?action=get_pdf_base64&url=" + encodeURIComponent(activeDocUrl.trim()));
-            var jsonPdf = await resPdf.json();
-            if(jsonPdf.status !== 'success') throw new Error("Gagal mengambil PDF asli.");
+            // Kita pakai memori PDF yang sudah ditarik saat buka modal (Sangat Cepat!)
+            if(!window.tempPdfBase64) throw new Error("Data PDF hilang, harap ulangi proses Sign.");
 
-            const pdfDoc = await PDFLib.PDFDocument.load(jsonPdf.base64);
+            const pdfDoc = await PDFLib.PDFDocument.load(window.tempPdfBase64);
             const lastPage = pdfDoc.getPages().pop();
             const { width, height } = lastPage.getSize();
             
@@ -311,6 +355,7 @@
             
             if(jsonAcc.status === 'success') {
                 alert("✅ Luar Biasa! Dokumen telah di-ACC dan Tanda Tangan berhasil dicetak permanen.");
+                window.tempPdfBase64 = null; // bersihkan memori
                 window.loadDaftarSupervisi();
             } else {
                 throw new Error(jsonAcc.message);
