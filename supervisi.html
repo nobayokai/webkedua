@@ -1,5 +1,4 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
 <style>
     /* DESAIN DASHBOARD SUPERVISI PREMIUM */
@@ -27,13 +26,11 @@
     #pdf-virtual-area { position: relative; width: 100%; max-width: 420px; height: auto; min-height: 200px; background: white; border: 2px solid #e2e8f0; margin: 0 auto; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     #pdf-canvas-preview { width: 100%; display: block; height: auto; } 
     
-    .drag-ttd-item { position: absolute; width: 100px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed #3b82f6; border-radius:6px; background:rgba(255,255,255,0.45); display: flex; align-items: center; justify-content: center;}
-    .drag-ttd-item img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .drag-ttd-item { position: absolute; width: 100px; height: 100px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed #3b82f6; border-radius:6px; background:rgba(255,255,255,0.45); box-sizing: border-box;}
     .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; background:rgba(255,255,255,0.8);}
-    
-    .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; cursor: pointer; font-size: 12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 20;}
-    /* Tambahan Tombol Resize */
-    .resize-handle-ttd { position: absolute; bottom: -8px; right: -8px; background: #3b82f6; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 20px; cursor: se-resize; font-size: 12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 20; user-select: none;}
+    .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; cursor: pointer; font-size: 12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:12;}
+    .btn-resize-ttd { position: absolute; bottom: -8px; right: -8px; width: 18px; height: 18px; background: #3b82f6; border: 2px solid white; border-radius: 50%; cursor: nwse-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:12; touch-action:none;}
+    .btn-resize-ttd:hover { background:#1d4ed8; transform: scale(1.15); }
 
     .pdf-controls { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
     .pdf-controls span { font-weight: 800; color: #1e293b; font-size: 13px; }
@@ -133,18 +130,28 @@
     window.signaturesByPage = {}; 
 
     window.ubahTeksLoading = function(teks){
-        var loading = document.getElementById("ios-loading");
-        if(loading){
-            var loadingText = document.querySelector("#ios-loading .ios-loading-text");
-            if(loadingText) loadingText.textContent = teks;
-            loading.classList.add("active");
-        }
+
+    var loading=document.getElementById("ios-loading");
+    var loadingText=document.querySelector("#ios-loading .ios-loading-text");
+
+    if(loading){
+
+        if(loadingText)
+            loadingText.textContent=teks;
+
+        loading.classList.add("active");
     }
 
-    window.tutupLoading=function(){
-        var loading = document.getElementById("ios-loading");
-        if(loading) loading.classList.remove("active");
-    }
+}
+
+window.tutupLoading=function(){
+
+    var loading=document.getElementById("ios-loading");
+
+    if(loading)
+        loading.classList.remove("active");
+
+}
 
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
@@ -337,13 +344,23 @@
 
     window.saveCurrentPageSignatures = function() {
         var items = document.querySelectorAll('.drag-ttd-item');
+        var canvas = document.getElementById('pdf-canvas-preview');
+        // PENTING: simpan juga ukuran tampilan (CSS) kanvas SAAT ITU JUGA.
+        // Ini adalah "bingkai referensi" yang sama persis dengan yang dilihat
+        // user saat menempatkan tanda tangan, sehingga posisi di PDF nanti
+        // bisa dihitung ulang dengan rasio yang tepat, per halaman.
+        var refW = canvas ? canvas.offsetWidth : 0;
+        var refH = canvas ? canvas.offsetHeight : 0;
+
         var pageSigs = [];
         items.forEach(function(item) {
             pageSigs.push({
-                left: item.style.left,
-                top: item.style.top,
+                left: item.offsetLeft,
+                top: item.offsetTop,
                 width: item.offsetWidth,
-                height: item.offsetHeight
+                height: item.offsetHeight,
+                refW: refW,
+                refH: refH
             });
         });
         window.signaturesByPage[window.currentPdfPage] = pageSigs;
@@ -378,34 +395,29 @@
         var area = document.getElementById('pdf-virtual-area');
         var wrapper = document.createElement('div');
         wrapper.className = 'drag-ttd-item';
-        wrapper.style.left = left; wrapper.style.top = top;
+        // Normalisasi satuan: terima angka (px) maupun string ('35%')
+        wrapper.style.left = (typeof left === 'number') ? left + 'px' : left;
+        wrapper.style.top = (typeof top === 'number') ? top + 'px' : top;
         if(w) wrapper.style.width = w + "px";
         if(h) wrapper.style.height = h + "px";
 
         var img = document.createElement('img');
         img.src = localStorage.getItem('ttd_kepsek');
+        img.style.width = '100%'; img.style.height = '100%'; img.style.objectFit = 'contain'; img.style.pointerEvents = 'none'; img.draggable = false;
 
-        // Tombol hapus
         var delBtn = document.createElement('div');
         delBtn.className = 'btn-delete-ttd'; delBtn.innerHTML = '✕';
         delBtn.onclick = function() { wrapper.remove(); };
 
-        // Tombol resize (tambahan baru)
         var resizeBtn = document.createElement('div');
-        resizeBtn.className = 'resize-handle-ttd'; resizeBtn.innerHTML = '⤡';
+        resizeBtn.className = 'btn-resize-ttd'; resizeBtn.title = 'Tarik untuk mengubah ukuran';
 
-        wrapper.appendChild(img); 
-        wrapper.appendChild(delBtn); 
-        wrapper.appendChild(resizeBtn); 
-        area.appendChild(wrapper);
+        wrapper.appendChild(img); wrapper.appendChild(delBtn); wrapper.appendChild(resizeBtn); area.appendChild(wrapper);
 
+        // --- GESER POSISI (DRAG) ---
         var p1=0, p2=0, p3=0, p4=0;
-        
-        // Logika Drag (Geser)
         wrapper.onmousedown = function(e) {
-            // Abaikan drag jika mengklik hapus atau resize
             if(e.target === delBtn || e.target === resizeBtn) return; 
-            
             e.preventDefault(); p3 = e.clientX; p4 = e.clientY;
             document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
             document.onmousemove = function(e) {
@@ -423,29 +435,58 @@
             };
         };
 
-        // Logika Resize
+        // --- UBAH UKURAN (RESIZE) ---
         resizeBtn.onmousedown = function(e) {
             e.preventDefault(); e.stopPropagation();
-            var startX = e.clientX;
-            var startY = e.clientY;
-            var startW = wrapper.offsetWidth;
-            var startH = wrapper.offsetHeight;
-            
+            var startX = e.clientX, startY = e.clientY;
+            var startWidth = wrapper.offsetWidth, startHeight = wrapper.offsetHeight;
+            var boxLeft = wrapper.offsetLeft, boxTop = wrapper.offsetTop;
+            var minSize = 30;
+
             document.onmousemove = function(e) {
-                var newW = startW + (e.clientX - startX);
-                var newH = startH + (e.clientY - startY);
-                
-                // Batas ukuran minimal (jangan terlalu kecil)
-                if(newW < 40) newW = 40;
-                if(newH < 40) newH = 40;
-                
-                wrapper.style.width = newW + 'px';
-                wrapper.style.height = newH + 'px';
+                e.preventDefault();
+                var deltaX = e.clientX - startX;
+                var deltaY = e.clientY - startY;
+
+                var newWidth = Math.max(minSize, startWidth + deltaX);
+                var newHeight = Math.max(minSize, startHeight + deltaY);
+
+                // Jangan biarkan kotak keluar dari area dokumen
+                if(boxLeft + newWidth > area.offsetWidth) newWidth = area.offsetWidth - boxLeft;
+                if(boxTop + newHeight > area.offsetHeight) newHeight = area.offsetHeight - boxTop;
+
+                wrapper.style.width = newWidth + "px";
+                wrapper.style.height = newHeight + "px";
             };
-            document.onmouseup = function() {
-                document.onmousemove = null;
-                document.onmouseup = null;
-            };
+            document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
+        };
+
+        // Dukungan sentuh (mobile/tablet) untuk resize
+        resizeBtn.ontouchstart = function(e) {
+            e.preventDefault(); e.stopPropagation();
+            var touch = e.touches[0];
+            var startX = touch.clientX, startY = touch.clientY;
+            var startWidth = wrapper.offsetWidth, startHeight = wrapper.offsetHeight;
+            var boxLeft = wrapper.offsetLeft, boxTop = wrapper.offsetTop;
+            var minSize = 30;
+
+            function onTouchMove(e) {
+                var t = e.touches[0];
+                var deltaX = t.clientX - startX;
+                var deltaY = t.clientY - startY;
+                var newWidth = Math.max(minSize, startWidth + deltaX);
+                var newHeight = Math.max(minSize, startHeight + deltaY);
+                if(boxLeft + newWidth > area.offsetWidth) newWidth = area.offsetWidth - boxLeft;
+                if(boxTop + newHeight > area.offsetHeight) newHeight = area.offsetHeight - boxTop;
+                wrapper.style.width = newWidth + "px";
+                wrapper.style.height = newHeight + "px";
+            }
+            function onTouchEnd() {
+                document.removeEventListener('touchmove', onTouchMove);
+                document.removeEventListener('touchend', onTouchEnd);
+            }
+            document.addEventListener('touchmove', onTouchMove, {passive:false});
+            document.addEventListener('touchend', onTouchEnd);
         };
     };
 
@@ -468,12 +509,7 @@
             for (var i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
 
             const pdfDoc = await PDFLib.PDFDocument.load(bytes);
-            
-            // PERBAIKAN: Gunakan offsetWidth/Height dari canvas (resolusi layar), bukan resolusi asli file PDF
-            var canvas = document.getElementById("pdf-canvas-preview");
-            var areaDisplayWidth = canvas.offsetWidth;
-            var areaDisplayHeight = canvas.offsetHeight;
-            
+
             var ttdBytes = await fetch(localStorage.getItem('ttd_kepsek')).then(res => res.arrayBuffer());
             var embedTtd = await pdfDoc.embedPng(ttdBytes);
 
@@ -484,17 +520,24 @@
 
                 var targetPage = pdfDoc.getPages()[pageNum - 1]; 
                 var { width, height } = targetPage.getSize();
-                
-                // Kalkulasi skala PDF vs Tampilan Layar
-                var scaleX = width / areaDisplayWidth; 
-                var scaleY = height / areaDisplayHeight;
 
                 sigList.forEach(function(sig){
-                    let left = parseFloat(sig.left), top = parseFloat(sig.top);
-                    if(String(sig.left).includes('%')) left = left / 100 * areaDisplayWidth;
-                    if(String(sig.top).includes('%')) top = top / 100 * areaDisplayHeight;
-                    
-                    targetPage.drawImage(embedTtd, {
+                    // PENTING: gunakan bingkai referensi (refW/refH) milik
+                    // masing-masing tanda tangan — yaitu ukuran TAMPILAN kanvas
+                    // (CSS px) pada saat tanda tangan itu ditempatkan/disimpan.
+                    // Ini harus sama persis dengan sistem koordinat tempat
+                    // sig.left/sig.top diambil (offsetLeft/offsetTop), agar
+                    // posisi hasil cetak PDF sama dengan posisi yang diatur user.
+                    var refW = sig.refW || width;
+                    var refH = sig.refH || height;
+
+                    var scaleX = width / refW;
+                    var scaleY = height / refH;
+
+                    var left = parseFloat(sig.left);
+                    var top = parseFloat(sig.top);
+
+                    targetPage.drawImage(embedTtd,{
                         x: left * scaleX,
                         y: height - (top * scaleY) - (sig.height * scaleY),
                         width: sig.width * scaleX,
@@ -517,6 +560,7 @@
         } catch(e) { 
             alert("❌ Gagal Memproses PDF: " + e.message); 
         } finally { 
+            // PERBAIKAN FATAL: Menghapus typo huruf h agar tidak terjadi crash lagi
             tutupLoading(); 
         }
     };
