@@ -1,4 +1,3 @@
-<!-- TAMBAHKAN LIBRARY PDF.JS UNTUK RENDER PRATINJAU -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
 <style>
@@ -23,15 +22,17 @@
     .sup-badge.wait { background: #f59e0b; } .sup-badge.acc { background: #10b981; } .sup-badge.reject { background: #ef4444; }
     .alasan-box { background: #fee2e2; border-left: 3px solid #ef4444; padding: 8px 10px; margin-top: 10px; border-radius: 4px; font-size: 11px; color: #991b1b;}
 
-    /* VIRTUAL AREA & MULTI-SIGNATURE */
-    #pdf-virtual-area { position: relative; width: 100%; max-width: 400px; height: 565px; background: white; border: 2px solid #e2e8f0; margin: 0 auto; overflow: hidden; border-radius: 8px; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
+    /* VIRTUAL AREA (SEKARANG FLEKSIBEL MENGIKUTI UKURAN KERTAS) */
+    #pdf-virtual-area { position: relative; width: 100%; max-width: 450px; background: white; border: 2px solid #e2e8f0; margin: 0 auto; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    #pdf-canvas-preview { width: 100%; display: block; } /* Canvas menyesuaikan kotak */
     
-    /* STYLE UNTUK CANVAS PRATINJAU PDF */
-    #pdf-canvas-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.9; }
-    
-    .drag-ttd-item { position: absolute; width: 110px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed #3b82f6; border-radius:6px; background:rgba(255,255,255,0.3);}
-    .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; background:rgba(255,255,255,0.7);}
+    .drag-ttd-item { position: absolute; width: 100px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed #3b82f6; border-radius:6px; background:rgba(255,255,255,0.4);}
+    .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; background:rgba(255,255,255,0.8);}
     .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; cursor: pointer; font-size: 12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
+
+    /* KONTROL HALAMAN PDF */
+    .pdf-controls { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+    .pdf-controls span { font-weight: 800; color: #1e293b; font-size: 13px; }
 </style>
 
 <div class="sup-container">
@@ -40,7 +41,6 @@
         <button class="sup-btn outline" id="btn-show-ttd" style="display:none;" onclick="document.getElementById('modal-set-ttd').style.display='flex'">⚙️ Stempel & TTD Lokal</button>
     </div>
 
-    <!-- FORM UPLOAD (HANYA GURU) -->
     <div id="area-upload-guru" style="display:none;">
         <div class="sup-upload-box">
             <h3 style="margin-top:0;">⬆️ Upload Berkas</h3>
@@ -61,39 +61,38 @@
         </div>
     </div>
 
-    <!-- DAFTAR DOKUMEN -->
     <h3 style="color:#334155; border-bottom: 2px dashed #e2e8f0; padding-bottom:10px;">📄 Daftar Berkas Supervisi</h3>
     <div class="sup-grid" id="list-dokumen-sup"></div>
 </div>
 
-<!-- MODAL ACC & MULTI-SIGNATURE -->
-<div class="modal" id="modal-acc" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
-    <div style="background:white; padding:20px; border-radius:12px; max-width:450px; width:90%; max-height:95vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
-        <h3 style="text-align:center; color:#047857; margin-top:0;">✍️ Papan Tanda Tangan</h3>
-        <p style="font-size:11px; color:#6b7280; text-align:center; margin-bottom:15px;">Klik tombol di bawah berkali-kali jika butuh lebih dari 1 stempel/TTD.</p>
+<div class="modal" id="modal-acc" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
+    <div style="background:white; padding:20px; border-radius:12px; max-width:500px; width:95%; max-height:98vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
+        <h3 style="text-align:center; color:#047857; margin-top:0; margin-bottom:5px;">✍️ Papan Tanda Tangan</h3>
         
-        <button class="sup-btn blue" style="display:block; margin:0 auto 15px; width:100%;" onclick="window.tambahTtdKeCanvas()">➕ Tambah TTD / Stempel</button>
+        <div class="pdf-controls">
+            <button class="sup-btn gray" onclick="window.prevPdfPage()">◀ Prev</button>
+            <span id="pdf-page-info">Halaman - / -</span>
+            <button class="sup-btn gray" onclick="window.nextPdfPage()">Next ▶</button>
+        </div>
+
+        <button class="sup-btn blue" style="display:block; margin:0 auto 15px; width:100%;" onclick="window.tambahTtdKeCanvas()">➕ Tambah TTD di Halaman Ini</button>
         
-        <!-- AREA VIRTUAL (SEKARANG BISA MENAMPILKAN PDF) -->
         <div id="pdf-virtual-area">
             <div id="pdf-loading-text" style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">
-                ⏳ Memuat Pratinjau Dokumen...
+                ⏳ Memuat Dokumen...
             </div>
-            <!-- Canvas PDF.js akan masuk ke sini -->
         </div>
         
         <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="sup-btn gray" style="flex:1;" onclick="document.getElementById('modal-acc').style.display='none'">Batal</button>
-            <button class="sup-btn" style="flex:2;" onclick="window.eksekusiAccDokumen()">✅ Terapkan & Simpan Final</button>
+            <button class="sup-btn red" style="flex:1;" onclick="document.getElementById('modal-acc').style.display='none'">Batal</button>
+            <button class="sup-btn" style="flex:2;" onclick="window.eksekusiAccDokumen()">✅ Terapkan & Simpan</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL TOLAK DOKUMEN -->
 <div class="modal" id="modal-tolak" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:white; padding:25px; border-radius:12px; max-width:400px; width:90%; text-align:center;">
         <h3 style="color:#ef4444; margin-top:0;">❌ Tolak Dokumen</h3>
-        <p style="font-size:12px; color:#6b7280;">Berikan alasan mengapa dokumen ini ditolak agar guru yang bersangkutan dapat memperbaikinya.</p>
         <textarea id="alasan-tolak" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-family:inherit; margin-bottom:15px;" placeholder="Tuliskan keterangan revisi / alasan penolakan..."></textarea>
         <div style="display:flex; gap:10px;">
             <button class="sup-btn gray" style="flex:1;" onclick="document.getElementById('modal-tolak').style.display='none'">Batal</button>
@@ -102,11 +101,9 @@
     </div>
 </div>
 
-<!-- MODAL SETTING TTD LOKAL -->
 <div class="modal" id="modal-set-ttd" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:white; padding:25px; border-radius:12px; text-align:center; max-width:350px; width:90%;">
         <h3 style="color:#3b82f6; margin-top:0;">⚙️ Upload TTD Lokal</h3>
-        <p style="font-size:11px; color:#6b7280; margin-bottom:15px;">Gambar ini (PNG Transparan) hanya disimpan di memori *browser* perangkat Anda saat ini demi keamanan.</p>
         <input type="file" id="file-ttd" accept="image/png" style="width:100%; margin-bottom:15px; border:1px solid #ccc; padding:10px; border-radius:8px;">
         <button class="sup-btn blue" style="width:100%; padding:10px;" onclick="window.simpanTtdLokal()">💾 Simpan ke Memori</button>
         <button class="sup-btn outline" style="width:100%; margin-top:10px; padding:10px;" onclick="document.getElementById('modal-set-ttd').style.display='none'">Tutup</button>
@@ -119,7 +116,26 @@
     var curUser = JSON.parse(localStorage.getItem('user_login'));
     var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
     var activeDocId = "", activeDocUrl = "";
-    window.tempPdfBase64 = null; // Menyimpan memori PDF sementara agar lebih cepat
+    
+    // Variabel PDF Global
+    window.tempPdfBase64 = null; 
+    window.pdfDocProxy = null;
+    window.currentPdfPage = 1;
+    window.totalPdfPages = 1;
+
+    // FUNGSI PEMBANTU UNTUK LOADING
+    function ubahTeksLoading(teks) {
+        var loading = document.getElementById('ios-loading');
+        var loadingText = document.querySelector('#ios-loading .ios-loading-text');
+        if (loading) {
+            if(loadingText) loadingText.textContent = teks;
+            loading.classList.add('active');
+        }
+    }
+    function tutupLoading() {
+        var loading = document.getElementById('ios-loading');
+        if (loading) loading.classList.remove('active');
+    }
 
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
@@ -128,7 +144,9 @@
         document.getElementById('area-upload-guru').style.display = 'block';
     }
 
+    // LOAD DATA DARI DATABASE
     window.loadDaftarSupervisi = async function() {
+        ubahTeksLoading("Membaca Database...");
         try {
             var res = await fetch(API_URL + "?action=get_supervisi");
             var json = await res.json();
@@ -138,7 +156,8 @@
             if(json.status === 'success') {
                 var dataFiltered = isKepsek ? json.data : json.data.filter(d => d.nama === curUser.nama);
                 if(dataFiltered.length === 0) {
-                    container.innerHTML = "<p style='color:#9ca3af; text-align:center; width:100%;'>Belum ada dokumen supervisi.</p>"; return;
+                    container.innerHTML = "<p style='color:#9ca3af; text-align:center; width:100%;'>Belum ada dokumen supervisi.</p>"; 
+                    tutupLoading(); return;
                 }
 
                 dataFiltered.reverse().forEach(d => {
@@ -156,8 +175,7 @@
                                 <a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="flex:1; text-decoration:none;">👀 Pratinjau</a>
                                 <button class="sup-btn orange" style="flex:1;" onclick="window.bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">✍️ Sign Dokumen</button>
                                 <button class="sup-btn red" style="flex:1;" onclick="window.bukaModalTolak('${d.id_dokumen}')">❌ Tolak</button>
-                            </div>
-                        `;
+                            </div>`;
                     } else if (isAcc) {
                         actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_acc}" target="_blank" class="sup-btn" style="width:100%; text-decoration:none;">📄 Download PDF Final</a></div>`;
                     } else {
@@ -180,16 +198,15 @@
                         </div>`;
                 });
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error(e); } 
+        finally { tutupLoading(); }
     };
 
     window.prosesUploadDokumen = function(e) {
         e.preventDefault();
         var fileInput = document.getElementById('sup-file');
         if(fileInput.files.length === 0) return alert("Pilih file PDF!");
-        
-        var loading = document.getElementById('ios-loading');
-        if(loading) loading.classList.add('active'); 
+        ubahTeksLoading("Mengunggah Berkas...");
         
         var reader = new FileReader();
         reader.onload = async function() {
@@ -198,8 +215,7 @@
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 alert("✅ Berkas berhasil diunggah!"); fileInput.value = "";
                 window.loadDaftarSupervisi();
-            } catch(e) { alert("Gagal mengupload berkas."); }
-            finally { if(loading) loading.classList.remove('active'); }
+            } catch(e) { alert("Gagal mengupload berkas."); tutupLoading(); }
         };
         reader.readAsDataURL(fileInput.files[0]);
     };
@@ -224,44 +240,36 @@
 
     window.eksekusiTolakDokumen = async function() {
         var alasan = document.getElementById('alasan-tolak').value;
-        if (!alasan) return alert("Harap isi keterangan alasan mengapa dokumen ini ditolak!");
-
+        if (!alasan) return alert("Harap isi alasan penolakan!");
         document.getElementById('modal-tolak').style.display = 'none';
-        var loading = document.getElementById('ios-loading');
-        if(loading) loading.classList.add('active');
-
+        
+        ubahTeksLoading("Mengirim Penolakan...");
         try {
-            await fetch(API_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ action: "reject_supervisi", id_dokumen: activeDocId, alasan: alasan }) 
-            });
+            await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "reject_supervisi", id_dokumen: activeDocId, alasan: alasan }) });
             alert("❌ Dokumen berhasil dikembalikan/ditolak.");
             window.loadDaftarSupervisi();
-        } catch(e) { alert("Gagal menolak dokumen."); }
-        finally { if(loading) loading.classList.remove('active'); }
+        } catch(e) { alert("Gagal menolak dokumen."); tutupLoading(); }
     };
 
     // ========================================================
-    // LOGIKA BARU: BUKA MODAL ACC & RENDER PREVIEW PDF.JS
+    // LOGIKA RENDER PDF (PILIH HALAMAN & UKURAN DINAMIS)
     // ========================================================
     window.bukaModalAcc = async function(id, url) {
-        if(!localStorage.getItem('ttd_kepsek')) return alert("⚠️ Anda belum menyimpan gambar Stempel/TTD. Klik tombol '⚙️ Stempel & TTD Lokal' di atas terlebih dahulu.");
+        if(!localStorage.getItem('ttd_kepsek')) return alert("⚠️ Anda belum menyimpan gambar Stempel/TTD Lokal!");
         activeDocId = id; activeDocUrl = url;
         
         var area = document.getElementById('pdf-virtual-area');
-        area.innerHTML = '<div id="pdf-loading-text" style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">⏳ Memuat Pratinjau Dokumen...</div>';
+        area.innerHTML = '<div id="pdf-loading-text" style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">⏳ Menarik Data PDF...</div>';
         document.getElementById('modal-acc').style.display = 'flex';
 
         try {
-            // 1. Tarik Data PDF Asli
             var resPdf = await fetch(API_URL + "?action=get_pdf_base64&url=" + encodeURIComponent(activeDocUrl.trim()));
             var jsonPdf = await resPdf.json();
             if(jsonPdf.status !== 'success') throw new Error("Gagal mengambil PDF asli.");
             
-            // Simpan ke memori sementara agar pas klik Terapkan tidak usah loading lama lagi
             window.tempPdfBase64 = jsonPdf.base64;
-
-            // 2. Render Halaman Terakhir Pakai PDF.js
+            
+            // Render PDF Pertama Kali
             var pdfjsLib = window['pdfjs-dist/build/pdf'];
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
@@ -269,33 +277,59 @@
             var uint8Array = new Uint8Array(pdfData.length);
             for (var i = 0; i < pdfData.length; i++) { uint8Array[i] = pdfData.charCodeAt(i); }
 
-            var pdfDoc = await pdfjsLib.getDocument({data: uint8Array}).promise;
-            var page = await pdfDoc.getPage(pdfDoc.numPages); // Ambil halaman paling akhir
+            window.pdfDocProxy = await pdfjsLib.getDocument({data: uint8Array}).promise;
+            window.totalPdfPages = window.pdfDocProxy.numPages;
+            window.currentPdfPage = 1; // Default ke halaman 1
             
-            var viewport = page.getViewport({scale: 1.5}); 
-            var canvas = document.createElement('canvas');
-            canvas.id = "pdf-canvas-preview";
-            var context = canvas.getContext('2d');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            
-            await page.render({canvasContext: context, viewport: viewport}).promise;
-
-            // Hapus teks loading dan masukkan canvas
-            area.innerHTML = '';
-            area.appendChild(canvas);
-
+            await window.renderPdfPage(window.currentPdfPage);
         } catch(e) {
             console.error(e);
-            area.innerHTML = '<div style="position:absolute; top:45%; width:100%; text-align:center; color:#ef4444; font-weight:bold; z-index:2;">Gagal memuat pratinjau visual.<br><small style="color:#6b7280;">Bapak tetap bisa menempelkan TTD secara manual.</small></div>';
+            area.innerHTML = '<div style="position:absolute; top:45%; width:100%; text-align:center; color:#ef4444; font-weight:bold; z-index:2;">Gagal memuat pratinjau.</div>';
         }
     };
 
+    window.renderPdfPage = async function(pageNum) {
+        if(!window.pdfDocProxy) return;
+        
+        var area = document.getElementById('pdf-virtual-area');
+        area.innerHTML = '<div style="position:absolute; top:45%; width:100%; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px; z-index:2;">⏳ Memuat Halaman '+pageNum+'...</div>';
+        
+        var page = await window.pdfDocProxy.getPage(pageNum);
+        var viewport = page.getViewport({scale: 1.5}); 
+        
+        var canvas = document.createElement('canvas');
+        canvas.id = "pdf-canvas-preview";
+        var context = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        await page.render({canvasContext: context, viewport: viewport}).promise;
+
+        area.innerHTML = '';
+        area.appendChild(canvas);
+        
+        document.getElementById('pdf-page-info').textContent = "Halaman " + pageNum + " dari " + window.totalPdfPages;
+    };
+
+    // NAVIGASI HALAMAN
+    window.prevPdfPage = function() {
+        if (window.currentPdfPage <= 1) return;
+        window.currentPdfPage--;
+        window.renderPdfPage(window.currentPdfPage);
+    };
+    
+    window.nextPdfPage = function() {
+        if (window.currentPdfPage >= window.totalPdfPages) return;
+        window.currentPdfPage++;
+        window.renderPdfPage(window.currentPdfPage);
+    };
+
+    // TAMBAH TTD (Bisa Geser Tanpa Bug!)
     window.tambahTtdKeCanvas = function() {
         var area = document.getElementById('pdf-virtual-area');
         var wrapper = document.createElement('div');
         wrapper.className = 'drag-ttd-item';
-        wrapper.style.left = '140px'; wrapper.style.top = '100px';
+        wrapper.style.left = '30%'; wrapper.style.top = '30%';
 
         var img = document.createElement('img');
         img.src = localStorage.getItem('ttd_kepsek');
@@ -309,7 +343,7 @@
 
         var p1=0, p2=0, p3=0, p4=0;
         wrapper.onmousedown = function(e) {
-            if(e.target === delBtn) return; // Jangan drag kalau ngeklik tombol hapus
+            if(e.target === delBtn) return; 
             e.preventDefault(); p3 = e.clientX; p4 = e.clientY;
             document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
             document.onmousemove = function(e) {
@@ -320,30 +354,40 @@
         };
     };
 
+    // PROSES SIMPAN PDF DENGAN KOORDINAT SUPER AKURAT
     window.eksekusiAccDokumen = async function() {
         var items = document.querySelectorAll('.drag-ttd-item');
-        if(items.length === 0) return alert("⚠️ Anda belum membubuhkan tanda tangan. Klik 'Tambah TTD' terlebih dahulu.");
+        if(items.length === 0) return alert("⚠️ Anda belum membubuhkan tanda tangan di halaman ini.");
 
         document.getElementById('modal-acc').style.display = 'none';
-        var loading = document.getElementById('ios-loading');
-        if(loading) loading.classList.add('active');
+        ubahTeksLoading("Menerapkan Tanda Tangan & Menyimpan...");
         
         try {
-            // Kita pakai memori PDF yang sudah ditarik saat buka modal (Sangat Cepat!)
             if(!window.tempPdfBase64) throw new Error("Data PDF hilang, harap ulangi proses Sign.");
 
             const pdfDoc = await PDFLib.PDFDocument.load(window.tempPdfBase64);
-            const lastPage = pdfDoc.getPages().pop();
-            const { width, height } = lastPage.getSize();
+            // Ambil Halaman yang Sedang Dibuka Saja! (Bukan Last Page Lagi)
+            const targetPage = pdfDoc.getPages()[window.currentPdfPage - 1]; 
+            const { width, height } = targetPage.getSize();
             
-            var scaleX = width / 400; var scaleY = height / 565;
+            // Perhitungan Skala Dinamis Mengikuti Ukuran Kotak Halaman Saat Ini
+            var area = document.getElementById('pdf-virtual-area');
+            var areaRealWidth = area.offsetWidth;
+            var areaRealHeight = area.offsetHeight;
+            
+            var scaleX = width / areaRealWidth; 
+            var scaleY = height / areaRealHeight;
+            
             var ttdBytes = await fetch(localStorage.getItem('ttd_kepsek')).then(res => res.arrayBuffer());
             var embedTtd = await pdfDoc.embedPng(ttdBytes);
 
             items.forEach(function(item) {
-                lastPage.drawImage(embedTtd, { 
-                    x: parseInt(item.style.left || 0) * scaleX, 
-                    y: height - (parseInt(item.style.top || 0) * scaleY) - (item.offsetHeight * scaleY), 
+                var itemLeft = parseInt(item.style.left || item.offsetLeft);
+                var itemTop = parseInt(item.style.top || item.offsetTop);
+                
+                targetPage.drawImage(embedTtd, { 
+                    x: itemLeft * scaleX, 
+                    y: height - (itemTop * scaleY) - (item.offsetHeight * scaleY), 
                     width: item.offsetWidth * scaleX, 
                     height: item.offsetHeight * scaleY 
                 });
@@ -354,16 +398,16 @@
             var jsonAcc = await resAcc.json();
             
             if(jsonAcc.status === 'success') {
-                alert("✅ Luar Biasa! Dokumen telah di-ACC dan Tanda Tangan berhasil dicetak permanen.");
-                window.tempPdfBase64 = null; // bersihkan memori
-                window.loadDaftarSupervisi();
+                alert("✅ Luar Biasa! TTD telah dicetak tepat di Halaman " + window.currentPdfPage + ".");
+                window.tempPdfBase64 = null; 
+                window.loadDaftarSupervisi(); // Memuat ulang data
             } else {
                 throw new Error(jsonAcc.message);
             }
-        } catch(e) { alert("❌ Gagal Memproses PDF: " + e.message); } 
-        finally { if(loading) loading.classList.remove('active'); }
+        } catch(e) { alert("❌ Gagal Memproses PDF: " + e.message); tutupLoading(); } 
     };
 
+    // Jalankan sistem
     window.loadDaftarSupervisi();
 })();
 </script>
