@@ -117,8 +117,10 @@
 <script>
 (function() {
     var API_URL = (typeof SCRIPT_URL !== 'undefined') ? SCRIPT_URL : 'https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec';
-    var curUser = JSON.parse(localStorage.getItem('user_login'));
-    var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
+    
+    var curUser = JSON.parse(localStorage.getItem('user_login') || '{}');
+    var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || (curUser.nama && curUser.nama.toLowerCase().includes("kepala")));
+    
     var activeDocId = "", activeDocUrl = "";
     
     window.tempPdfBase64 = null; 
@@ -127,19 +129,15 @@
     window.totalPdfPages = 1;
     window.signaturesByPage = {}; 
 
+    // Loading sederhana (karena #ios-loading tidak ada)
     function ubahTeksLoading(teks) {
-        var loading = document.getElementById('ios-loading');
-        var loadingText = document.querySelector('#ios-loading .ios-loading-text');
-        if (loading) {
-            if(loadingText) loadingText.textContent = teks;
-            loading.classList.add('active');
-        }
+        console.log("%c[LOADING] " + teks, "color: #3b82f6; font-weight: bold");
     }
     function tutupLoading() {
-        var loading = document.getElementById('ios-loading');
-        if (loading) loading.classList.remove('active');
+        console.log("%c[LOADING] Selesai", "color: #10b981");
     }
 
+    // Inisialisasi tampilan
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
         document.getElementById('area-upload-guru').style.display = 'none';
@@ -372,38 +370,64 @@
         var area = document.getElementById('pdf-virtual-area');
         var wrapper = document.createElement('div');
         wrapper.className = 'drag-ttd-item';
-        wrapper.style.left = left; wrapper.style.top = top;
+        wrapper.style.left = left; 
+        wrapper.style.top = top;
         if(w) wrapper.style.width = w + "px";
+        if(h) wrapper.style.height = h + "px";
 
         var img = document.createElement('img');
         img.src = localStorage.getItem('ttd_kepsek');
-        img.style.width = '100%'; img.style.pointerEvents = 'none';
+        img.style.width = '100%'; 
+        img.style.height = '100%';
+        img.style.pointerEvents = 'none';
+        img.style.objectFit = 'contain';
 
         var delBtn = document.createElement('div');
-        delBtn.className = 'btn-delete-ttd'; delBtn.innerHTML = '✕';
-        delBtn.onclick = function() { wrapper.remove(); };
-
-        wrapper.appendChild(img); wrapper.appendChild(delBtn); area.appendChild(wrapper);
-
-        var p1=0, p2=0, p3=0, p4=0;
-        wrapper.onmousedown = function(e) {
-            if(e.target === delBtn) return; 
-            e.preventDefault(); p3 = e.clientX; p4 = e.clientY;
-            document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
-            document.onmousemove = function(e) {
-                e.preventDefault(); p1 = p3 - e.clientX; p2 = p4 - e.clientY; p3 = e.clientX; p4 = e.clientY;
-                
-                var nTop = wrapper.offsetTop - p2;
-                var nLeft = wrapper.offsetLeft - p1;
-                
-                if(nTop < 0) nTop = 0; if(nLeft < 0) nLeft = 0;
-                if(nTop + wrapper.offsetHeight > area.offsetHeight) nTop = area.offsetHeight - wrapper.offsetHeight;
-                if(nLeft + wrapper.offsetWidth > area.offsetWidth) nLeft = area.offsetWidth - wrapper.offsetWidth;
-                
-                wrapper.style.top = nTop + "px";
-                wrapper.style.left = nLeft + "px";
-            };
+        delBtn.className = 'btn-delete-ttd'; 
+        delBtn.innerHTML = '✕';
+        delBtn.onclick = function(e) { 
+            e.stopImmediatePropagation(); 
+            wrapper.remove(); 
         };
+
+        wrapper.appendChild(img); 
+        wrapper.appendChild(delBtn); 
+        area.appendChild(wrapper);
+
+        // Drag logic yang lebih bersih
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+
+        wrapper.addEventListener('mousedown', function(e) {
+            if(e.target === delBtn) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = wrapper.offsetLeft;
+            startTop = wrapper.offsetTop;
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            
+            let dx = e.clientX - startX;
+            let dy = e.clientY - startY;
+            
+            let newLeft = startLeft + dx;
+            let newTop = startTop + dy;
+
+            // Boundary check
+            newLeft = Math.max(0, Math.min(newLeft, area.offsetWidth - wrapper.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, area.offsetHeight - wrapper.offsetHeight));
+
+            wrapper.style.left = newLeft + "px";
+            wrapper.style.top = newTop + "px";
+        });
+
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
     };
 
     window.eksekusiAccDokumen = async function() {
