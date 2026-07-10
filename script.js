@@ -176,26 +176,28 @@ function showLoginPopup(type, message) {
 
 
 // =============================================
-// UPDATE MENU LOGIN/LOGOUT
+// UPDATE MENU LOGIN/LOGOUT (Otomatis memunculkan Absensi untuk Guru)
 // =============================================
 function updateMenuLogin() {
     const userLogin = localStorage.getItem('user_login');
     const tabLogin  = document.getElementById('tab-login');
     const tabLogout = document.getElementById('tab-logout');
-
-    if (!tabLogin || !tabLogout) {
-        console.warn('tab-login atau tab-logout tidak ditemukan!');
-        return;
-    }
+    const tabAbsensi = document.getElementById('tab-absensi'); // Target Menu Absensi
 
     if (userLogin) {
-        tabLogin.style.display  = 'none';
-        tabLogout.style.display = '';
+        if(tabLogin) tabLogin.style.display  = 'none';
+        if(tabLogout) tabLogout.style.display = '';
         const user = JSON.parse(userLogin);
-        tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
+        if(tabLogout) tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
+        
+        // Munculkan menu absensi HANYA jika role adalah guru
+        if (tabAbsensi) {
+            tabAbsensi.style.display = (user.role === 'guru') ? 'inline-block' : 'none';
+        }
     } else {
-        tabLogin.style.display  = '';
-        tabLogout.style.display = 'none';
+        if(tabLogin) tabLogin.style.display  = '';
+        if(tabLogout) tabLogout.style.display = 'none';
+        if(tabAbsensi) tabAbsensi.style.display = 'none'; // Sembunyikan jika belum login
     }
 }
 
@@ -479,210 +481,193 @@ async function submitFormSiswaBaru(e) {
 }
 
 // =============================================
-// FITUR ABSENSI GURU (LMS)
+// FITUR ABSENSI GURU (KALENDER INTERAKTIF & IPHONE LOADING)
 // =============================================
-var globalSiswa = [];
+var globalSiswaAbsen = [];
+var kalenderAbsenDate = new Date();
+var tglPilihanAbsen = "";
 
-// Fungsi untuk menyiapkan tampilan saat menu Absensi diklik
-function initAbsensi() {
-    const tglAbsen = document.getElementById('tgl-absen');
-    if (tglAbsen) tglAbsen.valueAsDate = new Date(); // Set tanggal hari ini
+window.initAbsensi = async function() {
+    var userLogStr = localStorage.getItem("user_login");
+    var panelAbsen = document.getElementById("panel-absen");
+    if (!panelAbsen) return;
 
-    // Verifikasi Akses (Pastikan hanya Guru yang bisa melihat form)
-    // Catatan: Key yang benar di sistem login Bapak adalah 'user_login'
-    const userLogStr = localStorage.getItem("user_login"); 
-    const panelAbsen = document.getElementById("panel-absen");
-    
-    if (panelAbsen) {
-        if (!userLogStr) {
-            panelAbsen.style.display = "block";
-            panelAbsen.innerHTML = `<div style="text-align:center; padding: 50px;"><h2 style="color:#ef4444;">⛔ Akses Ditolak</h2><p>Harap login sebagai Guru untuk mengakses menu absensi ini.</p></div>`;
-            return;
-        }
-
-        const userLog = JSON.parse(userLogStr);
-        if (userLog.role !== 'guru') {
-            panelAbsen.style.display = "block";
-            panelAbsen.innerHTML = `<div style="text-align:center; padding: 50px;"><h2 style="color:#ef4444;">⛔ Akses Ditolak</h2><p>Hanya Guru yang dapat mengakses menu absensi ini.</p></div>`;
-        } else {
-            panelAbsen.style.display = "block";
-        }
+    if (!userLogStr) {
+        panelAbsen.innerHTML = `<div style="text-align:center; padding: 50px;"><h2>⛔ Akses Ditolak</h2><p>Harap login untuk mengakses menu ini.</p></div>`;
+        return;
     }
-}
-
-// Mengambil Data Siswa berdasarkan Kelas dari Google Sheets
-async function loadDaftarSiswa() {
-    const kelas = document.getElementById('pilih-kelas').value;
-    const container = document.getElementById('daftar-siswa-container');
-    const btnSubmit = document.getElementById('btn-submit-absen');
-    
-    if(!kelas) {
-        container.innerHTML = `<div style="text-align: center; color: #9ca3af; padding: 30px; font-weight: bold; border: 2px dashed #d1d5db; border-radius: 12px;">Silakan pilih kelas terlebih dahulu.</div>`;
-        btnSubmit.disabled = true;
+    var userLog = JSON.parse(userLogStr);
+    if (userLog.role !== 'guru') {
+        panelAbsen.innerHTML = `<div style="text-align:center; padding: 50px;"><h2>⛔ Akses Ditolak</h2><p>Hanya Guru yang dapat mengakses menu absensi.</p></div>`;
         return;
     }
 
-    document.getElementById('loader-siswa').style.display = "block";
-    container.innerHTML = "";
-    btnSubmit.disabled = true;
+    document.getElementById('main-absen-ui').style.display = 'block';
+    await window.loadDataAbsensiUtama();
+};
 
+window.loadDataAbsensiUtama = async function() {
+    document.getElementById('absen-loading-teks').style.display = 'block';
     try {
-        // Memanfaatkan SCRIPT_URL yang sudah ada di baris paling atas script.js
-        const res = await fetch(SCRIPT_URL + "?action=get_siswa");
-        const json = await res.json();
-        
-        if(json.status === 'success') {
-            globalSiswa = json.data;
-            const siswaKelasIni = globalSiswa.filter(s => s.kelas === kelas);
+        var resSiswa = await fetch(SCRIPT_URL + "?action=get_siswa");
+        var jsonSiswa = await resSiswa.json();
+        if(jsonSiswa.status === 'success') {
+            globalSiswaAbsen = jsonSiswa.data;
+            var kelasSet = new Set();
             
-            if(siswaKelasIni.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: #ef4444; padding: 30px; font-weight: bold; border: 2px dashed #fca5a5; border-radius: 12px;">Belum ada data siswa di ${kelas}.<br><br>Klik tombol "Tambah Siswa" di atas.</div>`;
-            } else {
-                renderTableSiswa(siswaKelasIni);
-                btnSubmit.disabled = false;
-            }
-        }
-    } catch(e) {
-        container.innerHTML = `<h3 style="color:red; text-align:center;">Gagal memuat data. Periksa koneksi internet.</h3>`;
-    } finally {
-        document.getElementById('loader-siswa').style.display = "none";
-    }
-}
+            // Filter agar dummy sistem untuk pendaftaran kelas tidak muncul di layar
+            globalSiswaAbsen.forEach(function(s) {
+                if(s.kelas && s.nis !== "DUMMY_KELAS") kelasSet.add(s.kelas);
+            });
 
-// Menampilkan Data Siswa beserta Tombol Radio Absensi
-function renderTableSiswa(dataSiswa) {
-    const container = document.getElementById('daftar-siswa-container');
+            var sel = document.getElementById('pilih-kelas-absen');
+            var curr = sel.value;
+            sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            Array.from(kelasSet).sort().forEach(function(k) {
+                sel.innerHTML += `<option value="${k}">${k}</option>`;
+            });
+            if(curr && kelasSet.has(curr)) sel.value = curr;
+        }
+    } catch(e) { console.log("Gagal load siswa"); }
+    document.getElementById('absen-loading-teks').style.display = 'none';
+    window.renderKalenderAbsensi();
+};
+
+window.gantiKelasAbsen = function() { window.renderKalenderAbsensi(); };
+window.navAbsenBulan = function(dir) { kalenderAbsenDate.setMonth(kalenderAbsenDate.getMonth() + dir); window.renderKalenderAbsensi(); };
+
+window.renderKalenderAbsensi = function() {
+    var grid = document.getElementById('absen-cal-grid');
+    var label = document.getElementById('absen-bulan-label');
+    if(!grid) return;
+
+    var y = kalenderAbsenDate.getFullYear(); var m = kalenderAbsenDate.getMonth();
+    label.textContent = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(kalenderAbsenDate);
+    grid.innerHTML = '';
+
+    var first = new Date(y, m, 1); var last = new Date(y, m+1, 0); var today = new Date();
+    var startIndex = (first.getDay() + 6) % 7;
+
+    for(var i=0; i<startIndex; i++) { grid.innerHTML += `<div class="absen-day muted"></div>`; }
+
+    var kelasTerpilih = document.getElementById('pilih-kelas-absen').value;
+
+    for(var day=1; day<=last.getDate(); day++) {
+        var isToday = (day === today.getDate() && m === today.getMonth() && y === today.getFullYear()) ? 'today' : '';
+        var tglStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+
+        // Disable klik jika kelas belum dipilih
+        var onClick = kelasTerpilih ? `onclick="window.bukaModalAbsenTgl('${tglStr}')"` : `onclick="alert('Pilih kelas di atas terlebih dahulu!')"`;
+
+        grid.innerHTML += `<div class="absen-day ${isToday}" ${onClick}>${day}</div>`;
+    }
+};
+
+window.bukaModalAbsenTgl = function(tgl) {
+    var kelas = document.getElementById('pilih-kelas-absen').value;
+    tglPilihanAbsen = tgl;
+    document.getElementById('judul-absen-tgl').textContent = `Absensi ${kelas} (${tgl})`;
+
+    var container = document.getElementById('list-siswa-absen');
     container.innerHTML = "";
-    
-    // Urutkan berdasarkan nama abjad (A-Z)
-    dataSiswa.sort((a,b) => a.nama.localeCompare(b.nama));
 
-    dataSiswa.forEach((s, index) => {
-        container.innerHTML += `
-            <div class="siswa-card" id="card-${s.nis}">
-                <div class="siswa-info">
-                    <div class="siswa-nama">${index + 1}. ${s.nama}</div>
-                    <div class="siswa-nis">NIS: ${s.nis}</div>
-                </div>
-                <div style="display:flex; align-items:center; gap: 15px;">
-                    <div class="radio-group">
-                        <input type="radio" id="h-${s.nis}" name="absen_${s.nis}" value="Hadir" checked>
-                        <label for="h-${s.nis}">H</label>
-                        
-                        <input type="radio" id="i-${s.nis}" name="absen_${s.nis}" value="Izin">
-                        <label for="i-${s.nis}">I</label>
-                        
-                        <input type="radio" id="s-${s.nis}" name="absen_${s.nis}" value="Sakit">
-                        <label for="s-${s.nis}">S</label>
-                        
-                        <input type="radio" id="a-${s.nis}" name="absen_${s.nis}" value="Alpa">
-                        <label for="a-${s.nis}">A</label>
+    var siswaKelas = globalSiswaAbsen.filter(function(s) { return s.kelas === kelas && s.nis !== "DUMMY_KELAS"; });
+    siswaKelas.sort(function(a,b){ return a.nama.localeCompare(b.nama); });
+
+    if(siswaKelas.length === 0) {
+        container.innerHTML = "<p style='text-align:center; color:#6b7280; font-weight:bold; padding:20px;'>Belum ada siswa di kelas ini.</p>";
+    } else {
+        siswaKelas.forEach(function(s, index) {
+            container.innerHTML += `
+                <div class="siswa-card-absen">
+                    <div><b style="color:#1f2937;">${index+1}. ${s.nama}</b><br><small style="color:#6b7280;">NIS: ${s.nis}</small></div>
+                    <div class="radio-group-absen">
+                        <input type="radio" id="h-${s.nis}" name="absen_${s.nis}" value="Hadir" checked><label for="h-${s.nis}">H</label>
+                        <input type="radio" id="s-${s.nis}" name="absen_${s.nis}" value="Sakit"><label for="s-${s.nis}">S</label>
+                        <input type="radio" id="i-${s.nis}" name="absen_${s.nis}" value="Izin"><label for="i-${s.nis}">I</label>
+                        <input type="radio" id="a-${s.nis}" name="absen_${s.nis}" value="Alpa"><label for="a-${s.nis}">A</label>
                     </div>
-                    <button type="button" class="btn-hapus-siswa" title="Hapus Siswa" onclick="hapusSiswa('${s.nis}', '${s.nama}')">🗑️</button>
                 </div>
-            </div>
-        `;
-    });
-}
-
-// Modal Tambah Siswa Baru
-function bukaModalTambah() {
-    const kelas = document.getElementById('pilih-kelas').value;
-    if(!kelas) return alert("Pilih kelas terlebih dahulu sebelum menambah siswa!");
-    document.getElementById('add-kelas').value = kelas;
-    document.getElementById('add-nis').value = "";
-    document.getElementById('add-nama').value = "";
-    document.getElementById('modal-tambah').classList.add('active');
-}
-
-function tutupModalTambah() { 
-    document.getElementById('modal-tambah').classList.remove('active'); 
-}
-
-// Kirim Data Siswa Baru ke Database
-async function simpanSiswaBaru() {
-    const kelas = document.getElementById('add-kelas').value;
-    const nis = document.getElementById('add-nis').value;
-    const nama = document.getElementById('add-nama').value;
-    if(!nis || !nama) return alert("NIS dan Nama wajib diisi!");
-
-    const btn = document.querySelector('#modal-tambah .btn-green');
-    btn.innerHTML = "Menyimpan..."; btn.disabled = true;
-
-    const payload = { action: "add_siswa_kelas", kelas: kelas, nis: nis, nama: nama };
-    
-    try {
-        const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-        const result = await res.json();
-        if(result.status === "success") {
-            alert("Berhasil! Siswa ditambahkan.");
-            tutupModalTambah();
-            loadDaftarSiswa(); // Refresh otomatis
-        }
-    } catch(e) { 
-        alert("Gagal menyimpan data!"); 
-    } finally { 
-        btn.innerHTML = "Simpan"; btn.disabled = false; 
+            `;
+        });
     }
-}
+    document.getElementById('modal-absen-harian').classList.add('active');
+};
 
-// Menghapus Siswa
-async function hapusSiswa(nis, nama) {
-    if(!confirm(`Apakah Anda yakin ingin MENGHAPUS data siswa bernama: ${nama} (NIS: ${nis}) dari database?`)) return;
+window.simpanAbsenHarian = async function() {
+    var kelas = document.getElementById('pilih-kelas-absen').value;
+    var siswaKelas = globalSiswaAbsen.filter(function(s) { return s.kelas === kelas && s.nis !== "DUMMY_KELAS"; });
+    var dataAbsen = [];
 
-    document.getElementById(`card-${nis}`).style.opacity = "0.5";
-
-    try {
-        const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete_siswa", nis: nis }) });
-        const result = await res.json();
-        if(result.status === "success") {
-            alert("Siswa berhasil dihapus.");
-            loadDaftarSiswa(); // Refresh otomatis
-        } else { 
-            alert("Gagal: " + result.message); 
-        }
-    } catch(e) { 
-        alert("Gagal terhubung ke server."); 
-        document.getElementById(`card-${nis}`).style.opacity = "1"; 
-    }
-}
-
-// Menyimpan Rekap Absensi
-async function submitAbsensi(e) {
-    e.preventDefault();
-    const tanggal = document.getElementById('tgl-absen').value;
-    const kelas = document.getElementById('pilih-kelas').value;
-    const btn = document.getElementById('btn-submit-absen');
-    
-    const kelasSiswa = globalSiswa.filter(s => s.kelas === kelas);
-    let dataAbsen = [];
-
-    // Baca radio button mana saja yang di-klik
-    kelasSiswa.forEach(s => {
-        const radioTerpilih = document.querySelector(`input[name="absen_${s.nis}"]:checked`);
-        if(radioTerpilih) {
-            dataAbsen.push({ nis: s.nis, nama: s.nama, status: radioTerpilih.value });
-        }
+    siswaKelas.forEach(function(s) {
+        var r = document.querySelector(`input[name="absen_${s.nis}"]:checked`);
+        if(r) dataAbsen.push({ nis: s.nis, nama: s.nama, status: r.value });
     });
 
     if(dataAbsen.length === 0) return alert("Tidak ada data siswa untuk diabsen.");
-    if(!confirm(`Kirim data absensi ${kelas} untuk tanggal ${tanggal}?`)) return;
 
-    btn.innerHTML = "⏳ Sedang Mengirim Data..."; btn.disabled = true;
+    document.getElementById('modal-absen-harian').classList.remove('active');
+    document.getElementById('ios-loading').classList.add('active'); // MUNCULKAN IPHONE LOADING
 
-    const payload = { action: "submit_absensi", tanggal: tanggal, kelas: kelas, data_absen: dataAbsen };
+    var payload = { action: "submit_absensi", tanggal: tglPilihanAbsen, kelas: kelas, data_absen: dataAbsen };
 
     try {
-        const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-        const result = await res.json();
-        if(result.status === "success") {
-            alert("Absensi berhasil disimpan ke Database!");
-            // Update widget kalender kiri (Jika function-nya ada)
-            if(typeof fetchRekapAbsensi === "function") { fetchRekapAbsensi(); }
-        }
-    } catch(e) { 
-        alert("Terjadi kesalahan sistem saat mengirim data."); 
-    } finally { 
-        btn.innerHTML = "✅ Simpan Data Absensi"; btn.disabled = false; 
+        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        if(typeof fetchRekapAbsensi === "function") { fetchRekapAbsensi(); } // Refresh chart di home
+    } catch(e) {
+        alert("Gagal menyimpan data!");
+    } finally {
+        document.getElementById('ios-loading').classList.remove('active'); // TUTUP IPHONE LOADING
+        alert("✅ Absensi berhasil disimpan ke Database!");
     }
-}
+};
+
+// Fitur Tambah Kelas (Menggunakan trik dummy siswa agar tersimpan di DB tanpa mengubah kode script Server)
+window.bukaModalTambahKelas = function() { document.getElementById('modal-tambah-kelas').classList.add('active'); };
+window.simpanKelasBaru = async function() {
+    var namaKelas = document.getElementById('input-kelas-baru').value;
+    if(!namaKelas) return alert("Nama kelas wajib diisi!");
+
+    document.getElementById('modal-tambah-kelas').classList.remove('active');
+    document.getElementById('ios-loading').classList.add('active');
+
+    var payload = { action: "add_siswa_kelas", kelas: namaKelas, nis: "DUMMY_KELAS", nama: "DUMMY_KELAS" };
+    try {
+        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        await window.loadDataAbsensiUtama();
+    } catch(e) { alert("Gagal!"); }
+    finally {
+        document.getElementById('input-kelas-baru').value = "";
+        document.getElementById('ios-loading').classList.remove('active');
+    }
+};
+
+// Fitur Tambah Siswa
+window.bukaModalTambahSiswa = function() {
+    var k = document.getElementById('pilih-kelas-absen').value;
+    if(!k) return alert("Pilih kelas di kalender terlebih dahulu!");
+    document.getElementById('add-kelas').value = k;
+    document.getElementById('modal-tambah-siswa').classList.add('active');
+};
+window.simpanSiswaBaru = async function() {
+    var kelas = document.getElementById('add-kelas').value;
+    var nis = document.getElementById('add-nis').value;
+    var nama = document.getElementById('add-nama').value;
+    if(!nis || !nama) return alert("Wajib diisi!");
+
+    document.getElementById('modal-tambah-siswa').classList.remove('active');
+    document.getElementById('ios-loading').classList.add('active');
+
+    var payload = { action: "add_siswa_kelas", kelas: kelas, nis: nis, nama: nama };
+    try {
+        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        await window.loadDataAbsensiUtama();
+    } catch(e) { alert("Gagal!"); }
+    finally {
+        document.getElementById('add-nis').value = "";
+        document.getElementById('add-nama').value = "";
+        document.getElementById('ios-loading').classList.remove('active');
+    }
+};
+
+window.tutupModalAbsen = function(id) { document.getElementById(id).classList.remove('active'); };
