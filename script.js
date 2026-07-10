@@ -593,14 +593,15 @@ window.bukaModalAbsenTgl = function(tgl) {
     var siswaKelas = globalSiswaAbsen.filter(function(s) { return s.kelas === kelas && s.nis !== "DUMMY_KELAS"; });
     siswaKelas.sort(function(a,b){ return a.nama.localeCompare(b.nama); });
 
-    // CARI RIWAYAT ABSEN (Dengan Pembersihan Tanda Petik & Zone Waktu)
+    // CARI RIWAYAT ABSEN (Dengan Pembersihan Tanda Petik & Zone Waktu Ekstra Ketat)
     var riwayatAbsen = window.globalDataAbsensi ? window.globalDataAbsensi.filter(function(a) {
         var tglBersih = "";
-        if (a.tanggal && String(a.tanggal).includes("T")) {
-             var d = new Date(a.tanggal);
+        var strTgl = String(a.tanggal).trim();
+        if (strTgl.includes("T")) {
+             var d = new Date(strTgl);
              tglBersih = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
         } else {
-             tglBersih = a.tanggal ? String(a.tanggal).replace(/['"]/g, '').trim().substring(0, 10) : "";
+             tglBersih = strTgl.replace(/['"]/g, '').substring(0, 10);
         }
         var kelasBersih = a.kelas ? String(a.kelas).trim() : "";
         return tglBersih === tgl && kelasBersih === kelas;
@@ -612,11 +613,13 @@ window.bukaModalAbsenTgl = function(tgl) {
         siswaKelas.forEach(function(s, index) {
             var statusSiswa = "Hadir"; 
             
-            // Pencocokan NIS yang kebal dari tanda petik (') Google Sheet
+            // Pencocokan NIS dan Nama yang kebal dari tanda petik (') Google Sheet
             var absenSiswaIni = riwayatAbsen.find(function(a) { 
                 var dbNis = String(a.nis).replace(/['"]/g, '').trim();
                 var localNis = String(s.nis).replace(/['"]/g, '').trim();
-                return dbNis === localNis || a.nama === s.nama; 
+                var dbNama = String(a.nama).trim().toLowerCase();
+                var localNama = String(s.nama).trim().toLowerCase();
+                return dbNis === localNis || dbNama === localNama; 
             });
             
             if(absenSiswaIni) {
