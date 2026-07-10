@@ -98,9 +98,11 @@
 
     if (curUser && (curUser.role === 'guru' || curUser.role === 'kepsek')) {
         document.getElementById('panel-supervisi').style.display = 'block';
-        if (curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala")) {
-            document.getElementById('btn-show-ttd').style.display = 'inline-block';
-        }
+        if (curUser.jabatan === 'kepsek') {
+        // Tampilkan semua dokumen untuk di-ACC
+    } else if (curUser.jabatan === 'guru_kelas' || curUser.jabatan === 'bidang_studi') {
+        // Hanya tampilkan dokumen milik guru tersebut
+    }
         loadDaftarSupervisi();
     }
 
