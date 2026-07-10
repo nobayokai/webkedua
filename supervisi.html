@@ -151,7 +151,6 @@
         var container = document.getElementById('list-dokumen-sup');
         if(!container) return;
 
-        // FITUR BARU: MEMUNCULKAN SPINNER LOADING DI DALAM DASHBOARD MENU
         container.innerHTML = `
             <div style="text-align:center; padding:50px; width:100%; grid-column:1/-1;">
                 <div class="sup-db-spinner"></div>
@@ -298,7 +297,6 @@
             await window.renderPdfPage(window.currentPdfPage);
         } catch(e) {
             console.error(e);
-            // PERBAIKAN TANDA PETIK TUNGGAL DI BAWAH INI AGAR TIDAK SYNTAX ERROR LAGI
             area.innerHTML = '<div style="padding:40px; text-align:center; color:#ef4444; font-weight:bold;">❌ Gagal memuat pratinjau dokumen.</div>';
         }
     };
@@ -469,8 +467,12 @@
             } else {
                 throw new Error(jsonAcc.message);
             }
-        } catch(e) { alert("❌ Gagal Memproses PDF: " + e.message); } 
-        finally { tuthupLoading(); }
+        } catch(e) { 
+            alert("❌ Gagal Memproses PDF: " + e.message); 
+        } finally { 
+            // PERBAIKAN FATAL: Menghapus typo huruf h agar tidak terjadi crash lagi
+            tutupLoading(); 
+        }
     };
 
     window.loadDaftarSupervisi();
