@@ -1,320 +1,101 @@
 <style>
-    .sup-panel { background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 20px; border: 1px solid rgba(16,185,129,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.05); font-family: 'Arial', sans-serif;}
-    .sup-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; }
-    .sup-title { color: #047857; font-family: 'Georgia', serif; font-size: 20px; font-weight: 900; margin:0;}
-    .sup-btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; background: #10b981; transition: 0.2s; }
-    .sup-btn.blue { background: #3b82f6; } .sup-btn.red { background: #ef4444; } .sup-btn.orange { background: #f59e0b; }
+    /* DESAIN DASHBOARD SUPERVISI PREMIUM */
+    .sup-container { background: #ffffff; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); font-family: 'Inter', sans-serif; }
+    .sup-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; margin-bottom: 25px; }
+    .sup-title { font-size: 24px; font-weight: 800; color: #111827; margin: 0; display: flex; align-items: center; gap: 10px;}
     
-    .sup-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .sup-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; color: white; text-transform: uppercase;}
+    .sup-btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; background: #10b981; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.25); font-size: 13px;}
+    .sup-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16,185,129,0.35); }
+    .sup-btn.blue { background: #3b82f6; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
+    .sup-btn.orange { background: #f59e0b; box-shadow: 0 4px 12px rgba(245,158,11,0.25); }
+    .sup-btn.red { background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,0.25); }
+    .sup-btn.outline { background: transparent; color: #374151; border: 1px solid #d1d5db; box-shadow: none; }
+    
+    .sup-upload-box { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 25px; text-align: center; transition: 0.3s; margin-bottom: 25px; }
+    .sup-upload-box:hover { border-color: #3b82f6; background: #eff6ff; }
+    .sup-form-group { margin-bottom: 15px; text-align: left; }
+    .sup-form-group label { display: block; font-weight: bold; font-size: 13px; color: #475569; margin-bottom: 8px; }
+    .sup-form-group select, .sup-form-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 14px; background: white;}
+
+    .sup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+    .sup-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .sup-card:hover { border-color: #10b981; box-shadow: 0 10px 20px rgba(16,185,129,0.1); transform: translateY(-3px); }
+    .sup-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 0.5px;}
     .sup-badge.wait { background: #f59e0b; } .sup-badge.acc { background: #10b981; }
 
-    .sup-form { display: none; background: white; padding: 20px; border-radius: 12px; border: 1px dashed #d1d5db; margin-bottom: 20px;}
-    .form-group-sup { margin-bottom: 15px; }
-    .form-group-sup label { display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px; color: #374151;}
-    .form-group-sup select, .form-group-sup input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; }
-
-    /* VIRTUAL PDF AREA UNTUK DRAG DROP TTD */
-    #pdf-virtual-area { width: 100%; max-width: 400px; height: 565px; background: #f3f4f6; border: 2px dashed #9ca3af; position: relative; margin: 0 auto; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 4px;}
-    #drag-ttd { position: absolute; width: 120px; cursor: grab; z-index: 10; border: 1px solid rgba(0,0,0,0.1); padding: 5px; background: rgba(255,255,255,0.5); border-radius: 8px;}
-    #drag-ttd:active { cursor: grabbing; border: 2px dashed #10b981; }
-    
-    .overlay-loading { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; display: none; backdrop-filter: blur(5px);}
+    /* VIRTUAL AREA & MULTI-SIGNATURE */
+    #pdf-virtual-area { position: relative; width: 100%; max-width: 400px; height: 565px; background: white; border: 2px solid #e2e8f0; margin: 0 auto; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-radius: 8px; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
+    .drag-ttd-item { position: absolute; width: 110px; cursor: grab; z-index: 10; padding: 4px; border: 2px dashed transparent; border-radius: 8px; transition: border 0.2s; }
+    .drag-ttd-item:active { cursor: grabbing; border-color: #3b82f6; background: rgba(59,130,246,0.05); }
+    .btn-delete-ttd { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 12px; font-weight: bold; display: none; box-shadow: 0 2px 5px rgba(239,68,68,0.4);}
+    .drag-ttd-item:hover { border-color: #cbd5e1; }
+    .drag-ttd-item:hover .btn-delete-ttd { display: block; }
 </style>
 
-<div class="sup-panel" id="panel-supervisi" style="display:none;">
+<div class="sup-container" id="panel-supervisi" style="display:none;">
     <div class="sup-header">
-        <h2 class="sup-title">📂 Administrasi Guru & Supervisi</h2>
-        <div>
-            <button class="sup-btn blue" id="btn-show-ttd" style="display:none;" onclick="bukaSettingTTD()">⚙️ Setting TTD</button>
-            <button class="sup-btn" onclick="toggleFormUpload()">➕ Upload Dokumen</button>
+        <h2 class="sup-title">📂 Supervisi Administrasi</h2>
+        <div id="sup-header-actions">
+            <button class="sup-btn outline" id="btn-show-ttd" style="display:none;" onclick="document.getElementById('modal-set-ttd').classList.add('active')">⚙️ Stempel & TTD</button>
         </div>
     </div>
 
-    <div class="sup-form" id="form-upload-sup">
-        <h3 style="margin-top:0; color:#1f2937;">Upload Dokumen Baru</h3>
-        <div class="form-group-sup">
-            <label>Jenis Dokumen</label>
-            <select id="sup-jenis">
-                <option value="Modul Ajar">Modul Ajar</option>
-                <option value="Program Tahunan (Prota)">Program Tahunan (Prota)</option>
-                <option value="Program Semester (Promes)">Program Semester (Promes)</option>
-                <option value="Capaian Pembelajaran (CP)">Capaian Pembelajaran (CP)</option>
-                <option value="Tujuan Pembelajaran (TP)">Tujuan Pembelajaran (TP)</option>
-                <option value="KKTP">Kriteria Ketercapaian Tujuan Pembelajaran (KKTP)</option>
-            </select>
+    <div id="area-upload-guru" style="display:none;">
+        <div class="sup-upload-box">
+            <h3 style="margin-top:0; color:#1e293b; font-weight:800;">⬆️ Upload Berkas Administrasi</h3>
+            <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:15px;">
+                <div class="sup-form-group" style="flex:1; min-width:200px;">
+                    <label>Pilih Jenis Berkas</label>
+                    <select id="sup-jenis">
+                        <option value="Modul Ajar">Modul Ajar</option>
+                        <option value="Program Tahunan (Prota)">Program Tahunan (Prota)</option>
+                        <option value="Program Semester (Promes)">Program Semester (Promes)</option>
+                        <option value="Capaian Pembelajaran (CP)">Capaian Pembelajaran (CP)</option>
+                        <option value="Tujuan Pembelajaran (TP)">Tujuan Pembelajaran (TP)</option>
+                        <option value="Kriteria Ketercapaian TP">Kriteria Ketercapaian TP (KKTP)</option>
+                    </select>
+                </div>
+                <div class="sup-form-group" style="flex:1; min-width:200px;">
+                    <label>Pilih File (Wajib PDF)</label>
+                    <input type="file" id="sup-file" accept="application/pdf">
+                </div>
+            </div>
+            <button class="sup-btn blue" style="width:100%; justify-content:center; padding:15px; font-size:15px;" onclick="window.prosesUploadDokumen(event)">🚀 Unggah ke Server</button>
         </div>
-        <div class="form-group-sup">
-            <label>File Dokumen (Hanya PDF)</label>
-            <input type="file" id="sup-file" accept="application/pdf">
-        </div>
-        <button type="button" class="sup-btn" style="width:100%;" onclick="window.prosesUploadDokumen(event)">🚀 Kirim Dokumen</button>
     </div>
 
-    <div id="list-dokumen-sup">
-        <div style="text-align:center; padding: 30px; color:#6b7280; font-weight:bold;">Memuat dokumen...</div>
+    <h3 style="color:#334155; font-weight:800; border-bottom: 2px dashed #e2e8f0; padding-bottom:10px;">📄 Daftar Berkas Supervisi</h3>
+    <div class="sup-grid" id="list-dokumen-sup">
+        <div style="text-align:center; padding: 30px; color:#94a3b8; font-weight:bold; width:100%;">Memuat data...</div>
     </div>
 </div>
 
-<div class="absen-modal" id="modal-acc">
-    <div class="absen-modal-content" style="max-width: 500px; max-height: 95vh;">
-        <h3 style="color:#047857; margin-top:0; text-align:center;">✍️ Bubuhkan Tanda Tangan</h3>
-        <p style="text-align:center; font-size:11px; color:#6b7280;">Geser (Drag) tanda tangan di bawah ini untuk menempatkannya pada posisi yang tepat di <b style="color:#ef4444;">HALAMAN TERAKHIR</b> dokumen PDF.</p>
+<div class="modal-overlay" id="modal-acc">
+    <div class="modal-calendar-card" style="max-width: 500px; max-height: 95vh; display:flex; flex-direction:column;">
+        <h3 style="color:#047857; margin-top:0; text-align:center; font-weight:900;">✍️ Papan Tanda Tangan</h3>
+        <p style="text-align:center; font-size:12px; color:#64748b; margin-top:-5px;">Klik "Tambah TTD" untuk menaruh stempel/tanda tangan di simulasi halaman terakhir PDF.</p>
         
+        <div style="text-align:center; margin-bottom:15px;">
+            <button class="sup-btn blue" onclick="window.tambahTtdKeCanvas()">➕ Tambah TTD / Stempel</button>
+        </div>
+
         <div id="pdf-virtual-area">
-            <div style="position:absolute; top:50%; width:100%; text-align:center; color:#9ca3af; font-weight:bold;">📄 (Simulasi Halaman Terakhir PDF)</div>
-            <img id="drag-ttd" src="" style="display:none;" title="Geser Saya!">
-        </div>
+            <div style="position:absolute; top:45%; width:100%; text-align:center; color:#94a3b8; font-weight:900; font-size:18px; opacity:0.3;">HALAMAN TERAKHIR PDF</div>
+            </div>
         
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="sup-btn red" style="flex:1;" onclick="document.getElementById('modal-acc').classList.remove('active')">Batal</button>
-            <button class="sup-btn" style="flex:1;" onclick="eksekusiAccDokumen()">✅ Terapkan & Simpan ACC</button>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="sup-btn red" style="flex:1; justify-content:center;" onclick="document.getElementById('modal-acc').classList.remove('active'); document.getElementById('pdf-virtual-area').innerHTML = '<div style=\'position:absolute; top:45%; width:100%; text-align:center; color:#94a3b8; font-weight:900; font-size:18px; opacity:0.3;\'>HALAMAN TERAKHIR PDF</div>';">Batal</button>
+            <button class="sup-btn" style="flex:1; justify-content:center;" onclick="window.eksekusiAccDokumen()">✅ Terapkan ACC</button>
         </div>
     </div>
 </div>
 
-<div class="absen-modal" id="modal-set-ttd">
-    <div class="absen-modal-content">
-        <h3 style="color:#3b82f6; margin-top:0;">⚙️ Upload Stempel & TTD</h3>
-        <p style="font-size:12px; color:#666;">Upload gambar Tanda Tangan + Stempel format PNG (Transparan). Gambar ini hanya disimpan di memori perangkat Anda.</p>
-        <input type="file" id="file-ttd" accept="image/png, image/jpeg" style="margin-bottom:15px; width:100%;">
-        <button class="sup-btn blue" style="width:100%;" onclick="simpanTtdLokal()">💾 Simpan TTD</button>
+<div class="modal-overlay" id="modal-set-ttd">
+    <div class="modal-download-card" style="text-align:center;">
+        <h3 style="color:#3b82f6; margin-top:0;">⚙️ Upload Stempel / TTD</h3>
+        <p style="font-size:12px; color:#64748b;">Gunakan gambar transparan (.png). Tersimpan aman di memori perangkat ini.</p>
+        <input type="file" id="file-ttd" accept="image/png, image/jpeg" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; margin-bottom:15px;">
+        <button class="sup-btn blue" style="width:100%; justify-content:center;" onclick="window.simpanTtdLokal()">💾 Simpan ke Perangkat</button>
+        <button class="sup-btn outline" style="width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('modal-set-ttd').classList.remove('active')">Tutup</button>
     </div>
 </div>
-
-<div class="overlay-loading" id="sup-loading">
-    <div class="ios-spinner"></div>
-    <div id="sup-load-text">Memproses...</div>
-</div>
-
-<script>
-    // Membaca URL dari script.js utama agar tidak perlu copy-paste link manual lagi
-    var API_SUP = (typeof SCRIPT_URL !== 'undefined') ? SCRIPT_URL : "URL_BAPAK_JIKA_BEDA";
-    
-    var curUser = JSON.parse(localStorage.getItem('user_login'));
-    var curTtdBase64 = localStorage.getItem('ttd_kepsek');
-    var activeDocId = "";
-    var activeDocUrl = "";
-
-    if (curUser && (curUser.role === 'guru' || curUser.role === 'kepsek')) {
-        document.getElementById('panel-supervisi').style.display = 'block';
-        if (curUser.jabatan === 'kepsek') {
-        // Tampilkan semua dokumen untuk di-ACC
-    } else if (curUser.jabatan === 'guru_kelas' || curUser.jabatan === 'bidang_studi') {
-        // Hanya tampilkan dokumen milik guru tersebut
-    }
-        loadDaftarSupervisi();
-    }
-
-    function toggleFormUpload() {
-        var f = document.getElementById('form-upload-sup');
-        f.style.display = f.style.display === 'none' || f.style.display === '' ? 'block' : 'none';
-    }
-
-    async function loadDaftarSupervisi() {
-        try {
-            var res = await fetch(API_SUP + "?action=get_supervisi");
-            var json = await res.json();
-            var container = document.getElementById('list-dokumen-sup');
-            container.innerHTML = "";
-
-            if(json.status === 'success') {
-                var data = json.data;
-                var isKepsek = (curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
-                var dataFiltered = isKepsek ? data : data.filter(d => d.nama === curUser.nama);
-
-                if(dataFiltered.length === 0) {
-                    container.innerHTML = "<div style='text-align:center; color:#9ca3af;'>Belum ada dokumen.</div>";
-                    return;
-                }
-
-                dataFiltered.reverse().forEach(d => {
-                    var badgeClass = d.status.includes('ACC') ? 'acc' : 'wait';
-                    var btnAksi = "";
-                    
-                    if (isKepsek && d.status.includes("Menunggu")) {
-                        btnAksi = `<button class="sup-btn orange" style="font-size:11px; padding:6px 10px;" onclick="bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">🔍 Proses ACC</button>`;
-                    } else if (d.status.includes('ACC')) {
-                        btnAksi = `<a href="${d.url_acc}" target="_blank" class="sup-btn" style="font-size:11px; padding:6px 10px; text-decoration:none;">📄 Lihat PDF Final</a>`;
-                    } else {
-                        btnAksi = `<a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="font-size:11px; padding:6px 10px; text-decoration:none;">Lihat Dokumen</a>`;
-                    }
-
-                    container.innerHTML += `
-                        <div class="sup-card">
-                            <div>
-                                <div style="font-weight:900; color:#1f2937; font-size:14px;">${d.jenis}</div>
-                                <div style="font-size:11px; color:#6b7280; margin-top:3px;">Oleh: ${d.nama} | <span class="sup-badge ${badgeClass}">${d.status}</span></div>
-                            </div>
-                            <div>${btnAksi}</div>
-                        </div>
-                    `;
-                });
-            }
-        } catch(e) { document.getElementById('list-dokumen-sup').innerHTML = "Gagal memuat data."; }
-    }
-
-    // FUNGSI UPLOAD YANG SUDAH DILENGKAPI PENDETEKSI ERROR
-    window.prosesUploadDokumen = function(e) {
-        if(e) e.preventDefault();
-        var fileInput = document.getElementById('sup-file');
-        var jenis = document.getElementById('sup-jenis').value;
-        
-        if(fileInput.files.length === 0) return alert("Pilih file PDF terlebih dahulu!");
-        var file = fileInput.files[0];
-        if(file.type !== "application/pdf") return alert("Hanya file PDF yang diizinkan!");
-        if(file.size > 5 * 1024 * 1024) return alert("Maksimal ukuran file 5 MB!");
-
-        var reader = new FileReader();
-        reader.onload = async function() {
-            document.getElementById('sup-load-text').textContent = "Mengupload ke Google Drive...";
-            document.getElementById('sup-loading').style.display = "flex";
-
-            var base64 = reader.result.split(',')[1];
-            var payload = {
-                action: "upload_supervisi", nama: curUser.nama, role: curUser.role,
-                jenis: jenis, fileName: curUser.nama + "_" + jenis + ".pdf",
-                mimeType: file.type, fileBase64: base64
-            };
-
-            try {
-                var res = await fetch(API_SUP, { method: "POST", body: JSON.stringify(payload) });
-                var json = await res.json();
-                
-                if(json.status === "success") {
-                    alert("✅ Berhasil Upload Dokumen!");
-                    toggleFormUpload(); 
-                    fileInput.value = "";
-                    loadDaftarSupervisi();
-                } else {
-                    // INI YANG SEBELUMNYA TIDAK ADA (Menyebabkan blank diam-diam)
-                    alert("⚠️ GAGAL DITOLAK SERVER: " + (json.message || "Error tidak diketahui"));
-                }
-            } catch(e) { 
-                alert("❌ Gagal jaringan! Pastikan koneksi lancar dan URL Script benar."); 
-            } finally { 
-                document.getElementById('sup-loading').style.display = "none"; 
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function bukaSettingTTD() { document.getElementById('modal-set-ttd').classList.add('active'); }
-    function simpanTtdLokal() {
-        var f = document.getElementById('file-ttd');
-        if(f.files.length === 0) return;
-        var r = new FileReader();
-        r.onload = function() {
-            localStorage.setItem('ttd_kepsek', r.result);
-            curTtdBase64 = r.result;
-            alert("Tanda Tangan berhasil disimpan di perangkat ini!");
-            document.getElementById('modal-set-ttd').classList.remove('active');
-        };
-        r.readAsDataURL(f.files[0]);
-    }
-
-    function bukaModalAcc(id, url) {
-        if(!curTtdBase64) return alert("Silakan 'Setting TTD' terlebih dahulu sebelum memproses ACC!");
-        activeDocId = id; activeDocUrl = url;
-        
-        var imgTtd = document.getElementById('drag-ttd');
-        imgTtd.src = curTtdBase64;
-        imgTtd.style.display = 'block';
-        imgTtd.style.left = '50px'; imgTtd.style.top = '400px'; 
-        document.getElementById('modal-acc').classList.add('active');
-    }
-
-    var dragItem = document.getElementById("drag-ttd");
-    dragItem.onmousedown = function(e) {
-        e.preventDefault();
-        var shiftX = e.clientX - dragItem.getBoundingClientRect().left;
-        var shiftY = e.clientY - dragItem.getBoundingClientRect().top;
-        
-        function moveAt(pageX, pageY) {
-            var parent = document.getElementById('pdf-virtual-area').getBoundingClientRect();
-            var newLeft = pageX - shiftX - parent.left;
-            var newTop = pageY - shiftY - parent.top;
-            if (newLeft < 0) newLeft = 0; if (newTop < 0) newTop = 0;
-            if (newLeft + dragItem.offsetWidth > parent.width) newLeft = parent.width - dragItem.offsetWidth;
-            if (newTop + dragItem.offsetHeight > parent.height) newTop = parent.height - dragItem.offsetHeight;
-
-            dragItem.style.left = newLeft + 'px';
-            dragItem.style.top = newTop + 'px';
-        }
-        function onMouseMove(event) { moveAt(event.pageX, event.pageY); }
-        document.addEventListener('mousemove', onMouseMove);
-        document.onmouseup = function() { document.removeEventListener('mousemove', onMouseMove); document.onmouseup = null; };
-    };
-    dragItem.ondragstart = function() { return false; };
-
-    // FUNGSI ACC YANG SUDAH DILENGKAPI PENDETEKSI ERROR
-    async function eksekusiAccDokumen() {
-        document.getElementById('modal-acc').classList.remove('active');
-        document.getElementById('sup-load-text').innerHTML = "Menarik PDF Asli...<br><small>Jangan tutup halaman ini</small>";
-        document.getElementById('sup-loading').style.display = "flex";
-
-        try {
-            var resPdf = await fetch(API_SUP + "?action=get_pdf_base64&url=" + encodeURIComponent(activeDocUrl));
-            var jsonPdf = await resPdf.json();
-            
-            if(jsonPdf.status !== 'success') {
-                throw new Error("Gagal menarik PDF. Error Server: " + (jsonPdf.message || "Unknown"));
-            }
-
-            document.getElementById('sup-load-text').innerHTML = "Membubuhkan Tanda Tangan...<br><small>Sedang memproses PDF</small>";
-
-            const pdfDoc = await PDFLib.PDFDocument.load(jsonPdf.base64);
-            const pages = pdfDoc.getPages();
-            const lastPage = pages[pages.length - 1]; 
-            const { width, height } = lastPage.getSize();
-
-            var vWidth = 400; var vHeight = 565;
-            var imgLeft = parseInt(dragItem.style.left || 0);
-            var imgTop = parseInt(dragItem.style.top || 0);
-            var imgWidth = dragItem.offsetWidth;
-            var imgHeight = dragItem.offsetHeight;
-
-            var scaleX = width / vWidth;
-            var scaleY = height / vHeight;
-
-            var finalX = imgLeft * scaleX;
-            var finalWidth = imgWidth * scaleX;
-            var finalHeight = imgHeight * scaleY;
-            var finalY = height - (imgTop * scaleY) - finalHeight;
-
-            var ttdBytes = await fetch(curTtdBase64).then(res => res.arrayBuffer());
-            var embedTtd;
-            if(curTtdBase64.includes("png")) { embedTtd = await pdfDoc.embedPng(ttdBytes); } 
-            else { embedTtd = await pdfDoc.embedJpg(ttdBytes); }
-
-            lastPage.drawImage(embedTtd, { x: finalX, y: finalY, width: finalWidth, height: finalHeight });
-
-            document.getElementById('sup-load-text').innerHTML = "Menyimpan ke Database...<br><small>Mengupload File Final</small>";
-
-            const pdfBytesNew = await pdfDoc.saveAsBase64();
-            
-            var payload = {
-                action: "update_supervisi_acc",
-                id_dokumen: activeDocId,
-                fileName: "ACC_SUPERVISI_" + activeDocId + ".pdf",
-                fileBase64: pdfBytesNew
-            };
-
-            var resUpload = await fetch(API_SUP, { method: "POST", body: JSON.stringify(payload) });
-            var jsonUpload = await resUpload.json();
-
-            if(jsonUpload.status === "success") {
-                alert("✅ Sukses! Dokumen telah di-ACC dan tanda tangan telah dibubuhkan.");
-                loadDaftarSupervisi();
-            } else {
-                alert("⚠️ Gagal menyimpan file final: " + jsonUpload.message);
-            }
-
-        } catch(e) {
-            console.error(e);
-            alert("❌ Terjadi kesalahan: " + e.message);
-        } finally {
-            document.getElementById('sup-loading').style.display = "none";
-        }
-    }
-</script>
