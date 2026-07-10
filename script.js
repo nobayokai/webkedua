@@ -43,10 +43,9 @@ function switchRole(role, elBtn) {
         inputNis.placeholder  = 'Masukkan NIS kamu';
         if (btnLogin) btnLogin.className = 'btn-login siswa';
     } else {
-        // PERBAIKAN: Ubah tulisan NIP menjadi Email agar selaras dengan Database
-        labelNis.textContent  = 'Email Guru';
+        labelNis.textContent  = 'NIP';
         labelPass.textContent = 'Password';
-        inputNis.placeholder  = 'Masukkan Email kamu';
+        inputNis.placeholder  = 'Masukkan NIP kamu';
         if (btnLogin) btnLogin.className = 'btn-login guru';
     }
 
@@ -70,13 +69,21 @@ async function handleLogin(e) {
         return;
     }
 
+    // Tampilkan popup loading
     const modal = showLoginPopup('loading', '⏳ Sedang verifikasi...');
 
     try {
-        const params = new URLSearchParams({ action : 'login', role : currentRole, nis : nis, pass : pass });
+        const params = new URLSearchParams({
+            action : 'login',
+            role   : currentRole,
+            nis    : nis,
+            pass   : pass
+        });
+
         const res  = await fetch(`${SCRIPT_URL}?${params}`);
         const data = await res.json();
 
+        // Hapus popup loading
         modal.remove();
 
         if (data.status === 'success') {  
@@ -89,7 +96,18 @@ async function handleLogin(e) {
 
             updateMenuLogin();  
 
+            // Tampilkan popup sukses dengan nama  
             const successModal = showLoginPopup('success', `Selamat datang, ${data.nama}`);  
+            
+            // PERBAIKAN DI SINI: Menggunakan currentRole, bukan role
+            if (currentRole === 'guru') {
+                // GANTI BAGIAN INI DI DALAM FUNGSI updateMenuLogin()
+        // Munculkan menu HANYA sesuai role
+        const tabAbsensi = document.getElementById('tab-absensi');
+        const tabSupervisi = document.getElementById('tab-supervisi');
+        if (tabAbsensi) tabAbsensi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
+        if (tabSupervisi) tabSupervisi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
+            }
             
             setTimeout(() => {  
                 successModal.remove();  
@@ -98,12 +116,13 @@ async function handleLogin(e) {
             }, 1500);  
 
         } else {  
+            // Pesan error baru  
             showLoginPopup('error', 'Sepertinya data yang kamu masukan salah');  
         }  
 
     } catch (err) {
         modal.remove();
-        console.error(err); 
+        console.error(err); // Tambahan untuk melihat detail error di inspect element
         showLoginPopup('error', '❌ Gagal terhubung ke server!');
     }
 }
@@ -161,33 +180,28 @@ function showLoginPopup(type, message) {
 
 
 // =============================================
-// UPDATE MENU LOGIN/LOGOUT (Memunculkan Absensi & Supervisi)
+// UPDATE MENU LOGIN/LOGOUT (Otomatis memunculkan Absensi untuk Guru)
 // =============================================
 function updateMenuLogin() {
     const userLogin = localStorage.getItem('user_login');
     const tabLogin  = document.getElementById('tab-login');
     const tabLogout = document.getElementById('tab-logout');
-    
-    // Target Menu
-    const tabAbsensi = document.getElementById('tab-absensi'); 
-    const tabSupervisi = document.getElementById('tab-supervisi'); 
+    const tabAbsensi = document.getElementById('tab-absensi'); // Target Menu Absensi
 
     if (userLogin) {
         if(tabLogin) tabLogin.style.display  = 'none';
         if(tabLogout) tabLogout.style.display = '';
-        
         const user = JSON.parse(userLogin);
         if(tabLogout) tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
         
-        // Munculkan menu HANYA sesuai role (Guru / Kepsek)
-        if (tabAbsensi) tabAbsensi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
-        if (tabSupervisi) tabSupervisi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
-        
+        // Munculkan menu absensi HANYA jika role adalah guru
+        if (tabAbsensi) {
+            tabAbsensi.style.display = (user.role === 'guru') ? 'inline-block' : 'none';
+        }
     } else {
         if(tabLogin) tabLogin.style.display  = '';
         if(tabLogout) tabLogout.style.display = 'none';
-        if(tabAbsensi) tabAbsensi.style.display = 'none'; 
-        if(tabSupervisi) tabSupervisi.style.display = 'none'; 
+        if(tabAbsensi) tabAbsensi.style.display = 'none'; // Sembunyikan jika belum login
     }
 }
 
@@ -725,296 +739,3 @@ window.simpanSiswaBaru = async function() {
 };
 
 window.tutupModalAbsen = function(id) { document.getElementById(id).classList.remove('active'); };
-
-
-// =============================================
-// FITUR SUPERVISI (DIGABUNG KE SCRIPT.JS)
-// =============================================
-window.initSupervisi = function() {
-    var curUser = JSON.parse(localStorage.getItem('user_login'));
-    var panelSup = document.getElementById('panel-supervisi');
-    if (!panelSup) return;
-
-    if (curUser && (curUser.role === 'guru' || curUser.role === 'kepsek')) {
-        panelSup.style.display = 'block';
-        if (curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala")) {
-            var btn = document.getElementById('btn-show-ttd');
-            if(btn) btn.style.display = 'inline-block';
-        }
-        window.loadDaftarSupervisi();
-    }
-};
-
-window.loadDaftarSupervisi = async function() {
-    var curUser = JSON.parse(localStorage.getItem('user_login'));
-    try {
-        var res = await fetch(SCRIPT_URL + "?action=get_supervisi");
-        var json = await res.json();
-        var container = document.getElementById('list-dokumen-sup');
-        if(!container) return;
-        container.innerHTML = "";
-
-        if(json.status === 'success') {
-            var data = json.data;
-            var isKepsek = (curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
-            var dataFiltered = isKepsek ? data : data.filter(d => d.nama === curUser.nama);
-
-            if(dataFiltered.length === 0) {
-                container.innerHTML = "<div style='text-align:center; color:#9ca3af;'>Belum ada dokumen.</div>";
-                return;
-            }
-
-            dataFiltered.reverse().forEach(d => {
-                var badgeClass = d.status.includes('ACC') ? 'acc' : 'wait';
-                var btnAksi = "";
-                
-                if (isKepsek && d.status.includes("Menunggu")) {
-                    btnAksi = `<button class="sup-btn orange" style="font-size:11px; padding:6px 10px;" onclick="window.bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">🔍 Proses ACC</button>`;
-                } else if (d.status.includes('ACC')) {
-                    btnAksi = `<a href="${d.url_acc}" target="_blank" class="sup-btn" style="font-size:11px; padding:6px 10px; text-decoration:none;">📄 Lihat PDF Final</a>`;
-                } else {
-                    btnAksi = `<a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="font-size:11px; padding:6px 10px; text-decoration:none;">Lihat Dokumen</a>`;
-                }
-
-                container.innerHTML += `
-                    <div class="sup-card">
-                        <div>
-                            <div style="font-weight:900; color:#1f2937; font-size:14px;">${d.jenis}</div>
-                            <div style="font-size:11px; color:#6b7280; margin-top:3px;">Oleh: ${d.nama} | <span class="sup-badge ${badgeClass}">${d.status}</span></div>
-                        </div>
-                        <div>${btnAksi}</div>
-                    </div>
-                `;
-            });
-        }
-    } catch(e) { document.getElementById('list-dokumen-sup').innerHTML = "Gagal memuat data."; }
-};
-
-
-
-var SCRIPT_URL = (typeof SCRIPT_URL !== 'undefined') ? SCRIPT_URL : "URL_BAPAK_JIKA_BEDA";
-    
-    var curUser = JSON.parse(localStorage.getItem('user_login'));
-    var curTtdBase64 = localStorage.getItem('ttd_kepsek');
-    var activeDocId = "";
-    var activeDocUrl = "";
-
-    if (curUser && (curUser.role === 'guru' || curUser.role === 'kepsek')) {
-        document.getElementById('panel-supervisi').style.display = 'block';
-        if (curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala")) {
-            document.getElementById('btn-show-ttd').style.display = 'inline-block';
-        }
-        loadDaftarSupervisi();
-    }
-
-    function toggleFormUpload() {
-        var f = document.getElementById('form-upload-sup');
-        f.style.display = f.style.display === 'none' || f.style.display === '' ? 'block' : 'none';
-    }
-
-    async function loadDaftarSupervisi() {
-        try {
-            var res = await fetch(SCRIPT_URL + "?action=get_supervisi");
-            var json = await res.json();
-            var container = document.getElementById('list-dokumen-sup');
-            container.innerHTML = "";
-
-            if(json.status === 'success') {
-                var data = json.data;
-                var isKepsek = (curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
-                var dataFiltered = isKepsek ? data : data.filter(d => d.nama === curUser.nama);
-
-                if(dataFiltered.length === 0) {
-                    container.innerHTML = "<div style='text-align:center; color:#9ca3af;'>Belum ada dokumen.</div>";
-                    return;
-                }
-
-                dataFiltered.reverse().forEach(d => {
-                    var badgeClass = d.status.includes('ACC') ? 'acc' : 'wait';
-                    var btnAksi = "";
-                    
-                    if (isKepsek && d.status.includes("Menunggu")) {
-                        btnAksi = `<button class="sup-btn orange" style="font-size:11px; padding:6px 10px;" onclick="bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">🔍 Proses ACC</button>`;
-                    } else if (d.status.includes('ACC')) {
-                        btnAksi = `<a href="${d.url_acc}" target="_blank" class="sup-btn" style="font-size:11px; padding:6px 10px; text-decoration:none;">📄 Lihat PDF Final</a>`;
-                    } else {
-                        btnAksi = `<a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="font-size:11px; padding:6px 10px; text-decoration:none;">Lihat Dokumen</a>`;
-                    }
-
-                    container.innerHTML += `
-                        <div class="sup-card">
-                            <div>
-                                <div style="font-weight:900; color:#1f2937; font-size:14px;">${d.jenis}</div>
-                                <div style="font-size:11px; color:#6b7280; margin-top:3px;">Oleh: ${d.nama} | <span class="sup-badge ${badgeClass}">${d.status}</span></div>
-                            </div>
-                            <div>${btnAksi}</div>
-                        </div>
-                    `;
-                });
-            }
-        } catch(e) { document.getElementById('list-dokumen-sup').innerHTML = "Gagal memuat data."; }
-    }
-
-    // FUNGSI UPLOAD YANG SUDAH DILENGKAPI PENDETEKSI ERROR
-    window.prosesUploadDokumen = function(e) {
-        if(e) e.preventDefault();
-        var fileInput = document.getElementById('sup-file');
-        var jenis = document.getElementById('sup-jenis').value;
-        
-        if(fileInput.files.length === 0) return alert("Pilih file PDF terlebih dahulu!");
-        var file = fileInput.files[0];
-        if(file.type !== "application/pdf") return alert("Hanya file PDF yang diizinkan!");
-        if(file.size > 5 * 1024 * 1024) return alert("Maksimal ukuran file 5 MB!");
-
-        var reader = new FileReader();
-        reader.onload = async function() {
-            document.getElementById('sup-load-text').textContent = "Mengupload ke Google Drive...";
-            document.getElementById('sup-loading').style.display = "flex";
-
-            var base64 = reader.result.split(',')[1];
-            var payload = {
-                action: "upload_supervisi", nama: curUser.nama, role: curUser.role,
-                jenis: jenis, fileName: curUser.nama + "_" + jenis + ".pdf",
-                mimeType: file.type, fileBase64: base64
-            };
-
-            try {
-                var res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-                var json = await res.json();
-                
-                if(json.status === "success") {
-                    alert("✅ Berhasil Upload Dokumen!");
-                    toggleFormUpload(); 
-                    fileInput.value = "";
-                    loadDaftarSupervisi();
-                } else {
-                    // INI YANG SEBELUMNYA TIDAK ADA (Menyebabkan blank diam-diam)
-                    alert("⚠️ GAGAL DITOLAK SERVER: " + (json.message || "Error tidak diketahui"));
-                }
-            } catch(e) { 
-                alert("❌ Gagal jaringan! Pastikan koneksi lancar dan URL Script benar."); 
-            } finally { 
-                document.getElementById('sup-loading').style.display = "none"; 
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function bukaSettingTTD() { document.getElementById('modal-set-ttd').classList.add('active'); }
-    function simpanTtdLokal() {
-        var f = document.getElementById('file-ttd');
-        if(f.files.length === 0) return;
-        var r = new FileReader();
-        r.onload = function() {
-            localStorage.setItem('ttd_kepsek', r.result);
-            curTtdBase64 = r.result;
-            alert("Tanda Tangan berhasil disimpan di perangkat ini!");
-            document.getElementById('modal-set-ttd').classList.remove('active');
-        };
-        r.readAsDataURL(f.files[0]);
-    }
-
-    function bukaModalAcc(id, url) {
-        if(!curTtdBase64) return alert("Silakan 'Setting TTD' terlebih dahulu sebelum memproses ACC!");
-        activeDocId = id; activeDocUrl = url;
-        
-        var imgTtd = document.getElementById('drag-ttd');
-        imgTtd.src = curTtdBase64;
-        imgTtd.style.display = 'block';
-        imgTtd.style.left = '50px'; imgTtd.style.top = '400px'; 
-        document.getElementById('modal-acc').classList.add('active');
-    }
-
-    var dragItem = document.getElementById("drag-ttd");
-    dragItem.onmousedown = function(e) {
-        e.preventDefault();
-        var shiftX = e.clientX - dragItem.getBoundingClientRect().left;
-        var shiftY = e.clientY - dragItem.getBoundingClientRect().top;
-        
-        function moveAt(pageX, pageY) {
-            var parent = document.getElementById('pdf-virtual-area').getBoundingClientRect();
-            var newLeft = pageX - shiftX - parent.left;
-            var newTop = pageY - shiftY - parent.top;
-            if (newLeft < 0) newLeft = 0; if (newTop < 0) newTop = 0;
-            if (newLeft + dragItem.offsetWidth > parent.width) newLeft = parent.width - dragItem.offsetWidth;
-            if (newTop + dragItem.offsetHeight > parent.height) newTop = parent.height - dragItem.offsetHeight;
-
-            dragItem.style.left = newLeft + 'px';
-            dragItem.style.top = newTop + 'px';
-        }
-        function onMouseMove(event) { moveAt(event.pageX, event.pageY); }
-        document.addEventListener('mousemove', onMouseMove);
-        document.onmouseup = function() { document.removeEventListener('mousemove', onMouseMove); document.onmouseup = null; };
-    };
-    dragItem.ondragstart = function() { return false; };
-
-    // FUNGSI ACC YANG SUDAH DILENGKAPI PENDETEKSI ERROR
-    async function eksekusiAccDokumen() {
-        document.getElementById('modal-acc').classList.remove('active');
-        document.getElementById('sup-load-text').innerHTML = "Menarik PDF Asli...<br><small>Jangan tutup halaman ini</small>";
-        document.getElementById('sup-loading').style.display = "flex";
-
-        try {
-            var resPdf = await fetch(SCRIPT_URL + "?action=get_pdf_base64&url=" + encodeURIComponent(activeDocUrl));
-            var jsonPdf = await resPdf.json();
-            
-            if(jsonPdf.status !== 'success') {
-                throw new Error("Gagal menarik PDF. Error Server: " + (jsonPdf.message || "Unknown"));
-            }
-
-            document.getElementById('sup-load-text').innerHTML = "Membubuhkan Tanda Tangan...<br><small>Sedang memproses PDF</small>";
-
-            const pdfDoc = await PDFLib.PDFDocument.load(jsonPdf.base64);
-            const pages = pdfDoc.getPages();
-            const lastPage = pages[pages.length - 1]; 
-            const { width, height } = lastPage.getSize();
-
-            var vWidth = 400; var vHeight = 565;
-            var imgLeft = parseInt(dragItem.style.left || 0);
-            var imgTop = parseInt(dragItem.style.top || 0);
-            var imgWidth = dragItem.offsetWidth;
-            var imgHeight = dragItem.offsetHeight;
-
-            var scaleX = width / vWidth;
-            var scaleY = height / vHeight;
-
-            var finalX = imgLeft * scaleX;
-            var finalWidth = imgWidth * scaleX;
-            var finalHeight = imgHeight * scaleY;
-            var finalY = height - (imgTop * scaleY) - finalHeight;
-
-            var ttdBytes = await fetch(curTtdBase64).then(res => res.arrayBuffer());
-            var embedTtd;
-            if(curTtdBase64.includes("png")) { embedTtd = await pdfDoc.embedPng(ttdBytes); } 
-            else { embedTtd = await pdfDoc.embedJpg(ttdBytes); }
-
-            lastPage.drawImage(embedTtd, { x: finalX, y: finalY, width: finalWidth, height: finalHeight });
-
-            document.getElementById('sup-load-text').innerHTML = "Menyimpan ke Database...<br><small>Mengupload File Final</small>";
-
-            const pdfBytesNew = await pdfDoc.saveAsBase64();
-            
-            var payload = {
-                action: "update_supervisi_acc",
-                id_dokumen: activeDocId,
-                fileName: "ACC_SUPERVISI_" + activeDocId + ".pdf",
-                fileBase64: pdfBytesNew
-            };
-
-            var resUpload = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-            var jsonUpload = await resUpload.json();
-
-            if(jsonUpload.status === "success") {
-                alert("✅ Sukses! Dokumen telah di-ACC dan tanda tangan telah dibubuhkan.");
-                loadDaftarSupervisi();
-            } else {
-                alert("⚠️ Gagal menyimpan file final: " + jsonUpload.message);
-            }
-
-        } catch(e) {
-            console.error(e);
-            alert("❌ Terjadi kesalahan: " + e.message);
-        } finally {
-            document.getElementById('sup-loading').style.display = "none";
-        }
-    }
