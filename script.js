@@ -101,8 +101,12 @@ async function handleLogin(e) {
             
             // PERBAIKAN DI SINI: Menggunakan currentRole, bukan role
             if (currentRole === 'guru') {
-                const tabAgenda = document.getElementById('tab-agenda');
-                if(tabAgenda) tabAgenda.style.display = 'inline-block'; 
+                // GANTI BAGIAN INI DI DALAM FUNGSI updateMenuLogin()
+        // Munculkan menu HANYA sesuai role
+        const tabAbsensi = document.getElementById('tab-absensi');
+        const tabSupervisi = document.getElementById('tab-supervisi');
+        if (tabAbsensi) tabAbsensi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
+        if (tabSupervisi) tabSupervisi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
             }
             
             setTimeout(() => {  
