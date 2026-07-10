@@ -127,18 +127,29 @@
     window.totalPdfPages = 1;
     window.signaturesByPage = {}; 
 
-    function ubahTeksLoading(teks) {
-        var loading = document.getElementById('ios-loading');
-        var loadingText = document.querySelector('#ios-loading .ios-loading-text');
-        if (loading) {
-            if(loadingText) loadingText.textContent = teks;
-            loading.classList.add('active');
-        }
+    window.ubahTeksLoading = function(teks){
+
+    var loading=document.getElementById("ios-loading");
+    var loadingText=document.querySelector("#ios-loading .ios-loading-text");
+
+    if(loading){
+
+        if(loadingText)
+            loadingText.textContent=teks;
+
+        loading.classList.add("active");
     }
-    function tutupLoading() {
-        var loading = document.getElementById('ios-loading');
-        if (loading) loading.classList.remove('active');
-    }
+
+}
+
+window.tutupLoading=function(){
+
+    var loading=document.getElementById("ios-loading");
+
+    if(loading)
+        loading.classList.remove("active");
+
+}
 
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
