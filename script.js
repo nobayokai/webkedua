@@ -390,10 +390,10 @@ window.bukaModalRekapStudi = function() {
 
 // Fungsi Bantuan untuk Kode Warna Absensi
 function getWarnaAbsen(status) {
-    if(status === 'SAKIT') return '<span style="color:#d97706; font-weight:900; font-size:12px;">s</span>';
-    if(status === 'IZIN') return '<span style="color:#ea580c; font-weight:900; font-size:12px;">i</span>';
-    if(status.includes('ALP') || status.includes('ALF')) return '<span style="color:#ef4444; font-weight:900; font-size:12px;">a</span>';
-    if(status === 'HADIR') return '<span style="color:#16a34a; font-weight:900; font-size:18px; line-height:0.5;">.</span>';
+    if(status === 'SAKIT') return '<span style="color:#78350f; font-weight:900; font-size:12px;">s</span>'; // Coklat
+    if(status === 'IZIN') return '<span style="color:#2563eb; font-weight:900; font-size:12px;">i</span>'; // Biru
+    if(status.includes('ALP') || status.includes('ALF')) return '<span style="color:#ef4444; font-weight:900; font-size:12px;">a</span>'; // Merah
+    if(status === 'HADIR') return '<span style="color:#16a34a; font-weight:900; font-size:16px; line-height:0.5;">.</span>'; // Hijau
     return '';
 }
 
@@ -420,15 +420,16 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
             .no-print button.cetak { background: #10b981; }
             .no-print button.tutup { background: #ef4444; }
             
-            /* Kontainer Kertas F4 - WAJIB RELATIVE untuk TTD agar ukurannya dikunci */
-            .print-wrapper { width: 330mm; height: 215mm; background: white; padding: 10mm; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; }
+            /* Kontainer Kertas F4 - PERBAIKAN: flex-start agar tabel dan TTD berkumpul rapi di atas */
+            .print-wrapper { width: 330mm; height: 215mm; background: white; padding: 10mm; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; }
             
             .print-header { text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; line-height: 1.3; }
             
-            table { width: 100%; border-collapse: collapse; margin-bottom: 5px; font-size: 10px; }
-            th, td { border: 1px solid black; padding: 1px 0; text-align: center; height: 13px;}
+            /* PERBAIKAN: table-layout: fixed memaksa lebar kolom sama rata sempurna */
+            table { width: 100%; border-collapse: collapse; margin-bottom: 5px; font-size: 10px; table-layout: fixed; }
+            th, td { border: 1px solid black; padding: 1px 0; text-align: center; height: 13px; word-wrap: break-word; overflow: hidden; }
             th { background-color: #f3f4f6; }
-            td.left-align { text-align: left; padding-left: 5px; white-space: nowrap; width: 160px; overflow: hidden; text-overflow: ellipsis; max-width: 160px;}
+            td.left-align { text-align: left; padding-left: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             
             /* Agar CSS Background Tabel Tercetak di Browser Chrome/Safari */
             .bg-red { background-color: #fca5a5 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;}
@@ -452,7 +453,8 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                 margin: 0 auto;
             }
 
-            .ttd-area { display: flex; justify-content: space-between; margin-top: auto; padding: 0 50px; font-size: 12px; position: relative;}
+            /* PERBAIKAN: Margin top statis 30px agar jarak dengan tabel proporsional */
+            .ttd-area { display: flex; justify-content: space-between; margin-top: 30px; padding: 0 50px; font-size: 12px; position: relative;}
             
             /* TTD Draggable */
             .drag-ttd-item { position: absolute; cursor: grab; z-index: 50; padding: 2px; border: 2px dashed #3b82f6; display: flex; align-items: center; justify-content: center;}
@@ -591,6 +593,15 @@ window.generateRekapWali = function() {
         }
     });
 
+    // PERBAIKAN: Menambahkan <colgroup> untuk memaksa pengaturan grid yang akurat
+    var colsHtml = `
+        <colgroup>
+            <col style="width: 3%;">
+            <col style="width: 22%;">
+            ${Array.from({length: daysInMonth + 3}, () => `<col>`).join('')}
+        </colgroup>
+    `;
+
     var htmlTabel = `
         <div class="print-header">
             DAFTAR HADIR SISWA KELAS ${kelas.toUpperCase()}<br>
@@ -598,47 +609,60 @@ window.generateRekapWali = function() {
             BULAN: ${namaBulan.toUpperCase()}
         </div>
         <table>
+            ${colsHtml}
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:25px;">No</th>
+                    <th rowspan="2">No</th>
                     <th rowspan="2">Nama Siswa</th>
                     <th colspan="${daysInMonth}">Tanggal</th>
                     <th colspan="3">Jumlah</th>
                 </tr>
                 <tr>
                     ${Array.from({length: daysInMonth}, (_, i) => `<th>${i+1}</th>`).join('')}
-                    <th style="width:20px;">S</th><th style="width:20px;">I</th><th style="width:20px;">A</th>
+                    <th>S</th><th>I</th><th>A</th>
                 </tr>
             </thead>
             <tbody>
     `;
+
+    var keteranganLiburPerTanggal = {};
+    for(let d=1; d<=daysInMonth; d++) {
+        var isWeekendCek = new Date(y, m, d).getDay() === 0 || new Date(y, m, d).getDay() === 6;
+        if(!isWeekendCek && mapLibur[d]) {
+            keteranganLiburPerTanggal[d] = mapLibur[d];
+        }
+    }
+    var jumlahBarisSiswa = siswaKelas.length;
 
     siswaKelas.forEach((s, idx) => {
         var tr = `<tr><td>${idx+1}</td><td class="left-align">${s.nama}</td>`;
         var totS = 0, totI = 0, totA = 0;
         
         for(let d=1; d<=daysInMonth; d++) {
-            if (mapLibur[d]) {
+            if (keteranganLiburPerTanggal.hasOwnProperty(d)) {
                 if (idx === 0) {
-                    tr += `<td rowspan="${siswaKelas.length}" class="bg-libur holiday-col"><div class="teks-libur-vertikal">${mapLibur[d]}</div></td>`;
+                    tr += `<td class="bg-libur" rowspan="${jumlahBarisSiswa}"><div class="teks-libur-vertikal">${keteranganLiburPerTanggal[d]}</div></td>`;
                 }
-            } else {
-                var isWeekend = new Date(y, m, d).getDay() === 0 || new Date(y, m, d).getDay() === 6;
-                var tdClass = isWeekend ? ' class="bg-gray"' : '';
-                var tglCari = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-                var absenSiswa = riwayat.find(a => {
-                    var dStr = String(a.tanggal).includes("T") ? new Date(a.tanggal).toISOString().substring(0,10) : String(a.tanggal).replace(/['"]/g, '').substring(0,10);
-                    return dStr === tglCari && String(a.nis).replace(/['"]/g, '').trim() === String(s.nis).replace(/['"]/g, '').trim();
-                });
-
-                var mark = "";
-                if(absenSiswa) {
-                    var st = (absenSiswa.status||"").toUpperCase();
-                    mark = getWarnaAbsen(st);
-                    if(st === 'SAKIT') totS++; else if(st === 'IZIN') totI++; else if(st.includes('ALP') || st.includes('ALF')) totA++;
-                }
-                tr += `<td${tdClass}>${mark}</td>`;
+                continue;
             }
+
+            var isWeekend = new Date(y, m, d).getDay() === 0 || new Date(y, m, d).getDay() === 6;
+            var tdClass = isWeekend ? ' class="bg-gray"' : '';
+
+            var tglCari = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            var absenSiswa = riwayat.find(a => {
+                var dStr = String(a.tanggal).includes("T") ? new Date(a.tanggal).toISOString().substring(0,10) : String(a.tanggal).replace(/['"]/g, '').substring(0,10);
+                return dStr === tglCari && String(a.nis).replace(/['"]/g, '').trim() === String(s.nis).replace(/['"]/g, '').trim();
+            });
+
+            var mark = "";
+            if(absenSiswa) {
+                var st = (absenSiswa.status||"").toUpperCase();
+                mark = getWarnaAbsen(st);
+                if(st === 'SAKIT') totS++; else if(st === 'IZIN') totI++; else if(st.includes('ALP') || st.includes('ALF')) totA++;
+            }
+            
+            tr += `<td${tdClass}>${mark}</td>`;
         }
         tr += `<td>${totS||''}</td><td>${totI||''}</td><td>${totA||''}</td></tr>`;
         htmlTabel += tr;
@@ -699,6 +723,16 @@ window.generateRekapStudi = function() {
         }
     }
 
+    // PERBAIKAN: Menambahkan <colgroup> untuk memaksa pengaturan grid yang akurat
+    var totalDynamicCols = arrayRangeBulan.length * 5;
+    var colsHtml = `
+        <colgroup>
+            <col style="width: 3%;">
+            <col style="width: 22%;">
+            ${Array.from({length: totalDynamicCols}, () => `<col>`).join('')}
+        </colgroup>
+    `;
+
     var htmlTabel = `
         <div class="print-header">
             DAFTAR HADIR SISWA KELAS ${kelas.toUpperCase()}<br>
@@ -706,10 +740,11 @@ window.generateRekapStudi = function() {
             TAHUN AJARAN ${ta}
         </div>
         <table>
+            ${colsHtml}
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:30px;">NO</th>
-                    <th rowspan="2" style="width:250px;">NAMA SISWA</th>
+                    <th rowspan="2">NO</th>
+                    <th rowspan="2">NAMA SISWA</th>
                     ${monthsColsHtml}
                 </tr>
                 <tr>${weeksColsHtml}</tr>
@@ -717,14 +752,35 @@ window.generateRekapStudi = function() {
             <tbody>
     `;
 
+    var keteranganLiburPerKolom = {};
+    arrayRangeBulan.forEach(m => {
+        var datesInMonthForDay = [];
+        var dTemp = new Date(y, m, 1);
+        while(dTemp.getMonth() === m) {
+            if(dTemp.getDay() === targetHari) datesInMonthForDay.push(dTemp.getDate());
+            dTemp.setDate(dTemp.getDate() + 1);
+        }
+        for(let w = 0; w < 5; w++) {
+            if (w < datesInMonthForDay.length) {
+                var tg = datesInMonthForDay[w];
+                var liburKey = m + "-" + tg;
+                if(mapLiburStudi[liburKey]) keteranganLiburPerKolom[m + '-' + w] = mapLiburStudi[liburKey];
+            }
+        }
+    });
+    var jumlahBarisSiswa = siswaKelas.length;
+
     siswaKelas.forEach((s, idx) => {
         var tr = `<tr><td>${idx+1}</td><td class="left-align">${s.nama}</td>`;
         
-        mapKolomStudi.forEach(k => {
+        mapKolomStudi.forEach((k, indexKolom) => {
+            var kolomKey = k.bln + '-' + (indexKolom % 5);
+            var adaLibur = keteranganLiburPerKolom.hasOwnProperty(kolomKey);
+
             if (k.valid) {
-                if (k.isLibur) {
+                if (adaLibur) {
                     if (idx === 0) {
-                        tr += `<td rowspan="${siswaKelas.length}" class="bg-libur holiday-col"><div class="teks-libur-vertikal">${k.isLibur}</div></td>`;
+                        tr += `<td class="bg-libur" rowspan="${jumlahBarisSiswa}"><div class="teks-libur-vertikal">${keteranganLiburPerKolom[kolomKey]}</div></td>`;
                     }
                 } else {
                     var mark = "";
