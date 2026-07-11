@@ -173,25 +173,6 @@
     </div>
 </div>
 
-<!-- Modal Pratinjau Cetak & Tanda Tangan -->
-<div class="absen-modal print-modal" id="modal-print-preview">
-    <div class="absen-modal-content print-modal-content">
-        <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:white; padding:15px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-            <h3 style="margin:0; color:#374151;">🖨️ Pratinjau Cetak</h3>
-            <div style="display:flex; gap:10px;">
-                <input type="file" id="file-ttd-absen" accept="image/png" style="display:none;" onchange="window.tambahTtdLokalAbsen(event)">
-                <button class="btn-tambah kelas" onclick="document.getElementById('file-ttd-absen').click()">✍️ Tambah TTD Lokal</button>
-                <button class="btn-tambah" style="background:#ef4444;" onclick="window.tutupModalAbsen('modal-print-preview')">Batal</button>
-                <button class="btn-tambah" style="background:#10b981;" onclick="window.print()">🖨️ Cetak PDF</button>
-            </div>
-        </div>
-        
-        <div class="print-area" id="print-area-content">
-            <!-- Konten tabel rekap akan di-generate di sini -->
-        </div>
-    </div>
-</div>
-
 <div class="absen-modal" id="modal-tambah-kelas">
     <div class="absen-modal-content" style="max-height: max-content;">
         <h3 style="margin-top:0; color:#047857;">🏫 Tambah Kelas Baru</h3>
