@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI RPPM Generator - Terintegrasi GAS</title>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-hover: #0d9488;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --border: #cbd5e1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .config-box {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #f8fafc;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        #loading {
+            text-align: center;
+            display: none;
+            margin: 20px 0;
+            font-weight: bold;
+            color: var(--primary);
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px dashed var(--primary);
+        }
+        #output-rppm {
+            display: none;
+        }
+        .rppm-section {
+            margin-bottom: 25px;
+        }
+        .rppm-section h3 {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+            margin-top: 0;
+            color: #0f172a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f8fafc;
+            width: 30%;
+            text-align: left;
+            color: #334155;
+        }
+        td {
+            white-space: pre-line; /* Mempertahankan format baris baru dari AI */
+        }
+        .signature-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            text-align: center;
+        }
+        .signature-box div {
+            width: 45%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Generator RPPM (AI + GAS)</h1>
+    
+    <div class="config-box">
+        <strong>PENTING:</strong> Pastikan Anda telah menempelkan URL Web App GAS Anda pada baris <code>const gasUrl = "..."</code> di bagian bawah script HTML ini agar tombol bisa berfungsi.
+    </div>
+
+    <!-- Form Input Identitas -->
+    <div class="card">
+        <h3 style="margin-top:0; border-bottom: 1px solid #cbd5e1; padding-bottom:10px;">I. IDENTITAS RPP</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Nama Penyusun</label>
+                <input type="text" id="nama" value="Nova Haryanto">
+            </div>
+            <div class="form-group">
+                <label>Mata Pelajaran</label>
+                <input type="text" id="mapel" value="Informatika / Kecerdasan Artifisial">
+            </div>
+            <div class="form-group">
+                <label>Unit/Materi</label>
+                <input type="text" id="materi" value="Konsep Kecerdasan Artifisial Secara Sederhana">
+            </div>
+            <div class="form-group">
+                <label>Alokasi Waktu</label>
+                <input type="text" id="waktu" value="2 x 35 menit (2 JP) 1 Pertemuan">
+            </div>
+            <div class="form-group">
+                <label>Fase/Kelas</label>
+                <input type="text" id="fase" value="C/V (lima)">
+            </div>
+            <div class="form-group">
+                <label>Semester</label>
+                <input type="text" id="semester" value="Semester II">
+            </div>
+        </div>
+        <button onclick="generateRPPM()">Proses dengan AI ✨</button>
+    </div>
+
+    <!-- Animasi Loading -->
+    <div id="loading">⏳ Sedang menghubungi server GAS dan menghasilkan konten RPPM... Mohon tunggu...</div>
+
+    <!-- Wadah Output RPPM -->
+    <div class="card" id="output-rppm">
+        <div id="rppm-content"></div>
+    </div>
+</div>
+
+<script>
+    // =========================================================================
+    // ⚠️ MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI ⚠️
+    // =========================================================================
+    const gasUrl = "https://script.google.com/macros/s/AKfycbylwu_WjRjLmXVu0K5_1nEKhVxuGqJkULjU3qzCoviPuEoUCTHwFQTCBM__WMXhhLehPA/exec"; 
+
+    async function generateRPPM() {
+        // 1. Kumpulkan data dari form
+        const identitas = {
+            nama: document.getElementById('nama').value,
+            mapel: document.getElementById('mapel').value,
+            materi: document.getElementById('materi').value,
+            waktu: document.getElementById('waktu').value,
+            fase: document.getElementById('fase').value,
+            semester: document.getElementById('semester').value
+        };
+
+        // 2. Siapkan tampilan antarmuka
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('output-rppm').style.display = 'none';
+
+        try {
+            // 3. Kirim data ke Google Apps Script via Fetch API
+            const response = await fetch(gasUrl, {
+                method: 'POST',
+                body: JSON.stringify({ identitas: identitas }),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8', 
+                }
+            });
+
+            // 4. Tangkap balasan dari GAS (Harus berupa JSON yang valid)
+            const dataAI = await response.json();
+            
+            // Cek apakah ada error dari GAS
+            if(dataAI.error) {
+                throw new Error(dataAI.error);
+            }
+
+            // 5. Gabungkan data identitas statis dengan data AI dinamis
+            const fullData = { ...identitas, ...dataAI };
+            
+            // 6. Cetak ke HTML
+            renderRPPM(fullData);
+            
+            // Sembunyikan loading, tampilkan hasil
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('output-rppm').style.display = 'block';
+
+        } catch (error) {
+            console.error("Terjadi kesalahan:", error);
+            alert("Gagal memproses RPPM. Pastikan URL GAS sudah benar dan format balasan dari AI berupa JSON murni.\n\nDetail Error: " + error.message);
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    function renderRPPM(data) {
+        // Menggunakan operator '||' untuk memberikan teks default jika AI gagal memunculkan field tertentu
+        const profilMurid = data.profil_murid || "Data profil murid sedang diproses...";
+        const analisisMateri = data.analisis_materi || "Data analisis materi sedang diproses...";
+        const capaian = data.capaian || "Data capaian pembelajaran sedang diproses...";
+        const kegiatanInti = data.kegiatan_inti || "Data kegiatan inti sedang diproses...";
+        const pengayaan = data.pengayaan || "Data pengayaan sedang diproses...";
+        const remedial = data.remedial || "Data remedial sedang diproses...";
+
+        const htmlContent = `
+            <div class="rppm-section">
+                <h3>I. IDENTITAS RPP</h3>
+                <table>
+                    <tr><th>Nama Penyusun</th><td>${data.nama}</td></tr>
+                    <tr><th>Mata Pelajaran</th><td>${data.mapel}</td></tr>
+                    <tr><th>Unit/Materi</th><td>${data.materi}</td></tr>
+                    <tr><th>Alokasi Waktu</th><td>${data.waktu}</td></tr>
+                    <tr><th>Fase/Kelas</th><td>${data.fase}</td></tr>
+                    <tr><th>Semester</th><td>${data.semester}</td></tr>
+                </table>
+            </div>
+
+            <div class="rppm-section">
+                <h3>II. IDENTIFIKASI</h3>
+                <table>
+                    <tr><th>Profil Murid</th><td>${profilMurid}</td></tr>
+                    <tr><th>Analisis Materi</th><td>${analisisMateri}</td></tr>
+                    <tr>
+                        <th>Dimensi Profil Lulusan</th>
+                        <td>
+                            1. Keimanan dan Ketaqwaan<br>
+                            2. Kewargaan<br>
+                            3. Penalaran Kritis<br>
+                            4. Kreativitas<br>
+                            5. Kolaborasi<br>
+                            6. Kemandirian
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="rppm-section">
+                <h3>III. DESAIN PEMBELAJARAN</h3>
+                <table>
+                    <tr><th>Capaian Pembelajaran</th><td>${capaian}</td></tr>
+                    <tr><th>Tujuan Pembelajaran</th><td>Memahami materi ${data.materi}</td></tr>
+                    <tr><th>Praktik Pedagogis</th><td>Pembelajaran Kontekstual & Diskusi</td></tr>
+                </table>
+            </div>
+
+            <div class="rppm-section">
+                <h3>IV. PENGALAMAN BELAJAR</h3>
+                <table>
+                    <tr>
+                        <th>Kegiatan Awal</th>
+                        <td>Salam, doa bersama, presensi, dan memaparkan tujuan pembelajaran.</td>
+                    </tr>
+                    <tr>
+                        <th>Kegiatan Inti</th>
+                        <td>${kegiatanInti}</td>
+                    </tr>
+                    <tr>
+                        <th>Kegiatan Penutup</th>
+                        <td>Refleksi bersama, menyimpulkan materi, dan merencanakan tindak lanjut.</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="rppm-section">
+                <h3>V. ASESMEN PEMBELAJARAN</h3>
+                <table>
+                    <tr><th>1. Asesmen Awal</th><td>Pretest / Kuis Pemantik</td></tr>
+                    <tr><th>2. Asesmen Proses</th><td>Observasi & Penilaian Kinerja kelompok</td></tr>
+                    <tr><th>3. Asesmen Akhir</th><td>Latihan Soal</td></tr>
+                </table>
+            </div>
+
+            <div class="rppm-section">
+                <h3>VI. LAYANAN DIFERENSIASI</h3>
+                <table>
+                    <tr><th>1. Pengayaan</th><td>${pengayaan}</td></tr>
+                    <tr><th>2. Remedial</th><td>${remedial}</td></tr>
+                </table>
+            </div>
+
+            <div class="rppm-section">
+                <h3>VII. CATATAN TINDAK LANJUT</h3>
+                <p><em>(Catatan tindak lanjut guru setelah kegiatan diisi di sini...)</em></p>
+            </div>
+
+            <div class="signature-box">
+                <div>
+                    <p>Mengetahui,<br>Kepala Sekolah</p>
+                    <br><br><br>
+                    <p><strong>(....................................)</strong></p>
+                </div>
+                <div>
+                    <p>Bekasi, Juli 2026<br>Guru Bidang Studi</p>
+                    <br><br><br>
+                    <p><strong>${data.nama}</strong></p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('rppm-content').innerHTML = htmlContent;
+    }
+</script>
+
+</body>
+</html>
