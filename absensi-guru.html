@@ -24,9 +24,9 @@
     .info-hari-efektif { margin-top: 15px; padding: 12px; background: #ecfdf5; border: 2px dashed #10b981; border-radius: 12px; font-weight: 800; color: #047857; text-align: center; font-size: 14px;}
 
     /* CSS Popup Interaktif & Radio Button */
-    .absen-modal { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: 0.3s; z-index: 99999; padding: 15px; box-sizing: border-box;}
+    .absen-modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: 0.3s; z-index: 9999999; padding: 15px; padding-bottom: 80px; box-sizing: border-box;}
     .absen-modal.active { opacity:1; pointer-events:auto; }
-    .absen-modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+    .absen-modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 450px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
     
     .siswa-card-absen { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; margin-bottom: 10px; }
     .radio-group-absen { display: flex; gap: 4px; background: #e5e7eb; padding: 4px; border-radius: 10px; }
@@ -83,8 +83,12 @@
 <div class="absen-modal" id="modal-absen-harian">
     <div class="absen-modal-content">
         <h3 id="judul-absen-tgl" style="margin-top:0; color:#047857; text-align:center; border-bottom:2px dashed #e5e7eb; padding-bottom:10px;">Absensi Kelas</h3>
-        <div id="list-siswa-absen" style="flex:1; overflow-y:auto; margin-bottom:15px; padding-right:5px;"></div>
-        <div style="display:flex; gap:10px;">
+        
+        <!-- Area List Siswa yang bisa di-scroll -->
+        <div id="list-siswa-absen" style="flex:1; overflow-y:auto; margin-bottom:10px; padding-right:5px;"></div>
+        
+        <!-- PERBAIKAN: Tambahkan flex-shrink: 0, padding-top, dan border agar tombol selalu diam di bawah dan tidak ikut ter-scroll -->
+        <div style="display:flex; gap:10px; flex-shrink: 0; padding-top: 10px; border-top: 1px solid #f3f4f6;">
             <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-absen-harian')">Batal</button>
             <button class="btn-tambah" style="flex:1; background:#10b981;" onclick="window.simpanAbsenHarian()">✅ Simpan</button>
         </div>
