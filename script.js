@@ -551,6 +551,169 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru, legendLiburHtml = "") {
     printWindow.document.close();
 }
 
+// =============================================
+// REKAPITULASI WALI KELAS & BIDANG STUDI (NEW TAB & F4 LANDSCAPE)
+// =============================================
+window.bukaModalRekapWali = function() {
+    if(!document.getElementById('pilih-kelas-absen').value) return alert("Pilih Kelas terlebih dahulu di kalender!");
+    document.getElementById('modal-rekap-wali').classList.add('active');
+};
+
+window.bukaModalRekapStudi = function() {
+    if(!document.getElementById('pilih-kelas-absen').value) return alert("Pilih Kelas terlebih dahulu di kalender!");
+    var currentMonthIdx = kalenderAbsenDate.getMonth();
+    document.getElementById('rs-bln-awal').value = currentMonthIdx;
+    document.getElementById('rs-bln-akhir').value = currentMonthIdx;
+    document.getElementById('modal-rekap-studi').classList.add('active');
+};
+
+// Fungsi Bantuan untuk Kode Warna Absensi
+function getWarnaAbsen(status) {
+    if(status === 'SAKIT') return '<span style="color:#d97706; font-weight:900; font-size:12px;">s</span>'; // Kuning Gelap/Mustard
+    if(status === 'IZIN') return '<span style="color:#ea580c; font-weight:900; font-size:12px;">i</span>'; // Oranye
+    if(status.includes('ALP') || status.includes('ALF')) return '<span style="color:#ef4444; font-weight:900; font-size:12px;">a</span>'; // Merah
+    if(status === 'HADIR') return '<span style="color:#16a34a; font-weight:900; font-size:16px;">.</span>'; // Titik Hijau
+    return '';
+}
+
+// FUNGSI UTAMA BUKA TAB BARU UNTUK CETAK
+function bukaTabCetak(judul, htmlTabel, kepsek, guru, legendLiburHtml = "") {
+    var fullHtml = `
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <title>Cetak - ${judul}</title>
+        <style>
+            /* SETTING KERTAS F4 LANDSCAPE (330mm x 215mm) & WAJIB 1 HALAMAN */
+            @page { size: 330mm 215mm landscape; margin: 10mm; }
+            body { font-family: 'Times New Roman', serif; color: black; margin: 0; padding: 0; font-size: 11px; }
+            
+            /* UI Toolbar (Tidak ikut dicetak) */
+            .no-print { background: #f8fafc; padding: 15px; text-align: center; border-bottom: 2px solid #cbd5e1; margin-bottom: 15px; font-family: Arial, sans-serif; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+            .no-print button { padding: 10px 18px; margin: 0 5px; cursor: pointer; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 13px; transition: 0.2s;}
+            .no-print button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+            .no-print button.ttd { background: #f59e0b; }
+            .no-print button.cetak { background: #10b981; }
+            .no-print button.tutup { background: #ef4444; }
+            
+            /* Kontainer Utama untuk Print */
+            .print-wrapper { width: 100%; height: auto; max-height: 195mm; box-sizing: border-box; page-break-inside: avoid; display: flex; flex-direction: column; justify-content: space-between;}
+            .print-header { text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
+            
+            /* Desain Tabel */
+            table { width: 100%; border-collapse: collapse; margin-bottom: 5px; font-size: 10.5px; }
+            th, td { border: 1px solid black; padding: 2px 0; text-align: center; height: 14px;}
+            th { background-color: #f3f4f6; }
+            td.left-align { text-align: left; padding-left: 5px; white-space: nowrap; width: 180px;}
+            
+            /* Warna Khusus Tabel */
+            .bg-red { background-color: #fca5a5 !important; }
+            .bg-gray { background-color: #e5e7eb !important; }
+            .legend-libur { font-size: 10px; margin-top: 5px; text-align: left; font-family: Arial, sans-serif;}
+
+            /* Area Tanda Tangan & Interaksi */
+            .ttd-area { display: flex; justify-content: space-between; margin-top: 15px; padding: 0 50px; font-size: 12px; position: relative;}
+            .drag-ttd-item { position: absolute; width: 90px; height: 90px; cursor: grab; z-index: 50; padding: 2px; border: 2px dashed #3b82f6; box-sizing: border-box; display: flex; align-items: center; justify-content: center;}
+            .drag-ttd-item img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+            .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; }
+            
+            .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 11px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
+            .btn-resize-ttd { position: absolute; bottom: -8px; right: -8px; width: 18px; height: 18px; background: #3b82f6; border: 2px solid white; border-radius: 50%; cursor: nwse-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
+
+            @media print {
+                .no-print { display: none !important; }
+                .drag-ttd-item { border: none !important; padding: 0;}
+                .btn-delete-ttd, .btn-resize-ttd { display: none !important; }
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; }
+                /* Opsi tambahan untuk memastikan muat 1 halaman jika siswa sangat banyak */
+                table { font-size: 10px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="no-print">
+            <input type="file" id="file-ttd" accept="image/png" style="display:none;" onchange="tambahTtdLokal(event)">
+            <button class="ttd" onclick="document.getElementById('file-ttd').click()">✍️ Tambah TTD Lokal</button>
+            <button class="cetak" onclick="window.print()">🖨️ Cetak (Save as PDF)</button>
+            <button class="tutup" onclick="window.close()">Tutup Tab</button>
+        </div>
+        
+        <div class="print-wrapper" id="print-area">
+            <div>
+                ${htmlTabel}
+                ${legendLiburHtml}
+            </div>
+            
+            <div class="ttd-area">
+                <div>Mengetahui,<br>Kepala Sekolah<br><br><br><br><br><b>${kepsek}</b></div>
+                <div><br>${guru.jabatan_title || 'Guru Kelas'}<br><br><br><br><br><b>${guru.nama}</b></div>
+            </div>
+        </div>
+
+        <script>
+            // LOGIKA DRAG AND RESIZE TANDA TANGAN (DI DALAM TAB BARU)
+            function tambahTtdLokal(e) {
+                if(e.target.files.length === 0) return;
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    var area = document.getElementById('print-area');
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'drag-ttd-item';
+                    wrapper.style.left = '75%';
+                    wrapper.style.top = '75%';
+
+                    var img = document.createElement('img');
+                    img.src = ev.target.result;
+                    
+                    var delBtn = document.createElement('div');
+                    delBtn.className = 'btn-delete-ttd no-print'; delBtn.innerHTML = '✕';
+                    delBtn.onclick = function() { wrapper.remove(); };
+
+                    var resizeBtn = document.createElement('div');
+                    resizeBtn.className = 'btn-resize-ttd no-print';
+                    resizeBtn.title = 'Tarik untuk ubah ukuran';
+
+                    wrapper.appendChild(img); wrapper.appendChild(delBtn); wrapper.appendChild(resizeBtn); area.appendChild(wrapper);
+
+                    var p1=0, p2=0, p3=0, p4=0;
+                    wrapper.onmousedown = function(evt) {
+                        if(evt.target === delBtn || evt.target === resizeBtn) return; 
+                        evt.preventDefault(); p3 = evt.clientX; p4 = evt.clientY;
+                        document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
+                        document.onmousemove = function(evt) {
+                            evt.preventDefault(); p1 = p3 - evt.clientX; p2 = p4 - evt.clientY; p3 = evt.clientX; p4 = evt.clientY;
+                            wrapper.style.top = (wrapper.offsetTop - p2) + "px";
+                            wrapper.style.left = (wrapper.offsetLeft - p1) + "px";
+                        };
+                    };
+
+                    resizeBtn.onmousedown = function(evt) {
+                        evt.preventDefault(); evt.stopPropagation();
+                        var startX = evt.clientX, startY = evt.clientY;
+                        var startWidth = wrapper.offsetWidth, startHeight = wrapper.offsetHeight;
+                        document.onmousemove = function(evt) {
+                            evt.preventDefault();
+                            wrapper.style.width = Math.max(30, startWidth + (evt.clientX - startX)) + "px";
+                            wrapper.style.height = Math.max(30, startHeight + (evt.clientY - startY)) + "px";
+                        };
+                        document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
+                    };
+                };
+                reader.readAsDataURL(e.target.files[0]);
+                e.target.value = ""; 
+            }
+        </script>
+    </body>
+    </html>
+    `;
+
+    // Eksekusi Buka Tab Baru
+    var printWindow = window.open('', '_blank');
+    printWindow.document.write(fullHtml);
+    printWindow.document.close();
+}
+
 window.generateRekapWali = function() {
     var ta = document.getElementById('rw-ta').value || "..................";
     var wali = document.getElementById('rw-wali').value || "..................";
