@@ -176,7 +176,7 @@
             }
 
             try {
-                const res = await fetch('https://script.google.com/macros/s/AKfycbylwu_WjRjLmXVu0K5_1nEKhVxuGqJkULjU3qzCoviPuEoUCTHwFQTCBM__WMXhhLehPA/exec?action=get_agenda');
+                const res = await fetch('https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec?action=get_agenda');
                 const json = await res.json();
                 
                 const globalAgenda = json.data.map(item => {
