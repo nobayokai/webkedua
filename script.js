@@ -277,6 +277,7 @@ window.onload = () => {
 var globalSiswaAbsen = [];
 var kalenderAbsenDate = new Date();
 var tglPilihanAbsen = "";
+var globalDataAgenda = []; // Menyimpan data agenda secara global
 
 window.initAbsensi = async function() {
     var userLogStr = localStorage.getItem("user_login");
@@ -309,17 +310,21 @@ window.loadDataAbsensiUtama = async function() {
     }
 
     try {
-        var [resSiswa, resAbsen] = await Promise.all([
+        // PERBAIKAN: Tarik data Agenda sekaligus untuk mengecek Libur Nasional
+        var [resSiswa, resAbsen, resAgenda] = await Promise.all([
             fetch(SCRIPT_URL + "?action=get_siswa"),
-            fetch(SCRIPT_URL + "?action=get_rekap_absensi")
+            fetch(SCRIPT_URL + "?action=get_rekap_absensi"),
+            fetch(SCRIPT_URL + "?action=get_agenda")
         ]);
         
         var jsonSiswa = await resSiswa.json();
         var jsonAbsen = await resAbsen.json();
+        var jsonAgenda = await resAgenda.json();
         
         if(jsonSiswa.status === 'success') {
             globalSiswaAbsen = jsonSiswa.data;
             window.globalDataAbsensi = jsonAbsen.data || []; 
+            window.globalDataAgenda = jsonAgenda.data || []; 
             
             var kelasSet = new Set();
             globalSiswaAbsen.forEach(function(s) {
@@ -340,7 +345,7 @@ window.loadDataAbsensiUtama = async function() {
     
     // 2. Matikan Animasi Loading setelah selesai
     if(iosLoad) iosLoad.classList.remove('active');
-    document.getElementById('absen-loading-teks').style.display = 'none'; // Sembunyikan teks loading usang
+    document.getElementById('absen-loading-teks').style.display = 'none'; 
     window.renderKalenderAbsensi();
 };
 
@@ -350,26 +355,60 @@ window.navAbsenBulan = function(dir) { kalenderAbsenDate.setMonth(kalenderAbsenD
 window.renderKalenderAbsensi = function() {
     var grid = document.getElementById('absen-cal-grid');
     var label = document.getElementById('absen-bulan-label');
+    var infoEfektif = document.getElementById('info-efektif'); // Ambil elemen hari efektif
     if(!grid) return;
 
-    var y = kalenderAbsenDate.getFullYear(); var m = kalenderAbsenDate.getMonth();
+    var y = kalenderAbsenDate.getFullYear(); 
+    var m = kalenderAbsenDate.getMonth();
     label.textContent = new Intl.DateTimeFormat('id-ID', { month:'long', year:'numeric' }).format(kalenderAbsenDate);
     grid.innerHTML = '';
 
-    var first = new Date(y, m, 1); var last = new Date(y, m+1, 0); var today = new Date();
+    var first = new Date(y, m, 1); 
+    var last = new Date(y, m+1, 0); 
+    var today = new Date();
     var startIndex = (first.getDay() + 6) % 7;
+
+    // Filter Agenda: Cari yang kategorinya "Libur Nasional" di bulan dan tahun yang sedang dilihat
+    var liburNasional = window.globalDataAgenda.filter(function(a) {
+        var isNasional = String(a.kategori).toLowerCase().includes("libur nasional");
+        if (!isNasional) return false;
+        var dLibur = new Date(a.tanggal);
+        return dLibur.getFullYear() === y && dLibur.getMonth() === m;
+    });
 
     for(var i=0; i<startIndex; i++) { grid.innerHTML += `<div class="absen-day muted"></div>`; }
 
     var kelasTerpilih = document.getElementById('pilih-kelas-absen').value;
+    var jumlahHariEfektif = 0;
 
     for(var day=1; day<=last.getDate(); day++) {
-        var isToday = (day === today.getDate() && m === today.getMonth() && y === today.getFullYear()) ? 'today' : '';
         var tglStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+        var currDate = new Date(y, m, day);
+        var dayOfWeek = currDate.getDay();
+        
+        var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6); // 0: Minggu, 6: Sabtu
+        var isToday = (day === today.getDate() && m === today.getMonth() && y === today.getFullYear()) ? 'today' : '';
+        
+        // Cek apakah tanggal ini ada di daftar libur nasional
+        var isLiburNasional = liburNasional.some(function(l) {
+            return new Date(l.tanggal).getDate() === day;
+        });
+
+        var classLibur = (isWeekend || isLiburNasional) ? 'libur' : '';
+
+        // Hitung Hari Efektif Belajar
+        if (!isWeekend && !isLiburNasional) {
+            jumlahHariEfektif++;
+        }
 
         var onClick = kelasTerpilih ? `onclick="window.bukaModalAbsenTgl('${tglStr}')"` : `onclick="alert('Pilih kelas di atas terlebih dahulu!')"`;
 
-        grid.innerHTML += `<div class="absen-day ${isToday}" ${onClick}>${day}</div>`;
+        grid.innerHTML += `<div class="absen-day ${isToday} ${classLibur}" ${onClick} title="${isLiburNasional ? 'Libur Nasional' : ''}">${day}</div>`;
+    }
+
+    // Update Text Jumlah Hari Efektif
+    if (infoEfektif) {
+        infoEfektif.innerHTML = `📚 Jumlah Hari Efektif Belajar: <b>${jumlahHariEfektif} Hari</b>`;
     }
 };
 
@@ -384,7 +423,6 @@ window.bukaModalAbsenTgl = function(tgl) {
     var siswaKelas = globalSiswaAbsen.filter(function(s) { return s.kelas === kelas && s.nis !== "DUMMY_KELAS"; });
     siswaKelas.sort(function(a,b){ return a.nama.localeCompare(b.nama); });
 
-    // CARI RIWAYAT ABSEN (Dengan Pembersihan Tanda Petik & Zone Waktu Ekstra Ketat)
     var riwayatAbsen = window.globalDataAbsensi ? window.globalDataAbsensi.filter(function(a) {
         var tglBersih = "";
         var strTgl = String(a.tanggal).trim();
@@ -404,7 +442,6 @@ window.bukaModalAbsenTgl = function(tgl) {
         siswaKelas.forEach(function(s, index) {
             var statusSiswa = "Hadir"; 
             
-            // Pencocokan NIS dan Nama yang kebal dari tanda petik (') Google Sheet
             var absenSiswaIni = riwayatAbsen.find(function(a) { 
                 var dbNis = String(a.nis).replace(/['"]/g, '').trim();
                 var localNis = String(s.nis).replace(/['"]/g, '').trim();
@@ -455,7 +492,6 @@ window.simpanAbsenHarian = async function() {
 
     document.getElementById('modal-absen-harian').classList.remove('active');
     
-    // Teks Loading Menjadi "Menyimpan"
     var iosLoad = document.getElementById('ios-loading');
     var iosText = document.querySelector('#ios-loading .ios-loading-text');
     if(iosLoad && iosText) { iosText.textContent = "Menyimpan..."; iosLoad.classList.add('active'); }
@@ -464,7 +500,7 @@ window.simpanAbsenHarian = async function() {
 
     try {
         await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-        await window.loadDataAbsensiUtama(); // REFRESH AGAR BISA LANGSUNG DIEDIT
+        await window.loadDataAbsensiUtama(); 
         if(typeof fetchRekapAbsensi === "function") { fetchRekapAbsensi(); } 
     } catch(e) {
         alert("Gagal menyimpan data!");
@@ -480,7 +516,6 @@ window.simpanKelasBaru = async function() {
     if(!namaKelas) return alert("Nama kelas wajib diisi!");
 
     document.getElementById('modal-tambah-kelas').classList.remove('active');
-    
     var iosLoad = document.getElementById('ios-loading');
     var iosText = document.querySelector('#ios-loading .ios-loading-text');
     if(iosLoad && iosText) { iosText.textContent = "Menyimpan..."; iosLoad.classList.add('active'); }
