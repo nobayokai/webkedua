@@ -95,9 +95,14 @@ function updateMenuLogin() {
     const tabAbsensi = document.getElementById('tab-absensi'); 
     const tabAgenda = document.getElementById('tab-agenda'); 
     const tabSupervisi = document.getElementById('tab-supervisi'); 
+    const tabPosting = document.getElementById('tab-posting'); 
+    const tabFormulir = document.getElementById('tab-formulir'); 
+    
 
     if (userLogin) {
         if(tabLogin) tabLogin.style.display  = 'none';
+        if(tabPosting) tabPosting.style.display = 'none';
+        if(tabFormulir) tabFormulir.style.display = 'none';
         if(tabLogout) tabLogout.style.display = '';
         const user = JSON.parse(userLogin);
         if(tabLogout) tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
