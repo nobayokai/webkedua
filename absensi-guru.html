@@ -19,7 +19,6 @@
     .absen-day.muted { opacity: 0; pointer-events: none; }
     .absen-day.today { border: 2px solid #10b981; background: #ecfdf5; color: #047857; }
     
-    /* PERBAIKAN: Style Khusus untuk Hari Libur & Weekend */
     .absen-day.libur { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
     .absen-day.libur:hover { background: #ef4444; color: white; border-color: #ef4444; box-shadow: 0 5px 15px rgba(239,68,68,0.3); }
     .info-hari-efektif { margin-top: 15px; padding: 12px; background: #ecfdf5; border: 2px dashed #10b981; border-radius: 12px; font-weight: 800; color: #047857; text-align: center; font-size: 14px;}
@@ -39,6 +38,37 @@
     .radio-group-absen input[value="Izin"]:checked + label { background: #f59e0b; color: white; }
     .radio-group-absen input[value="Alpa"]:checked + label { background: #ef4444; color: white; }
 
+    /* CSS CETAK REKAP & TANDA TANGAN LOKAL */
+    .print-modal-content { max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; background: #f1f5f9; padding: 20px; }
+    .print-area { background: white; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 8px; min-height: 600px; position: relative; overflow: hidden; color: black; font-family: 'Times New Roman', Times, serif; }
+    .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+    .print-table th, .print-table td { border: 1px solid black; padding: 5px; text-align: center; }
+    .print-table th { background-color: #f9fafb; font-weight: bold; }
+    .print-table td.left-align { text-align: left; padding-left: 8px; }
+    .print-header { text-align: center; font-weight: bold; margin-bottom: 20px; line-height: 1.5; font-size: 14px;}
+    
+    .print-ttd-area { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 30px; font-size: 13px;}
+    
+    .drag-ttd-item { position: absolute; width: 100px; height: 100px; cursor: grab; z-index: 50; padding: 4px; border: 2px dashed #3b82f6; box-sizing: border-box; }
+    .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; }
+    .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 10px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
+    .btn-resize-ttd { position: absolute; bottom: -8px; right: -8px; width: 16px; height: 16px; background: #3b82f6; border: 2px solid white; border-radius: 50%; cursor: nwse-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
+
+    @media print {
+        body * { visibility: hidden; }
+        .no-print { display: none !important; }
+        .print-modal { position: absolute; left: 0; top: 0; margin: 0; padding: 0; width: 100%; }
+        .print-modal-content { max-width: 100%; padding: 0; background: transparent; overflow: visible; box-shadow: none;}
+        .print-area { box-shadow: none; padding: 0; border: none; }
+        .print-area * { visibility: visible; }
+        .drag-ttd-item { border: none !important; }
+        .btn-delete-ttd, .btn-resize-ttd { display: none !important; }
+    }
+
+    .form-group-abs { margin-bottom: 15px; text-align: left;}
+    .form-group-abs label { display: block; font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 5px;}
+    .form-group-abs input, .form-group-abs select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none;}
+
     /* ANIMASI LOADING iPHONE (iOS) */
     .ios-loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999999; opacity: 0; pointer-events: none; transition: 0.3s; }
     .ios-loading-overlay.active { opacity: 1; pointer-events: auto; }
@@ -46,10 +76,6 @@
     .ios-spinner { width: 40px; height: 40px; border: 4px solid #d1d5db; border-top-color: #3b82f6; border-radius: 50%; animation: ios-spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 15px; }
     @keyframes ios-spin { 100% { transform: rotate(360deg); } }
     .ios-loading-text { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold; color: #374151; font-size: 15px; }
-
-    .form-group-abs { margin-bottom: 15px; text-align: left;}
-    .form-group-abs label { display: block; font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 5px;}
-    .form-group-abs input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none;}
 </style>
 
 <div id="panel-absen">
@@ -61,8 +87,6 @@
            <button class="btn-tambah" onclick="window.bukaModalTambahSiswa()">👤 Tambah Siswa</button>
        </div>
 
-       <div id="absen-loading-teks" style="text-align:center; font-weight:bold; color:#10b981; display:none; margin-bottom:15px;">⏳ Menyinkronkan Data...</div>
-
        <div class="absen-cal-card">
            <div class="absen-cal-head">
                <button class="absen-cal-nav" onclick="window.navAbsenBulan(-1)">❮</button>
@@ -72,12 +96,18 @@
            <div class="absen-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
            <div class="absen-grid" id="absen-cal-grid"></div>
            
-           <!-- PERBAIKAN: Elemen Informasi Hari Efektif -->
            <div id="info-efektif" class="info-hari-efektif">📚 Jumlah Hari Efektif Belajar: - Hari</div>
+           
+           <!-- TOMBOL CETAK REKAPITULASI -->
+           <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+               <button class="btn-tambah" style="flex:1; background:#8b5cf6;" onclick="window.bukaModalRekapWali()">📄 Unduh Rekapan (Wali Kelas)</button>
+               <button class="btn-tambah" style="flex:1; background:#ec4899;" onclick="window.bukaModalRekapStudi()">📊 Unduh Rekapan (Bidang Studi)</button>
+           </div>
        </div>
    </div>
 </div>
 
+<!-- Modal Absen Harian -->
 <div class="absen-modal" id="modal-absen-harian">
     <div class="absen-modal-content">
         <h3 id="judul-absen-tgl" style="margin-top:0; color:#047857; text-align:center; border-bottom:2px dashed #e5e7eb; padding-bottom:10px;">Absensi Kelas</h3>
@@ -85,6 +115,79 @@
         <div style="display:flex; gap:10px;">
             <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-absen-harian')">Batal</button>
             <button class="btn-tambah" style="flex:1; background:#10b981;" onclick="window.simpanAbsenHarian()">✅ Simpan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Rekap Wali Kelas -->
+<div class="absen-modal" id="modal-rekap-wali">
+    <div class="absen-modal-content" style="max-height: max-content;">
+        <h3 style="margin-top:0; color:#8b5cf6;">📄 Pengaturan Rekap Wali Kelas</h3>
+        <div class="form-group-abs"><label>Tahun Ajaran</label><input type="text" id="rw-ta" placeholder="Contoh: 2024/2025"></div>
+        <div class="form-group-abs"><label>Nama Wali Kelas</label><input type="text" id="rw-wali" placeholder="Nama lengkap wali kelas"></div>
+        <div class="form-group-abs"><label>Nama Kepala Sekolah</label><input type="text" id="rw-kepsek" placeholder="Nama lengkap kepala sekolah"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-rekap-wali')">Batal</button>
+            <button class="btn-tambah" style="flex:1; background:#8b5cf6;" onclick="window.generateRekapWali()">Lanjutkan 🚀</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Rekap Bidang Studi -->
+<div class="absen-modal" id="modal-rekap-studi">
+    <div class="absen-modal-content" style="max-height: 85vh; overflow-y:auto;">
+        <h3 style="margin-top:0; color:#ec4899;">📊 Pengaturan Rekap Bidang Studi</h3>
+        <div style="display:flex; gap:10px;">
+            <div class="form-group-abs" style="flex:1"><label>Bulan Awal</label>
+                <select id="rs-bln-awal">
+                    <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+                    <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+                    <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+                </select>
+            </div>
+            <div class="form-group-abs" style="flex:1"><label>Bulan Akhir</label>
+                <select id="rs-bln-akhir">
+                    <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+                    <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+                    <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group-abs">
+            <label>Hari Pembelajaran</label>
+            <select id="rs-hari">
+                <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
+                <option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option>
+            </select>
+        </div>
+        <div class="form-group-abs"><label>Mata Pelajaran</label><input type="text" id="rs-mapel" placeholder="Contoh: Matematika"></div>
+        <div class="form-group-abs"><label>Tahun Ajaran</label><input type="text" id="rs-ta" placeholder="Contoh: 2024/2025"></div>
+        <div class="form-group-abs"><label>Nama Guru Bidang Studi</label><input type="text" id="rs-guru" placeholder="Nama lengkap guru"></div>
+        <div class="form-group-abs"><label>Nama Kepala Sekolah</label><input type="text" id="rs-kepsek" placeholder="Nama lengkap kepala sekolah"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-tambah" style="flex:1; background:#ef4444;" onclick="window.tutupModalAbsen('modal-rekap-studi')">Batal</button>
+            <button class="btn-tambah" style="flex:1; background:#ec4899;" onclick="window.generateRekapStudi()">Lanjutkan 🚀</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pratinjau Cetak & Tanda Tangan -->
+<div class="absen-modal print-modal" id="modal-print-preview">
+    <div class="absen-modal-content print-modal-content">
+        <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:white; padding:15px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h3 style="margin:0; color:#374151;">🖨️ Pratinjau Cetak</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="file" id="file-ttd-absen" accept="image/png" style="display:none;" onchange="window.tambahTtdLokalAbsen(event)">
+                <button class="btn-tambah kelas" onclick="document.getElementById('file-ttd-absen').click()">✍️ Tambah TTD Lokal</button>
+                <button class="btn-tambah" style="background:#ef4444;" onclick="window.tutupModalAbsen('modal-print-preview')">Batal</button>
+                <button class="btn-tambah" style="background:#10b981;" onclick="window.print()">🖨️ Cetak PDF</button>
+            </div>
+        </div>
+        
+        <div class="print-area" id="print-area-content">
+            <!-- Konten tabel rekap akan di-generate di sini -->
         </div>
     </div>
 </div>
