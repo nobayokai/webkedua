@@ -24,6 +24,13 @@
     .sup-badge.wait { background: #f59e0b; } .sup-badge.acc { background: #10b981; } .sup-badge.reject { background: #ef4444; }
     .alasan-box { background: #fee2e2; border-left: 3px solid #ef4444; padding: 8px 10px; margin-top: 10px; border-radius: 4px; font-size: 11px; color: #991b1b;}
 
+    /* AREA STAGING BULK UPLOAD */
+    .queue-box { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; max-height: 250px; overflow-y: auto;}
+    .queue-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px dashed #e2e8f0; font-size: 12px;}
+    .queue-item:last-child { border-bottom: none; }
+    .queue-title { font-weight: bold; color: #334155; }
+    .queue-info { color: #64748b; font-size: 11px; }
+
     /* AREA VIRTUAL PAPAN TTD */
     #pdf-virtual-area { position: relative; width: 100%; max-width: 420px; height: auto; min-height: 200px; background: white; border: 2px solid #e2e8f0; margin: 0 auto; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     #pdf-canvas-preview { width: 100%; display: block; height: auto; } 
@@ -71,31 +78,31 @@
                 <option value="Ditolak">Ditolak</option>
             </select>
             <select id="filter-ta" class="sup-btn outline" style="width:100%; padding:10px; background:white; text-align:left;" onchange="window.renderDaftarSupervisi()">
-                <option value="ALL">Semua Tahun Ajaran</option>
-                <option value="2023/2024">2023/2024</option>
-                <option value="2024/2025">2024/2025</option>
-                <option value="2025/2026">2025/2026</option>
+                <!-- Opsi Di-generate Otomatis oleh JavaScript -->
             </select>
-            <input type="text" id="filter-kelas" class="sup-btn outline" style="width:100%; padding:10px; background:white; text-align:left; cursor:text;" placeholder="Cari Kelas (Cth: X IPA 1)" oninput="window.renderDaftarSupervisi()">
+            <select id="filter-kelas" class="sup-btn outline" style="width:100%; padding:10px; background:white; text-align:left;" onchange="window.renderDaftarSupervisi()">
+                <option value="ALL">Semua Kelas</option>
+            </select>
         </div>
     </div>
 
+    <!-- AREA UPLOAD GURU -->
     <div id="area-upload-guru" style="display:none;">
         <div class="sup-upload-box">
-            <h3 style="margin-top:0;">⬆️ Upload Berkas Administrasi (Bisa Multiple)</h3>
+            <h3 style="margin-top:0;">⬆️ Tambah Berkas Administrasi (Bisa Bulk/Banyak)</h3>
             
             <div class="sup-form-row">
                 <div class="sup-form-group">
                     <label>Tahun Ajaran</label>
                     <select id="sup-ta">
-                        <option value="2023/2024">2023/2024</option>
-                        <option value="2024/2025" selected>2024/2025</option>
-                        <option value="2025/2026">2025/2026</option>
+                        <!-- Opsi Di-generate Otomatis oleh JavaScript -->
                     </select>
                 </div>
                 <div class="sup-form-group">
                     <label>Kelas</label>
-                    <input type="text" id="sup-kelas" placeholder="Cth: X IPA 1 / Kelas 1A" required>
+                    <select id="sup-kelas">
+                        <option value="">⏳ Memuat kelas dari absensi...</option>
+                    </select>
                 </div>
             </div>
 
@@ -116,11 +123,21 @@
             </div>
 
             <div class="sup-form-group">
-                <label>Pilih File (Bisa pilih banyak - Wajib PDF)</label>
-                <input type="file" id="sup-file" accept="application/pdf" multiple>
+                <label>Pilih File PDF</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="file" id="sup-file" accept="application/pdf" style="flex:1;">
+                    <button class="sup-btn gray" onclick="window.tambahKeAntrean()">➕ Tambah ke Daftar</button>
+                </div>
             </div>
-            
-            <button class="sup-btn blue" style="width:100%; padding:14px; font-size:14px;" onclick="window.prosesUploadDokumen(event)">🚀 Unggah Berkas ke Server</button>
+
+            <!-- AREA ANTREAN (STAGING) -->
+            <div id="area-queue" style="display:none;">
+                <h4 style="margin-bottom:8px; color:#475569;">📋 Daftar Berkas Siap Diunggah:</h4>
+                <div class="queue-box" id="list-antrean">
+                    <!-- List antrean muncul di sini -->
+                </div>
+                <button class="sup-btn blue" style="width:100%; padding:14px; font-size:14px;" onclick="window.prosesUploadSemua()">🚀 Unggah Semua Berkas di Daftar</button>
+            </div>
         </div>
     </div>
 
@@ -128,25 +145,19 @@
     <div class="sup-grid" id="list-dokumen-sup"></div>
 </div>
 
-<!-- Modal TTD, Tolak, dan Set TTD Lokal (tetap sama dengan sebelumnya) -->
+<!-- Modal TTD, Tolak, dan Set TTD Lokal (Tetap sama) -->
 <div class="modal" id="modal-acc" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
     <div style="background:white; padding:20px; border-radius:12px; max-width:480px; width:95%; max-height:98vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
         <h3 style="text-align:center; color:#047857; margin-top:0; margin-bottom:10px; font-weight:800;">✍️ Papan Penandatanganan</h3>
-        
         <div class="pdf-controls">
             <button class="sup-btn gray" onclick="window.prevPdfPage()">◀ Sebelum</button>
             <span id="pdf-page-info">Halaman - / -</span>
             <button class="sup-btn gray" onclick="window.nextPdfPage()">Berikut ▶</button>
         </div>
-
         <button class="sup-btn blue" style="display:block; margin:0 auto 15px; width:100%;" onclick="window.tambahTtdKeCanvas()">➕ Tambah TTD Di Halaman Ini</button>
-        
         <div id="pdf-virtual-area">
-            <div id="pdf-loading-text" style="padding: 50px 0; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px;">
-                ⏳ Memuat Dokumen...
-            </div>
+            <div id="pdf-loading-text" style="padding: 50px 0; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px;">⏳ Memuat Dokumen...</div>
         </div>
-        
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button class="sup-btn red" style="flex:1;" onclick="document.getElementById('modal-acc').style.display='none'">Batal</button>
             <button class="sup-btn" style="flex:2;" onclick="window.eksekusiAccDokumen()">✅ Terapkan & Simpan Final</button>
@@ -177,17 +188,16 @@
 
 <script>
 (function() {
+    // ======== GANTI DENGAN URL DEPLOY APP SCRIPT YANG BARU JIKA BERUBAH ========
     var API_URL = (typeof SCRIPT_URL !== 'undefined') ? SCRIPT_URL : 'https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec';
+    
     var curUser = JSON.parse(localStorage.getItem('user_login') || '{}');
-    var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || curUser.nama.toLowerCase().includes("kepala"));
+    var isKepsek = (curUser.jabatan === 'kepsek' || curUser.role === 'kepsek' || (curUser.nama && curUser.nama.toLowerCase().includes("kepala")));
     var activeDocId = "", activeDocUrl = "";
     
-    window.tempPdfBase64 = null; 
-    window.pdfDocProxy = null;
-    window.currentPdfPage = 1;
-    window.totalPdfPages = 1;
-    window.signaturesByPage = {}; 
-    window.allDataSupervisi = []; // Menyimpan semua data agar mudah difilter
+    window.tempPdfBase64 = null; window.pdfDocProxy = null; window.currentPdfPage = 1; window.totalPdfPages = 1; window.signaturesByPage = {}; 
+    window.allDataSupervisi = []; 
+    window.fileQueue = []; // Array Staging Berkas
 
     window.ubahTeksLoading = function(teks){
         var loading = document.getElementById("ios-loading");
@@ -197,11 +207,27 @@
             loading.classList.add("active");
         }
     }
-
     window.tutupLoading = function(){
         var loading = document.getElementById("ios-loading");
         if(loading) loading.classList.remove("active");
     }
+
+    // FUNGSI RENDER TAHUN AJARAN DINAMIS (2025 s/d 5 TAHUN KEDEPAN)
+    function generateTahunAjaran() {
+        var startYear = 2025;
+        var options = [];
+        for (var i = 0; i < 5; i++) {
+            options.push('<option value="'+(startYear + i)+'/'+(startYear + i + 1)+'">'+(startYear + i)+'/'+(startYear + i + 1)+'</option>');
+        }
+        var elTA = document.getElementById('sup-ta');
+        if(elTA) elTA.innerHTML = options.join("");
+        
+        var elFilterTA = document.getElementById('filter-ta');
+        if(elFilterTA) {
+            elFilterTA.innerHTML = '<option value="ALL">Semua Tahun Ajaran</option>' + options.join("");
+        }
+    }
+    generateTahunAjaran();
 
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
@@ -209,8 +235,29 @@
         document.getElementById('area-upload-guru').style.display = 'none';
     } else {
         document.getElementById('area-upload-guru').style.display = 'block';
+        fetchDropdownKelas(); // Hanya panggil untuk guru saat form ditampilkan
     }
 
+    // MENGAMBIL KELAS DARI ABSENSI
+    async function fetchDropdownKelas() {
+        try {
+            var res = await fetch(API_URL + "?action=get_kelas");
+            var json = await res.json();
+            if(json.status === 'success') {
+                var kelasSelect = document.getElementById('sup-kelas');
+                if(json.data.length === 0) {
+                    kelasSelect.innerHTML = "<option value=''>Data Kelas Kosong</option>";
+                    return;
+                }
+                kelasSelect.innerHTML = "<option value=''>-- Pilih Kelas --</option>";
+                json.data.forEach(function(k) {
+                    kelasSelect.innerHTML += '<option value="'+k+'">'+k+'</option>';
+                });
+            }
+        } catch(e) { console.error("Gagal load kelas dari absensi", e); }
+    }
+
+    // MENGAMBIL DAFTAR SUPERVISI & MENGATUR FILTER UNTUK KEPSEK
     window.loadDaftarSupervisi = async function() {
         var container = document.getElementById('list-dokumen-sup');
         if(!container) return;
@@ -222,7 +269,17 @@
             
             if(json.status === 'success') {
                 window.allDataSupervisi = json.data;
-                window.renderDaftarSupervisi(); // Panggil fungsi render
+                
+                // Jika Kepsek, Render opsi filter kelas berdasarkan data supervisi yang masuk
+                if(isKepsek) {
+                    var filterKelas = document.getElementById('filter-kelas');
+                    var unikKelas = [...new Set(window.allDataSupervisi.map(d => d.kelas).filter(k => k))];
+                    var strOpts = '<option value="ALL">Semua Kelas</option>';
+                    unikKelas.sort().forEach(function(k) { strOpts += '<option value="'+k+'">'+k+'</option>'; });
+                    filterKelas.innerHTML = strOpts;
+                }
+
+                window.renderDaftarSupervisi(); 
             }
         } catch(e) { 
             console.error(e); 
@@ -236,25 +293,16 @@
         var container = document.getElementById('list-dokumen-sup');
         container.innerHTML = "";
 
-        // Logika Filter
         var filterStatus = isKepsek ? (document.getElementById('filter-status').value || "ALL") : "ALL";
         var filterTA = isKepsek ? (document.getElementById('filter-ta').value || "ALL") : "ALL";
-        var filterKelas = isKepsek ? (document.getElementById('filter-kelas').value.trim().toLowerCase()) : "";
+        var filterKelas = isKepsek ? (document.getElementById('filter-kelas').value || "ALL") : "ALL";
 
         var dataFiltered = window.allDataSupervisi.filter(d => {
-            // Guru hanya melihat miliknya
             if (!isKepsek && d.nama !== curUser.nama) return false;
-            
-            // Kepsek menerapkan filter tambahan
             if (isKepsek) {
-                var statusBersih = String(d.status).trim();
-                if (filterStatus !== "ALL" && statusBersih !== filterStatus) return false;
+                if (filterStatus !== "ALL" && String(d.status).trim() !== filterStatus) return false;
                 if (filterTA !== "ALL" && d.tahun_ajaran !== filterTA) return false;
-                if (filterKelas && d.kelas) {
-                    if (!d.kelas.toLowerCase().includes(filterKelas)) return false;
-                } else if (filterKelas && !d.kelas) {
-                    return false; // Jika mencari kelas tapi data tidak punya kelas
-                }
+                if (filterKelas !== "ALL" && d.kelas !== filterKelas) return false;
             }
             return true;
         });
@@ -266,36 +314,30 @@
 
         dataFiltered.reverse().forEach(d => {
             var statusBersih = String(d.status).trim();
-            var isAcc = (statusBersih === 'Sudah ACC');
-            var isReject = (statusBersih === 'Ditolak');
-            var isWait = (statusBersih === 'Menunggu ACC');
-            
-            var badgeClass = isAcc ? 'acc' : (isReject ? 'reject' : 'wait');
+            var badgeClass = (statusBersih === 'Sudah ACC') ? 'acc' : ((statusBersih === 'Ditolak') ? 'reject' : 'wait');
             var actionsHTML = "";
             
-            // Extra Info Display (Tahun Ajaran & Kelas)
             var infoTA = d.tahun_ajaran ? `<br><b>TA:</b> ${d.tahun_ajaran}` : "";
             var infoKelas = d.kelas ? `<br><b>Kelas:</b> ${d.kelas}` : "";
             
-            if (isKepsek && isWait) {
+            if (isKepsek && statusBersih === 'Menunggu ACC') {
                 actionsHTML = `
                     <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
                         <a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="flex:1; text-decoration:none;">👀 Pratinjau</a>
                         <button class="sup-btn orange" style="flex:1;" onclick="window.bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">✍️ Sign</button>
                         <button class="sup-btn red" style="flex:1;" onclick="window.bukaModalTolak('${d.id_dokumen}')">❌ Tolak</button>
                     </div>`;
-            } else if (isAcc) {
+            } else if (statusBersih === 'Sudah ACC') {
                 actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_acc}" target="_blank" class="sup-btn" style="width:100%; text-decoration:none;">📄 Download PDF Final</a></div>`;
             } else {
                 actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="width:100%; text-decoration:none;">👀 Lihat Draft Berkas</a></div>`;
             }
 
-            // Tambahan Tombol Hapus untuk Guru
             if (!isKepsek) {
                 actionsHTML += `<button class="sup-btn outline" style="width:100%; margin-top:8px; border-color:#ef4444; color:#ef4444;" onclick="window.hapusDokumen('${d.id_dokumen}')">🗑️ Hapus Berkas</button>`;
             }
 
-            var alasanHTML = (isReject && d.alasan) ? `<div class="alasan-box"><b>Alasan Ditolak:</b> ${d.alasan}</div>` : "";
+            var alasanHTML = (statusBersih === 'Ditolak' && d.alasan) ? `<div class="alasan-box"><b>Alasan Ditolak:</b> ${d.alasan}</div>` : "";
 
             container.innerHTML += `
                 <div class="sup-card">
@@ -312,41 +354,79 @@
         });
     };
 
-    window.prosesUploadDokumen = async function(e) {
-        e.preventDefault();
+    // FUNGSI QUEUE / STAGING BULK UPLOAD
+    window.tambahKeAntrean = function() {
+        var inputTA = document.getElementById('sup-ta').value;
+        var inputKelas = document.getElementById('sup-kelas').value;
+        var inputJenis = document.getElementById('sup-jenis').value;
         var fileInput = document.getElementById('sup-file');
-        var ta = document.getElementById('sup-ta').value;
-        var kelas = document.getElementById('sup-kelas').value.trim();
-        var jenis = document.getElementById('sup-jenis').value;
+        
+        if(!inputKelas) return alert("⚠️ Harap pilih Kelas terlebih dahulu!");
+        if(fileInput.files.length === 0) return alert("⚠️ Harap pilih file PDF terlebih dahulu!");
 
-        if(!kelas) return alert("⚠️ Harap isi kolom Kelas terlebih dahulu!");
-        if(fileInput.files.length === 0) return alert("⚠️ Pilih minimal 1 file PDF!");
+        var fileObj = fileInput.files[0];
+        window.fileQueue.push({
+            ta: inputTA, kelas: inputKelas, jenis: inputJenis,
+            file: fileObj, idQueue: Date.now()
+        });
+
+        fileInput.value = ""; // Reset input file setelah ditambah
+        window.renderAntreanUI();
+    };
+
+    window.renderAntreanUI = function() {
+        var area = document.getElementById('area-queue');
+        var list = document.getElementById('list-antrean');
+        if(window.fileQueue.length === 0) {
+            area.style.display = 'none'; return;
+        }
         
-        var totalFiles = fileInput.files.length;
-        window.ubahTeksLoading(`Memulai unggah ${totalFiles} berkas...`);
+        area.style.display = 'block';
+        list.innerHTML = "";
+        window.fileQueue.forEach(function(item, index) {
+            list.innerHTML += `
+                <div class="queue-item">
+                    <div>
+                        <div class="queue-title">${item.jenis}</div>
+                        <div class="queue-info">${item.file.name} | Kelas: ${item.kelas}</div>
+                    </div>
+                    <button class="sup-btn red" style="padding:4px 8px; font-size:10px;" onclick="window.hapusDariAntrean(${index})">Batal</button>
+                </div>
+            `;
+        });
+    };
+
+    window.hapusDariAntrean = function(index) {
+        window.fileQueue.splice(index, 1);
+        window.renderAntreanUI();
+    };
+
+    // EKSEKUSI SEMUA ANTREAN (BULK UPLOAD SEQUENTIAL)
+    window.prosesUploadSemua = async function() {
+        if(window.fileQueue.length === 0) return alert("Tidak ada dokumen di antrean.");
         
+        var total = window.fileQueue.length;
         var successCount = 0;
 
-        // Proses berurutan (sequential) untuk menghindari tabrakan di Google Apps Script
-        for (var i = 0; i < totalFiles; i++) {
-            var file = fileInput.files[i];
-            window.ubahTeksLoading(`Mengunggah berkas ${i + 1} dari ${totalFiles}...`);
+        for (var i = 0; i < total; i++) {
+            var curr = window.fileQueue[i];
+            window.ubahTeksLoading(`Mengunggah berkas ${i + 1} dari ${total}...`);
             
             try {
                 var base64Data = await new Promise((resolve) => {
                     var reader = new FileReader();
                     reader.onload = function(e) { resolve(e.target.result.split(',')[1]); };
-                    reader.readAsDataURL(file);
+                    reader.readAsDataURL(curr.file);
                 });
 
                 var payload = { 
                     action: "upload_supervisi", 
                     nama: curUser.nama, 
                     role: curUser.role, 
-                    jenis: jenis,
-                    tahun_ajaran: ta,
-                    kelas: kelas,
-                    fileName: curUser.nama + "_" + file.name, 
+                    jenis: curr.jenis,
+                    tahun_ajaran: curr.ta,
+                    kelas: curr.kelas,
+                    fileName: curUser.nama + "_" + curr.file.name, 
                     mimeType: "application/pdf", 
                     fileBase64: base64Data 
                 };
@@ -354,24 +434,20 @@
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 successCount++;
             } catch (err) {
-                console.error("Gagal upload file:", file.name, err);
+                console.error("Gagal upload antrean file ke-" + (i+1), err);
             }
         }
         
         tutupLoading();
-        if(successCount > 0) {
-            alert(`✅ Berhasil mengunggah ${successCount} dari ${totalFiles} berkas!`);
-            fileInput.value = ""; 
-            document.getElementById('sup-kelas').value = "";
-            window.loadDaftarSupervisi();
-        } else {
-            alert("❌ Gagal mengunggah berkas ke server.");
-        }
+        alert(`✅ Selesai! Berhasil mengunggah ${successCount} dari ${total} berkas ke server.`);
+        window.fileQueue = []; // Kosongkan antrean
+        window.renderAntreanUI();
+        window.loadDaftarSupervisi(); // Refresh data layar
     };
 
-    // Fungsi Hapus Dokumen (Baru)
+    // FUNGSI HAPUS DOKUMEN (API BARU)
     window.hapusDokumen = async function(id_dokumen) {
-        var konfirmasi = confirm("⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Dokumen akan terhapus dari Database dan Google Drive.");
+        var konfirmasi = confirm("⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Data akan terhapus dari Database.");
         if(!konfirmasi) return;
 
         window.ubahTeksLoading("Menghapus Dokumen...");
@@ -380,18 +456,18 @@
             var json = await res.json();
             if(json.status === 'success' || json.status === true) {
                 alert("✅ Dokumen berhasil dihapus.");
-                window.loadDaftarSupervisi();
+                window.loadDaftarSupervisi(); // Reload dari sheet
             } else {
                 throw new Error(json.message || "Unknown Error");
             }
         } catch (e) {
-            alert("❌ Gagal menghapus dokumen. Pastikan script mendukung 'delete_supervisi'.");
-            console.error(e);
+            alert("❌ Gagal menghapus dokumen: " + e.message);
         } finally {
             tutupLoading();
         }
     };
 
+    // LOGIKA PENANDATANGANAN PDF (Tetap sama dari perbaikan sebelumnya)
     window.simpanTtdLokal = function() {
         var f = document.getElementById('file-ttd');
         if (f.files.length === 0) return alert("Pilih gambar PNG transparan!");
@@ -460,7 +536,6 @@
 
     window.renderPdfPage = async function(pageNum) {
         if(!window.pdfDocProxy) return;
-        
         var area = document.getElementById('pdf-virtual-area');
         area.innerHTML = '<div style="padding:50px 0; text-align:center; color:#3b82f6; font-weight:bold; font-size:14px;">⏳ Memuat Halaman '+pageNum+'...</div>';
         
@@ -475,14 +550,8 @@
         
         await page.render({canvasContext: context, viewport: viewport}).promise;
 
-        area.innerHTML = '';
-        area.appendChild(canvas);
-        
-        setTimeout(() => {
-            area.style.height = canvas.offsetHeight + 'px';
-            window.loadPageSignatures(pageNum); 
-        }, 120);
-        
+        area.innerHTML = ''; area.appendChild(canvas);
+        setTimeout(() => { area.style.height = canvas.offsetHeight + 'px'; window.loadPageSignatures(pageNum); }, 120);
         document.getElementById('pdf-page-info').textContent = "Halaman " + pageNum + " dari " + window.totalPdfPages;
     };
 
@@ -491,45 +560,21 @@
         var canvas = document.getElementById('pdf-canvas-preview');
         var refW = canvas ? canvas.offsetWidth : 0;
         var refH = canvas ? canvas.offsetHeight : 0;
-
         var pageSigs = [];
         items.forEach(function(item) {
-            pageSigs.push({
-                left: item.offsetLeft,
-                top: item.offsetTop,
-                width: item.offsetWidth,
-                height: item.offsetHeight,
-                refW: refW,
-                refH: refH
-            });
+            pageSigs.push({ left: item.offsetLeft, top: item.offsetTop, width: item.offsetWidth, height: item.offsetHeight, refW: refW, refH: refH });
         });
         window.signaturesByPage[window.currentPdfPage] = pageSigs;
     };
 
     window.loadPageSignatures = function(pageNum) {
         var sigs = window.signaturesByPage[pageNum] || [];
-        sigs.forEach(function(sig) {
-            window.buatElemenTtd(sig.left, sig.top, sig.width, sig.height);
-        });
+        sigs.forEach(function(sig) { window.buatElemenTtd(sig.left, sig.top, sig.width, sig.height); });
     };
 
-    window.prevPdfPage = function() {
-        if (window.currentPdfPage <= 1) return;
-        window.saveCurrentPageSignatures();
-        window.currentPdfPage--;
-        window.renderPdfPage(window.currentPdfPage);
-    };
-    
-    window.nextPdfPage = function() {
-        if (window.currentPdfPage >= window.totalPdfPages) return;
-        window.saveCurrentPageSignatures();
-        window.currentPdfPage++;
-        window.renderPdfPage(window.currentPdfPage);
-    };
-
-    window.tambahTtdKeCanvas = function() {
-        window.buatElemenTtd('35%', '35%', 100, 100);
-    };
+    window.prevPdfPage = function() { if (window.currentPdfPage <= 1) return; window.saveCurrentPageSignatures(); window.currentPdfPage--; window.renderPdfPage(window.currentPdfPage); };
+    window.nextPdfPage = function() { if (window.currentPdfPage >= window.totalPdfPages) return; window.saveCurrentPageSignatures(); window.currentPdfPage++; window.renderPdfPage(window.currentPdfPage); };
+    window.tambahTtdKeCanvas = function() { window.buatElemenTtd('35%', '35%', 100, 100); };
 
     window.buatElemenTtd = function(left, top, w, h) {
         var area = document.getElementById('pdf-virtual-area');
@@ -560,16 +605,11 @@
             document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
             document.onmousemove = function(e) {
                 e.preventDefault(); p1 = p3 - e.clientX; p2 = p4 - e.clientY; p3 = e.clientX; p4 = e.clientY;
-                
-                var nTop = wrapper.offsetTop - p2;
-                var nLeft = wrapper.offsetLeft - p1;
-                
+                var nTop = wrapper.offsetTop - p2; var nLeft = wrapper.offsetLeft - p1;
                 if(nTop < 0) nTop = 0; if(nLeft < 0) nLeft = 0;
                 if(nTop + wrapper.offsetHeight > area.offsetHeight) nTop = area.offsetHeight - wrapper.offsetHeight;
                 if(nLeft + wrapper.offsetWidth > area.offsetWidth) nLeft = area.offsetWidth - wrapper.offsetWidth;
-                
-                wrapper.style.top = nTop + "px";
-                wrapper.style.left = nLeft + "px";
+                wrapper.style.top = nTop + "px"; wrapper.style.left = nLeft + "px";
             };
         };
 
@@ -579,20 +619,13 @@
             var startWidth = wrapper.offsetWidth, startHeight = wrapper.offsetHeight;
             var boxLeft = wrapper.offsetLeft, boxTop = wrapper.offsetTop;
             var minSize = 30;
-
             document.onmousemove = function(e) {
                 e.preventDefault();
-                var deltaX = e.clientX - startX;
-                var deltaY = e.clientY - startY;
-
-                var newWidth = Math.max(minSize, startWidth + deltaX);
-                var newHeight = Math.max(minSize, startHeight + deltaY);
-
+                var newWidth = Math.max(minSize, startWidth + (e.clientX - startX));
+                var newHeight = Math.max(minSize, startHeight + (e.clientY - startY));
                 if(boxLeft + newWidth > area.offsetWidth) newWidth = area.offsetWidth - boxLeft;
                 if(boxTop + newHeight > area.offsetHeight) newHeight = area.offsetHeight - boxTop;
-
-                wrapper.style.width = newWidth + "px";
-                wrapper.style.height = newHeight + "px";
+                wrapper.style.width = newWidth + "px"; wrapper.style.height = newHeight + "px";
             };
             document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
         };
@@ -604,74 +637,41 @@
             var startWidth = wrapper.offsetWidth, startHeight = wrapper.offsetHeight;
             var boxLeft = wrapper.offsetLeft, boxTop = wrapper.offsetTop;
             var minSize = 30;
-
             function onTouchMove(e) {
                 var t = e.touches[0];
-                var deltaX = t.clientX - startX;
-                var deltaY = t.clientY - startY;
-                var newWidth = Math.max(minSize, startWidth + deltaX);
-                var newHeight = Math.max(minSize, startHeight + deltaY);
+                var newWidth = Math.max(minSize, startWidth + (t.clientX - startX));
+                var newHeight = Math.max(minSize, startHeight + (t.clientY - startY));
                 if(boxLeft + newWidth > area.offsetWidth) newWidth = area.offsetWidth - boxLeft;
                 if(boxTop + newHeight > area.offsetHeight) newHeight = area.offsetHeight - boxTop;
-                wrapper.style.width = newWidth + "px";
-                wrapper.style.height = newHeight + "px";
+                wrapper.style.width = newWidth + "px"; wrapper.style.height = newHeight + "px";
             }
-            function onTouchEnd() {
-                document.removeEventListener('touchmove', onTouchMove);
-                document.removeEventListener('touchend', onTouchEnd);
-            }
-            document.addEventListener('touchmove', onTouchMove, {passive:false});
-            document.addEventListener('touchend', onTouchEnd);
+            function onTouchEnd() { document.removeEventListener('touchmove', onTouchMove); document.removeEventListener('touchend', onTouchEnd); }
+            document.addEventListener('touchmove', onTouchMove, {passive:false}); document.addEventListener('touchend', onTouchEnd);
         };
     };
 
     window.eksekusiAccDokumen = async function() {
         window.saveCurrentPageSignatures(); 
-
-        var totalSignatures = 0;
-        for (var p in window.signaturesByPage) { totalSignatures += window.signaturesByPage[p].length; }
+        var totalSignatures = 0; for (var p in window.signaturesByPage) { totalSignatures += window.signaturesByPage[p].length; }
         if(totalSignatures === 0) return alert("⚠️ Anda belum membubuhkan tanda tangan di halaman manapun.");
-
         document.getElementById('modal-acc').style.display = 'none';
         window.ubahTeksLoading("Mencetak Tanda Tangan & Menyimpan...");
         
         try {
             if(!window.tempPdfBase64) throw new Error("Memori data PDF kosong.");
-
-            var binaryString = atob(window.tempPdfBase64);
-            var len = binaryString.length;
-            var bytes = new Uint8Array(len);
+            var binaryString = atob(window.tempPdfBase64); var len = binaryString.length; var bytes = new Uint8Array(len);
             for (var i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
-
             const pdfDoc = await PDFLib.PDFDocument.load(bytes);
-
             var ttdBytes = await fetch(localStorage.getItem('ttd_kepsek')).then(res => res.arrayBuffer());
             var embedTtd = await pdfDoc.embedPng(ttdBytes);
 
             for (var pageKey in window.signaturesByPage) {
-                var pageNum = parseInt(pageKey);
-                var sigList = window.signaturesByPage[pageKey];
+                var pageNum = parseInt(pageKey); var sigList = window.signaturesByPage[pageKey];
                 if(sigList.length === 0) continue;
-
-                var targetPage = pdfDoc.getPages()[pageNum - 1]; 
-                var { width, height } = targetPage.getSize();
-
+                var targetPage = pdfDoc.getPages()[pageNum - 1]; var { width, height } = targetPage.getSize();
                 sigList.forEach(function(sig){
-                    var refW = sig.refW || width;
-                    var refH = sig.refH || height;
-
-                    var scaleX = width / refW;
-                    var scaleY = height / refH;
-
-                    var left = parseFloat(sig.left);
-                    var top = parseFloat(sig.top);
-
-                    targetPage.drawImage(embedTtd,{
-                        x: left * scaleX,
-                        y: height - (top * scaleY) - (sig.height * scaleY),
-                        width: sig.width * scaleX,
-                        height: sig.height * scaleY
-                    });
+                    var scaleX = width / (sig.refW || width); var scaleY = height / (sig.refH || height);
+                    targetPage.drawImage(embedTtd,{ x: parseFloat(sig.left) * scaleX, y: height - (parseFloat(sig.top) * scaleY) - (sig.height * scaleY), width: sig.width * scaleX, height: sig.height * scaleY });
                 });
             }
 
@@ -680,17 +680,9 @@
             var jsonAcc = await resAcc.json();
             
             if(jsonAcc.status === 'success') {
-                alert("✅ Luar Biasa! Berkas berhasil ditandatangani di semua halaman pilihan Anda.");
-                window.tempPdfBase64 = null; 
-                window.loadDaftarSupervisi();
-            } else {
-                throw new Error(jsonAcc.message);
-            }
-        } catch(e) { 
-            alert("❌ Gagal Memproses PDF: " + e.message); 
-        } finally { 
-            tutupLoading(); 
-        }
+                alert("✅ Luar Biasa! Berkas berhasil ditandatangani."); window.tempPdfBase64 = null; window.loadDaftarSupervisi();
+            } else { throw new Error(jsonAcc.message); }
+        } catch(e) { alert("❌ Gagal Memproses PDF: " + e.message); } finally { tutupLoading(); }
     };
 
     window.loadDaftarSupervisi();
