@@ -1,16 +1,44 @@
-<div class="content-section active" style="padding: 20px;">
-    <h2 style="font-family: 'Georgia', serif; color: var(--green2); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📅 Tambah Agenda Sekolah</h2>
+<style>
+    /* Desain Kartu Agenda */
+    .agenda-card { background: white; border: 1px solid #e5e7eb; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .agenda-info { flex: 1; min-width: 200px; }
+    .agenda-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-sm { padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; color: white; transition: 0.2s; }
+    .btn-sm:hover { transform: translateY(-2px); }
+    .btn-edit { background: #f59e0b; box-shadow: 0 2px 5px rgba(245,158,11,0.3); }
+    .btn-delete { background: #ef4444; box-shadow: 0 2px 5px rgba(239,68,68,0.3); }
+    .badge { font-size: 10px; padding: 4px 8px; border-radius: 6px; background: #e5e7eb; color: #374151; font-weight: bold; margin-left: 8px;}
     
-    <div style="background: rgba(255,255,255,0.8); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px;">
-        <form id="form-agenda" onsubmit="submitAgenda(event)" style="display: flex; flex-direction: column; gap: 15px;">
+    /* Warna Badge Spesifik */
+    .badge-Libur { background: #fee2e2; color: #b91c1c; }
+    .badge-Ujian { background: #f3e8ff; color: #7e22ce; }
+    
+    /* Overlay Spinner Loading Global */
+    #agenda-spinner-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 99999; display: none; justify-content: center; align-items: center; flex-direction: column; }
+    .agenda-spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.3); border-top: 5px solid #10b981; border-radius: 50%; animation: spin-agenda 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 15px;}
+    @keyframes spin-agenda { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+
+<!-- Elemen Loading -->
+<div id="agenda-spinner-overlay">
+    <div class="agenda-spinner"></div>
+    <p style="color: white; font-weight: bold; font-family: sans-serif; font-size: 15px;" id="agenda-spinner-text">Memproses Data...</p>
+</div>
+
+<div class="content-section active" style="padding: 20px; padding-bottom: 60px;">
+    <h2 style="font-family: 'Georgia', serif; color: var(--green2); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📅 Pengaturan Agenda Sekolah</h2>
+    
+    <div style="background: rgba(255,255,255,0.8); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px; margin-bottom: 25px;">
+        <h3 id="form-title" style="margin-top:0; color:#374151;">✨ Tambah Agenda Baru</h3>
+        <form id="form-agenda" onsubmit="submitAgendaForm(event)" style="display: flex; flex-direction: column; gap: 15px;">
             <div>
                 <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Tanggal Kegiatan</label>
-                <input type="date" id="input-tanggal-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
+                <input type="date" id="input-tanggal-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px; box-sizing:border-box;">
             </div>
 
             <div>
                 <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Kategori Agenda</label>
-                <select id="input-kategori-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px; background: white; cursor: pointer;">
+                <select id="input-kategori-agenda" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px; background: white; cursor: pointer; box-sizing:border-box;">
                     <option value="Kegiatan Sekolah">🟧 Kegiatan Sekolah (Umum)</option>
                     <option value="Ujian Sekolah">🟪 Ujian Sekolah / STS / SAS</option>
                     <option value="Libur Nasional">🟥 Libur Nasional / Cuti Bersama</option>
@@ -19,73 +47,180 @@
             
             <div>
                 <label style="font-weight: bold; font-size: 14px; color: #4b5563;">Nama / Deskripsi Kegiatan</label>
-                <input type="text" id="input-nama-agenda" placeholder="Contoh: Rapat Wali Murid Kelas 1-6" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px;">
+                <input type="text" id="input-nama-agenda" placeholder="Contoh: Rapat Wali Murid Kelas 1-6" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 5px; box-sizing:border-box;">
             </div>
 
-            <button type="submit" style="background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
-                💾 Simpan Agenda
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button type="button" id="btn-cancel-edit" onclick="resetModeAgenda()" style="display:none; flex:1; background: #9ca3af; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    Batal Edit
+                </button>
+                <button type="submit" id="btn-submit-agenda" style="flex:2; background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                    💾 Simpan Agenda
+                </button>
+            </div>
         </form>
-        <p id="pesan-agenda" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+
+    <!-- AREA DAFTAR AGENDA YANG BISA DIKELOLA -->
+    <h3 style="color: #374151; margin-bottom: 15px; border-bottom: 2px dashed #e5e7eb; padding-bottom: 10px;">📌 Daftar Agenda Tersimpan</h3>
+    <div id="list-agenda-container">
+        <!-- List Agenda Dirender Disini -->
     </div>
 </div>
 
 <script>
-    async function submitAgenda(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button');
-        const pesan = document.getElementById('pesan-agenda');
-        
-        btn.textContent = "Menyimpan...";
-        btn.disabled = true;
-        pesan.textContent = "";
+    const LINK_GAS_AGENDA = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
+    let editingAgendaId = null;
 
+    function tampilkanSpinnerAgenda(text) {
+        document.getElementById('agenda-spinner-text').textContent = text || 'Memproses Data...';
+        document.getElementById('agenda-spinner-overlay').style.display = 'flex';
+    }
+    function sembunyikanSpinnerAgenda() {
+        document.getElementById('agenda-spinner-overlay').style.display = 'none';
+    }
+
+    async function loadDaftarAgenda() {
+        tampilkanSpinnerAgenda("Menyinkronkan Daftar Agenda...");
+        try {
+            const res = await fetch(LINK_GAS_AGENDA + "?action=get_agenda");
+            const result = await res.json();
+            const container = document.getElementById('list-agenda-container');
+            container.innerHTML = "";
+            
+            if(result.status === 'success' && result.data.length > 0) {
+                // Tampilkan yang paling baru/terakhir ditambahkan di atas
+                result.data.reverse().forEach(ag => {
+                    const safeKegiatan = ag.kegiatan.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const safeKategori = ag.kategori.replace(/'/g, "\\'");
+                    
+                    let badgeClass = "badge";
+                    if(ag.kategori.includes("Libur")) badgeClass += " badge-Libur";
+                    if(ag.kategori.includes("Ujian")) badgeClass += " badge-Ujian";
+                    
+                    container.innerHTML += `
+                        <div class="agenda-card">
+                            <div class="agenda-info">
+                                <div style="margin-bottom: 5px;">
+                                    <span style="font-weight: 900; color: #111827; font-size:15px;">${ag.tanggal}</span> 
+                                    <span class="${badgeClass}">${ag.kategori}</span>
+                                </div>
+                                <div style="color: #4b5563; font-size: 13px; line-height:1.5;">${ag.kegiatan}</div>
+                                <div style="font-size: 11px; color: #9ca3af; margin-top: 5px;">👨‍🏫 Oleh: ${ag.pembuat}</div>
+                            </div>
+                            <div class="agenda-actions">
+                                <button class="btn-sm btn-edit" onclick="setEditAgenda('${ag.id}', '${ag.tanggal}', '${safeKategori}', '${safeKegiatan}')">✏️ Edit</button>
+                                <button class="btn-sm btn-delete" onclick="hapusAgenda('${ag.id}')">🗑️ Hapus</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                container.innerHTML = "<div style='text-align:center; padding:30px; background:white; border-radius:12px; color:#9ca3af;'>Belum ada agenda yang tersimpan di database.</div>";
+            }
+        } catch(e) {
+            console.error(e);
+            document.getElementById('list-agenda-container').innerHTML = "<p style='color:red; text-align:center;'>❌ Gagal terhubung ke server.</p>";
+        }
+        sembunyikanSpinnerAgenda();
+    }
+
+    function setEditAgenda(id, tgl, kategori, kegiatan) {
+        editingAgendaId = id;
+        
+        // Bersihkan format T/Z jika ada (Format Tanggal)
+        let tglBersih = tgl;
+        if(tgl.includes("T")) { tglBersih = tgl.substring(0, 10); }
+
+        document.getElementById('input-tanggal-agenda').value = tglBersih;
+        document.getElementById('input-kategori-agenda').value = kategori;
+        document.getElementById('input-nama-agenda').value = kegiatan;
+        
+        document.getElementById('form-title').innerHTML = "✏️ Edit Agenda";
+        document.getElementById('btn-submit-agenda').innerHTML = "Simpan Perubahan";
+        document.getElementById('btn-submit-agenda').style.background = "#f59e0b";
+        document.getElementById('btn-cancel-edit').style.display = "block";
+        
+        // Scroll layar kembali ke atas untuk mengisi form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetModeAgenda() {
+        editingAgendaId = null;
+        document.getElementById('form-agenda').reset();
+        document.getElementById('form-title').innerHTML = "✨ Tambah Agenda Baru";
+        document.getElementById('btn-submit-agenda').innerHTML = "💾 Simpan Agenda";
+        document.getElementById('btn-submit-agenda').style.background = "var(--green)";
+        document.getElementById('btn-cancel-edit').style.display = "none";
+    }
+
+    async function hapusAgenda(id) {
+        if(!confirm("⚠️ Yakin ingin menghapus agenda ini secara permanen dari database?")) return;
+        
+        tampilkanSpinnerAgenda("Menghapus Agenda...");
+        try {
+            const response = await fetch(LINK_GAS_AGENDA, {
+                method: "POST",
+                body: JSON.stringify({ action: 'delete_agenda', id: id })
+            });
+            const result = await response.json();
+            if(result.status === 'success') {
+                loadDaftarAgenda();
+            } else {
+                alert("Gagal menghapus: " + result.message);
+                sembunyikanSpinnerAgenda();
+            }
+        } catch(e) {
+            alert("Terjadi kesalahan jaringan.");
+            sembunyikanSpinnerAgenda();
+        }
+    }
+
+    async function submitAgendaForm(e) {
+        e.preventDefault();
+        
         const userLoginData = localStorage.getItem('user_login');
-        let namaGuru = 'Guru';
+        let namaGuru = 'Admin/Guru';
         if(userLoginData) {
             const parsedData = JSON.parse(userLoginData);
             namaGuru = parsedData.nama || 'Guru';
         }
         
-        // KINI DATA DIKIRIM TERPISAH (TIDAK DIGABUNG LAGI)
+        const isEditing = (editingAgendaId !== null);
         const payload = {
-            action: 'add_agenda',
+            action: isEditing ? 'edit_agenda' : 'add_agenda',
+            id: editingAgendaId,
             tanggal: document.getElementById('input-tanggal-agenda').value,
             kegiatan: document.getElementById('input-nama-agenda').value,
-            pembuat: namaGuru,
-            kategori: document.getElementById('input-kategori-agenda').value // <-- Parameter Kategori Baru
+            kategori: document.getElementById('input-kategori-agenda').value,
+            pembuat: namaGuru
         };
 
-        try {
-            const LINK_GAS = "https://script.google.com/macros/s/AKfycbw72VAmuae0gBueTndaZpL8NrUJkl2K1M-lVpMJSUsMKBjo1o6Bafc5mdrzJXOH7toQBg/exec";
+        tampilkanSpinnerAgenda(isEditing ? "Menyimpan Perubahan..." : "Menambahkan Agenda...");
 
-            const response = await fetch(LINK_GAS, {
+        try {
+            const response = await fetch(LINK_GAS_AGENDA, {
                 method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
             
             const result = await response.json();
             
             if (result.status === 'success') {
-                pesan.style.color = "green";
-                pesan.textContent = "✅ Agenda berhasil ditambahkan!";
-                document.getElementById('form-agenda').reset();
-                
-                if (typeof fetchAgendaDatabase === 'function') {
-                    fetchAgendaDatabase();
-                }
+                alert(isEditing ? "✅ Perubahan berhasil disimpan!" : "✅ Agenda berhasil ditambahkan!");
+                resetModeAgenda();
+                loadDaftarAgenda(); // Refresh Daftar Otomatis
             } else {
-                pesan.style.color = "red";
-                pesan.textContent = "❌ Gagal: " + result.message;
+                alert("❌ Gagal: " + result.message);
+                sembunyikanSpinnerAgenda();
             }
         } catch (error) {
             console.error("Detail Error:", error);
-            pesan.style.color = "red";
-            pesan.textContent = "❌ Terjadi kesalahan jaringan.";
+            alert("❌ Terjadi kesalahan jaringan.");
+            sembunyikanSpinnerAgenda();
         }
-        
-        btn.textContent = "💾 Simpan Agenda";
-        btn.disabled = false;
     }
+
+    // Load list pertama kali tab ini dibuka
+    setTimeout(loadDaftarAgenda, 200);
 </script>
