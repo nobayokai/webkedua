@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylwu_WjRjLmXVu0K5_1nEKhVxuGqJkULjU3qzCoviPuEoUCTHwFQTCBM__WMXhhLehPA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec';
 
 // ===========================================
 // GLOBAL VARIABLE
