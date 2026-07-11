@@ -38,33 +38,6 @@
     .radio-group-absen input[value="Izin"]:checked + label { background: #f59e0b; color: white; }
     .radio-group-absen input[value="Alpa"]:checked + label { background: #ef4444; color: white; }
 
-    /* CSS CETAK REKAP & TANDA TANGAN LOKAL */
-    .print-modal-content { max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; background: #f1f5f9; padding: 20px; }
-    .print-area { background: white; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 8px; min-height: 600px; position: relative; overflow: hidden; color: black; font-family: 'Times New Roman', Times, serif; }
-    .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-    .print-table th, .print-table td { border: 1px solid black; padding: 5px; text-align: center; }
-    .print-table th { background-color: #f9fafb; font-weight: bold; }
-    .print-table td.left-align { text-align: left; padding-left: 8px; }
-    .print-header { text-align: center; font-weight: bold; margin-bottom: 20px; line-height: 1.5; font-size: 14px;}
-    
-    .print-ttd-area { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 30px; font-size: 13px;}
-    
-    .drag-ttd-item { position: absolute; width: 100px; height: 100px; cursor: grab; z-index: 50; padding: 4px; border: 2px dashed #3b82f6; box-sizing: border-box; }
-    .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; }
-    .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 10px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
-    .btn-resize-ttd { position: absolute; bottom: -8px; right: -8px; width: 16px; height: 16px; background: #3b82f6; border: 2px solid white; border-radius: 50%; cursor: nwse-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
-
-    @media print {
-        body * { visibility: hidden; }
-        .no-print { display: none !important; }
-        .print-modal { position: absolute; left: 0; top: 0; margin: 0; padding: 0; width: 100%; }
-        .print-modal-content { max-width: 100%; padding: 0; background: transparent; overflow: visible; box-shadow: none;}
-        .print-area { box-shadow: none; padding: 0; border: none; }
-        .print-area * { visibility: visible; }
-        .drag-ttd-item { border: none !important; }
-        .btn-delete-ttd, .btn-resize-ttd { display: none !important; }
-    }
-
     .form-group-abs { margin-bottom: 15px; text-align: left;}
     .form-group-abs label { display: block; font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 5px;}
     .form-group-abs input, .form-group-abs select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none;}
@@ -80,7 +53,6 @@
 
 <div id="panel-absen">
    <div id="main-absen-ui" style="display:none;">
-       
        <div class="absen-toolbar">
            <select id="pilih-kelas-absen" onchange="window.gantiKelasAbsen()"></select>
            <button class="btn-tambah kelas" onclick="window.bukaModalTambahKelas()">➕ Tambah Kelas</button>
