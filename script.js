@@ -93,6 +93,7 @@ function updateMenuLogin() {
     const tabLogin  = document.getElementById('tab-login');
     const tabLogout = document.getElementById('tab-logout');
     const tabAbsensi = document.getElementById('tab-absensi'); 
+    const tabAgenda = document.getElementById('tab-agenda'); 
     const tabSupervisi = document.getElementById('tab-supervisi'); 
 
     if (userLogin) {
@@ -100,11 +101,13 @@ function updateMenuLogin() {
         if(tabLogout) tabLogout.style.display = '';
         const user = JSON.parse(userLogin);
         if(tabLogout) tabLogout.innerHTML = `<span style="color:#ff3b30;">Logout</span>`;
+        if (tabAgenda) tabAgenda.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
         if (tabAbsensi) tabAbsensi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
         if (tabSupervisi) tabSupervisi.style.display = (user.role === 'guru' || user.role === 'kepsek') ? 'inline-block' : 'none';
     } else {
         if(tabLogin) tabLogin.style.display  = '';
         if(tabLogout) tabLogout.style.display = 'none';
+        if(tabAgenda) tabAgenda.style.display = 'none'; 
         if(tabAbsensi) tabAbsensi.style.display = 'none'; 
         if(tabSupervisi) tabSupervisi.style.display = 'none'; 
     }
