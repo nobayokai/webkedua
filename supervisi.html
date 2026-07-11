@@ -1,4 +1,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
 <style>
     /* DESAIN DASHBOARD SUPERVISI PREMIUM */
@@ -12,7 +13,8 @@
     .sup-btn.outline { background: transparent; color: #374151; border: 1px solid #d1d5db; box-shadow: none; }
     
     .sup-upload-box { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 25px; margin-bottom: 25px; }
-    .sup-form-group { margin-bottom: 15px; }
+    .sup-form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+    .sup-form-group { flex: 1; min-width: 200px; }
     .sup-form-group label { display: block; font-weight: bold; font-size: 13px; color: #475569; margin-bottom: 8px; }
     .sup-form-group select, .sup-form-group input, .sup-form-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-family:inherit;}
 
@@ -35,10 +37,22 @@
     .pdf-controls { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
     .pdf-controls span { font-weight: 800; color: #1e293b; font-size: 13px; }
 
-    /* ANIMASI SPINNER LOCAL */
-    .sup-db-spinner { border: 4px solid #f3f4f6; border-top: 4px solid #3b82f6; border-radius: 50%; width: 35px; height: 35px; animation: sup-spin-anime 1s linear infinite; margin: 0 auto 12px; }
-    @keyframes sup-spin-anime { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    /* PANEL FILTER KEPSEK */
+    .filter-panel { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 15px; margin-bottom: 25px; display: none; }
+
+    /* IOS LOADING SPINNER COMPONENT */
+    #ios-loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 100000; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(4px); }
+    #ios-loading.active { display: flex; }
+    .ios-spinner { width: 50px; height: 50px; border: 5px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #ffffff; animation: ios-spin 1s ease-in-out infinite; margin-bottom: 15px; }
+    @keyframes ios-spin { to { transform: rotate(360deg); } }
+    .ios-loading-text { color: white; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); text-align: center;}
 </style>
+
+<!-- ANIMASI LOADING GLOBAL -->
+<div id="ios-loading">
+    <div class="ios-spinner"></div>
+    <div class="ios-loading-text">Memproses...</div>
+</div>
 
 <div class="sup-container">
     <div class="sup-header">
@@ -46,23 +60,67 @@
         <button class="sup-btn outline" id="btn-show-ttd" style="display:none;" onclick="document.getElementById('modal-set-ttd').style.display='flex'">⚙️ Stempel & TTD Lokal</button>
     </div>
 
+    <!-- PANEL FILTER UNTUK KEPALA SEKOLAH -->
+    <div id="area-filter-kepsek" class="filter-panel">
+        <h4 style="margin-top:0; margin-bottom:12px; color:#1e293b;">🔍 Filter Dokumen (Khusus Kepsek)</h4>
+        <div class="sup-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            <select id="filter-status" class="sup-btn outline" style="width:100%; padding:10px; background:white; text-align:left;" onchange="window.renderDaftarSupervisi()">
+                <option value="ALL">Semua Status ACC</option>
+                <option value="Menunggu ACC">Menunggu ACC</option>
+                <option value="Sudah ACC">Sudah ACC</option>
+                <option value="Ditolak">Ditolak</option>
+            </select>
+            <select id="filter-ta" class="sup-btn outline" style="width:100%; padding:10px; background:white; text-align:left;" onchange="window.renderDaftarSupervisi()">
+                <option value="ALL">Semua Tahun Ajaran</option>
+                <option value="2023/2024">2023/2024</option>
+                <option value="2024/2025">2024/2025</option>
+                <option value="2025/2026">2025/2026</option>
+            </select>
+            <input type="text" id="filter-kelas" class="sup-btn outline" style="width:100%; padding:10px; background:white; text-align:left; cursor:text;" placeholder="Cari Kelas (Cth: X IPA 1)" oninput="window.renderDaftarSupervisi()">
+        </div>
+    </div>
+
     <div id="area-upload-guru" style="display:none;">
         <div class="sup-upload-box">
-            <h3 style="margin-top:0;">⬆️ Upload Berkas</h3>
-            <div class="sup-form-group">
+            <h3 style="margin-top:0;">⬆️ Upload Berkas Administrasi (Bisa Multiple)</h3>
+            
+            <div class="sup-form-row">
+                <div class="sup-form-group">
+                    <label>Tahun Ajaran</label>
+                    <select id="sup-ta">
+                        <option value="2023/2024">2023/2024</option>
+                        <option value="2024/2025" selected>2024/2025</option>
+                        <option value="2025/2026">2025/2026</option>
+                    </select>
+                </div>
+                <div class="sup-form-group">
+                    <label>Kelas</label>
+                    <input type="text" id="sup-kelas" placeholder="Cth: X IPA 1 / Kelas 1A" required>
+                </div>
+            </div>
+
+            <div class="sup-form-group" style="margin-bottom:15px;">
                 <label>Pilih Jenis Berkas</label>
                 <select id="sup-jenis">
+                    <option value="Capaian Pembelajaran (CP)">Capaian Pembelajaran (CP)</option>
+                    <option value="Alur Tujuan Pembelajaran (ATP)">Alur Tujuan Pembelajaran (ATP)</option>
                     <option value="Modul Ajar">Modul Ajar</option>
                     <option value="Program Tahunan (Prota)">Program Tahunan (Prota)</option>
                     <option value="Program Semester (Promes)">Program Semester (Promes)</option>
                     <option value="KKTP">Kriteria Ketercapaian TP (KKTP)</option>
+                    <option value="Jadwal Pelajaran">Jadwal Pelajaran</option>
+                    <option value="Denah Tempat Duduk">Denah Tempat Duduk</option>
+                    <option value="Daftar Piket">Daftar Piket</option>
+                    <option value="Tata Tertib Kelas">Tata Tertib Kelas</option>
                 </select>
             </div>
+
             <div class="sup-form-group">
-                <label>Pilih File (Wajib PDF)</label>
-                <input type="file" id="sup-file" accept="application/pdf">
+                <label>Pilih File (Bisa pilih banyak - Wajib PDF)</label>
+                <input type="file" id="sup-file" accept="application/pdf" multiple>
             </div>
-            <button class="sup-btn blue" style="width:100%; padding:12px;" onclick="window.prosesUploadDokumen(event)">🚀 Unggah ke Server</button>
+            
+            <button class="sup-btn blue" style="width:100%; padding:14px; font-size:14px;" onclick="window.prosesUploadDokumen(event)">🚀 Unggah Berkas ke Server</button>
         </div>
     </div>
 
@@ -70,6 +128,7 @@
     <div class="sup-grid" id="list-dokumen-sup"></div>
 </div>
 
+<!-- Modal TTD, Tolak, dan Set TTD Lokal (tetap sama dengan sebelumnya) -->
 <div class="modal" id="modal-acc" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
     <div style="background:white; padding:20px; border-radius:12px; max-width:480px; width:95%; max-height:98vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
         <h3 style="text-align:center; color:#047857; margin-top:0; margin-bottom:10px; font-weight:800;">✍️ Papan Penandatanganan</h3>
@@ -128,33 +187,25 @@
     window.currentPdfPage = 1;
     window.totalPdfPages = 1;
     window.signaturesByPage = {}; 
+    window.allDataSupervisi = []; // Menyimpan semua data agar mudah difilter
 
     window.ubahTeksLoading = function(teks){
-
-    var loading=document.getElementById("ios-loading");
-    var loadingText=document.querySelector("#ios-loading .ios-loading-text");
-
-    if(loading){
-
-        if(loadingText)
-            loadingText.textContent=teks;
-
-        loading.classList.add("active");
+        var loading = document.getElementById("ios-loading");
+        if(loading){
+            var loadingText = document.querySelector("#ios-loading .ios-loading-text");
+            if(loadingText) loadingText.textContent = teks;
+            loading.classList.add("active");
+        }
     }
 
-}
-
-window.tutupLoading=function(){
-
-    var loading=document.getElementById("ios-loading");
-
-    if(loading)
-        loading.classList.remove("active");
-
-}
+    window.tutupLoading = function(){
+        var loading = document.getElementById("ios-loading");
+        if(loading) loading.classList.remove("active");
+    }
 
     if (isKepsek) {
         document.getElementById('btn-show-ttd').style.display = 'inline-flex';
+        document.getElementById('area-filter-kepsek').style.display = 'block';
         document.getElementById('area-upload-guru').style.display = 'none';
     } else {
         document.getElementById('area-upload-guru').style.display = 'block';
@@ -164,63 +215,14 @@ window.tutupLoading=function(){
         var container = document.getElementById('list-dokumen-sup');
         if(!container) return;
 
-        container.innerHTML = `
-            <div style="text-align:center; padding:50px; width:100%; grid-column:1/-1;">
-                <div class="sup-db-spinner"></div>
-                <span style="color:#64748b; font-weight:bold; font-size:13px;">Menghubungkan ke database sekolah...</span>
-            </div>
-        `;
-
         window.ubahTeksLoading("Membaca Berkas Supervisi...");
         try {
             var res = await fetch(API_URL + "?action=get_supervisi");
             var json = await res.json();
-            container.innerHTML = "";
-
+            
             if(json.status === 'success') {
-                var dataFiltered = isKepsek ? json.data : json.data.filter(d => d.nama === curUser.nama);
-                if(dataFiltered.length === 0) {
-                    container.innerHTML = "<p style='color:#9ca3af; text-align:center; width:100%; grid-column:1/-1;'>Belum ada dokumen supervisi.</p>"; 
-                    tutupLoading(); return;
-                }
-
-                dataFiltered.reverse().forEach(d => {
-                    var statusBersih = String(d.status).trim();
-                    var isAcc = (statusBersih === 'Sudah ACC');
-                    var isReject = (statusBersih === 'Ditolak');
-                    var isWait = (statusBersih === 'Menunggu ACC');
-                    
-                    var badgeClass = isAcc ? 'acc' : (isReject ? 'reject' : 'wait');
-                    var actionsHTML = "";
-                    
-                    if (isKepsek && isWait) {
-                        actionsHTML = `
-                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                                <a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="flex:1; text-decoration:none;">👀 Pratinjau</a>
-                                <button class="sup-btn orange" style="flex:1;" onclick="window.bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">✍️ Sign Dokumen</button>
-                                <button class="sup-btn red" style="flex:1;" onclick="window.bukaModalTolak('${d.id_dokumen}')">❌ Tolak</button>
-                            </div>`;
-                    } else if (isAcc) {
-                        actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_acc}" target="_blank" class="sup-btn" style="width:100%; text-decoration:none;">📄 Download PDF Final</a></div>`;
-                    } else {
-                        actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="width:100%; text-decoration:none;">👀 Lihat Draft Berkas</a></div>`;
-                    }
-
-                    var alasanHTML = (isReject && d.alasan) ? `<div class="alasan-box"><b>Alasan Ditolak:</b> ${d.alasan}</div>` : "";
-
-                    container.innerHTML += `
-                        <div class="sup-card">
-                            <div>
-                                <div style="font-weight:900; font-size:15px; margin-bottom:5px;">${d.jenis}</div>
-                                <div style="font-size:11px; color:#475569;">
-                                    <b>Oleh:</b> ${d.nama} <br> 
-                                    <b>Status:</b> <span class="sup-badge ${badgeClass}">${statusBersih}</span>
-                                </div>
-                                ${alasanHTML}
-                            </div>
-                            ${actionsHTML}
-                        </div>`;
-                });
+                window.allDataSupervisi = json.data;
+                window.renderDaftarSupervisi(); // Panggil fungsi render
             }
         } catch(e) { 
             console.error(e); 
@@ -230,22 +232,164 @@ window.tutupLoading=function(){
         }
     };
 
-    window.prosesUploadDokumen = function(e) {
+    window.renderDaftarSupervisi = function() {
+        var container = document.getElementById('list-dokumen-sup');
+        container.innerHTML = "";
+
+        // Logika Filter
+        var filterStatus = isKepsek ? (document.getElementById('filter-status').value || "ALL") : "ALL";
+        var filterTA = isKepsek ? (document.getElementById('filter-ta').value || "ALL") : "ALL";
+        var filterKelas = isKepsek ? (document.getElementById('filter-kelas').value.trim().toLowerCase()) : "";
+
+        var dataFiltered = window.allDataSupervisi.filter(d => {
+            // Guru hanya melihat miliknya
+            if (!isKepsek && d.nama !== curUser.nama) return false;
+            
+            // Kepsek menerapkan filter tambahan
+            if (isKepsek) {
+                var statusBersih = String(d.status).trim();
+                if (filterStatus !== "ALL" && statusBersih !== filterStatus) return false;
+                if (filterTA !== "ALL" && d.tahun_ajaran !== filterTA) return false;
+                if (filterKelas && d.kelas) {
+                    if (!d.kelas.toLowerCase().includes(filterKelas)) return false;
+                } else if (filterKelas && !d.kelas) {
+                    return false; // Jika mencari kelas tapi data tidak punya kelas
+                }
+            }
+            return true;
+        });
+
+        if(dataFiltered.length === 0) {
+            container.innerHTML = "<p style='color:#9ca3af; text-align:center; width:100%; grid-column:1/-1;'>Belum ada/Tidak ditemukan dokumen supervisi.</p>"; 
+            return;
+        }
+
+        dataFiltered.reverse().forEach(d => {
+            var statusBersih = String(d.status).trim();
+            var isAcc = (statusBersih === 'Sudah ACC');
+            var isReject = (statusBersih === 'Ditolak');
+            var isWait = (statusBersih === 'Menunggu ACC');
+            
+            var badgeClass = isAcc ? 'acc' : (isReject ? 'reject' : 'wait');
+            var actionsHTML = "";
+            
+            // Extra Info Display (Tahun Ajaran & Kelas)
+            var infoTA = d.tahun_ajaran ? `<br><b>TA:</b> ${d.tahun_ajaran}` : "";
+            var infoKelas = d.kelas ? `<br><b>Kelas:</b> ${d.kelas}` : "";
+            
+            if (isKepsek && isWait) {
+                actionsHTML = `
+                    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                        <a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="flex:1; text-decoration:none;">👀 Pratinjau</a>
+                        <button class="sup-btn orange" style="flex:1;" onclick="window.bukaModalAcc('${d.id_dokumen}', '${d.url_asli}')">✍️ Sign</button>
+                        <button class="sup-btn red" style="flex:1;" onclick="window.bukaModalTolak('${d.id_dokumen}')">❌ Tolak</button>
+                    </div>`;
+            } else if (isAcc) {
+                actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_acc}" target="_blank" class="sup-btn" style="width:100%; text-decoration:none;">📄 Download PDF Final</a></div>`;
+            } else {
+                actionsHTML = `<div style="margin-top:12px;"><a href="${d.url_asli}" target="_blank" class="sup-btn blue" style="width:100%; text-decoration:none;">👀 Lihat Draft Berkas</a></div>`;
+            }
+
+            // Tambahan Tombol Hapus untuk Guru
+            if (!isKepsek) {
+                actionsHTML += `<button class="sup-btn outline" style="width:100%; margin-top:8px; border-color:#ef4444; color:#ef4444;" onclick="window.hapusDokumen('${d.id_dokumen}')">🗑️ Hapus Berkas</button>`;
+            }
+
+            var alasanHTML = (isReject && d.alasan) ? `<div class="alasan-box"><b>Alasan Ditolak:</b> ${d.alasan}</div>` : "";
+
+            container.innerHTML += `
+                <div class="sup-card">
+                    <div>
+                        <div style="font-weight:900; font-size:15px; margin-bottom:5px;">${d.jenis}</div>
+                        <div style="font-size:11px; color:#475569; line-height: 1.5;">
+                            <b>Oleh:</b> ${d.nama} ${infoTA} ${infoKelas} <br> 
+                            <b>Status:</b> <span class="sup-badge ${badgeClass}">${statusBersih}</span>
+                        </div>
+                        ${alasanHTML}
+                    </div>
+                    ${actionsHTML}
+                </div>`;
+        });
+    };
+
+    window.prosesUploadDokumen = async function(e) {
         e.preventDefault();
         var fileInput = document.getElementById('sup-file');
-        if(fileInput.files.length === 0) return alert("Pilih file PDF!");
+        var ta = document.getElementById('sup-ta').value;
+        var kelas = document.getElementById('sup-kelas').value.trim();
+        var jenis = document.getElementById('sup-jenis').value;
+
+        if(!kelas) return alert("⚠️ Harap isi kolom Kelas terlebih dahulu!");
+        if(fileInput.files.length === 0) return alert("⚠️ Pilih minimal 1 file PDF!");
         
-        window.ubahTeksLoading("Mengunggah Berkas ke Drive...");
-        var reader = new FileReader();
-        reader.onload = async function() {
-            var payload = { action: "upload_supervisi", nama: curUser.nama, role: curUser.role, jenis: document.getElementById('sup-jenis').value, fileName: curUser.nama+".pdf", mimeType: "application/pdf", fileBase64: reader.result.split(',')[1] };
+        var totalFiles = fileInput.files.length;
+        window.ubahTeksLoading(`Memulai unggah ${totalFiles} berkas...`);
+        
+        var successCount = 0;
+
+        // Proses berurutan (sequential) untuk menghindari tabrakan di Google Apps Script
+        for (var i = 0; i < totalFiles; i++) {
+            var file = fileInput.files[i];
+            window.ubahTeksLoading(`Mengunggah berkas ${i + 1} dari ${totalFiles}...`);
+            
             try {
+                var base64Data = await new Promise((resolve) => {
+                    var reader = new FileReader();
+                    reader.onload = function(e) { resolve(e.target.result.split(',')[1]); };
+                    reader.readAsDataURL(file);
+                });
+
+                var payload = { 
+                    action: "upload_supervisi", 
+                    nama: curUser.nama, 
+                    role: curUser.role, 
+                    jenis: jenis,
+                    tahun_ajaran: ta,
+                    kelas: kelas,
+                    fileName: curUser.nama + "_" + file.name, 
+                    mimeType: "application/pdf", 
+                    fileBase64: base64Data 
+                };
+
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-                alert("✅ Berkas berhasil diunggah!"); fileInput.value = "";
+                successCount++;
+            } catch (err) {
+                console.error("Gagal upload file:", file.name, err);
+            }
+        }
+        
+        tutupLoading();
+        if(successCount > 0) {
+            alert(`✅ Berhasil mengunggah ${successCount} dari ${totalFiles} berkas!`);
+            fileInput.value = ""; 
+            document.getElementById('sup-kelas').value = "";
+            window.loadDaftarSupervisi();
+        } else {
+            alert("❌ Gagal mengunggah berkas ke server.");
+        }
+    };
+
+    // Fungsi Hapus Dokumen (Baru)
+    window.hapusDokumen = async function(id_dokumen) {
+        var konfirmasi = confirm("⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Dokumen akan terhapus dari Database dan Google Drive.");
+        if(!konfirmasi) return;
+
+        window.ubahTeksLoading("Menghapus Dokumen...");
+        try {
+            var res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete_supervisi", id_dokumen: id_dokumen }) });
+            var json = await res.json();
+            if(json.status === 'success' || json.status === true) {
+                alert("✅ Dokumen berhasil dihapus.");
                 window.loadDaftarSupervisi();
-            } catch(e) { alert("Gagal mengupload berkas."); tutupLoading(); }
-        };
-        reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                throw new Error(json.message || "Unknown Error");
+            }
+        } catch (e) {
+            alert("❌ Gagal menghapus dokumen. Pastikan script mendukung 'delete_supervisi'.");
+            console.error(e);
+        } finally {
+            tutupLoading();
+        }
     };
 
     window.simpanTtdLokal = function() {
@@ -345,10 +489,6 @@ window.tutupLoading=function(){
     window.saveCurrentPageSignatures = function() {
         var items = document.querySelectorAll('.drag-ttd-item');
         var canvas = document.getElementById('pdf-canvas-preview');
-        // PENTING: simpan juga ukuran tampilan (CSS) kanvas SAAT ITU JUGA.
-        // Ini adalah "bingkai referensi" yang sama persis dengan yang dilihat
-        // user saat menempatkan tanda tangan, sehingga posisi di PDF nanti
-        // bisa dihitung ulang dengan rasio yang tepat, per halaman.
         var refW = canvas ? canvas.offsetWidth : 0;
         var refH = canvas ? canvas.offsetHeight : 0;
 
@@ -395,7 +535,6 @@ window.tutupLoading=function(){
         var area = document.getElementById('pdf-virtual-area');
         var wrapper = document.createElement('div');
         wrapper.className = 'drag-ttd-item';
-        // Normalisasi satuan: terima angka (px) maupun string ('35%')
         wrapper.style.left = (typeof left === 'number') ? left + 'px' : left;
         wrapper.style.top = (typeof top === 'number') ? top + 'px' : top;
         if(w) wrapper.style.width = w + "px";
@@ -414,7 +553,6 @@ window.tutupLoading=function(){
 
         wrapper.appendChild(img); wrapper.appendChild(delBtn); wrapper.appendChild(resizeBtn); area.appendChild(wrapper);
 
-        // --- GESER POSISI (DRAG) ---
         var p1=0, p2=0, p3=0, p4=0;
         wrapper.onmousedown = function(e) {
             if(e.target === delBtn || e.target === resizeBtn) return; 
@@ -435,7 +573,6 @@ window.tutupLoading=function(){
             };
         };
 
-        // --- UBAH UKURAN (RESIZE) ---
         resizeBtn.onmousedown = function(e) {
             e.preventDefault(); e.stopPropagation();
             var startX = e.clientX, startY = e.clientY;
@@ -451,7 +588,6 @@ window.tutupLoading=function(){
                 var newWidth = Math.max(minSize, startWidth + deltaX);
                 var newHeight = Math.max(minSize, startHeight + deltaY);
 
-                // Jangan biarkan kotak keluar dari area dokumen
                 if(boxLeft + newWidth > area.offsetWidth) newWidth = area.offsetWidth - boxLeft;
                 if(boxTop + newHeight > area.offsetHeight) newHeight = area.offsetHeight - boxTop;
 
@@ -461,7 +597,6 @@ window.tutupLoading=function(){
             document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
         };
 
-        // Dukungan sentuh (mobile/tablet) untuk resize
         resizeBtn.ontouchstart = function(e) {
             e.preventDefault(); e.stopPropagation();
             var touch = e.touches[0];
@@ -522,12 +657,6 @@ window.tutupLoading=function(){
                 var { width, height } = targetPage.getSize();
 
                 sigList.forEach(function(sig){
-                    // PENTING: gunakan bingkai referensi (refW/refH) milik
-                    // masing-masing tanda tangan — yaitu ukuran TAMPILAN kanvas
-                    // (CSS px) pada saat tanda tangan itu ditempatkan/disimpan.
-                    // Ini harus sama persis dengan sistem koordinat tempat
-                    // sig.left/sig.top diambil (offsetLeft/offsetTop), agar
-                    // posisi hasil cetak PDF sama dengan posisi yang diatur user.
                     var refW = sig.refW || width;
                     var refH = sig.refH || height;
 
@@ -560,7 +689,6 @@ window.tutupLoading=function(){
         } catch(e) { 
             alert("❌ Gagal Memproses PDF: " + e.message); 
         } finally { 
-            // PERBAIKAN FATAL: Menghapus typo huruf h agar tidak terjadi crash lagi
             tutupLoading(); 
         }
     };
