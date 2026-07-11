@@ -390,10 +390,10 @@ window.bukaModalRekapStudi = function() {
 
 // Fungsi Bantuan untuk Kode Warna Absensi
 function getWarnaAbsen(status) {
-    if(status === 'SAKIT') return '<span style="color:#eab308; font-weight:900; font-size:12px;">s</span>'; // Kuning
-    if(status === 'IZIN') return '<span style="color:#f97316; font-weight:900; font-size:12px;">i</span>'; // Oranye
-    if(status.includes('ALP') || status.includes('ALF')) return '<span style="color:#ef4444; font-weight:900; font-size:12px;">a</span>'; // Merah
-    if(status === 'HADIR') return '<span style="color:#16a34a; font-weight:900; font-size:16px;">.</span>'; // Hijau
+    if(status === 'SAKIT') return '<span style="color:#d97706; font-weight:900; font-size:12px;">s</span>';
+    if(status === 'IZIN') return '<span style="color:#ea580c; font-weight:900; font-size:12px;">i</span>';
+    if(status.includes('ALP') || status.includes('ALF')) return '<span style="color:#ef4444; font-weight:900; font-size:12px;">a</span>';
+    if(status === 'HADIR') return '<span style="color:#16a34a; font-weight:900; font-size:18px; line-height:0.5;">.</span>';
     return '';
 }
 
@@ -430,16 +430,17 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
             th { background-color: #f3f4f6; }
             td.left-align { text-align: left; padding-left: 5px; white-space: nowrap; width: 160px; overflow: hidden; text-overflow: ellipsis; max-width: 160px;}
             
-            .bg-red { background-color: #fca5a5 !important; }
-            .bg-gray { background-color: #e5e7eb !important; }
-
-            .bg-libur { background-color: #ef4444 !important; padding: 0 !important; }
+            /* Agar CSS Background Tabel Tercetak di Browser Chrome/Safari */
+            .bg-red { background-color: #fca5a5 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;}
+            .bg-gray { background-color: #e5e7eb !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;}
+            .bg-libur { background-color: #ef4444 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;}
+            
             .teks-libur-vertikal {
                 writing-mode: vertical-rl;
                 transform: rotate(180deg);
                 white-space: nowrap;
                 overflow: hidden;
-                color: #ffffff;
+                color: #ffffff !important;
                 font-weight: 900;
                 font-size: 9px;
                 letter-spacing: 0.5px;
@@ -490,7 +491,6 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
         </div>
 
         <script>
-            // Logika TTD disematkan dengan Kalkulasi Persentase (%) Relatif pada Kertas F4
             function tambahTtdLokal(e) {
                 if(e.target.files.length === 0) return;
                 var reader = new FileReader();
@@ -499,7 +499,6 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                     var wrapper = document.createElement('div');
                     wrapper.className = 'drag-ttd-item';
                     
-                    // Default width/height & position based on percentage (scale-proof)
                     wrapper.style.width = '12%'; 
                     wrapper.style.height = '15%';
                     wrapper.style.left = '75%'; 
@@ -530,7 +529,6 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                             if(nTop + wrapper.offsetHeight > area.offsetHeight) nTop = area.offsetHeight - wrapper.offsetHeight;
                             if(nLeft + wrapper.offsetWidth > area.offsetWidth) nLeft = area.offsetWidth - wrapper.offsetWidth;
                             
-                            // Transform pixels back to relative percentages to survive print-scaling
                             wrapper.style.top = (nTop / area.offsetHeight * 100) + "%"; 
                             wrapper.style.left = (nLeft / area.offsetWidth * 100) + "%";
                         };
@@ -754,3 +752,5 @@ window.generateRekapStudi = function() {
     window.tutupModalAbsen('modal-rekap-studi');
     bukaTabCetak('Rekap Bidang Studi', htmlTabel, kepsek, {jabatan_title: 'Guru Bidang Studi', nama: guru});
 };
+
+window.tutupModalAbsen = function(id) { document.getElementById(id).classList.remove('active'); };
