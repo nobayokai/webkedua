@@ -436,7 +436,7 @@ window.jalankanWidgetKiri = function() {
                               <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
                               <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.S}</span></div>
                               <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.I}</span></div>
-                              <div class="stat-box"><span class="stat-label">Tanpa Keterangan</span><span class="stat-value val-a">${d.A}</span></div>
+                              <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.A}</span></div>
                           </div>
                       </div>
                   `;
@@ -685,7 +685,7 @@ window.jalankanWidgetKiri = function() {
                   <tr>
                       <th colspan="2" class="bg-peach">Sakit</th>
                       <th colspan="2" class="bg-peach">Ijin</th>
-                      <th colspan="2" class="bg-peach">Tanpa Keterangan</th>
+                      <th colspan="2" class="bg-peach">Alpa</th>
                   </tr>
                   <tr class="bg-blue">
                       <th>1</th>
@@ -732,7 +732,7 @@ window.jalankanWidgetKiri = function() {
                       datasets: [
                           { label: 'Sakit', data: ${JSON.stringify(dataS_pct)}, backgroundColor: '#4472c4', categoryPercentage: 0.8, barPercentage: 0.9 },
                           { label: 'Izin', data: ${JSON.stringify(dataI_pct)}, backgroundColor: '#ed7d31', categoryPercentage: 0.8, barPercentage: 0.9 },
-                          { label: 'Tanpa Keterangan', data: ${JSON.stringify(dataA_pct)}, backgroundColor: '#a5a5a5', categoryPercentage: 0.8, barPercentage: 0.9 }
+                          { label: 'Alpa', data: ${JSON.stringify(dataA_pct)}, backgroundColor: '#a5a5a5', categoryPercentage: 0.8, barPercentage: 0.9 }
                       ]
                   },
                   options: {
