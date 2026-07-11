@@ -397,7 +397,9 @@ function getWarnaAbsen(status) {
     return '';
 }
 
-// FUNGSI UTAMA BUKA TAB BARU UNTUK CETAK
+// =============================================
+// FUNGSI UTAMA BUKA TAB BARU UNTUK CETAK (TANDA TANGAN FIX SCALE)
+// =============================================
 function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
     var fullHtml = `
     <!DOCTYPE html>
@@ -406,41 +408,31 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
         <meta charset="UTF-8">
         <title>Cetak - ${judul}</title>
         <style>
-            /* SETTING KERTAS F4 LANDSCAPE (330mm x 215mm) & WAJIB 1 HALAMAN */
-            @page { size: 330mm 215mm landscape; margin: 10mm; }
-            body { font-family: 'Times New Roman', serif; color: black; margin: 0; padding: 0; font-size: 11px; }
+            /* SETTING KERTAS F4 LANDSCAPE & WAJIB 1 HALAMAN */
+            @page { size: 330mm 215mm landscape; margin: 0; }
+            * { box-sizing: border-box; }
+            body { font-family: 'Times New Roman', serif; color: black; margin: 0; padding: 0; background: #525659; display: flex; flex-direction: column; align-items: center; }
             
-            /* UI Toolbar (Tidak ikut dicetak) */
-            .no-print { background: #f8fafc; padding: 15px; text-align: center; border-bottom: 2px solid #cbd5e1; margin-bottom: 15px; font-family: Arial, sans-serif; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+            .no-print { width: 100%; background: #f8fafc; padding: 15px; text-align: center; border-bottom: 2px solid #cbd5e1; margin-bottom: 20px; font-family: Arial, sans-serif; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
             .no-print button { padding: 10px 18px; margin: 0 5px; cursor: pointer; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 13px; transition: 0.2s;}
             .no-print button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
             .no-print button.ttd { background: #f59e0b; }
             .no-print button.cetak { background: #10b981; }
             .no-print button.tutup { background: #ef4444; }
             
-            /* Kontainer Utama untuk Print */
-            /* PERBAIKAN BUG UTAMA: position:relative WAJIB ada di sini.
-               Tanpa ini, elemen TTD (position:absolute) akan mengambil acuan
-               posisi dari <body>, yang ukurannya berubah saat toolbar .no-print
-               disembunyikan ketika mencetak — sehingga posisi TTD bergeser
-               dari yang ditampilkan di layar. Dengan position:relative di sini,
-               TTD selalu mengacu pada kotak dokumen itu sendiri, konsisten
-               baik di layar maupun saat dicetak/disimpan sebagai PDF. */
-            .print-wrapper { width: 100%; height: auto; max-height: 195mm; box-sizing: border-box; page-break-inside: avoid; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-            .print-header { text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
+            /* Kontainer Kertas F4 - WAJIB RELATIVE untuk TTD agar ukurannya dikunci */
+            .print-wrapper { width: 330mm; height: 215mm; background: white; padding: 10mm; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; }
             
-            /* Desain Tabel */
-            table { width: 100%; border-collapse: collapse; margin-bottom: 5px; font-size: 10.5px; }
-            th, td { border: 1px solid black; padding: 2px 0; text-align: center; height: 14px;}
+            .print-header { text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 12px; line-height: 1.3; }
+            
+            table { width: 100%; border-collapse: collapse; margin-bottom: 5px; font-size: 10px; }
+            th, td { border: 1px solid black; padding: 1px 0; text-align: center; height: 13px;}
             th { background-color: #f3f4f6; }
-            td.left-align { text-align: left; padding-left: 5px; white-space: nowrap; width: 180px;}
+            td.left-align { text-align: left; padding-left: 5px; white-space: nowrap; width: 160px; overflow: hidden; text-overflow: ellipsis; max-width: 160px;}
             
-            /* Warna Khusus Tabel */
+            .bg-red { background-color: #fca5a5 !important; }
             .bg-gray { background-color: #e5e7eb !important; }
 
-            /* Kolom Hari Libur Nasional: satu sel gabungan (rowspan) penuh
-               satu kolom tanggal, background merah + teks keterangan vertikal,
-               persis seperti contoh gambar (bukan lagi keterangan di bawah tabel). */
             .bg-libur { background-color: #ef4444 !important; padding: 0 !important; }
             .teks-libur-vertikal {
                 writing-mode: vertical-rl;
@@ -459,22 +451,23 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                 margin: 0 auto;
             }
 
-            /* Area Tanda Tangan & Interaksi */
-            .ttd-area { display: flex; justify-content: space-between; margin-top: 15px; padding: 0 50px; font-size: 12px; }
-            .drag-ttd-item { position: absolute; width: 90px; height: 90px; cursor: grab; z-index: 50; padding: 2px; border: 2px dashed #3b82f6; box-sizing: border-box; display: flex; align-items: center; justify-content: center;}
+            .ttd-area { display: flex; justify-content: space-between; margin-top: auto; padding: 0 50px; font-size: 12px; position: relative;}
+            
+            /* TTD Draggable */
+            .drag-ttd-item { position: absolute; cursor: grab; z-index: 50; padding: 2px; border: 2px dashed #3b82f6; display: flex; align-items: center; justify-content: center;}
             .drag-ttd-item img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
             .drag-ttd-item:active { cursor: grabbing; border-color: #ef4444; }
-            
-            .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 11px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
-            .btn-resize-ttd { position: absolute; bottom: -8px; right: -8px; width: 18px; height: 18px; background: #3b82f6; border: 2px solid white; border-radius: 50%; cursor: nwse-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index:52;}
+            .btn-delete-ttd { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; cursor: pointer; font-size: 11px; font-weight:bold; z-index:52;}
+            .btn-resize-ttd { position: absolute; bottom: -8px; right: -8px; width: 18px; height: 18px; background: #3b82f6; border: 2px solid white; border-radius: 50%; cursor: nwse-resize; z-index:52;}
 
+            /* Mode Print Beneran */
             @media print {
+                body { background: white; margin: 0; }
                 .no-print { display: none !important; }
+                .print-wrapper { margin: 0; padding: 10mm; width: 330mm; height: 215mm; box-shadow: none; border: none; page-break-after: avoid; }
                 .drag-ttd-item { border: none !important; padding: 0;}
                 .btn-delete-ttd, .btn-resize-ttd { display: none !important; }
-                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; }
-                /* Opsi tambahan untuk memastikan muat 1 halaman jika siswa sangat banyak */
-                table { font-size: 10px; }
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             }
         </style>
     </head>
@@ -490,7 +483,6 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
             <div>
                 ${htmlTabel}
             </div>
-            
             <div class="ttd-area">
                 <div>Mengetahui,<br>Kepala Sekolah<br><br><br><br><br><b>${kepsek}</b></div>
                 <div><br>${guru.jabatan_title || 'Guru Kelas'}<br><br><br><br><br><b>${guru.nama}</b></div>
@@ -498,11 +490,7 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
         </div>
 
         <script>
-            // LOGIKA DRAG AND RESIZE TANDA TANGAN (DI DALAM TAB BARU)
-            // TTD ditempel sebagai anak langsung #print-area (yang sekarang
-            // position:relative), sehingga koordinat top/left selalu diukur
-            // dari kotak dokumen yang sama persis, baik saat pratinjau di
-            // layar maupun saat window.print() dijalankan.
+            // Logika TTD disematkan dengan Kalkulasi Persentase (%) Relatif pada Kertas F4
             function tambahTtdLokal(e) {
                 if(e.target.files.length === 0) return;
                 var reader = new FileReader();
@@ -510,19 +498,20 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                     var area = document.getElementById('print-area');
                     var wrapper = document.createElement('div');
                     wrapper.className = 'drag-ttd-item';
-                    wrapper.style.left = '75%';
+                    
+                    // Default width/height & position based on percentage (scale-proof)
+                    wrapper.style.width = '12%'; 
+                    wrapper.style.height = '15%';
+                    wrapper.style.left = '75%'; 
                     wrapper.style.top = '75%';
 
                     var img = document.createElement('img');
                     img.src = ev.target.result;
-                    
                     var delBtn = document.createElement('div');
                     delBtn.className = 'btn-delete-ttd no-print'; delBtn.innerHTML = '✕';
                     delBtn.onclick = function() { wrapper.remove(); };
-
                     var resizeBtn = document.createElement('div');
-                    resizeBtn.className = 'btn-resize-ttd no-print';
-                    resizeBtn.title = 'Tarik untuk ubah ukuran';
+                    resizeBtn.className = 'btn-resize-ttd no-print'; resizeBtn.title = 'Tarik untuk ubah ukuran';
 
                     wrapper.appendChild(img); wrapper.appendChild(delBtn); wrapper.appendChild(resizeBtn); area.appendChild(wrapper);
 
@@ -533,15 +522,17 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                         document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
                         document.onmousemove = function(evt) {
                             evt.preventDefault(); p1 = p3 - evt.clientX; p2 = p4 - evt.clientY; p3 = evt.clientX; p4 = evt.clientY;
-
-                            var nTop = wrapper.offsetTop - p2;
+                            
+                            var nTop = wrapper.offsetTop - p2; 
                             var nLeft = wrapper.offsetLeft - p1;
+                            
                             if(nTop < 0) nTop = 0; if(nLeft < 0) nLeft = 0;
                             if(nTop + wrapper.offsetHeight > area.offsetHeight) nTop = area.offsetHeight - wrapper.offsetHeight;
                             if(nLeft + wrapper.offsetWidth > area.offsetWidth) nLeft = area.offsetWidth - wrapper.offsetWidth;
-
-                            wrapper.style.top = nTop + "px";
-                            wrapper.style.left = nLeft + "px";
+                            
+                            // Transform pixels back to relative percentages to survive print-scaling
+                            wrapper.style.top = (nTop / area.offsetHeight * 100) + "%"; 
+                            wrapper.style.left = (nLeft / area.offsetWidth * 100) + "%";
                         };
                     };
 
@@ -551,8 +542,14 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
                         var startWidth = wrapper.offsetWidth, startHeight = wrapper.offsetHeight;
                         document.onmousemove = function(evt) {
                             evt.preventDefault();
-                            wrapper.style.width = Math.max(30, startWidth + (evt.clientX - startX)) + "px";
-                            wrapper.style.height = Math.max(30, startHeight + (evt.clientY - startY)) + "px";
+                            var nW = Math.max(30, startWidth + (evt.clientX - startX));
+                            var nH = Math.max(30, startHeight + (evt.clientY - startY));
+                            
+                            if(wrapper.offsetLeft + nW > area.offsetWidth) nW = area.offsetWidth - wrapper.offsetLeft;
+                            if(wrapper.offsetTop + nH > area.offsetHeight) nH = area.offsetHeight - wrapper.offsetTop;
+                            
+                            wrapper.style.width = (nW / area.offsetWidth * 100) + "%"; 
+                            wrapper.style.height = (nH / area.offsetHeight * 100) + "%";
                         };
                         document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
                     };
@@ -564,8 +561,6 @@ function bukaTabCetak(judul, htmlTabel, kepsek, guru) {
     </body>
     </html>
     `;
-
-    // Eksekusi Buka Tab Baru
     var printWindow = window.open('', '_blank');
     printWindow.document.write(fullHtml);
     printWindow.document.close();
@@ -588,12 +583,14 @@ window.generateRekapWali = function() {
         return t.getFullYear() === y && t.getMonth() === m && String(a.kelas).trim() === kelas;
     });
 
-    // Deteksi Libur Nasional
-    var liburNasional = window.globalDataAgenda.filter(function(a) {
-        var isNasional = String(a.kategori).toLowerCase().includes("libur nasional");
-        if (!isNasional) return false;
-        var dLibur = new Date(a.tanggal);
-        return dLibur.getFullYear() === y && dLibur.getMonth() === m;
+    var mapLibur = {};
+    window.globalDataAgenda.forEach(a => {
+        if(String(a.kategori).toLowerCase().includes("libur nasional")) {
+            let dl = new Date(a.tanggal);
+            if(dl.getFullYear() === y && dl.getMonth() === m && dl.getDay() !== 0 && dl.getDay() !== 6) {
+                mapLibur[dl.getDate()] = a.kegiatan;
+            }
+        }
     });
 
     var htmlTabel = `
@@ -618,60 +615,38 @@ window.generateRekapWali = function() {
             <tbody>
     `;
 
-    // Precompute keterangan libur nasional per tanggal (dipakai bersama untuk semua baris siswa)
-    var keteranganLiburPerTanggal = {};
-    for(let d=1; d<=daysInMonth; d++) {
-        var isWeekendCek = new Date(y, m, d).getDay() === 0 || new Date(y, m, d).getDay() === 6;
-        var liburHariIniCek = liburNasional.find(l => new Date(l.tanggal).getDate() === d);
-        if(!isWeekendCek && liburHariIniCek) {
-            keteranganLiburPerTanggal[d] = liburHariIniCek.kegiatan;
-        }
-    }
-    var jumlahBarisSiswa = siswaKelas.length;
-
     siswaKelas.forEach((s, idx) => {
         var tr = `<tr><td>${idx+1}</td><td class="left-align">${s.nama}</td>`;
         var totS = 0, totI = 0, totA = 0;
         
         for(let d=1; d<=daysInMonth; d++) {
-            var isLiburNasional = keteranganLiburPerTanggal.hasOwnProperty(d);
-
-            if(isLiburNasional) {
-                // Kolom libur digabung (rowspan) jadi 1 sel tinggi penuh dengan
-                // keterangan teks vertikal di dalamnya, hanya ditulis 1x pada
-                // baris siswa pertama; baris lainnya tidak menulis <td> lagi
-                // untuk kolom tanggal ini karena sudah tercakup oleh rowspan.
-                if(idx === 0) {
-                    tr += `<td class="bg-libur" rowspan="${jumlahBarisSiswa}"><div class="teks-libur-vertikal">${keteranganLiburPerTanggal[d]}</div></td>`;
+            if (mapLibur[d]) {
+                if (idx === 0) {
+                    tr += `<td rowspan="${siswaKelas.length}" class="bg-libur holiday-col"><div class="teks-libur-vertikal">${mapLibur[d]}</div></td>`;
                 }
-                continue;
+            } else {
+                var isWeekend = new Date(y, m, d).getDay() === 0 || new Date(y, m, d).getDay() === 6;
+                var tdClass = isWeekend ? ' class="bg-gray"' : '';
+                var tglCari = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+                var absenSiswa = riwayat.find(a => {
+                    var dStr = String(a.tanggal).includes("T") ? new Date(a.tanggal).toISOString().substring(0,10) : String(a.tanggal).replace(/['"]/g, '').substring(0,10);
+                    return dStr === tglCari && String(a.nis).replace(/['"]/g, '').trim() === String(s.nis).replace(/['"]/g, '').trim();
+                });
+
+                var mark = "";
+                if(absenSiswa) {
+                    var st = (absenSiswa.status||"").toUpperCase();
+                    mark = getWarnaAbsen(st);
+                    if(st === 'SAKIT') totS++; else if(st === 'IZIN') totI++; else if(st.includes('ALP') || st.includes('ALF')) totA++;
+                }
+                tr += `<td${tdClass}>${mark}</td>`;
             }
-
-            var isWeekend = new Date(y, m, d).getDay() === 0 || new Date(y, m, d).getDay() === 6;
-            var tdClass = isWeekend ? ' class="bg-gray"' : '';
-
-            var tglCari = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-            var absenSiswa = riwayat.find(a => {
-                var dStr = String(a.tanggal).includes("T") ? new Date(a.tanggal).toISOString().substring(0,10) : String(a.tanggal).replace(/['"]/g, '').substring(0,10);
-                return dStr === tglCari && String(a.nis).replace(/['"]/g, '').trim() === String(s.nis).replace(/['"]/g, '').trim();
-            });
-
-            var mark = "";
-            if(absenSiswa) {
-                var st = (absenSiswa.status||"").toUpperCase();
-                mark = getWarnaAbsen(st);
-                if(st === 'SAKIT') totS++; else if(st === 'IZIN') totI++; else if(st.includes('ALP') || st.includes('ALF')) totA++;
-            }
-            
-            tr += `<td${tdClass}>${mark}</td>`;
         }
         tr += `<td>${totS||''}</td><td>${totI||''}</td><td>${totA||''}</td></tr>`;
         htmlTabel += tr;
     });
 
     htmlTabel += `</tbody></table>`;
-
-    // Eksekusi Pindah Tab
     window.tutupModalAbsen('modal-rekap-wali');
     bukaTabCetak('Rekap Wali Kelas', htmlTabel, kepsek, {jabatan_title: 'Wali Kelas', nama: wali});
 };
@@ -688,25 +663,42 @@ window.generateRekapStudi = function() {
     var y = kalenderAbsenDate.getFullYear();
 
     if (bAkhir < bAwal) return alert("Bulan akhir tidak boleh lebih kecil dari bulan awal!");
-
     var namaBulanFull = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    
     var siswaKelas = globalSiswaAbsen.filter(s => s.kelas === kelas && s.nis !== "DUMMY_KELAS").sort((a,b) => a.nama.localeCompare(b.nama));
+    
+    var mapLiburStudi = {};
+    window.globalDataAgenda.forEach(a => {
+        if(String(a.kategori).toLowerCase().includes("libur nasional")) {
+            let dl = new Date(a.tanggal);
+            if(dl.getFullYear() === y && dl.getMonth() >= bAwal && dl.getMonth() <= bAkhir) {
+                mapLiburStudi[dl.getMonth() + "-" + dl.getDate()] = a.kegiatan;
+            }
+        }
+    });
+
+    var arrayRangeBulan = [];
     var monthsColsHtml = "";
     var weeksColsHtml = "";
-    var arrayRangeBulan = [];
-
-    // Deteksi Libur Nasional Sepanjang Rentang Bulan Tersebut
-    var liburNasional = window.globalDataAgenda.filter(function(a) {
-        if (!String(a.kategori).toLowerCase().includes("libur nasional")) return false;
-        var dLibur = new Date(a.tanggal);
-        return dLibur.getFullYear() === y && dLibur.getMonth() >= bAwal && dLibur.getMonth() <= bAkhir;
-    });
+    var mapKolomStudi = []; 
 
     for(let b = bAwal; b <= bAkhir; b++) {
         arrayRangeBulan.push(b);
         monthsColsHtml += `<th colspan="5">${namaBulanFull[b].toUpperCase()}</th>`;
         weeksColsHtml += `<th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>`;
+        
+        var datesInMonthForDay = [];
+        var dTemp = new Date(y, b, 1);
+        while(dTemp.getMonth() === b) {
+            if(dTemp.getDay() === targetHari) datesInMonthForDay.push(dTemp.getDate());
+            dTemp.setDate(dTemp.getDate() + 1);
+        }
+        for(let w = 0; w < 5; w++) {
+            if(w < datesInMonthForDay.length) {
+                mapKolomStudi.push({ bln: b, tgl: datesInMonthForDay[w], isLibur: mapLiburStudi[b + "-" + datesInMonthForDay[w]], valid: true });
+            } else {
+                mapKolomStudi.push({ valid: false });
+            }
+        }
     }
 
     var htmlTabel = `
@@ -719,7 +711,7 @@ window.generateRekapStudi = function() {
             <thead>
                 <tr>
                     <th rowspan="2" style="width:30px;">NO</th>
-                    <th rowspan="2">NAMA SISWA</th>
+                    <th rowspan="2" style="width:250px;">NAMA SISWA</th>
                     ${monthsColsHtml}
                 </tr>
                 <tr>${weeksColsHtml}</tr>
@@ -727,58 +719,18 @@ window.generateRekapStudi = function() {
             <tbody>
     `;
 
-    // Precompute keterangan libur per kolom (bulan-minggu), sama untuk semua siswa,
-    // supaya bisa dibuat 1 sel gabungan (rowspan) per kolom tanggal libur.
-    var keteranganLiburPerKolom = {};
-    arrayRangeBulan.forEach(m => {
-        var datesInMonthForDay = [];
-        var dTemp = new Date(y, m, 1);
-        while(dTemp.getMonth() === m) {
-            if(dTemp.getDay() === targetHari) datesInMonthForDay.push(dTemp.getDate());
-            dTemp.setDate(dTemp.getDate() + 1);
-        }
-        for(let w = 0; w < 5; w++) {
-            if (w < datesInMonthForDay.length) {
-                var tg = datesInMonthForDay[w];
-                var liburHariIni = liburNasional.find(l => {
-                    let dl = new Date(l.tanggal);
-                    return dl.getDate() === tg && dl.getMonth() === m;
-                });
-                if(liburHariIni) keteranganLiburPerKolom[m + '-' + w] = liburHariIni.kegiatan;
-            }
-        }
-    });
-    var jumlahBarisSiswa = siswaKelas.length;
-
     siswaKelas.forEach((s, idx) => {
         var tr = `<tr><td>${idx+1}</td><td class="left-align">${s.nama}</td>`;
         
-        arrayRangeBulan.forEach(m => {
-            var datesInMonthForDay = [];
-            var dTemp = new Date(y, m, 1);
-            while(dTemp.getMonth() === m) {
-                if(dTemp.getDay() === targetHari) datesInMonthForDay.push(dTemp.getDate());
-                dTemp.setDate(dTemp.getDate() + 1);
-            }
-
-            for(let w = 0; w < 5; w++) {
-                var kolomKey = m + '-' + w;
-                var adaLibur = keteranganLiburPerKolom.hasOwnProperty(kolomKey);
-
-                if(adaLibur) {
-                    // Kolom libur digabung (rowspan), ditulis 1x di baris pertama saja
-                    if(idx === 0) {
-                        tr += `<td class="bg-libur" rowspan="${jumlahBarisSiswa}"><div class="teks-libur-vertikal">${keteranganLiburPerKolom[kolomKey]}</div></td>`;
+        mapKolomStudi.forEach(k => {
+            if (k.valid) {
+                if (k.isLibur) {
+                    if (idx === 0) {
+                        tr += `<td rowspan="${siswaKelas.length}" class="bg-libur holiday-col"><div class="teks-libur-vertikal">${k.isLibur}</div></td>`;
                     }
-                    continue;
-                }
-
-                var mark = "";
-                var tdClass = "";
-                
-                if (w < datesInMonthForDay.length) {
-                    var tg = datesInMonthForDay[w];
-                    var tglCari = y + '-' + String(m+1).padStart(2,'0') + '-' + String(tg).padStart(2,'0');
+                } else {
+                    var mark = "";
+                    var tglCari = y + '-' + String(k.bln+1).padStart(2,'0') + '-' + String(k.tgl).padStart(2,'0');
                     var absenSiswa = window.globalDataAbsensi.find(a => {
                         var dStr = String(a.tanggal).includes("T") ? new Date(a.tanggal).toISOString().substring(0,10) : String(a.tanggal).replace(/['"]/g, '').substring(0,10);
                         return dStr === tglCari && String(a.nis).replace(/['"]/g, '').trim() === String(s.nis).replace(/['"]/g, '').trim() && String(a.kelas).trim() === kelas;
@@ -787,21 +739,18 @@ window.generateRekapStudi = function() {
                     if(absenSiswa) {
                         mark = getWarnaAbsen((absenSiswa.status||"").toUpperCase());
                     }
-                } else {
-                    // Blank space (minggu ke-5 kosong)
-                    tdClass = ' class="bg-gray"'; 
+                    tr += `<td>${mark}</td>`;
                 }
-                tr += `<td${tdClass}>${mark}</td>`;
+            } else {
+                tr += `<td class="bg-gray"></td>`; 
             }
         });
+        
         tr += `</tr>`;
         htmlTabel += tr;
     });
 
     htmlTabel += `</tbody></table>`;
-
     window.tutupModalAbsen('modal-rekap-studi');
     bukaTabCetak('Rekap Bidang Studi', htmlTabel, kepsek, {jabatan_title: 'Guru Bidang Studi', nama: guru});
 };
-
-window.tutupModalAbsen = function(id) { document.getElementById(id).classList.remove('active'); };
