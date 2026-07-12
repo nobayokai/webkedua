@@ -104,6 +104,10 @@
                         <option value="">⏳ Memuat kelas dari absensi...</option>
                     </select>
                 </div>
+                <div class="sup-form-group">
+                    <label>Mata Pelajaran</label>
+                    <input type="text" id="sup-mapel" placeholder="Cth: Matematika / Tematik" required>
+                </div>
             </div>
 
             <div class="sup-form-group" style="margin-bottom:15px;">
@@ -145,7 +149,7 @@
     <div class="sup-grid" id="list-dokumen-sup"></div>
 </div>
 
-<!-- Modal TTD, Tolak, dan Set TTD Lokal (Tetap sama) -->
+<!-- Modal TTD, Tolak, dan Set TTD Lokal -->
 <div class="modal" id="modal-acc" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
     <div style="background:white; padding:20px; border-radius:12px; max-width:480px; width:95%; max-height:98vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
         <h3 style="text-align:center; color:#047857; margin-top:0; margin-bottom:10px; font-weight:800;">✍️ Papan Penandatanganan</h3>
@@ -188,7 +192,6 @@
 
 <script>
 (function() {
-    // ======== GANTI DENGAN URL DEPLOY APP SCRIPT YANG BARU JIKA BERUBAH ========
     var API_URL = (typeof SCRIPT_URL !== 'undefined') ? SCRIPT_URL : 'https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec';
     
     var curUser = JSON.parse(localStorage.getItem('user_login') || '{}');
@@ -197,7 +200,7 @@
     
     window.tempPdfBase64 = null; window.pdfDocProxy = null; window.currentPdfPage = 1; window.totalPdfPages = 1; window.signaturesByPage = {}; 
     window.allDataSupervisi = []; 
-    window.fileQueue = []; // Array Staging Berkas
+    window.fileQueue = []; 
 
     window.ubahTeksLoading = function(teks){
         var loading = document.getElementById("ios-loading");
@@ -212,7 +215,6 @@
         if(loading) loading.classList.remove("active");
     }
 
-    // FUNGSI RENDER TAHUN AJARAN DINAMIS (2025 s/d 5 TAHUN KEDEPAN)
     function generateTahunAjaran() {
         var startYear = 2025;
         var options = [];
@@ -235,10 +237,9 @@
         document.getElementById('area-upload-guru').style.display = 'none';
     } else {
         document.getElementById('area-upload-guru').style.display = 'block';
-        fetchDropdownKelas(); // Hanya panggil untuk guru saat form ditampilkan
+        fetchDropdownKelas(); 
     }
 
-    // MENGAMBIL KELAS DARI ABSENSI
     async function fetchDropdownKelas() {
         try {
             var res = await fetch(API_URL + "?action=get_kelas");
@@ -257,7 +258,6 @@
         } catch(e) { console.error("Gagal load kelas dari absensi", e); }
     }
 
-    // MENGAMBIL DAFTAR SUPERVISI & MENGATUR FILTER UNTUK KEPSEK
     window.loadDaftarSupervisi = async function() {
         var container = document.getElementById('list-dokumen-sup');
         if(!container) return;
@@ -270,7 +270,6 @@
             if(json.status === 'success') {
                 window.allDataSupervisi = json.data;
                 
-                // Jika Kepsek, Render opsi filter kelas berdasarkan data supervisi yang masuk
                 if(isKepsek) {
                     var filterKelas = document.getElementById('filter-kelas');
                     var unikKelas = [...new Set(window.allDataSupervisi.map(d => d.kelas).filter(k => k))];
@@ -319,6 +318,7 @@
             
             var infoTA = d.tahun_ajaran ? `<br><b>TA:</b> ${d.tahun_ajaran}` : "";
             var infoKelas = d.kelas ? `<br><b>Kelas:</b> ${d.kelas}` : "";
+            var infoMapel = d.mapel ? `<br><b>Mapel:</b> ${d.mapel}` : "";
             
             if (isKepsek && statusBersih === 'Menunggu ACC') {
                 actionsHTML = `
@@ -344,7 +344,7 @@
                     <div>
                         <div style="font-weight:900; font-size:15px; margin-bottom:5px;">${d.jenis}</div>
                         <div style="font-size:11px; color:#475569; line-height: 1.5;">
-                            <b>Oleh:</b> ${d.nama} ${infoTA} ${infoKelas} <br> 
+                            <b>Oleh:</b> ${d.nama} ${infoTA} ${infoKelas} ${infoMapel} <br> 
                             <b>Status:</b> <span class="sup-badge ${badgeClass}">${statusBersih}</span>
                         </div>
                         ${alasanHTML}
@@ -354,23 +354,24 @@
         });
     };
 
-    // FUNGSI QUEUE / STAGING BULK UPLOAD
     window.tambahKeAntrean = function() {
         var inputTA = document.getElementById('sup-ta').value;
         var inputKelas = document.getElementById('sup-kelas').value;
+        var inputMapel = document.getElementById('sup-mapel').value.trim();
         var inputJenis = document.getElementById('sup-jenis').value;
         var fileInput = document.getElementById('sup-file');
         
         if(!inputKelas) return alert("⚠️ Harap pilih Kelas terlebih dahulu!");
+        if(!inputMapel) return alert("⚠️ Harap isi Mata Pelajaran!");
         if(fileInput.files.length === 0) return alert("⚠️ Harap pilih file PDF terlebih dahulu!");
 
         var fileObj = fileInput.files[0];
         window.fileQueue.push({
-            ta: inputTA, kelas: inputKelas, jenis: inputJenis,
+            ta: inputTA, kelas: inputKelas, mapel: inputMapel, jenis: inputJenis,
             file: fileObj, idQueue: Date.now()
         });
 
-        fileInput.value = ""; // Reset input file setelah ditambah
+        fileInput.value = ""; 
         window.renderAntreanUI();
     };
 
@@ -388,7 +389,7 @@
                 <div class="queue-item">
                     <div>
                         <div class="queue-title">${item.jenis}</div>
-                        <div class="queue-info">${item.file.name} | Kelas: ${item.kelas}</div>
+                        <div class="queue-info">${item.file.name} | Kelas: ${item.kelas} | Mapel: ${item.mapel}</div>
                     </div>
                     <button class="sup-btn red" style="padding:4px 8px; font-size:10px;" onclick="window.hapusDariAntrean(${index})">Batal</button>
                 </div>
@@ -401,7 +402,6 @@
         window.renderAntreanUI();
     };
 
-    // EKSEKUSI SEMUA ANTREAN (BULK UPLOAD SEQUENTIAL)
     window.prosesUploadSemua = async function() {
         if(window.fileQueue.length === 0) return alert("Tidak ada dokumen di antrean.");
         
@@ -426,6 +426,7 @@
                     jenis: curr.jenis,
                     tahun_ajaran: curr.ta,
                     kelas: curr.kelas,
+                    mapel: curr.mapel,
                     fileName: curUser.nama + "_" + curr.file.name, 
                     mimeType: "application/pdf", 
                     fileBase64: base64Data 
@@ -440,12 +441,11 @@
         
         tutupLoading();
         alert(`✅ Selesai! Berhasil mengunggah ${successCount} dari ${total} berkas ke server.`);
-        window.fileQueue = []; // Kosongkan antrean
+        window.fileQueue = []; 
         window.renderAntreanUI();
-        window.loadDaftarSupervisi(); // Refresh data layar
+        window.loadDaftarSupervisi(); 
     };
 
-    // FUNGSI HAPUS DOKUMEN (API BARU)
     window.hapusDokumen = async function(id_dokumen) {
         var konfirmasi = confirm("⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Data akan terhapus dari Database.");
         if(!konfirmasi) return;
@@ -456,7 +456,7 @@
             var json = await res.json();
             if(json.status === 'success' || json.status === true) {
                 alert("✅ Dokumen berhasil dihapus.");
-                window.loadDaftarSupervisi(); // Reload dari sheet
+                window.loadDaftarSupervisi(); 
             } else {
                 throw new Error(json.message || "Unknown Error");
             }
@@ -467,7 +467,6 @@
         }
     };
 
-    // LOGIKA PENANDATANGANAN PDF (Tetap sama dari perbaikan sebelumnya)
     window.simpanTtdLokal = function() {
         var f = document.getElementById('file-ttd');
         if (f.files.length === 0) return alert("Pilih gambar PNG transparan!");
