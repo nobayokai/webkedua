@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator RPPM Final - Page Break & TTD</title>
-    
-    <!-- Memanggil Library html2pdf -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Generator RPPM Final</title>
 
     <style>
         /* === DESAIN TEMA COLORFUL === */
@@ -59,13 +56,13 @@
         .signature-box { display: flex; justify-content: space-between; margin-top: 40px; }
         .sig-col { width: 45%; display: flex; flex-direction: column; align-items: center; text-align: center; }
         
-        /* Tinggi signature disesuaikan menjadi 60px sesuai permintaan */
+        /* Ketinggian diset ke 60px */
         .sig-space { position: relative; width: 100%; height: 60px; display: flex; justify-content: center; align-items: center; margin: 10px 0; }
         
         #ttd-wrapper {
             position: absolute;
             width: 150px;
-            height: 100px; /* Boleh lebih besar dari container agar bebas ditarik */
+            height: 100px; 
             border: 2px dashed var(--accent);
             background-color: rgba(245, 158, 11, 0.1);
             resize: both;
@@ -88,7 +85,6 @@
             outline: 3px dashed #ef4444;
             background-color: #fef2f2 !important;
         }
-        /* Efek hover saat mode Page Break nyala */
         .pb-mode-active h3:hover, 
         .pb-mode-active tr:hover, 
         .pb-mode-active .signature-box:hover {
@@ -98,12 +94,6 @@
             box-shadow: 0 -5px 10px rgba(239, 68, 68, 0.2);
         }
         
-        /* === PEMOTONG HALAMAN (PAGE BREAK) ===
-           PENTING: html2canvas (mesin pemotret PDF) TIDAK membaca @media print,
-           sehingga elemen ini HARUS disembunyikan secara default (bukan lewat
-           @media print) agar tidak ikut ter-screenshot ke dalam PDF dan
-           merusak posisi potongan halaman. Kotak merah hanya dimunculkan saat
-           mode "Atur Batas Halaman" aktif (lihat .pb-mode-active di bawah). */
         .custom-page-break {
             width: 100%;
             height: 0;
@@ -115,15 +105,8 @@
             color: transparent;
             font-size: 0;
             line-height: 0;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            /* Penanda pemotong halaman asli untuk mesin PDF */
-            page-break-before: always;
-            break-before: page;
         }
-        /* Tampilan garis pembatas HANYA saat mode edit batas halaman aktif */
+
         .pb-mode-active .custom-page-break {
             height: auto;
             overflow: visible;
@@ -134,17 +117,48 @@
             color: #ef4444;
             font-size: 0.9rem;
             line-height: 1.6;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
         }
         .pb-mode-active .custom-page-break:hover { background-color: #fca5a5; color: white; }
 
-        /* Cegah tabel/baris/judul/blok TTD terpotong acak di tengah halaman */
-        h3, tr, table, .signature-box {
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-
+        /* === PENGATURAN CETAK (NATIVE PRINT CHROME) === */
         @media print {
+            @page {
+                size: 215mm 330mm; /* Kertas F4 */
+                margin: 15mm;
+            }
+            body { 
+                /* Memaksa Chrome menampilkan warna background saat print */
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                background-color: white; 
+            }
+            .container { max-width: 100%; width: 100%; padding: 0; }
+            .card { box-shadow: none; border: none; padding: 0; margin: 0; }
+            #rppm-document { padding: 0; }
+            
             .no-print { display: none !important; }
+            
+            /* Terapkan Page Break pada elemen yang disisipkan */
+            .custom-page-break {
+                page-break-before: always !important;
+                break-before: page !important;
+            }
+            /* Cegah tabel terpotong di tengah baris jika memungkinkan */
+            tr, h3, .signature-box {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Hilangkan border putus-putus TTD saat dicetak */
+            #ttd-wrapper {
+                border: none !important;
+                background-color: transparent !important;
+                resize: none !important;
+            }
         }
     </style>
 </head>
@@ -153,7 +167,7 @@
 <div class="container">
     <div>
         <h1>RPPM Generator</h1>
-        <p class="subtitle">Download PDF Warna • Fitur Batas Halaman (Page Break) • Tanda Tangan</p>
+        <p class="subtitle">Print F4 Full Color • Fitur Batas Halaman (Page Break) • Tanda Tangan</p>
     </div>
     
     <div class="card no-print">
@@ -186,13 +200,13 @@
         <div class="print-controls no-print">
             <div style="flex-direction: column; align-items: flex-start; gap: 5px;">
                 <strong style="color:var(--text);">Langkah Persiapan:</strong>
-                <span style="font-size:0.85rem; color:#64748b;">1. Atur batas halaman &nbsp; | &nbsp; 2. Upload & atur TTD &nbsp; | &nbsp; 3. Download PDF</span>
+                <span style="font-size:0.85rem; color:#64748b;">1. Atur batas halaman &nbsp; | &nbsp; 2. Upload & atur TTD &nbsp; | &nbsp; 3. Print / Save PDF</span>
             </div>
             <div>
                 <button id="btn-pb" style="background-color: #ef4444; color:#fff;" onclick="togglePageBreakMode()">✂️ Atur Batas Halaman</button>
                 <input type="file" id="ttd-upload" accept="image/*" style="display: none;" onchange="loadSignature(event)">
                 <button style="background-color: var(--accent); color:#fff;" onclick="document.getElementById('ttd-upload').click()">+ Upload TTD</button>
-                <button onclick="downloadPDF()">📥 Download PDF (F4)</button>
+                <button onclick="downloadPDF()">🖨️ Cetak / Save PDF (F4)</button>
             </div>
         </div>
 
@@ -391,24 +405,19 @@
         }
     }
 
-    // Menangkap klik untuk menaruh/menghapus batas halaman
     document.addEventListener('click', function(e) {
         if (!isPageBreakMode) return;
         
         const doc = document.getElementById('rppm-document');
         if (doc.contains(e.target)) {
-            // Jika mengklik garis batas yang sudah ada, hapus garisnya
             if (e.target.classList.contains('custom-page-break')) {
                 e.target.remove();
                 return;
             }
-            
-            // Cari elemen terdekat (Judul H3, Baris TR, atau Kotak TTD) untuk dipotong
             const target = e.target.closest('h3, tr, .signature-box');
             if (target) {
                 const pb = document.createElement('div');
-                // Kelas html2pdf__page-break adalah kelas bawaan untuk memotong dokumen
-                pb.className = 'custom-page-break html2pdf__page-break no-print';
+                pb.className = 'custom-page-break'; // Class dipanggil murni CSS saat diprint
                 pb.innerHTML = '✂️ BATAS HALAMAN (Teks di bawah ini pindah ke halaman baru) - Klik untuk hapus';
                 target.parentNode.insertBefore(pb, target);
             }
@@ -431,11 +440,8 @@
         elmnt.onmousedown = dragMouseDown;
 
         function dragMouseDown(e) {
-            // Matikan drag jika sedang mode page break
             if (isPageBreakMode) return;
-            
             e = e || window.event;
-            // Cegah drag jika mengklik area pojok (resize)
             if (e.offsetX > elmnt.offsetWidth - 20 && e.offsetY > elmnt.offsetHeight - 20) return;
             e.preventDefault();
             pos3 = e.clientX;
@@ -461,54 +467,33 @@
         }
     }
 
-
     // ==========================================
-    // LOGIKA DOWNLOAD PDF (F4) + NAMA DINAMIS
+    // LOGIKA PRINT & NAMA PDF DINAMIS
     // ==========================================
     function downloadPDF() {
         if (isPageBreakMode) {
-            alert("Harap selesaikan Mode Batas Halaman (klik 'Selesai Atur Batas') sebelum mengunduh PDF.");
+            alert("Harap selesaikan Mode Batas Halaman (klik 'Selesai Atur Batas') sebelum mencetak/save PDF.");
             return;
         }
 
-        const element = document.getElementById('rppm-document');
-        const ttdWrapper = document.getElementById('ttd-wrapper');
+        // Trik menyimpan nama file asli tab browser (biasanya 'Generator RPPM Final')
+        const originalTitle = document.title;
         
-        // Sembunyikan styling kotak TTD sebelum dicetak
-        if(ttdWrapper) {
-            ttdWrapper.style.border = 'none';
-            ttdWrapper.style.backgroundColor = 'transparent';
-            ttdWrapper.style.resize = 'none';
-        }
-
-        // Ambil nama dari input Unit/Materi, dan bersihkan dari karakter aneh
+        // Ambil nama materi untuk jadi nama file
         let namaMateri = document.getElementById('materi').value.trim();
         namaMateri = namaMateri.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
-        
-        // Jika kolom materi kosong, gunakan default
         if(namaMateri === "") namaMateri = "Dokumen";
+        
+        // Ubah judul tab browser SESAAT sebelum print dialog terbuka
+        document.title = 'RPPM_' + namaMateri;
 
-        const opt = {
-            // Margin PDF dalam mm, urutan: [atas, kiri, bawah, kanan]
-            // Atas & bawah dikunci 10mm (1cm) sesuai permintaan
-            margin:       [10, 15, 10, 15],
-            filename:     'RPPM_' + namaMateri + '.pdf', // Penamaan dinamis berdasarkan Materi
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: [215, 330], orientation: 'portrait' },
-            // Pastikan potongan halaman mengikuti tanda batas yang dibuat (mode 'legacy'),
-            // dan tidak memotong baris tabel / judul / blok TTD di tengah (mode 'css' + avoid)
-            pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', 'h3', '.signature-box'] }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            // Kembalikan kotak TTD setelah selesai Download
-            if(ttdWrapper) {
-                ttdWrapper.style.border = '2px dashed var(--accent)';
-                ttdWrapper.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
-                ttdWrapper.style.resize = 'both';
-            }
-        });
+        // Buka Jendela Print Bawaan Chrome
+        window.print();
+        
+        // Kembalikan nama tab ke aslinya setelah 1 detik (setelah dialog print muncul)
+        setTimeout(() => {
+            document.title = originalTitle;
+        }, 1000);
     }
 </script>
 
