@@ -98,31 +98,52 @@
             box-shadow: 0 -5px 10px rgba(239, 68, 68, 0.2);
         }
         
-        /* Tampilan garis pembatas di Web */
+        /* === PEMOTONG HALAMAN (PAGE BREAK) ===
+           PENTING: html2canvas (mesin pemotret PDF) TIDAK membaca @media print,
+           sehingga elemen ini HARUS disembunyikan secara default (bukan lewat
+           @media print) agar tidak ikut ter-screenshot ke dalam PDF dan
+           merusak posisi potongan halaman. Kotak merah hanya dimunculkan saat
+           mode "Atur Batas Halaman" aktif (lihat .pb-mode-active di bawah). */
         .custom-page-break {
             width: 100%;
+            height: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            border: none;
+            background: transparent;
+            color: transparent;
+            font-size: 0;
+            line-height: 0;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            /* Penanda pemotong halaman asli untuk mesin PDF */
+            page-break-before: always;
+            break-before: page;
+        }
+        /* Tampilan garis pembatas HANYA saat mode edit batas halaman aktif */
+        .pb-mode-active .custom-page-break {
+            height: auto;
+            overflow: visible;
             padding: 8px 0;
+            margin: 15px 0;
             background-color: #fee2e2;
             border: 2px dashed #ef4444;
             color: #ef4444;
-            text-align: center;
             font-size: 0.9rem;
-            cursor: pointer;
-            margin: 15px 0;
-            font-weight: bold;
-            border-radius: 4px;
+            line-height: 1.6;
         }
-        .custom-page-break:hover { background-color: #fca5a5; color: white; }
+        .pb-mode-active .custom-page-break:hover { background-color: #fca5a5; color: white; }
 
-        /* Sembunyikan garis merah dan ubah menjadi pemotong halaman asli saat PDF dibuat */
+        /* Cegah tabel/baris/judul/blok TTD terpotong acak di tengah halaman */
+        h3, tr, table, .signature-box {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         @media print {
-            .custom-page-break {
-                visibility: hidden;
-                height: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                border: none !important;
-            }
             .no-print { display: none !important; }
         }
     </style>
@@ -468,11 +489,16 @@
         if(namaMateri === "") namaMateri = "Dokumen";
 
         const opt = {
-            margin:       10, // Margin PDF (mm)
+            // Margin PDF dalam mm, urutan: [atas, kiri, bawah, kanan]
+            // Atas & bawah dikunci 10mm (1cm) sesuai permintaan
+            margin:       [10, 15, 10, 15],
             filename:     'RPPM_' + namaMateri + '.pdf', // Penamaan dinamis berdasarkan Materi
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: [215, 330], orientation: 'portrait' } 
+            jsPDF:        { unit: 'mm', format: [215, 330], orientation: 'portrait' },
+            // Pastikan potongan halaman mengikuti tanda batas yang dibuat (mode 'legacy'),
+            // dan tidak memotong baris tabel / judul / blok TTD di tengah (mode 'css' + avoid)
+            pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', 'h3', '.signature-box'] }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
