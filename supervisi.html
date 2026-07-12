@@ -242,8 +242,10 @@
 
     async function fetchDropdownKelas() {
         try {
-            var res = await fetch(API_URL + "?action=get_kelas");
+            // PERHATIKAN BARIS INI: Ubah get_kelas menjadi get_kelas_siswa
+            var res = await fetch(API_URL + "?action=get_kelas_siswa");
             var json = await res.json();
+            
             if(json.status === 'success') {
                 var kelasSelect = document.getElementById('sup-kelas');
                 if(json.data.length === 0) {
@@ -255,7 +257,7 @@
                     kelasSelect.innerHTML += '<option value="'+k+'">'+k+'</option>';
                 });
             }
-        } catch(e) { console.error("Gagal load kelas dari absensi", e); }
+        } catch(e) { console.error("Gagal load kelas dari data siswa", e); }
     }
 
     window.loadDaftarSupervisi = async function() {
