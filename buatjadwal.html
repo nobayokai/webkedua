@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Jadwal Anti-Bentrok</title>
+    <style>
+        /* DESAIN DASHBOARD PREMIUM */
+        body { font-family: 'Arial', sans-serif; background: #f3f4f6; padding: 20px; color: #1f2937; }
+        .jadwal-container { background: #ffffff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 1100px; margin: auto; overflow-x: auto; }
+        
+        .header-title { font-size: 22px; font-weight: 900; color: #047857; margin-bottom: 5px; text-transform: uppercase; }
+        .header-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 20px; font-weight: bold; }
+
+        /* TABEL JADWAL */
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: #10b981; color: white; padding: 12px 10px; font-size: 13px; font-weight: bold; text-transform: uppercase; border: 1px solid #059669; }
+        td { padding: 8px; border: 1px solid #d1d5db; text-align: center; vertical-align: middle; background: #f9fafb; transition: 0.3s; }
+        td:hover { background: #eff6ff; }
+        
+        .jam-col { font-weight: 900; color: #374151; font-size: 12px; background: white; width: 100px; }
+        
+        /* INPUT KODE */
+        .input-kode { width: 100%; height: 35px; border: 2px solid transparent; border-radius: 8px; text-align: center; font-size: 14px; font-weight: 900; color: #1f2937; outline: none; background: white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; text-transform: uppercase; }
+        .input-kode:focus { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        .input-kode.error { border-color: #ef4444; background: #fef2f2; color: #b91c1c; animation: shake 0.3s ease-in-out; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+        /* TOAST NOTIFIKASI BENTROK */
+        #toast-bentrok { visibility: hidden; min-width: 300px; background-color: #ef4444; color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold; font-size: 14px; box-shadow: 0 10px 25px rgba(239,68,68,0.4); opacity: 0; transition: opacity 0.3s, bottom 0.3s; display: flex; align-items: center; gap: 10px; justify-content: center; }
+        #toast-bentrok.show { visibility: visible; opacity: 1; bottom: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="jadwal-container">
+        <div class="header-title">📅 Input Jadwal Pelajaran (Simulasi Senin)</div>
+        <div class="header-subtitle">SDIT HIDAYATUT TAUFIQ - TAHUN AJARAN 2024/2025</div>
+
+        <table id="tabel-jadwal">
+            <thead>
+                <tr>
+                    <th>Waktu / Jam</th>
+                    <th>Kelas I</th>
+                    <th>Kelas II</th>
+                    <th>Kelas III</th>
+                    <th>Kelas IV</th>
+                    <th>Kelas V</th>
+                    <th>Kelas VI</th>
+                </tr>
+            </thead>
+            <tbody id="body-jadwal">
+                <!-- Baris tabel akan di-generate oleh JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Popup Peringatan Custom -->
+    <div id="toast-bentrok">
+        <span style="font-size:20px;">⚠️</span>
+        <span id="toast-pesan">Pesan Error</span>
+    </div>
+
+<script>
+// ==========================================
+// 1. DATABASE KODE & NAMA GURU
+// Diambil dari daftar referensi SDIT
+// ==========================================
+const dataGuru = {
+    "1": "Ghoniyah N, S.Pd",
+    "2": "Siti Marlina",
+    "3": "Septy Ratna Wati, S.Pd",
+    "4": "Ayu Annisa",
+    "5": "Nurul Khasanah, S.Pd",
+    "6": "Assyifa Mega Utami, S.Pd",
+    "7": "Sena Yunita, S.Pd",
+    "8": "Nurhayati, S.Pd",
+    "9": "Nova Haryanto",
+    "10": "Rohati, S.Pd.I",
+    "11": "Nia Damarsari (PAI)", 
+    "12": "Nia Damarsari (B. Arab)",
+    "13": "Rifana Septiana, S.Pd"
+};
+
+// ==========================================
+// 2. JAM PELAJARAN SDIT[cite: 7]
+// ==========================================
+const jamPelajaran = [
+    "07.45 - 08.20", "08.20 - 08.55", "08.55 - 09.30", 
+    "09.30 - 10.05", "10.30 - 11.05", "11.05 - 11.40", "13.00 - 13.35"
+];
+
+const daftarKelas = ["Kelas I", "Kelas II", "Kelas III", "Kelas IV", "Kelas V", "Kelas VI"];
+
+// ==========================================
+// 3. GENERATE TABEL JADWAL
+// ==========================================
+const tbody = document.getElementById('body-jadwal');
+
+jamPelajaran.forEach((jam) => {
+    let tr = document.createElement('tr');
+    
+    // Kolom Jam
+    let tdJam = document.createElement('td');
+    tdJam.className = 'jam-col';
+    tdJam.textContent = jam;
+    tr.appendChild(tdJam);
+
+    // Kolom Kelas (Input Kode)
+    daftarKelas.forEach((kelas) => {
+        let tdInput = document.createElement('td');
+        
+        let inputEl = document.createElement('input');
+        inputEl.type = 'text';
+        inputEl.className = 'input-kode';
+        inputEl.placeholder = '-';
+        inputEl.dataset.kelas = kelas; // Menyimpan info kelas
+        inputEl.dataset.jam = jam;     // Menyimpan info jam
+        
+        // Event Listener: Dijalankan setiap kali user mengetik/pindah sel
+        inputEl.addEventListener('change', function() {
+            validasiJadwal(this, tr);
+        });
+
+        tdInput.appendChild(inputEl);
+        tr.appendChild(tdInput);
+    });
+
+    tbody.appendChild(tr);
+});
+
+// ==========================================
+// 4. LOGIKA CERDAS PENDETEKSI BENTROK
+// ==========================================
+function validasiJadwal(inputAktif, barisTr) {
+    let kodeInput = inputAktif.value.trim().toUpperCase();
+    
+    // Jika dikosongkan, hapus warna error
+    if (!kodeInput) {
+        inputAktif.classList.remove('error');
+        return;
+    }
+
+    // Ekstrak angka utama (misal input "5BI" -> ambil "5")
+    let kodeAngka = kodeInput.replace(/[^0-9]/g, ''); 
+    let namaGuru = dataGuru[kodeAngka] || `Kode Guru (${kodeInput})`;
+
+    let kelasAktif = inputAktif.dataset.kelas;
+    let jamAktif = inputAktif.dataset.jam;
+    
+    // Cari semua input lain di BARIS JAM YANG SAMA
+    let semuaInputDiJamIni = barisTr.querySelectorAll('.input-kode');
+    
+    let isBentrok = false;
+    let kelasBentrok = "";
+
+    semuaInputDiJamIni.forEach(inpLain => {
+        // Abaikan kotak yang sedang diketik
+        if (inpLain !== inputAktif) {
+            let kodeLain = inpLain.value.trim().toUpperCase();
+            let angkaLain = kodeLain.replace(/[^0-9]/g, '');
+
+            // Jika kode gurunya sama dan tidak kosong, BENTROK!
+            if (kodeLain !== "" && angkaLain === kodeAngka) {
+                isBentrok = true;
+                kelasBentrok = inpLain.dataset.kelas;
+            }
+        }
+    });
+
+    if (isBentrok) {
+        // Tampilkan Peringatan
+        munculkanPeringatan(`Gagal! ${namaGuru} sudah mengajar di ${kelasBentrok} pada jam ${jamAktif}.`);
+        
+        // Tandai kotak dengan warna merah & kosongkan isinya
+        inputAktif.classList.add('error');
+        setTimeout(() => {
+            inputAktif.value = '';
+            inputAktif.classList.remove('error');
+            inputAktif.focus();
+        }, 1500); // Reset setelah 1.5 detik
+    } else {
+        // Jika aman, pastikan tidak ada warna merah
+        inputAktif.classList.remove('error');
+    }
+}
+
+// ==========================================
+// 5. MUNCULKAN NOTIFIKASI TOAST (PREMIUM)
+// ==========================================
+let toastTimer;
+function munculkanPeringatan(pesan) {
+    let toast = document.getElementById("toast-bentrok");
+    document.getElementById("toast-pesan").textContent = pesan;
+    
+    toast.classList.add("show");
+    
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ 
+        toast.classList.remove("show"); 
+    }, 4000);
+}
+</script>
+
+</body>
+</html>
