@@ -35,10 +35,21 @@
         .header h1 { color: var(--green2); margin:0; font-size: 20px; font-family: 'Georgia', serif; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;}
         .header h2 { color: var(--green); margin: 2px 0 0 0; font-size: 13px; letter-spacing: 2px; }
 
-        /* GRID KALENDER DI BAGIAN ATAS (3 BARIS x 2 KOLOM) */
-        .grid-kalender { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 4mm 6mm; flex: 1; }
+        /* GRID KALENDER DIPAKSA DIBAGI 3 RATA AGAR TIDAK MENDORONG KE BAWAH */
+        .grid-kalender { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: repeat(3, minmax(0, 1fr)); 
+            gap: 4mm 6mm; 
+            flex: 1; 
+            min-height: 0; 
+        }
         
-        .kotak-bulan { border: 2px solid #e5e7eb; border-radius: 10px; padding: 3mm; background: #fafafa; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02); overflow: hidden; }
+        .kotak-bulan { 
+            border: 2px solid #e5e7eb; border-radius: 10px; padding: 3mm; background: #fafafa; 
+            display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
+            overflow: hidden; min-height: 0; 
+        }
         .kotak-bulan h3 { text-align: center; margin: 0 0 2mm 0; color: var(--green2); font-family: 'Georgia', serif; font-size: 14px; font-weight: 900; text-transform: uppercase;}
         
         .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9.5px; font-weight: bold; color: #6b7280; margin-bottom: 2px; }
@@ -51,30 +62,37 @@
         .cal-day.has-agenda { border-bottom: 2.5px solid var(--amber) !important; color: var(--text); }
         .cal-day.has-ujian { border-bottom: 2.5px solid var(--pink) !important; color: var(--text); }
 
-        /* LIST AGENDA DI DALAM KOTAK BULAN */
+        /* PERBAIKAN: LIST AGENDA DIDESAIN 1 BARIS (INLINE) MENGHEMAT BANYAK TEMPAT */
         .agenda-list-wrap { 
             margin-top: 3mm; border-top: 1.5px dashed #d1d5db; padding-top: 2.5mm; 
-            display: flex; flex-direction: column; gap: 2.5px; flex: 1; overflow: hidden; 
+            display: flex; flex-direction: column; gap: 2mm; flex: 1; overflow: hidden; min-height: 0;
         }
         
+        /* Box item dibuat transparan agar lebih bersih seperti tulisan biasa */
         .agenda-item { 
-            background: white; border: 1px solid #e5e7eb; border-left: 3px solid; 
-            padding: 1.5mm 2.5mm; border-radius: 4px; 
-            display: flex; flex-direction: column; gap: 1.5px; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            display: flex; 
+            align-items: flex-start; /* Jika nama sangat panjang bisa turun ke bawah sedikit */
+            gap: 1.5mm;
+            flex-shrink: 0;
+            line-height: 1.2;
         }
-        .agenda-item.kat-kegiatan { border-left-color: var(--amber); }
-        .agenda-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.05) !important; }
-        .agenda-item.kat-libur    { border-left-color: #ef4444; background: rgba(239,68,68,0.05) !important; }
         
-        /* Font diperkecil tapi tetap tebal agar muat banyak dan tajam saat diprint */
-        .agenda-date { font-weight: 900; font-size: 7.5px; color: #4b5563; display: flex; align-items: center; justify-content: space-between;}
-        .agenda-name { font-weight: bold; font-size: 9px; color: var(--text); line-height: 1.15;}
+        /* Indikator titik warna di sebelah kiri (sebagai penanda kategori) */
+        .agenda-dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            margin-top: 2.5px; flex-shrink: 0;
+        }
+        .kat-kegiatan .agenda-dot { background: var(--amber); }
+        .kat-ujian    .agenda-dot { background: var(--pink); }
+        .kat-libur    .agenda-dot { background: #ef4444; }
         
-        .badge-kategori { font-size: 5px; padding: 1.5px 3px; border-radius: 2px; color: white; display: inline-block; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;}
-        .badge-kategori.kegiatan { background: var(--amber) !important; }
-        .badge-kategori.ujian    { background: var(--pink) !important; }
-        .badge-kategori.libur    { background: #ef4444 !important; }
+        /* Teks Tgl & Nama menyatu 1 baris */
+        .agenda-text-inline {
+            font-size: 8.5px; color: var(--text); font-weight: 500;
+        }
+        .agenda-text-inline strong {
+            font-size: 8.5px; color: #4b5563; font-weight: 900;
+        }
 
         .btn-print { position:fixed; top:20px; right:20px; padding:10px 20px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 12px rgba(16,185,129,0.3); z-index: 999; }
         .btn-print:hover { background: #059669; }
@@ -113,18 +131,16 @@
             return d1.getTime() === d2.getTime();
         }
 
-        // Format tanggal ringkas karena sudah ada di dalam kotak bulannya
         function formatRangeSingkat(startStr, endStr) {
             let d1 = parseYMD(startStr);
             let d2 = parseYMD(endStr);
             if (startStr === endStr) {
                 return `${d1.getDate()}`;
             } else {
-                return `${d1.getDate()} - ${d2.getDate()}`;
+                return `${d1.getDate()}-${d2.getDate()}`;
             }
         }
 
-        // Grouping agenda yang tanggalnya berurutan dan memiliki kategori/nama sama
         function groupAgendas(agendaList) {
             agendaList.sort((a,b) => a.tanggalBersih.localeCompare(b.tanggalBersih));
             let grouped = [];
@@ -222,7 +238,6 @@
 
                 document.getElementById('loading-screen').style.display = 'none';
                 
-                // Memicu jendela print saat load selesai 
                 setTimeout(() => { window.print(); }, 500);
 
             } catch (err) {
@@ -240,7 +255,6 @@
             let html = `<div class="kotak-bulan">`;
             html += `<h3>${monthName}</h3>`;
             
-            // Urutan Hari mulai dari Senin
             html += `<div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>`;
             html += `<div class="cal-grid">`;
 
@@ -270,27 +284,27 @@
                 }
                 html += `<div class="cal-day ${extraClass}">${d}</div>`;
             }
-            html += `</div>`; // End cal-grid
+            html += `</div>`; 
 
-            // RENDER LIST AGENDA DI BAWAH KALENDER (DENGAN GROUPING)
+            // RENDER LIST AGENDA DENGAN FORMAT 1 BARIS (INLINE)
             const grouped = groupAgendas(agendaBulanIni);
             html += `<div class="agenda-list-wrap">`;
             
             if (grouped.length > 0) {
                 grouped.forEach(ag => {
-                    let katClass = 'kat-kegiatan', badgeClass = 'kegiatan';
-                    if(ag.cat === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
-                    if(ag.cat === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
+                    let katClass = 'kat-kegiatan';
+                    if(ag.cat === 'Ujian Sekolah') katClass = 'kat-ujian';
+                    if(ag.cat === 'Libur Nasional') katClass = 'kat-libur';
 
                     const stringTanggalSingkat = formatRangeSingkat(ag.start, ag.end);
 
+                    // Desain 1 baris yang padat
                     html += `
                         <div class="agenda-item ${katClass}">
-                            <div class="agenda-date">
-                                <span>🗓️ Tgl: ${stringTanggalSingkat}</span>
-                                <span class="badge-kategori ${badgeClass}">${ag.cat}</span>
+                            <div class="agenda-dot"></div>
+                            <div class="agenda-text-inline">
+                                <strong>Tgl ${stringTanggalSingkat} :</strong> ${ag.name}
                             </div>
-                            <div class="agenda-name">${ag.name}</div>
                         </div>
                     `;
                 });
@@ -298,7 +312,7 @@
                 html += `<div style="text-align: center; color: #9ca3af; font-style: italic; font-size: 8px; margin-top: 4px;">Tidak ada agenda</div>`;
             }
 
-            html += `</div></div>`; // End agenda-list-wrap & kotak-bulan
+            html += `</div></div>`; 
             container.innerHTML += html;
         }
 
