@@ -116,8 +116,7 @@
             <div class="form-add">
                 <input type="text" id="add-guru-kode" placeholder="Kode (1)" style="flex:0.3;">
                 <input type="text" id="add-guru-nama" placeholder="Nama Guru">
-                <input type="text" id="add-guru-jabatan" placeholder="Jabatan / Mapel" style="flex:100%; margin-top:5px;">
-                <button class="btn-add" style="background:#3b82f6; width:100%; margin-top:5px;" onclick="tambahMaster('guru')">Tambah</button>
+                <button class="btn-add" style="background:#3b82f6; width:100%; margin-top:5px;" onclick="tambahMaster('guru')">Tambah Guru</button>
             </div>
         </div>
 
@@ -178,7 +177,7 @@
                 <tr>
                     <th style="width:40px;">Kode</th>
                     <th>Nama Guru</th>
-                    <th>Jabatan / Mata Pelajaran</th>
+                    <th>Mata Pelajaran</th>
                     <th style="width:60px;">Senin</th>
                     <th style="width:60px;">Selasa</th>
                     <th style="width:60px;">Rabu</th>
@@ -247,11 +246,10 @@
 // ==========================================
 let memoriJadwal = {}; 
 
-// Struktur baru dbGuru dengan Objek (Nama & Jabatan)
 let dbGuru = { 
-    "1": { nama: "Ghoniyah N, S.Pd", jabatan: "KEPALA SEKOLAH & GURU KELAS 6A" }, 
-    "9": { nama: "Nova Haryanto", jabatan: "TIK" }, 
-    "11": { nama: "Nia Damarsari, S.Pd", jabatan: "PAI KELAS 4-6, QURDIS 1-6" } 
+    "1": { nama: "Ghoniyah N, S.Pd", jabatan: "-" }, 
+    "9": { nama: "Nova Haryanto", jabatan: "-" }, 
+    "11": { nama: "Nia Damarsari, S.Pd", jabatan: "-" } 
 };
 let dbMapel = { "AH": "Aqidah Akhlak", "TIK": "TIK", "F": "Fiqih", "UM": "Umum", "P5": "P5", "BA": "B. Arab", "O": "Olahraga" };
 let kelasArray = ["I", "IIA", "IIB", "III", "IV", "VA", "VB", "VI"];
@@ -279,14 +277,8 @@ function loadState() {
     let saved = localStorage.getItem('jadwal_state_ultimate');
     if(saved) {
         let data = JSON.parse(saved);
-        
-        // Migrasi jika format dbGuru masih string lama
-        for(let k in data.dbGuru) {
-            if(typeof data.dbGuru[k] === 'string') {
-                data.dbGuru[k] = { nama: data.dbGuru[k], jabatan: "-" };
-            }
-        }
-
+        // Migrasi jika ada format dbGuru string lama
+        for(let k in data.dbGuru) { if(typeof data.dbGuru[k] === 'string') data.dbGuru[k] = { nama: data.dbGuru[k], jabatan: "-" }; }
         dbGuru = data.dbGuru; dbMapel = data.dbMapel; kelasArray = data.kelasArray; waktuArray = data.waktuArray; memoriJadwal = data.memoriJadwal;
     }
 }
@@ -294,8 +286,7 @@ function loadState() {
 function exportData() {
     saveState();
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('jadwal_state_ultimate'));
-    let dl = document.createElement('a');
-    dl.setAttribute("href", dataStr); dl.setAttribute("download", "Backup_Jadwal_SDIT.json");
+    let dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "Backup_Jadwal_SDIT.json");
     document.body.appendChild(dl); dl.click(); dl.remove();
 }
 
@@ -352,10 +343,7 @@ function renderMasterLists() {
         listGuru.innerHTML += `
             <div class="master-item">
                 <span class="kode">${k}</span>
-                <div style="flex:1; display:flex; flex-direction:column;">
-                    <input type="text" class="edit-input" value="${dbGuru[k].nama}" onchange="editMaster('guru_nama', '${k}', this.value)">
-                    <input type="text" class="edit-input" style="color:#6b7280; font-weight:normal;" value="${dbGuru[k].jabatan}" onchange="editMaster('guru_jabatan', '${k}', this.value)">
-                </div>
+                <input type="text" class="edit-input" value="${dbGuru[k].nama}" onchange="editMaster('guru_nama', '${k}', this.value)">
                 <button class="btn-delete" onclick="hapusMaster('guru', '${k}')">✕</button>
             </div>`; 
     }
@@ -378,7 +366,6 @@ function renderMasterLists() {
 function editMaster(tipe, key, newVal) {
     let val = newVal.trim();
     if(tipe === 'guru_nama') { if(val) dbGuru[key].nama = val; }
-    else if(tipe === 'guru_jabatan') { dbGuru[key].jabatan = val; }
     else if(tipe === 'mapel') { if(val) dbMapel[key] = val; }
     else if(tipe === 'kelas') { if(val) kelasArray[key] = val.toUpperCase(); }
     saveState(); renderSeluruhSistem();
@@ -386,8 +373,8 @@ function editMaster(tipe, key, newVal) {
 
 function tambahMaster(tipe) {
     if(tipe === 'guru') {
-        let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-guru-nama').value.trim(); let jab = document.getElementById('add-guru-jabatan').value.trim();
-        if(kode && nama) { dbGuru[kode] = { nama: nama, jabatan: jab || "-" }; document.getElementById('add-guru-kode').value=''; document.getElementById('add-guru-nama').value=''; document.getElementById('add-guru-jabatan').value=''; }
+        let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-guru-nama').value.trim();
+        if(kode && nama) { dbGuru[kode] = { nama: nama, jabatan: "-" }; document.getElementById('add-guru-kode').value=''; document.getElementById('add-guru-nama').value=''; }
     } else if(tipe === 'mapel') {
         let kode = document.getElementById('add-mapel-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-mapel-nama').value.trim();
         if(kode && nama) { dbMapel[kode] = nama; document.getElementById('add-mapel-kode').value=''; document.getElementById('add-mapel-nama').value=''; }
@@ -472,7 +459,7 @@ function validasiBentrok(inputAktif) {
     if(!memoriJadwal[hariAktif]) memoriJadwal[hariAktif] = {}; if(!memoriJadwal[hariAktif][jamAktif]) memoriJadwal[hariAktif][jamAktif] = {};
     memoriJadwal[hariAktif][jamAktif][kelasAktif] = rawValue;
     
-    saveState(); renderRekapGuru(); // Update rekap setiap mengetik
+    saveState(); renderRekapGuru(); 
 
     if (!rawValue) { inputAktif.classList.remove('error'); return; }
 
@@ -510,8 +497,8 @@ function renderRekapGuru() {
 
     for(let k in dbGuru) {
         let harian = { "SENIN":0, "SELASA":0, "RABU":0, "KAMIS":0, "JUMAT":0 };
+        let mapelSet = new Set(); // Kecerdasan Buatan Deteksi Mapel
         
-        // Hitung Kemunculan Kode di Memori
         for(let hari in memoriJadwal) {
             for(let jam in memoriJadwal[hari]) {
                 for(let kls in memoriJadwal[hari][jam]) {
@@ -519,8 +506,14 @@ function renderRekapGuru() {
                     if(val) {
                         let kodeAngka = val.replace(/[^0-9]/g, '');
                         if(kodeAngka === k) {
-                            harian[hari]++;
-                            totalAll[hari]++;
+                            harian[hari]++; totalAll[hari]++;
+                            
+                            // Ekstrak Huruf (Kode Mapel)
+                            let kodeHuruf = val.replace(/[0-9]/g, '');
+                            if(kodeHuruf) {
+                                if(dbMapel[kodeHuruf]) mapelSet.add(dbMapel[kodeHuruf]);
+                                else mapelSet.add(kodeHuruf);
+                            }
                         }
                     }
                 }
@@ -530,11 +523,13 @@ function renderRekapGuru() {
         let sum = harian["SENIN"] + harian["SELASA"] + harian["RABU"] + harian["KAMIS"] + harian["JUMAT"];
         totalAll["SUM"] += sum;
 
+        let stringMapel = mapelSet.size > 0 ? Array.from(mapelSet).join(', ') : '-';
+
         tbody.innerHTML += `
             <tr>
                 <td>${k}</td>
                 <td>${dbGuru[k].nama}</td>
-                <td>${dbGuru[k].jabatan}</td>
+                <td>${stringMapel}</td>
                 <td>${harian["SENIN"]}</td><td>${harian["SELASA"]}</td><td>${harian["RABU"]}</td>
                 <td>${harian["KAMIS"]}</td><td>${harian["JUMAT"]}</td>
                 <td style="font-weight:bold;">${sum}</td>
@@ -542,7 +537,6 @@ function renderRekapGuru() {
         `;
     }
 
-    // Baris Grand Total
     tbody.innerHTML += `
         <tr>
             <th colspan="3">Jumlah Total Jam</th>
