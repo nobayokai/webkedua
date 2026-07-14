@@ -9,14 +9,15 @@
         body { font-family: 'Arial', sans-serif; background: #f3f4f6; margin: 0; padding: 20px; color: #1f2937; font-size: 13px; }
         .kop-sekolah { text-align: center; margin-bottom: 20px; line-height: 1.4; }
         .kop-sekolah h1 { margin: 0; font-size: 18px; color: #047857; font-family: 'Georgia', serif; font-weight: 900; }
-        .kop-sekolah h2 { margin: 0; font-size: 22px; color: #10b981; font-weight: 900; }
-        .kop-sekolah h3 { margin: 0; font-size: 14px; color: #374151; font-weight: bold; }
+        .kop-sekolah h2 { margin: 0; font-size: 22px; color: #10b981; font-weight: 900; text-transform: uppercase; }
+        .kop-sekolah h3 { margin: 0; font-size: 14px; color: #374151; font-weight: bold; text-transform: uppercase; }
 
-        .btn-action-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .btn-action-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;}
         .btn-action { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
         .btn-action:hover { transform: translateY(-2px); }
         .btn-print { background: #ef4444; } .btn-print:hover { background: #dc2626; }
         .btn-setting { background: #3b82f6; } .btn-setting:hover { background: #2563eb; }
+        .btn-perkelas { background: #f59e0b; } .btn-perkelas:hover { background: #d97706; }
 
         /* KOTAK MASTER DATA */
         .master-data-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
@@ -71,21 +72,23 @@
 
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center; backdrop-filter: blur(3px); }
         .modal-card { background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
-        .modal-card input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
+        .modal-card input, .modal-card select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit;}
+        .modal-card label { display: block; text-align: left; font-size: 11px; font-weight: bold; color: #4b5563; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="kop-sekolah">
         <h1>YAYASAN PENDIDIKAN ISLAM</h1>
-        <h2>SEKOLAH DASAR ISLAM TERPADU HIDAYATUT TAUFIQ</h2>
-        <h3>JADWAL MATA PELAJARAN DINAMIS</h3>
+        <h2 id="kop-nama-sekolah">SDIT HIDAYATUT TAUFIQ</h2>
+        <h3 id="kop-ta">JADWAL MATA PELAJARAN DINAMIS - T.A 2024/2025</h3>
     </div>
 
     <!-- TOMBOL AKSI UTAMA -->
     <div class="btn-action-group">
-        <button class="btn-action btn-setting" onclick="document.getElementById('modal-cetak').style.display='flex'">⚙️ Pengaturan Cetak & TTD</button>
-        <button class="btn-action btn-print" onclick="cetakJadwalPdf()">🖨️ Download / Cetak PDF</button>
+        <button class="btn-action btn-setting" onclick="bukaPengaturan()">⚙️ Pengaturan & TTD</button>
+        <button class="btn-action btn-print" onclick="cetakJadwalGlobalPdf()">🖨️ Cetak Jadwal Global</button>
+        <button class="btn-action btn-perkelas" onclick="bukaModalPerKelas()">🎨 Cetak Per Kelas</button>
     </div>
 
     <!-- PENGATURAN MASTER DATA -->
@@ -157,20 +160,37 @@
         </div>
     </div>
 
-    <!-- MODAL PENGATURAN CETAK -->
+    <!-- MODAL PENGATURAN UMUM -->
     <div class="modal" id="modal-cetak">
         <div class="modal-card">
-            <h3 style="color:#047857; margin-top:0;">⚙️ Pengaturan Cetak PDF</h3>
-            <div style="text-align:left; margin-bottom:10px;">
-                <label style="font-size:11px; font-weight:bold; color:#4b5563;">Nama Kepala Sekolah:</label>
-                <input type="text" id="set-nama-kepsek" value="Muhammad Arif, S.Ag">
-            </div>
-            <div style="text-align:left; margin-bottom:10px;">
-                <label style="font-size:11px; font-weight:bold; color:#4b5563;">Upload Stempel & TTD (PNG Transparan):</label>
-                <input type="file" id="set-ttd-file" accept="image/png">
-            </div>
+            <h3 style="color:#047857; margin-top:0;">⚙️ Pengaturan Cetak & Sekolah</h3>
+            
+            <label>Nama Sekolah:</label>
+            <input type="text" id="set-nama-sekolah" placeholder="SDIT HIDAYATUT TAUFIQ">
+            
+            <label>Tahun Ajaran / Semester:</label>
+            <input type="text" id="set-tahun-ajaran" placeholder="Genap - T.A 2024/2025">
+
+            <label>Nama Kepala Sekolah:</label>
+            <input type="text" id="set-nama-kepsek" placeholder="Muhammad Arif, S.Ag">
+            
+            <label>Upload Stempel & TTD (PNG Transparan):</label>
+            <input type="file" id="set-ttd-file" accept="image/png">
+            
             <button class="btn-action" style="background:#10b981; width:100%; justify-content:center; padding:12px;" onclick="simpanPengaturanCetak()">💾 Simpan Pengaturan</button>
             <button class="btn-action" style="background:#6b7280; width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('modal-cetak').style.display='none'">Tutup</button>
+        </div>
+    </div>
+
+    <!-- MODAL PILIH KELAS UNTUK DICETAK -->
+    <div class="modal" id="modal-cetak-perkelas">
+        <div class="modal-card">
+            <h3 style="color:#d97706; margin-top:0;">🎨 Cetak Jadwal Per Kelas</h3>
+            <label>Pilih Kelas yang ingin dicetak:</label>
+            <select id="select-kelas-cetak"></select>
+            
+            <button class="btn-action btn-perkelas" style="width:100%; justify-content:center; padding:12px; margin-top:10px;" onclick="eksekusiCetakPerKelas()">🚀 Generate & Print PDF</button>
+            <button class="btn-action" style="background:#6b7280; width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('modal-cetak-perkelas').style.display='none'">Tutup</button>
         </div>
     </div>
 
@@ -181,11 +201,10 @@
 let memoriJadwal = {}; 
 
 let dbGuru = { "1": "Ghoniyah N, S.Pd", "2": "Siti Marlina", "3": "Septy Ratna Wati", "9": "Nova Haryanto", "11": "Nia Damarsari" };
-let dbMapel = { "AH": "Aqidah Akhlak", "TIK": "TIK", "F": "Fiqih", "UM": "Umum", "P5": "P5" };
+let dbMapel = { "AH": "Aqidah Akhlak", "TIK": "TIK", "F": "Fiqih", "UM": "Umum", "P5": "P5", "BA": "B. Arab", "O": "Olahraga" };
 let kelasArray = ["I", "IIA", "IIB", "III", "IV", "VA", "VB", "VI"];
 let hariArray = ["SENIN", "SELASA", "RABU", "KAMIS", "JUMAT"];
 
-// DATABASE WAKTU DEFAULT (Menyesuaikan Target Hari & Target Kelas)
 let waktuArray = [
     { jam: "07.20-07.45", tipe: "kegiatan", label: "UPACARA", targetHari: "SENIN", targetKelas: "" },
     { jam: "07.20-07.45", tipe: "kegiatan", label: "TAHFIDZ", targetHari: "SELASA, KAMIS", targetKelas: "" },
@@ -195,45 +214,55 @@ let waktuArray = [
     { jam: "07.45-08.20", tipe: "pelajaran", label: "", targetHari: "", targetKelas: "" },
     { jam: "08.20-08.55", tipe: "pelajaran", label: "", targetHari: "", targetKelas: "" },
     { jam: "10.05-10.30", tipe: "istirahat", label: "ISTIRAHAT", targetHari: "", targetKelas: "" },
-    { jam: "10.30-11.05", tipe: "pelajaran", label: "", targetHari: "", targetKelas: "" },
-    
-    // CONTOH JAM KHUSUS LES
-    { jam: "13.35-14.35", tipe: "pelajaran", label: "Les Awal", targetHari: "", targetKelas: "I, IIA, IIB" },
-    { jam: "14.10-15.10", tipe: "pelajaran", label: "Les Besar", targetHari: "", targetKelas: "III, IV, VA, VB, VI" }
+    { jam: "10.30-11.05", tipe: "pelajaran", label: "", targetHari: "", targetKelas: "" }
 ];
 
 // ==========================================
-// 2. FUNGSI RENDER & EDIT MASTER DATA
+// 2. FUNGSI PENGATURAN (LOAD & SIMPAN)
+// ==========================================
+function loadPengaturan() {
+    let namaSekolah = localStorage.getItem('jadwal_sekolah') || "SDIT HIDAYATUT TAUFIQ";
+    let taSekolah = localStorage.getItem('jadwal_ta') || "Semester Genap - T.A 2024/2025";
+    
+    document.getElementById('kop-nama-sekolah').textContent = namaSekolah;
+    document.getElementById('kop-ta').textContent = `JADWAL MATA PELAJARAN DINAMIS - ${taSekolah}`;
+}
+
+function bukaPengaturan() {
+    document.getElementById('set-nama-sekolah').value = localStorage.getItem('jadwal_sekolah') || "SDIT HIDAYATUT TAUFIQ";
+    document.getElementById('set-tahun-ajaran').value = localStorage.getItem('jadwal_ta') || "Semester Genap - T.A 2024/2025";
+    document.getElementById('set-nama-kepsek').value = localStorage.getItem('jadwal_kepsek') || "Muhammad Arif, S.Ag";
+    document.getElementById('modal-cetak').style.display='flex';
+}
+
+function simpanPengaturanCetak() {
+    let f = document.getElementById('set-ttd-file');
+    if (f.files.length > 0) {
+        let r = new FileReader();
+        r.onload = function(e) { localStorage.setItem('jadwal_ttd', e.target.result); };
+        r.readAsDataURL(f.files[0]);
+    }
+    localStorage.setItem('jadwal_sekolah', document.getElementById('set-nama-sekolah').value.toUpperCase());
+    localStorage.setItem('jadwal_ta', document.getElementById('set-tahun-ajaran').value.toUpperCase());
+    localStorage.setItem('jadwal_kepsek', document.getElementById('set-nama-kepsek').value);
+    
+    loadPengaturan(); // Update kop layar
+    alert('Pengaturan Berhasil Disimpan!');
+    document.getElementById('modal-cetak').style.display='none';
+}
+
+// ==========================================
+// 3. FUNGSI RENDER MASTER & TABEL UTAMA
 // ==========================================
 function renderMasterLists() {
     const listGuru = document.getElementById('list-guru'); listGuru.innerHTML = '';
-    for(let k in dbGuru) {
-        listGuru.innerHTML += `
-            <div class="master-item">
-                <span class="kode">${k}</span>
-                <input type="text" class="edit-input" value="${dbGuru[k]}" onchange="editMaster('guru', '${k}', this.value)">
-                <button class="btn-delete" onclick="hapusMaster('guru', '${k}')">✕</button>
-            </div>`;
-    }
+    for(let k in dbGuru) { listGuru.innerHTML += `<div class="master-item"><span class="kode">${k}</span><input type="text" class="edit-input" value="${dbGuru[k]}" onchange="editMaster('guru', '${k}', this.value)"><button class="btn-delete" onclick="hapusMaster('guru', '${k}')">✕</button></div>`; }
 
     const listMapel = document.getElementById('list-mapel'); listMapel.innerHTML = '';
-    for(let k in dbMapel) {
-        listMapel.innerHTML += `
-            <div class="master-item">
-                <span class="kode">${k}</span>
-                <input type="text" class="edit-input" value="${dbMapel[k]}" onchange="editMaster('mapel', '${k}', this.value)">
-                <button class="btn-delete" onclick="hapusMaster('mapel', '${k}')">✕</button>
-            </div>`;
-    }
+    for(let k in dbMapel) { listMapel.innerHTML += `<div class="master-item"><span class="kode">${k}</span><input type="text" class="edit-input" value="${dbMapel[k]}" onchange="editMaster('mapel', '${k}', this.value)"><button class="btn-delete" onclick="hapusMaster('mapel', '${k}')">✕</button></div>`; }
 
     const listKelas = document.getElementById('list-kelas'); listKelas.innerHTML = '';
-    kelasArray.forEach((k, idx) => {
-        listKelas.innerHTML += `
-            <div class="master-item">
-                🏫 Kelas <input type="text" class="edit-input" value="${k}" onchange="editMaster('kelas', ${idx}, this.value)">
-                <button class="btn-delete" onclick="hapusMaster('kelas', ${idx})">✕</button>
-            </div>`;
-    });
+    kelasArray.forEach((k, idx) => { listKelas.innerHTML += `<div class="master-item">🏫 Kelas <input type="text" class="edit-input" value="${k}" onchange="editMaster('kelas', ${idx}, this.value)"><button class="btn-delete" onclick="hapusMaster('kelas', ${idx})">✕</button></div>`; });
 
     const listJam = document.getElementById('list-jam'); listJam.innerHTML = '';
     waktuArray.forEach((w, idx) => {
@@ -255,32 +284,20 @@ function editMaster(tipe, key, newVal) {
 
 function tambahMaster(tipe) {
     if(tipe === 'guru') {
-        let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase();
-        let nama = document.getElementById('add-guru-nama').value.trim();
+        let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-guru-nama').value.trim();
         if(kode && nama) { dbGuru[kode] = nama; document.getElementById('add-guru-kode').value=''; document.getElementById('add-guru-nama').value=''; }
-    } 
-    else if(tipe === 'mapel') {
-        let kode = document.getElementById('add-mapel-kode').value.trim().toUpperCase();
-        let nama = document.getElementById('add-mapel-nama').value.trim();
+    } else if(tipe === 'mapel') {
+        let kode = document.getElementById('add-mapel-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-mapel-nama').value.trim();
         if(kode && nama) { dbMapel[kode] = nama; document.getElementById('add-mapel-kode').value=''; document.getElementById('add-mapel-nama').value=''; }
-    }
-    else if(tipe === 'kelas') {
+    } else if(tipe === 'kelas') {
         let nama = document.getElementById('add-kelas-nama').value.trim().toUpperCase();
         if(nama && !kelasArray.includes(nama)) { kelasArray.push(nama); document.getElementById('add-kelas-nama').value=''; }
-    }
-    else if(tipe === 'jam') {
-        let jam = document.getElementById('add-jam-waktu').value.trim();
-        let t = document.getElementById('add-jam-tipe').value;
+    } else if(tipe === 'jam') {
+        let jam = document.getElementById('add-jam-waktu').value.trim(); let t = document.getElementById('add-jam-tipe').value;
         let lbl = document.getElementById('add-jam-label').value.trim().toUpperCase();
         let tHari = document.getElementById('add-jam-target-hari').value.trim().replace(/\s/g, '').toUpperCase();
         let tKelas = document.getElementById('add-jam-target-kelas').value.trim().replace(/\s/g, '').toUpperCase();
-        
-        if(jam) { 
-            waktuArray.push({ jam: jam, tipe: t, label: lbl, targetHari: tHari, targetKelas: tKelas }); 
-            document.getElementById('add-jam-waktu').value='';
-            document.getElementById('add-jam-target-hari').value='';
-            document.getElementById('add-jam-target-kelas').value='';
-        }
+        if(jam) { waktuArray.push({ jam: jam, tipe: t, label: lbl, targetHari: tHari, targetKelas: tKelas }); document.getElementById('add-jam-waktu').value=''; document.getElementById('add-jam-target-hari').value=''; document.getElementById('add-jam-target-kelas').value=''; }
         waktuArray.sort((a,b) => a.jam.localeCompare(b.jam));
     }
     renderSeluruhSistem();
@@ -288,104 +305,51 @@ function tambahMaster(tipe) {
 
 function hapusMaster(tipe, key) {
     if(confirm('Yakin ingin menghapus data ini?')) {
-        if(tipe === 'guru') delete dbGuru[key];
-        else if(tipe === 'mapel') delete dbMapel[key];
-        else if(tipe === 'kelas') kelasArray.splice(key, 1);
-        else if(tipe === 'jam') waktuArray.splice(key, 1);
+        if(tipe === 'guru') delete dbGuru[key]; else if(tipe === 'mapel') delete dbMapel[key]; else if(tipe === 'kelas') kelasArray.splice(key, 1); else if(tipe === 'jam') waktuArray.splice(key, 1);
         renderSeluruhSistem();
     }
 }
 
-// ==========================================
-// 3. FUNGSI RENDER TABEL JADWAL (MULTI-TARGET)
-// ==========================================
 function renderTabelJadwal() {
-    const thead = document.getElementById('thead-jadwal');
-    const tbody = document.getElementById('body-jadwal');
+    const thead = document.getElementById('thead-jadwal'); const tbody = document.getElementById('body-jadwal');
+    let trHari = `<tr><th rowspan="2" style="width:100px;">HARI / WAKTU</th>`; let trKelas = `<tr>`;
     
-    let trHari = `<tr><th rowspan="2" style="width:100px;">HARI / WAKTU</th>`;
-    let trKelas = `<tr>`;
-    
-    if(kelasArray.length === 0) {
-        tbody.innerHTML = `<tr><td style="padding:20px;">Silakan tambahkan Kelas.</td></tr>`; return;
-    }
+    if(kelasArray.length === 0) { tbody.innerHTML = `<tr><td style="padding:20px;">Silakan tambahkan Kelas.</td></tr>`; return; }
 
     hariArray.forEach(hari => {
         trHari += `<th colspan="${kelasArray.length}" class="head-${hari}">${hari}</th>`;
         kelasArray.forEach(kls => { trKelas += `<th class="theme-${hari}">${kls}</th>`; });
     });
     trHari += `</tr>`; trKelas += `</tr>`;
-    thead.innerHTML = trHari + trKelas;
-
-    tbody.innerHTML = '';
+    thead.innerHTML = trHari + trKelas; tbody.innerHTML = '';
     
-    // Ambil Jam unik saja agar tabel rapi
     let uniqueJams = [...new Set(waktuArray.map(w => w.jam))].sort();
 
     uniqueJams.forEach(jamStr => {
         let tr = document.createElement('tr');
-        
-        let tdJam = document.createElement('td');
-        tdJam.className = 'jam-col';
-        tdJam.textContent = jamStr;
-        tr.appendChild(tdJam);
+        let tdJam = document.createElement('td'); tdJam.className = 'jam-col'; tdJam.textContent = jamStr; tr.appendChild(tdJam);
 
         hariArray.forEach(hari => {
-            // Cari konfigurasi untuk Jam ini pada Hari ini
             let configsJamIni = waktuArray.filter(w => w.jam === jamStr);
-            let configAktif = configsJamIni.find(w => w.targetHari && w.targetHari.includes(hari)) || 
-                              configsJamIni.find(w => !w.targetHari || w.targetHari === "");
+            let configAktif = configsJamIni.find(w => w.targetHari && w.targetHari.includes(hari)) || configsJamIni.find(w => !w.targetHari || w.targetHari === "");
 
-            if (!configAktif) {
-                // Jika kosong total (Tidak ada jadwal sama sekali di hari ini)
-                let tdKosong = document.createElement('td');
-                tdKosong.colSpan = kelasArray.length;
-                tdKosong.className = `theme-${hari} td-disabled`;
-                tdKosong.innerHTML = '-';
-                tr.appendChild(tdKosong);
-                return;
-            }
+            if (!configAktif) { let tdKosong = document.createElement('td'); tdKosong.colSpan = kelasArray.length; tdKosong.className = `theme-${hari} td-disabled`; tdKosong.innerHTML = '-'; tr.appendChild(tdKosong); return; }
 
-            // Jika Kegiatannya Istirahat/Upacara (Menyatu semua kelas dalam 1 hari)
             if (configAktif.tipe === "istirahat" || configAktif.tipe === "kegiatan") {
-                let tdIstirahat = document.createElement('td');
-                tdIstirahat.colSpan = kelasArray.length;
-                tdIstirahat.textContent = configAktif.label;
-                
-                // Styling manual agar warna terbawa saat di print PDF
-                if(configAktif.tipe === "kegiatan") {
-                    tdIstirahat.setAttribute('style', 'background-color:#e0f2fe !important; color:#0369a1 !important; font-weight:900; letter-spacing:2px;');
-                } else {
-                    tdIstirahat.setAttribute('style', 'background-color:#f3f4f6 !important; color:#4b5563 !important; font-weight:900; letter-spacing:4px;');
-                }
+                let tdIstirahat = document.createElement('td'); tdIstirahat.colSpan = kelasArray.length; tdIstirahat.textContent = configAktif.label;
+                if(configAktif.tipe === "kegiatan") tdIstirahat.setAttribute('style', 'background-color:#e0f2fe !important; color:#0369a1 !important; font-weight:900; letter-spacing:2px;');
+                else tdIstirahat.setAttribute('style', 'background-color:#f3f4f6 !important; color:#4b5563 !important; font-weight:900; letter-spacing:4px;');
                 tr.appendChild(tdIstirahat);
-            } 
-            else { // Tipe Pelajaran
+            } else { 
                 kelasArray.forEach(kls => {
-                    let tdInput = document.createElement('td');
-                    tdInput.className = `theme-${hari}`;
-                    
-                    // Cek Target Kelas
+                    let tdInput = document.createElement('td'); tdInput.className = `theme-${hari}`;
                     let targetArray = configAktif.targetKelas ? configAktif.targetKelas.split(',').map(x=>x.trim()) : [];
                     let isTargeted = targetArray.length === 0 || targetArray.includes(kls);
 
-                    if (!isTargeted) {
-                        tdInput.className += ' td-disabled';
-                        tdInput.innerHTML = '✕';
-                    } else {
-                        let inputEl = document.createElement('input');
-                        inputEl.type = 'text';
-                        inputEl.className = 'input-kode';
-                        inputEl.dataset.hari = hari;
-                        inputEl.dataset.jam = jamStr;
-                        inputEl.dataset.kelas = kls;
-                        
-                        // Kembalikan tulisan user dari memori
-                        if(memoriJadwal[hari] && memoriJadwal[hari][jamStr] && memoriJadwal[hari][jamStr][kls]) {
-                            inputEl.value = memoriJadwal[hari][jamStr][kls];
-                            inputEl.setAttribute('value', memoriJadwal[hari][jamStr][kls]); // Update atribut untuk cetak
-                        }
-                        
+                    if (!isTargeted) { tdInput.className += ' td-disabled'; tdInput.innerHTML = '✕'; } 
+                    else {
+                        let inputEl = document.createElement('input'); inputEl.type = 'text'; inputEl.className = 'input-kode'; inputEl.dataset.hari = hari; inputEl.dataset.jam = jamStr; inputEl.dataset.kelas = kls;
+                        if(memoriJadwal[hari] && memoriJadwal[hari][jamStr] && memoriJadwal[hari][jamStr][kls]) { inputEl.value = memoriJadwal[hari][jamStr][kls]; inputEl.setAttribute('value', memoriJadwal[hari][jamStr][kls]); }
                         inputEl.addEventListener('change', function() { validasiBentrok(this); });
                         tdInput.appendChild(inputEl);
                     }
@@ -399,18 +363,12 @@ function renderTabelJadwal() {
 
 function renderSeluruhSistem() { renderMasterLists(); renderTabelJadwal(); }
 
-// ==========================================
-// 4. MESIN PENDETEKSI BENTROK 
-// ==========================================
 function validasiBentrok(inputAktif) {
     let rawValue = inputAktif.value.trim().toUpperCase();
-    inputAktif.value = rawValue;
-    inputAktif.setAttribute('value', rawValue); // Penting agar teks ini terbawa ke PDF
+    inputAktif.value = rawValue; inputAktif.setAttribute('value', rawValue);
     
     let hariAktif = inputAktif.dataset.hari; let jamAktif = inputAktif.dataset.jam; let kelasAktif = inputAktif.dataset.kelas;
-
-    if(!memoriJadwal[hariAktif]) memoriJadwal[hariAktif] = {};
-    if(!memoriJadwal[hariAktif][jamAktif]) memoriJadwal[hariAktif][jamAktif] = {};
+    if(!memoriJadwal[hariAktif]) memoriJadwal[hariAktif] = {}; if(!memoriJadwal[hariAktif][jamAktif]) memoriJadwal[hariAktif][jamAktif] = {};
     memoriJadwal[hariAktif][jamAktif][kelasAktif] = rawValue;
 
     if (!rawValue) { inputAktif.classList.remove('error'); return; }
@@ -418,129 +376,222 @@ function validasiBentrok(inputAktif) {
     let kodeGuru = rawValue.replace(/[^0-9]/g, ''); 
     if(!kodeGuru) return; 
 
-    let namaGuru = dbGuru[kodeGuru] || `Guru Kode (${kodeGuru})`;
-    let selector = `.input-kode[data-hari="${hariAktif}"][data-jam="${jamAktif}"]`;
-    let semuaInputDiJamSama = document.querySelectorAll(selector);
+    let namaGuru = dbGuru[kodeGuru] || `Guru (${kodeGuru})`;
+    let semuaInputDiJamSama = document.querySelectorAll(`.input-kode[data-hari="${hariAktif}"][data-jam="${jamAktif}"]`);
     
     let isBentrok = false; let kelasBentrok = "";
-
     semuaInputDiJamSama.forEach(inpLain => {
         if (inpLain !== inputAktif) {
-            let kodeLain = inpLain.value.trim().toUpperCase();
-            let angkaLain = kodeLain.replace(/[^0-9]/g, ''); 
+            let kodeLain = inpLain.value.trim().toUpperCase(); let angkaLain = kodeLain.replace(/[^0-9]/g, ''); 
             if (kodeLain !== "" && angkaLain === kodeGuru) { isBentrok = true; kelasBentrok = inpLain.dataset.kelas; }
         }
     });
 
     if (isBentrok) {
-        munculkanToast(`Bapak/Ibu ${namaGuru} sudah ada jadwal di Kelas ${kelasBentrok} pada hari ${hariAktif} jam ${jamAktif}.`);
+        let toast = document.getElementById("toast-bentrok"); document.getElementById("toast-pesan").textContent = `Bapak/Ibu ${namaGuru} sudah ada jadwal di Kelas ${kelasBentrok} pada hari ${hariAktif} jam ${jamAktif}.`;
+        toast.classList.add("show"); setTimeout(() => { toast.classList.remove("show"); }, 5000);
+        
         inputAktif.classList.add('error');
-        setTimeout(() => {
-            inputAktif.value = ''; inputAktif.setAttribute('value', '');
-            memoriJadwal[hariAktif][jamAktif][kelasAktif] = ''; 
-            inputAktif.classList.remove('error'); inputAktif.focus();
-        }, 2000);
+        setTimeout(() => { inputAktif.value = ''; inputAktif.setAttribute('value', ''); memoriJadwal[hariAktif][jamAktif][kelasAktif] = ''; inputAktif.classList.remove('error'); inputAktif.focus(); }, 2000);
     } else { inputAktif.classList.remove('error'); }
 }
 
-let toastTimer;
-function munculkanToast(pesan) {
-    let toast = document.getElementById("toast-bentrok");
-    document.getElementById("toast-pesan").textContent = pesan;
-    toast.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toast.classList.remove("show"); }, 5000);
-}
-
 // ==========================================
-// 5. FITUR CETAK PDF + LEGENDA + TTD
+// 4. CETAK JADWAL GLOBAL (KESELURUHAN)
 // ==========================================
-function simpanPengaturanCetak() {
-    let f = document.getElementById('set-ttd-file');
-    if (f.files.length > 0) {
-        let r = new FileReader();
-        r.onload = function(e) { localStorage.setItem('jadwal_ttd', e.target.result); };
-        r.readAsDataURL(f.files[0]);
-    }
-    localStorage.setItem('jadwal_kepsek', document.getElementById('set-nama-kepsek').value);
-    alert('Pengaturan Cetak Berhasil Disimpan!');
-    document.getElementById('modal-cetak').style.display='none';
-}
-
-function cetakJadwalPdf() {
-    let ttdData = localStorage.getItem('jadwal_ttd') || '';
-    let kepsekNama = localStorage.getItem('jadwal_kepsek') || 'Muhammad Arif, S.Ag';
+function cetakJadwalGlobalPdf() {
+    let ttdData = localStorage.getItem('jadwal_ttd') || ''; let kepsekNama = localStorage.getItem('jadwal_kepsek') || 'Muhammad Arif, S.Ag';
     let ttdImg = ttdData ? `<img src="${ttdData}" style="max-height:80px; margin: 5px 0;">` : `<br><br><br><br>`;
-
-    // Render Legenda Guru & Mapel
-    let htmlLegendaGuru = '';
-    for(let k in dbGuru) { htmlLegendaGuru += `<div><b>${k}</b> = ${dbGuru[k]}</div>`; }
     
-    let htmlLegendaMapel = '';
-    for(let k in dbMapel) { htmlLegendaMapel += `<div><b>${k}</b> = ${dbMapel[k]}</div>`; }
+    let htmlLegendaGuru = ''; for(let k in dbGuru) { htmlLegendaGuru += `<div><b>${k}</b> = ${dbGuru[k]}</div>`; }
+    let htmlLegendaMapel = ''; for(let k in dbMapel) { htmlLegendaMapel += `<div><b>${k}</b> = ${dbMapel[k]}</div>`; }
 
     let printWin = window.open('', '', 'width=1200,height=800');
     let tabelAsli = document.getElementById('tabel-jadwal').outerHTML;
+    
+    let nmSekolah = localStorage.getItem('jadwal_sekolah') || "SDIT HIDAYATUT TAUFIQ";
+    let taSekolah = localStorage.getItem('jadwal_ta') || "Semester Genap - T.A 2024/2025";
 
     let htmlPdf = `
     <html>
     <head>
-        <title>Cetak Jadwal Pelajaran</title>
+        <title>Cetak Jadwal Global</title>
         <style>
             @page { size: landscape; margin: 10mm; }
             body { font-family: Arial, sans-serif; font-size: 10px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
             .header { text-align: center; margin-bottom: 10px; border-bottom: 3px double #000; padding-bottom: 5px; }
-            .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; }
-            .header h2 { margin: 3px 0; font-size: 12px; font-weight: normal;}
-            
-            table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-            th, td { border: 1px solid #000; padding: 3px; text-align: center; font-size:9px;}
-            th { background-color: #e5e7eb; font-weight: bold; }
-            
+            .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; } .header h2 { margin: 3px 0; font-size: 12px; font-weight: normal; text-transform:uppercase;}
+            table { width: 100%; border-collapse: collapse; margin-bottom: 15px; } th, td { border: 1px solid #000; padding: 3px; text-align: center; font-size:9px;} th { background-color: #e5e7eb; font-weight: bold; }
             input { border: none !important; background: transparent !important; width: 100%; text-align: center; font-size: 9px; font-weight: bold; font-family: Arial; padding:0; margin:0; outline:none;}
-            
-            .td-disabled { background-color: #d1d5db !important; }
-
+            .td-disabled { background-color: #d1d5db !important; } .row-istirahat td { background-color: #f3f4f6 !important; font-weight: bold; letter-spacing: 2px;}
             .footer-area { display: flex; justify-content: space-between; margin-top: 10px; page-break-inside: avoid;}
             .legenda-box { border: 1px solid #000; padding: 10px; width: 65%; display: flex; gap: 20px; background: #fff;}
-            .legenda-col { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; font-size: 9px; }
-            .legenda-title { grid-column: 1 / -1; font-weight: bold; font-size: 10px; border-bottom: 1px solid #000; margin-bottom: 5px; padding-bottom: 2px; text-align:center;}
-
-            .ttd-box { width: 25%; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;}
-            .ttd-name { font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+            .legenda-col { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; font-size: 9px; } .legenda-title { grid-column: 1 / -1; font-weight: bold; font-size: 10px; border-bottom: 1px solid #000; margin-bottom: 5px; padding-bottom: 2px; text-align:center;}
+            .ttd-box { width: 25%; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;} .ttd-name { font-weight: bold; text-decoration: underline; text-transform: uppercase; }
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>JADWAL MATA PELAJARAN SDIT HIDAYATUT TAUFIQ</h1>
-            <h2>TAHUN AJARAN 2025/2026</h2>
-        </div>
-        
+        <div class="header"><h1>JADWAL MATA PELAJARAN</h1><h2>${nmSekolah} - ${taSekolah}</h2></div>
         ${tabelAsli}
-        
         <div class="footer-area">
-            <div class="legenda-box">
-                <div class="legenda-col">
-                    <div class="legenda-title">KETERANGAN KODE GURU</div>
-                    ${htmlLegendaGuru}
-                </div>
-                <div style="border-left: 1px solid #000; margin: 0 10px;"></div>
-                <div class="legenda-col">
-                    <div class="legenda-title">KETERANGAN MATA PELAJARAN</div>
-                    ${htmlLegendaMapel}
-                </div>
-            </div>
-            
-            <div class="ttd-box">
-                Mengetahui,<br>Kepala Sekolah<br>
-                ${ttdImg}
-                <span class="ttd-name">${kepsekNama}</span>
-            </div>
+            <div class="legenda-box"><div class="legenda-col"><div class="legenda-title">KODE GURU</div>${htmlLegendaGuru}</div><div style="border-left: 1px solid #000; margin: 0 10px;"></div><div class="legenda-col"><div class="legenda-title">KODE MATA PELAJARAN</div>${htmlLegendaMapel}</div></div>
+            <div class="ttd-box">Mengetahui,<br>Kepala Sekolah<br>${ttdImg}<span class="ttd-name">${kepsekNama}</span></div>
         </div>
+        <script>setTimeout(() => { window.print(); }, 800);<\/script>
+    </body>
+    </html>`;
+    printWin.document.open(); printWin.document.write(htmlPdf); printWin.document.close();
+}
 
-        <script>
-            setTimeout(() => { window.print(); }, 800);
-        </${'script'}>
+// ==========================================
+// 5. FITUR CETAK PER KELAS (VIBE CERIA / KIDS)
+// ==========================================
+function bukaModalPerKelas() {
+    if(kelasArray.length === 0) return alert("Data kelas kosong!");
+    let select = document.getElementById('select-kelas-cetak');
+    select.innerHTML = '';
+    kelasArray.forEach(kls => { select.innerHTML += `<option value="${kls}">Kelas ${kls}</option>`; });
+    document.getElementById('modal-cetak-perkelas').style.display = 'flex';
+}
+
+function eksekusiCetakPerKelas() {
+    let kls = document.getElementById('select-kelas-cetak').value;
+    document.getElementById('modal-cetak-perkelas').style.display = 'none';
+
+    let nmSekolah = localStorage.getItem('jadwal_sekolah') || "SDIT HIDAYATUT TAUFIQ";
+    let taSekolah = localStorage.getItem('jadwal_ta') || "Semester Genap - 2024/2025";
+    
+    // BUILD ROWS
+    let trs = '';
+    let uniqueJams = [...new Set(waktuArray.map(w => w.jam))].sort();
+
+    uniqueJams.forEach(jamStr => {
+        let rowHtml = `<tr><td class="td-time">${jamStr}</td>`;
+        
+        hariArray.forEach(hari => {
+            let configsJamIni = waktuArray.filter(w => w.jam === jamStr);
+            let configAktif = configsJamIni.find(w => w.targetHari && w.targetHari.includes(hari)) || configsJamIni.find(w => !w.targetHari || w.targetHari === "");
+
+            if (!configAktif) { rowHtml += `<td class="td-empty">-</td>`; return; }
+
+            let targetArray = configAktif.targetKelas ? configAktif.targetKelas.split(',').map(x=>x.trim()) : [];
+            let isTargeted = targetArray.length === 0 || targetArray.includes(kls);
+
+            if (!isTargeted) {
+                rowHtml += `<td class="td-empty">-</td>`;
+            } else if (configAktif.tipe === "istirahat" || configAktif.tipe === "kegiatan") {
+                rowHtml += `<td class="td-kegiatan">${configAktif.label}</td>`;
+            } else {
+                let kode = (memoriJadwal[hari] && memoriJadwal[hari][jamStr] && memoriJadwal[hari][jamStr][kls]) ? memoriJadwal[hari][jamStr][kls] : "";
+                if (kode) {
+                    // Ekstrak Huruf (Buang angka dari "11F" menjadi "F")
+                    let kodeHurufMapel = kode.replace(/[0-9]/g, '');
+                    let namaMapel = dbMapel[kodeHurufMapel] || kode; // Fallback jika mapel tak ditemukan
+                    rowHtml += `<td class="td-pelajaran">${namaMapel}</td>`;
+                } else {
+                    rowHtml += `<td class="td-empty">-</td>`;
+                }
+            }
+        });
+        rowHtml += `</tr>`;
+        trs += rowHtml;
+    });
+
+    let printWin = window.open('', '', 'width=1100,height=800');
+    let htmlPdf = `
+    <html>
+    <head>
+        <title>Cetak Jadwal Kelas ${kls}</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+            @page { size: landscape; margin: 0; }
+            body { 
+                margin: 0; padding: 20px; box-sizing: border-box; 
+                background-color: #68d3e6; /* Biru muda ceria */
+                font-family: 'Nunito', sans-serif;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+                position: relative; height: 100vh; overflow: hidden;
+            }
+            
+            /* DEKORASI BENTUK (MENGGANTIKAN GAMBAR AGAR TIDAK ERROR SAAT PRINT) */
+            .decor { position: absolute; z-index: -1; }
+            .d-star1 { top: 10%; left: 5%; font-size: 60px; color: #facc15; transform: rotate(-20deg); }
+            .d-star2 { bottom: 15%; right: 10%; font-size: 50px; color: #f472b6; transform: rotate(15deg); }
+            .d-star3 { top: 20%; right: 25%; font-size: 40px; color: #ef4444; }
+            .d-clock { top: 5%; left: 10%; font-size: 100px; }
+            .d-ball { top: 5%; right: 5%; font-size: 110px; }
+            .d-book { bottom: -20px; left: 5%; font-size: 120px; transform: rotate(-15deg); }
+            .d-glass { bottom: -10px; right: 5%; font-size: 130px; transform: rotate(15deg); }
+
+            .container {
+                position: relative; z-index: 10;
+                background: rgba(255, 255, 255, 0.4);
+                border: 6px dashed #ffffff;
+                border-radius: 30px;
+                padding: 20px 40px;
+                height: 100%; box-sizing: border-box;
+                display: flex; flex-direction: column;
+            }
+
+            .header { text-align: center; margin-bottom: 15px; }
+            .title { 
+                font-family: 'Fredoka One', cursive; 
+                font-size: 48px; margin: 0; 
+                color: #ef4444; text-shadow: 3px 3px 0 #fff;
+                letter-spacing: 2px;
+            }
+            .title span { color: #3b82f6; }
+            .subtitle { font-size: 24px; color: #1f2937; margin: 5px 0 0 0; font-weight: 900; background: #fde047; display: inline-block; padding: 5px 25px; border-radius: 20px; border: 3px solid #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+            .school-name { font-size: 14px; font-weight: bold; color: #374151; margin-top: 5px; text-transform: uppercase; }
+
+            table { width: 100%; border-collapse: separate; border-spacing: 6px; margin-top: 10px; flex: 1; }
+            th { border-radius: 12px; padding: 12px; font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+            
+            /* WARNA HEADER HARI */
+            .th-time { background-color: #f97316; }
+            .th-senin { background-color: #ef4444; }
+            .th-selasa { background-color: #ec4899; }
+            .th-rabu { background-color: #a855f7; }
+            .th-kamis { background-color: #84cc16; }
+            .th-jumat { background-color: #eab308; }
+
+            td { background: white; border-radius: 10px; padding: 8px; text-align: center; font-weight: 900; font-size: 15px; color: #1f2937; border: 2px solid #e5e7eb; box-shadow: 0 3px 0 rgba(0,0,0,0.05); }
+            
+            .td-time { background: transparent; border: 2px solid #1f2937; color: #1f2937; font-size: 14px; box-shadow: none; }
+            .td-empty { background: transparent; border-color: transparent; box-shadow: none; color: rgba(0,0,0,0.2); }
+            .td-kegiatan { background: #fef08a; color: #854d0e; border-color: #facc15; font-size: 13px; }
+            .td-pelajaran { color: #0369a1; }
+        </style>
+    </head>
+    <body>
+        <div class="decor d-star1">⭐</div>
+        <div class="decor d-star2">⭐</div>
+        <div class="decor d-star3">✨</div>
+        <div class="decor d-clock">⏰</div>
+        <div class="decor d-ball">⚽</div>
+        <div class="decor d-book">📚</div>
+        <div class="decor d-glass">🔍</div>
+
+        <div class="container">
+            <div class="header">
+                <h1 class="title">Jadwal <span>Pelajaran</span></h1>
+                <h2 class="subtitle">Kelas: ${kls}</h2>
+                <div class="school-name">${nmSekolah} | ${taSekolah}</div>
+            </div>
+
+            <table>
+                <tr>
+                    <th class="th-time">WAKTU</th>
+                    <th class="th-senin">SENIN</th>
+                    <th class="th-selasa">SELASA</th>
+                    <th class="th-rabu">RABU</th>
+                    <th class="th-kamis">KAMIS</th>
+                    <th class="th-jumat">JUM'AT</th>
+                </tr>
+                ${trs}
+            </table>
+        </div>
+        <script>setTimeout(() => { window.print(); }, 800);<\/script>
     </body>
     </html>`;
 
@@ -549,6 +600,8 @@ function cetakJadwalPdf() {
     printWin.document.close();
 }
 
+// Inisialisasi awal
+loadPengaturan();
 renderSeluruhSistem();
 </script>
 </body>
