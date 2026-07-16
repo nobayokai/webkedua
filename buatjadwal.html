@@ -20,6 +20,7 @@
         .btn-perkelas { background: #f59e0b; } .btn-perkelas:hover { background: #d97706; }
         .btn-backup { background: #10b981; } .btn-backup:hover { background: #059669; }
         .btn-rekap { background: #881337; } .btn-rekap:hover { background: #4c0519; }
+        .btn-rekap-mapel { background: #ca8a04; } .btn-rekap-mapel:hover { background: #a16207; }
 
         /* KOTAK MASTER DATA */
         .master-data-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
@@ -54,13 +55,23 @@
         .jam-col { position: sticky; left: 0; background: #ffffff; z-index: 11; font-weight: 900; font-size: 11px; width: 95px; color: #374151; box-shadow: 2px 0 5px rgba(0,0,0,0.05); border-right: 2px solid #d1d5db;}
         thead th:first-child { z-index: 12; left: 0; background: #1f2937 !important; border-right: 2px solid #d1d5db;}
 
-        /* TABEL REKAPITULASI */
+        /* TABEL REKAPITULASI (GURU) */
         .rekap-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #d1d5db; margin-bottom: 20px; }
         .rekap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         .rekap-table th { background: #881337; color: white; border: 1px solid #4c0519; padding: 8px; position: static; }
         .rekap-table td { border: 1px solid #d1d5db; padding: 6px; text-align: center; }
         .rekap-table td:nth-child(2), .rekap-table td:nth-child(3) { text-align: left; font-weight: bold; }
         .rekap-table tr:last-child th { background: #f3f4f6; color: #1f2937; border: 1px solid #d1d5db; }
+
+        /* TABEL REKAPITULASI (MATA PELAJARAN / KURIKULUM) */
+        .rekap-mapel-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        .rekap-mapel-table th { background: #bef264; color: #1f2937; border: 1px solid #4b5563; padding: 10px; position: static; font-weight: 900; font-size: 13px;}
+        .rekap-mapel-table td { border: 1px solid #4b5563; padding: 8px; text-align: center; font-weight: 900; color: #374151;}
+        .rekap-mapel-table td:nth-child(1) { text-align: left; }
+        /* TEMA WARNA SELANG-SELING KURIKULUM 2025 */
+        .rekap-mapel-table tr:nth-child(odd) td { background-color: #ffffff; }
+        .rekap-mapel-table tr:nth-child(even) td { background-color: #fde047; }
+        .rekap-mapel-table tr:last-child th { background: #fcd34d; color: #1f2937; border: 1px solid #4b5563; font-size: 14px;}
 
         /* TEMA WARNA HARI */
         .theme-SENIN { background: #eff6ff !important; } .head-SENIN { background: #3b82f6 !important; } 
@@ -104,7 +115,8 @@
         
         <button class="btn-action btn-print" onclick="cetakJadwalGlobalPdf()">🖨️ Cetak Global</button>
         <button class="btn-action btn-perkelas" onclick="bukaModalPerKelas()">🎨 Cetak Per Kelas</button>
-        <button class="btn-action btn-rekap" onclick="cetakRekapPdf()">📊 Cetak Rekap</button>
+        <button class="btn-action btn-rekap" onclick="cetakRekapPdf()">📊 Cetak Rekap Guru</button>
+        <button class="btn-action btn-rekap-mapel" onclick="cetakRekapMapelPdf()">📑 Cetak Rekap Mapel</button>
     </div>
 
     <!-- PENGATURAN MASTER DATA -->
@@ -116,6 +128,7 @@
             <div class="form-add">
                 <input type="text" id="add-guru-kode" placeholder="Kode (1)" style="flex:0.3;">
                 <input type="text" id="add-guru-nama" placeholder="Nama Guru">
+                <input type="text" id="add-guru-jabatan" placeholder="Jabatan / Mapel" style="flex:100%; margin-top:5px;">
                 <button class="btn-add" style="background:#3b82f6; width:100%; margin-top:5px;" onclick="tambahMaster('guru')">Tambah Guru</button>
             </div>
         </div>
@@ -153,8 +166,8 @@
                     <option value="kegiatan">Kegiatan Awal</option>
                 </select>
                 <input type="text" id="add-jam-label" placeholder="Nama Kegiatan" style="flex:1.5;">
-                <input type="text" id="add-jam-target-hari" placeholder="Target Hari (Cth: SENIN, RABU). Kosong = Semua" style="flex:100%; margin-top:5px;">
-                <input type="text" id="add-jam-target-kelas" placeholder="Target Kelas (Cth: I, IIA). Kosong = Semua" style="flex:100%; margin-top:5px;">
+                <input type="text" id="add-jam-target-hari" placeholder="Target Hari (Kosong = Semua)" style="flex:100%; margin-top:5px;">
+                <input type="text" id="add-jam-target-kelas" placeholder="Target Kelas (Kosong = Semua)" style="flex:100%; margin-top:5px;">
                 <button class="btn-add" style="background:#a855f7; width:100%; margin-top:5px;" onclick="tambahMaster('jam')">Tambah Waktu</button>
             </div>
         </div>
@@ -168,10 +181,10 @@
         </table>
     </div>
 
-    <!-- TABEL REKAPITULASI MINGGUAN -->
-    <div class="rekap-container">
+    <!-- TABEL REKAPITULASI MINGGUAN GURU -->
+    <div class="rekap-container" style="border-top: 4px solid #881337;">
         <h2 style="margin:0 0 5px 0; color:#881337; text-align:center; font-family:'Georgia',serif;">📊 REKAP JAM MENGAJAR GURU</h2>
-        <p style="margin:0; font-size:11px; text-align:center; color:#6b7280; font-weight:bold;">Tabel ini akan terisi otomatis saat Anda memasukkan jadwal di atas.</p>
+        <p style="margin:0; font-size:11px; text-align:center; color:#6b7280; font-weight:bold;">Tabel otomatis berdasarkan jadwal di atas.</p>
         <table class="rekap-table" id="tabel-rekap">
             <thead>
                 <tr>
@@ -188,6 +201,22 @@
             </thead>
             <tbody id="body-rekap"></tbody>
         </table>
+    </div>
+
+    <!-- TABEL REKAPITULASI JP PER KELAS (KURIKULUM MERDEKA) -->
+    <div class="rekap-container" style="border-top: 4px solid #ca8a04;">
+        <h2 style="margin:0 0 5px 0; color:#a16207; text-align:center; font-family:'Georgia',serif;">📑 JUMLAH JAM PER MINGGU SESUAI KURIKULUM</h2>
+        <p style="margin:0 0 10px 0; font-size:11px; text-align:center; color:#6b7280; font-weight:bold;">Total JP setiap Mata Pelajaran di setiap Kelas.</p>
+        <div style="overflow-x:auto;">
+            <table class="rekap-mapel-table" id="tabel-rekap-mapel">
+                <thead id="thead-rekap-mapel">
+                    <!-- Digenerate JS -->
+                </thead>
+                <tbody id="body-rekap-mapel">
+                    <!-- Digenerate JS -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- TOAST BENTROK -->
@@ -246,8 +275,12 @@
 // ==========================================
 let memoriJadwal = {}; 
 
-let dbGuru = { };
-let dbMapel = { };
+let dbGuru = { 
+    "1": { nama: "Ghoniyah N, S.Pd", jabatan: "KEPALA SEKOLAH & GURU KELAS 6A" }, 
+    "9": { nama: "Nova Haryanto", jabatan: "TIK" }, 
+    "11": { nama: "Nia Damarsari, S.Pd", jabatan: "PAI KELAS 4-6, QURDIS 1-6" } 
+};
+let dbMapel = { "AH": "Aqidah Akhlak", "TIK": "TIK", "F": "Fiqih", "UM": "Umum", "P5": "P5", "BA": "B. Arab", "O": "Olahraga" };
 let kelasArray = ["I", "IIA", "IIB", "III", "IV", "VA", "VB", "VI"];
 let hariArray = ["SENIN", "SELASA", "RABU", "KAMIS", "JUMAT"];
 
@@ -273,7 +306,6 @@ function loadState() {
     let saved = localStorage.getItem('jadwal_state_ultimate');
     if(saved) {
         let data = JSON.parse(saved);
-        // Migrasi jika ada format dbGuru string lama
         for(let k in data.dbGuru) { if(typeof data.dbGuru[k] === 'string') data.dbGuru[k] = { nama: data.dbGuru[k], jabatan: "-" }; }
         dbGuru = data.dbGuru; dbMapel = data.dbMapel; kelasArray = data.kelasArray; waktuArray = data.waktuArray; memoriJadwal = data.memoriJadwal;
     }
@@ -339,7 +371,10 @@ function renderMasterLists() {
         listGuru.innerHTML += `
             <div class="master-item">
                 <span class="kode">${k}</span>
-                <input type="text" class="edit-input" value="${dbGuru[k].nama}" onchange="editMaster('guru_nama', '${k}', this.value)">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                    <input type="text" class="edit-input" value="${dbGuru[k].nama}" onchange="editMaster('guru_nama', '${k}', this.value)">
+                    <input type="text" class="edit-input" style="color:#6b7280; font-weight:normal;" value="${dbGuru[k].jabatan}" onchange="editMaster('guru_jabatan', '${k}', this.value)">
+                </div>
                 <button class="btn-delete" onclick="hapusMaster('guru', '${k}')">✕</button>
             </div>`; 
     }
@@ -362,6 +397,7 @@ function renderMasterLists() {
 function editMaster(tipe, key, newVal) {
     let val = newVal.trim();
     if(tipe === 'guru_nama') { if(val) dbGuru[key].nama = val; }
+    else if(tipe === 'guru_jabatan') { dbGuru[key].jabatan = val; }
     else if(tipe === 'mapel') { if(val) dbMapel[key] = val; }
     else if(tipe === 'kelas') { if(val) kelasArray[key] = val.toUpperCase(); }
     saveState(); renderSeluruhSistem();
@@ -369,8 +405,8 @@ function editMaster(tipe, key, newVal) {
 
 function tambahMaster(tipe) {
     if(tipe === 'guru') {
-        let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-guru-nama').value.trim();
-        if(kode && nama) { dbGuru[kode] = { nama: nama, jabatan: "-" }; document.getElementById('add-guru-kode').value=''; document.getElementById('add-guru-nama').value=''; }
+        let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-guru-nama').value.trim(); let jab = document.getElementById('add-guru-jabatan').value.trim();
+        if(kode && nama) { dbGuru[kode] = { nama: nama, jabatan: jab || "-" }; document.getElementById('add-guru-kode').value=''; document.getElementById('add-guru-nama').value=''; document.getElementById('add-guru-jabatan').value=''; }
     } else if(tipe === 'mapel') {
         let kode = document.getElementById('add-mapel-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-mapel-nama').value.trim();
         if(kode && nama) { dbMapel[kode] = nama; document.getElementById('add-mapel-kode').value=''; document.getElementById('add-mapel-nama').value=''; }
@@ -455,7 +491,7 @@ function validasiBentrok(inputAktif) {
     if(!memoriJadwal[hariAktif]) memoriJadwal[hariAktif] = {}; if(!memoriJadwal[hariAktif][jamAktif]) memoriJadwal[hariAktif][jamAktif] = {};
     memoriJadwal[hariAktif][jamAktif][kelasAktif] = rawValue;
     
-    saveState(); renderRekapGuru(); 
+    saveState(); renderSeluruhRekap(); // Update rekap setiap mengetik
 
     if (!rawValue) { inputAktif.classList.remove('error'); return; }
 
@@ -478,13 +514,18 @@ function validasiBentrok(inputAktif) {
         toast.classList.add("show"); setTimeout(() => { toast.classList.remove("show"); }, 5000);
         
         inputAktif.classList.add('error');
-        setTimeout(() => { inputAktif.value = ''; inputAktif.setAttribute('value', ''); memoriJadwal[hariAktif][jamAktif][kelasAktif] = ''; inputAktif.classList.remove('error'); inputAktif.focus(); saveState(); renderRekapGuru();}, 2000);
+        setTimeout(() => { inputAktif.value = ''; inputAktif.setAttribute('value', ''); memoriJadwal[hariAktif][jamAktif][kelasAktif] = ''; inputAktif.classList.remove('error'); inputAktif.focus(); saveState(); renderSeluruhRekap();}, 2000);
     } else { inputAktif.classList.remove('error'); }
 }
 
 // ==========================================
-// 6. RENDER REKAP JAM MENGAJAR OTOMATIS
+// 6. RENDER KEDUA TABEL REKAPITULASI (GURU & MAPEL)
 // ==========================================
+function renderSeluruhRekap() {
+    renderRekapGuru();
+    renderRekapMapel();
+}
+
 function renderRekapGuru() {
     const tbody = document.getElementById('body-rekap');
     tbody.innerHTML = '';
@@ -493,7 +534,7 @@ function renderRekapGuru() {
 
     for(let k in dbGuru) {
         let harian = { "SENIN":0, "SELASA":0, "RABU":0, "KAMIS":0, "JUMAT":0 };
-        let mapelSet = new Set(); // Kecerdasan Buatan Deteksi Mapel
+        let mapelSet = new Set(); 
         
         for(let hari in memoriJadwal) {
             for(let jam in memoriJadwal[hari]) {
@@ -503,8 +544,6 @@ function renderRekapGuru() {
                         let kodeAngka = val.replace(/[^0-9]/g, '');
                         if(kodeAngka === k) {
                             harian[hari]++; totalAll[hari]++;
-                            
-                            // Ekstrak Huruf (Kode Mapel)
                             let kodeHuruf = val.replace(/[0-9]/g, '');
                             if(kodeHuruf) {
                                 if(dbMapel[kodeHuruf]) mapelSet.add(dbMapel[kodeHuruf]);
@@ -543,7 +582,75 @@ function renderRekapGuru() {
     `;
 }
 
-function renderSeluruhSistem() { loadPengaturan(); renderMasterLists(); renderTabelJadwal(); renderRekapGuru(); }
+// FITUR BARU: RENDER TABEL MAPEL PER KELAS
+function renderRekapMapel() {
+    const thead = document.getElementById('thead-rekap-mapel');
+    const tbody = document.getElementById('body-rekap-mapel');
+    if(!thead || !tbody) return;
+
+    // Header Kelas
+    let headerHtml = `<tr><th>MATA PELAJARAN</th>`;
+    kelasArray.forEach(k => { headerHtml += `<th>KLS ${k}</th>`; });
+    headerHtml += `<th>TOTAL JP</th></tr>`;
+    thead.innerHTML = headerHtml;
+
+    // Inisialisasi Matrix Penghitung (Mapel x Kelas)
+    let mapelCounts = {};
+    for(let m in dbMapel) {
+        mapelCounts[dbMapel[m]] = { total: 0 };
+        kelasArray.forEach(k => mapelCounts[dbMapel[m]][k] = 0);
+    }
+    mapelCounts["Guru Kelas / Tematik"] = { total: 0 };
+    kelasArray.forEach(k => mapelCounts["Guru Kelas / Tematik"][k] = 0);
+
+    let totalPerKelas = {};
+    kelasArray.forEach(k => totalPerKelas[k] = 0);
+
+    // Hitung JP dari memori
+    for(let hari in memoriJadwal) {
+        for(let jam in memoriJadwal[hari]) {
+            for(let kls in memoriJadwal[hari][jam]) {
+                let val = memoriJadwal[hari][jam][kls];
+                if(val) {
+                    let kodeHuruf = val.replace(/[0-9]/g, '');
+                    let namaMapel = dbMapel[kodeHuruf] || "Guru Kelas / Tematik";
+                    
+                    if(!mapelCounts[namaMapel]) {
+                        mapelCounts[namaMapel] = { total: 0 };
+                        kelasArray.forEach(k => mapelCounts[namaMapel][k] = 0);
+                    }
+                    
+                    mapelCounts[namaMapel][kls]++;
+                    mapelCounts[namaMapel].total++;
+                    totalPerKelas[kls]++;
+                }
+            }
+        }
+    }
+
+    // Render Body Matrix
+    tbody.innerHTML = '';
+    for(let m in mapelCounts) {
+        if(mapelCounts[m].total === 0 && m === "Guru Kelas / Tematik") continue; // Sembunyikan jika kosong
+        
+        let row = `<tr><td>${m}</td>`;
+        kelasArray.forEach(k => { row += `<td>${mapelCounts[m][k] > 0 ? mapelCounts[m][k] : '-'}</td>`; });
+        row += `<td>${mapelCounts[m].total}</td></tr>`;
+        tbody.innerHTML += row;
+    }
+
+    // Footer Total
+    let grandTotal = 0;
+    let footerRow = `<tr><th style="text-align:right;">TOTAL JP / MINGGU</th>`;
+    kelasArray.forEach(k => {
+        footerRow += `<th>${totalPerKelas[k]}</th>`;
+        grandTotal += totalPerKelas[k];
+    });
+    footerRow += `<th>${grandTotal}</th></tr>`;
+    tbody.innerHTML += footerRow;
+}
+
+function renderSeluruhSistem() { loadPengaturan(); renderMasterLists(); renderTabelJadwal(); renderSeluruhRekap(); }
 
 
 // ==========================================
@@ -625,7 +732,60 @@ function cetakRekapPdf() {
             <h2>${localStorage.getItem('jadwal_sekolah')}</h2>
         </div>
         <div class="sub-header">
-            REKAP JAM MENGAJAR<br>${localStorage.getItem('jadwal_ta')}
+            REKAP JAM MENGAJAR GURU<br>${localStorage.getItem('jadwal_ta')}
+        </div>
+        
+        ${tabelAsli}
+        
+        <div class="footer-area">
+            <div class="ttd-box">
+                <br>Kepala Sekolah,<br><br>
+                ${getTtdElement()}
+                <span class="ttd-name" style="margin-top:5px;">${localStorage.getItem('jadwal_kepsek')}</span>
+            </div>
+            <div class="ttd-box">
+                ........, .................... 2026<br>Waka Bidang Kurikulum,<br>
+                <span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span>
+            </div>
+        </div>
+        <script>setTimeout(() => { window.print(); }, 800);<\/script>
+    </body>
+    </html>`;
+    printWin.document.open(); printWin.document.write(htmlPdf); printWin.document.close();
+}
+
+function cetakRekapMapelPdf() {
+    let printWin = window.open('', '', 'width=1200,height=800');
+    let tabelAsli = document.getElementById('tabel-rekap-mapel').outerHTML;
+    
+    let htmlPdf = `
+    <html>
+    <head>
+        <title>Cetak Rekap Mata Pelajaran</title>
+        <style>
+            @page { size: portrait; margin: 15mm; }
+            body { font-family: Arial, sans-serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
+            .header-dinas { background: #bef264; color: #1f2937; text-align: center; padding: 10px; margin-bottom: 20px; border: 2px solid #000;}
+            .header-dinas h1 { margin: 0; font-size: 18px; font-weight: 900; }
+            .header-dinas h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
+            
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px;}
+            th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;}
+            th { background-color: #bef264; }
+            td:nth-child(1) { text-align: left; }
+            tr:nth-child(even) td { background-color: #fde047; }
+            tr:nth-child(odd) td { background-color: #fff; }
+            tr:last-child th { background-color: #fcd34d; font-size:13px;}
+
+            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;}
+            .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; }
+            .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <div class="header-dinas">
+            <h1>REKAPITULASI JUMLAH JAM MATA PELAJARAN (JP)</h1>
+            <h2>${localStorage.getItem('jadwal_sekolah')} - ${localStorage.getItem('jadwal_ta')}</h2>
         </div>
         
         ${tabelAsli}
