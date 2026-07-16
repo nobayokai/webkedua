@@ -103,7 +103,7 @@
   .input-group { margin-bottom: 12px; text-align: left; }
   .input-group label { font-size: 11px; font-weight: bold; color: #4b5563; }
 
-  @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
+  @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .widget-grid > .card{ grid-column: 1 / -1 !important; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
 </style>
 
 <div id="widget-islam">
@@ -114,11 +114,11 @@
 
   <div class="widget-grid">
     <div class="card" style="grid-column: 1 / span 2; display:flex; flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-      <div class="clock-now" style="flex-direction:row; align-items:center; gap:16px; flex-wrap:wrap;">
+      <div class="clock-now" style="flex-direction:row; align-items:center; gap:16px; flex-wrap:wrap; position:relative; z-index:1;">
         <div class="clock-time" id="clock-time">--:--:--</div>
         <div class="clock-date" style="margin:0;"><span class="clock-dot"></span><span id="clock-date">-</span></div>
       </div>
-      <div style="text-align:right;"><div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div><div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:2px;">—</div></div>
+      <div style="text-align:right; position:relative; z-index:1;"><div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div><div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:2px;">—</div></div>
     </div>
 
     <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat opsi cetak laporan">
@@ -337,15 +337,40 @@ window.jalankanWidgetKiri = function() {
         if (isAgendaLoading) {
             t.listEl.innerHTML = '<div class="agenda-loader"><div class="spinner-circle"></div><div>Sinkronisasi data...</div></div>';
         } else if (agendaBulanIni.length > 0) {
-            agendaBulanIni.forEach(function(ag) {
-                var parts = ag.tanggalBersih.split('-'); var thn = parts[0], bln = parts[1], tgl = parts[2];
-                var namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            var namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
+            // Normalisasi: pisahkan kategori & keterangan dari format "kategori|||keterangan"
+            var flatAgenda = agendaBulanIni.map(function(ag) {
                 var finalKategori = ag.kategori || 'Kegiatan Sekolah'; var namaKgt = ag.kegiatan || '';
                 if(namaKgt.includes('|||')) { var p = namaKgt.split('|||'); finalKategori = p[0]; namaKgt = p.slice(1).join('|||'); }
+                return { tgl: ag.tanggalBersih, kategori: finalKategori, kegiatan: namaKgt };
+            });
+
+            // Kelompokkan tanggal berurutan yang punya kategori & keterangan sama menjadi satu rentang
+            var groupsAgenda = [];
+            flatAgenda.forEach(function(item) {
+                var last = groupsAgenda[groupsAgenda.length - 1];
+                if(last && last.kategori === item.kategori && last.kegiatan === item.kegiatan) {
+                    var pLast = last.end.split('-').map(Number);
+                    var pCur = item.tgl.split('-').map(Number);
+                    var dLast = new Date(pLast[0], pLast[1]-1, pLast[2]);
+                    var dCur = new Date(pCur[0], pCur[1]-1, pCur[2]);
+                    dLast.setDate(dLast.getDate() + 1);
+                    if(dLast.getTime() === dCur.getTime()) { last.end = item.tgl; return; }
+                }
+                groupsAgenda.push({ start: item.tgl, end: item.tgl, kategori: item.kategori, kegiatan: item.kegiatan });
+            });
+
+            function fmtTgl(tglStr) { var p = tglStr.split('-'); return p[2] + ' ' + namaBulan[parseInt(p[1],10)-1] + ' ' + p[0]; }
+
+            groupsAgenda.forEach(function(g) {
                 var katClass = 'kat-kegiatan', badgeClass = 'kegiatan';
-                if(finalKategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
-                if(finalKategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
-                t.listEl.innerHTML += '<div class="agenda-item ' + katClass + '"><div class="tgl">' + tgl + ' ' + namaBulan[parseInt(bln,10)-1] + ' ' + thn + '</div><div class="kgt"><span class="badge-kategori ' + badgeClass + '">' + finalKategori + '</span><br>' + namaKgt + '</div></div>';
+                if(g.kategori === 'Ujian Sekolah') { katClass = 'kat-ujian'; badgeClass = 'ujian'; }
+                if(g.kategori === 'Libur Nasional') { katClass = 'kat-libur'; badgeClass = 'libur'; }
+
+                var tglLabel = (g.start === g.end) ? fmtTgl(g.start) : (fmtTgl(g.start) + ' – ' + fmtTgl(g.end));
+
+                t.listEl.innerHTML += '<div class="agenda-item ' + katClass + '"><div class="tgl">' + tglLabel + '</div><div class="kgt"><span class="badge-kategori ' + badgeClass + '">' + g.kategori + '</span><br>' + g.kegiatan + '</div></div>';
             });
         } else {
             t.listEl.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top: 15px;">Tidak ada agenda di bulan ini</div>';
