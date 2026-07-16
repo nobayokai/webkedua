@@ -29,15 +29,7 @@
   .clock-date{ color: rgba(31,41,55,.75); font-weight: 850; font-size: 13px; display:flex; gap: 10px; flex-wrap: wrap; }
   .clock-dot{ width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 6px rgba(16,185,129,.12); margin-top: 4px; flex: 0 0 auto; }
   
-  .weather-top{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-  .weather-temp{ font-size: 26px; font-weight: 1000; color:#0f172a; line-height: 1; }
-  .weather-desc{ color: rgba(31,41,55,.75); font-weight: 900; font-size: 12px; display:flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .weather-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-  .weather-pill{ background: rgba(255,255,255,.35); border: 1px solid rgba(0,0,0,.06); border-radius: 14px; padding: 8px 10px; }
-  .weather-pill .k{ font-size: 10.5px; font-weight: 950; color: rgba(0,0,0,.45); text-transform: uppercase; letter-spacing: .2px; }
-  .weather-pill .v{ font-size: 12px; font-weight: 1000; color: rgba(0,0,0,.72); margin-top: 4px; white-space: nowrap; }
-
-  #sidebar-calendar-card { cursor: pointer; transition: transform 0.2s; }
+  #sidebar-calendar-card { cursor: pointer; transition: transform 0.2s; overflow: visible; }
   #sidebar-calendar-card:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0,0,0,.1); }
 
   .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
@@ -56,7 +48,7 @@
   .cal-day.has-agenda { border-bottom: 3px solid var(--amber); font-weight: 1000; color: var(--text); }
   .cal-day.has-ujian { border-bottom: 3px solid var(--pink); font-weight: 1000; color: var(--text); }
 
-  .agenda-list-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+  .agenda-list-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; overflow: visible; }
   .agenda-item { background: rgba(255,255,255,.45); padding: 6px 10px; border-radius: 6px; font-size: 11px; border-left: 3px solid; }
   .agenda-item.kat-kegiatan { border-left-color: var(--amber); }
   .agenda-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.12); }
@@ -77,6 +69,17 @@
   .stat-label { font-size: 9px; font-weight: 900; color: rgba(0,0,0,0.4); text-transform: uppercase; }
   .stat-value { font-size: 14px; font-weight: 1000; }
   .val-h { color: var(--green); } .val-i { color: var(--amber); } .val-s { color: var(--blue); } .val-a { color: #9ca3af; }
+
+  .absensi-nav-date { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 900; text-align:center; min-width: 92px; }
+  .nav-btn.nav-btn-sm { width: 20px; height: 20px; font-size: 10px; }
+  .nav-btn.disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+
+  .absen-detail-group { background: rgba(255,255,255,.6); border-radius: 10px; padding: 8px 10px; border:1px solid rgba(0,0,0,.06); }
+  .absen-detail-group .grp-title { font-size: 11px; font-weight: 1000; margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+  .absen-detail-group .grp-title .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .absen-detail-names { display:flex; flex-wrap:wrap; gap:5px; }
+  .absen-detail-names span { font-size: 10.5px; font-weight: 800; background: rgba(0,0,0,.05); padding: 3px 8px; border-radius: 999px; color: rgba(0,0,0,.7); }
+  .absen-detail-empty { font-size: 10.5px; color: rgba(0,0,0,.4); font-style: italic; }
 
   .agenda-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px 0; gap: 8px; color: rgba(0,0,0,0.5); font-size: 11px; font-weight: 800; }
   .spinner-circle { width: 24px; height: 24px; border: 3px solid rgba(16,185,129,0.2); border-top: 3px solid var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -110,29 +113,22 @@
   </div>
 
   <div class="widget-grid">
-    <div class="card">
-      <div class="clock-now">
+    <div class="card" style="grid-column: 1 / span 2; display:flex; flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div class="clock-now" style="flex-direction:row; align-items:center; gap:16px; flex-wrap:wrap;">
         <div class="clock-time" id="clock-time">--:--:--</div>
-        <div class="clock-date"><span class="clock-dot"></span><span id="clock-date">-</span></div>
-        <div style="margin-top:10px;"><div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div><div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:4px;">—</div></div>
+        <div class="clock-date" style="margin:0;"><span class="clock-dot"></span><span id="clock-date">-</span></div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="weather-top">
-        <div><div style="font-weight:1100;color:rgba(0,0,0,.55);font-size:12px; margin-bottom:4px;">Cuaca hari ini</div><div class="weather-desc"><span id="weather-icon">🌤️</span><span id="weather-desc">—</span></div></div>
-        <div style="text-align:right;"><div class="weather-temp" id="weather-temp">—</div><div style="font-weight:950;color:rgba(0,0,0,.45);font-size:11px;margin-top:4px;" id="weather-time">—</div></div>
-      </div>
-      <div class="weather-row">
-        <div class="weather-pill"><div class="k">Hujan</div><div class="v" id="weather-rain">—</div></div>
-        <div class="weather-pill"><div class="k">Angin</div><div class="v" id="weather-wind">—</div></div>
-      </div>
+      <div style="text-align:right;"><div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div><div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:2px;">—</div></div>
     </div>
 
     <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat opsi cetak laporan">
       <div class="cal-head" style="margin-bottom:8px;">
-        <div style="font-weight:950;color:var(--green2);font-size:13px;">📊 Kehadiran Hari Ini</div>
-        <div style="font-size:10px; color:rgba(0,0,0,0.5); font-weight:bold;" id="absensi-tanggal">-</div>
+        <div style="font-weight:950;color:var(--green2);font-size:13px;">📊 Rekap Kehadiran</div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button class="nav-btn nav-btn-sm" id="btn-prev-absensi" title="Hari sebelumnya">❮</button>
+          <div class="absensi-nav-date" id="absensi-tanggal">-</div>
+          <button class="nav-btn nav-btn-sm" id="btn-next-absensi" title="Hari berikutnya">❯</button>
+        </div>
       </div>
       <div id="absensi-list-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; padding-right:4px;">
         <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px;">
@@ -150,10 +146,10 @@
       </div>
       <div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
       <div class="cal-grid" id="cal-grid"></div>
-      <div class="agenda-list-wrap" id="agenda-list-container" style="max-height: 90px;"></div>
+      <div class="agenda-list-wrap" id="agenda-list-container"></div>
     </div>
   </div>
-  <div class="footer-note">Data: Cuaca (Open-Meteo) & Sistem Absensi SDIT Hidayatut Taufiq.</div>
+  <div class="footer-note">Data: Sistem Absensi SDIT Hidayatut Taufiq.</div>
 </div>
 
 <div id="tempat-modal-dinamis"></div>
@@ -179,6 +175,12 @@ var htmlModal = `
         <div style="width:100%; overflow-x:auto; background:white; padding:10px; border-radius:10px; border:1px solid #e5e7eb;">
             <canvas id="absenChart"></canvas>
         </div>
+
+        <div id="absen-detail-wrap" style="margin-top:15px; text-align:left;">
+            <div style="font-weight:900; font-size:12px; color:var(--green2); margin-bottom:8px;" id="absen-detail-tanggal">Detail Kehadiran</div>
+            <div id="absen-detail-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
         <button class="btn-green-large" onclick="window.bukaModalPengaturanAbsen()">📥 Download Laporan Absensi (PDF)</button>
     </div>
 </div>
@@ -254,12 +256,7 @@ window.jalankanWidgetKiri = function() {
   var elDate = document.getElementById('clock-date');
   var elGreeting = document.getElementById('clock-greeting');
   var elChipLokasi = document.getElementById('chip-lokasi');
-  var elWeatherTemp = document.getElementById('weather-temp');
-  var elWeatherDesc = document.getElementById('weather-desc');
-  var elWeatherRain = document.getElementById('weather-rain');
-  var elWeatherWind = document.getElementById('weather-wind');
-  var elWeatherTime = document.getElementById('weather-time');
-  var elWeatherIcon = document.getElementById('weather-icon');
+  var currentAbsensiDate = new Date();
 
   function pad2(n){ return String(n).padStart(2,'0'); }
   function formatClock(d){ var h = d.getHours(); var isPM = h >= 12; var hh = h % 12 || 12; return pad2(hh) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()) + (isPM ? ' PM' : ' AM'); }
@@ -375,14 +372,73 @@ window.jalankanWidgetKiri = function() {
   // ==========================================
   // SISTEM ABSENSI (HARI INI)
   // ==========================================
-  window.fetchRekapAbsensi = async function() {
+  function ymdStr(d){ return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
+  function isSameOrAfterToday(d){ var t = new Date(); return ymdStr(d) >= ymdStr(t); }
+
+  window.renderRekapAbsensi = function(tanggal) {
       var elTgl = document.getElementById('absensi-tanggal');
       var container = document.getElementById('absensi-list-container');
-      
-      var now = new Date();
-      elTgl.textContent = new Intl.DateTimeFormat('id-ID', { dateStyle:'full' }).format(now);
-      var todayStr = now.getFullYear() + '-' + pad2(now.getMonth()+1) + '-' + pad2(now.getDate());
+      var btnNext = document.getElementById('btn-next-absensi');
 
+      elTgl.textContent = new Intl.DateTimeFormat('id-ID', { dateStyle:'medium' }).format(tanggal);
+      if(btnNext) btnNext.classList.toggle('disabled', isSameOrAfterToday(tanggal));
+      var todayStr = ymdStr(tanggal);
+
+      var dataSiswa = window.globalDataSemuaSiswa || [];
+      var dataAbsen = window.globalDataAbsensi || [];
+
+      var rekapHariIni = {};
+      var kelasSet = new Set();
+
+      dataSiswa.forEach(s => {
+          if(s.kelas) {
+              kelasSet.add(s.kelas);
+              if(!rekapHariIni[s.kelas]) rekapHariIni[s.kelas] = { H:0, I:0, S:0, A:0, Total: 0 };
+              rekapHariIni[s.kelas].Total += 1;
+          }
+      });
+
+      dataAbsen.forEach(absen => {
+          if(!absen.tanggal) return;
+          var tglBersih = String(absen.tanggal).replace(/['"]/g, '').trim().substring(0, 10);
+
+          if(tglBersih === todayStr) {
+              var kelas = absen.kelas;
+              if(kelas && rekapHariIni[kelas]) {
+                  var stat = (absen.status || "").toUpperCase().trim();
+                  if(stat === 'HADIR') rekapHariIni[kelas].H += 1;
+                  else if(stat === 'IZIN') rekapHariIni[kelas].I += 1;
+                  else if(stat === 'SAKIT') rekapHariIni[kelas].S += 1;
+                  else rekapHariIni[kelas].A += 1;
+              }
+          }
+      });
+
+      container.innerHTML = '';
+      var listKelas = Array.from(kelasSet).sort();
+
+      if(listKelas.length === 0) {
+          container.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px; font-style:italic;">Belum ada data murid.<br>Gunakan menu Absensi untuk menambah.</div>';
+      } else {
+          listKelas.forEach(function(kls) {
+              var d = rekapHariIni[kls];
+              container.innerHTML += `
+                 <div class="absensi-item" onclick="window.bukaChartKelas('${kls}')">
+                      <div class="kelas-name"><span>📚 ${kls}</span><span style="font-size:10px; color:#6b7280; font-weight:bold;">Total: ${d.Total} Siswa</span></div>
+                      <div class="absensi-stats">
+                          <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
+                          <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.S}</span></div>
+                          <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.I}</span></div>
+                          <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.A}</span></div>
+                      </div>
+                  </div>
+              `;
+          });
+      }
+  };
+
+  window.fetchRekapAbsensi = async function() {
+      var container = document.getElementById('absensi-list-container');
       try {
           var URL_ABSEN = API_URL_UTAMA + "?action=get_rekap_absensi";
           var URL_SISWA = API_URL_UTAMA + "?action=get_siswa";
@@ -394,58 +450,21 @@ window.jalankanWidgetKiri = function() {
           window.globalDataAbsensi = jsonAbsen.data || [];
           window.globalDataSemuaSiswa = jsonSiswa.data || []; // Simpan semua siswa di memori
 
-          var rekapHariIni = {};
-          var kelasSet = new Set();
-          
-          window.globalDataSemuaSiswa.forEach(s => {
-              if(s.kelas) {
-                  kelasSet.add(s.kelas);
-                  if(!rekapHariIni[s.kelas]) rekapHariIni[s.kelas] = { H:0, I:0, S:0, A:0, Total: 0 };
-                  rekapHariIni[s.kelas].Total += 1; 
-              }
-          });
-
-          window.globalDataAbsensi.forEach(absen => {
-              if(!absen.tanggal) return;
-              var tglBersih = String(absen.tanggal).replace(/['"]/g, '').trim().substring(0, 10);
-              
-              if(tglBersih === todayStr) {
-                  var kelas = absen.kelas;
-                  if(kelas && rekapHariIni[kelas]) {
-                      var stat = (absen.status || "").toUpperCase().trim();
-                      if(stat === 'HADIR') rekapHariIni[kelas].H += 1;
-                      else if(stat === 'IZIN') rekapHariIni[kelas].I += 1;
-                      else if(stat === 'SAKIT') rekapHariIni[kelas].S += 1;
-                      else rekapHariIni[kelas].A += 1;
-                  }
-              }
-          });
-
-          container.innerHTML = '';
-          var listKelas = Array.from(kelasSet).sort();
-          
-          if(listKelas.length === 0) {
-              container.innerHTML = '<div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px; font-style:italic;">Belum ada data murid.<br>Gunakan menu Absensi untuk menambah.</div>';
-          } else {
-              listKelas.forEach(function(kls) {
-                  var d = rekapHariIni[kls];
-                  container.innerHTML += `
-                     <div class="absensi-item" onclick="window.bukaChartKelas('${kls}')">
-                          <div class="kelas-name"><span>📚 ${kls}</span><span style="font-size:10px; color:#6b7280; font-weight:bold;">Total: ${d.Total} Siswa</span></div>
-                          <div class="absensi-stats">
-                              <div class="stat-box"><span class="stat-label">Hadir</span><span class="stat-value val-h">${d.H}</span></div>
-                              <div class="stat-box"><span class="stat-label">Sakit</span><span class="stat-value val-s">${d.S}</span></div>
-                              <div class="stat-box"><span class="stat-label">Izin</span><span class="stat-value val-i">${d.I}</span></div>
-                              <div class="stat-box"><span class="stat-label">Alpa</span><span class="stat-value val-a">${d.A}</span></div>
-                          </div>
-                      </div>
-                  `;
-              });
-          }
+          renderRekapAbsensi(currentAbsensiDate);
       } catch (e) {
           container.innerHTML = '<div style="text-align:center; color:red; font-size:10px; margin-top:15px;">Gagal memuat rekap absensi.</div>';
       }
   };
+
+  document.getElementById('btn-prev-absensi').addEventListener('click', function() {
+      currentAbsensiDate.setDate(currentAbsensiDate.getDate() - 1);
+      renderRekapAbsensi(currentAbsensiDate);
+  });
+  document.getElementById('btn-next-absensi').addEventListener('click', function() {
+      if(isSameOrAfterToday(currentAbsensiDate)) return;
+      currentAbsensiDate.setDate(currentAbsensiDate.getDate() + 1);
+      renderRekapAbsensi(currentAbsensiDate);
+  });
 
   // 1. MUNCULKAN CHART DENGAN MODEL BERDAMPINGAN SAAT DIKLIK
   window.bukaChartKelas = function(kelas) {
@@ -521,6 +540,59 @@ window.jalankanWidgetKiri = function() {
               scales: { x: { grid: { display: false } }, y: { beginAtZero: true, max: 10 } }
           }
       });
+
+      renderDetailAbsenHarian(kelas, currentAbsensiDate);
+  };
+
+  // 1b. TAMPILKAN NAMA SISWA SAKIT/IZIN/ALPA PADA TANGGAL YANG SEDANG DILIHAT
+  function namaDariAbsen(a) {
+      return a.nama || a.namaSiswa || a.nama_siswa || a.siswa || a.Nama || 'Tanpa Nama';
+  }
+
+  window.renderDetailAbsenHarian = function(kelas, tanggal) {
+      var elTgl = document.getElementById('absen-detail-tanggal');
+      var wrap = document.getElementById('absen-detail-list');
+      if(!elTgl || !wrap) return;
+
+      var tglStr = tanggal.getFullYear() + '-' + pad2(tanggal.getMonth()+1) + '-' + pad2(tanggal.getDate());
+      var tglTampil = new Intl.DateTimeFormat('id-ID', { dateStyle:'full' }).format(tanggal);
+      elTgl.textContent = '🗓️ Detail Kehadiran ' + tglTampil;
+
+      var dataHarian = (window.globalDataAbsensi || []).filter(function(a) {
+          if(a.kelas !== kelas || !a.tanggal) return false;
+          var t = String(a.tanggal).replace(/['"]/g, '').trim().substring(0, 10);
+          return t === tglStr;
+      });
+
+      var grup = { SAKIT: [], IZIN: [], ALPA: [] };
+      dataHarian.forEach(function(a) {
+          var stat = (a.status || '').toUpperCase().trim();
+          var nm = namaDariAbsen(a);
+          if(stat === 'SAKIT') grup.SAKIT.push(nm);
+          else if(stat === 'IZIN') grup.IZIN.push(nm);
+          else if(stat === 'ALPA' || stat === 'ALFA') grup.ALPA.push(nm);
+      });
+
+      var konfig = [
+          { key:'SAKIT', label:'🤒 Sakit', color:'#4472c4' },
+          { key:'IZIN',  label:'📩 Izin',  color:'#ed7d31' },
+          { key:'ALPA',  label:'🚫 Alpa',  color:'#9ca3af' }
+      ];
+
+      var html = '';
+      konfig.forEach(function(k) {
+          var daftar = grup[k.key];
+          html += '<div class="absen-detail-group">';
+          html += '<div class="grp-title" style="color:' + k.color + '"><span class="dot" style="background:' + k.color + '"></span>' + k.label + ' (' + daftar.length + ')</div>';
+          if(daftar.length > 0) {
+              html += '<div class="absen-detail-names">' + daftar.map(function(n){ return '<span>' + n + '</span>'; }).join('') + '</div>';
+          } else {
+              html += '<div class="absen-detail-empty">Tidak ada siswa ' + k.label.split(' ')[1].toLowerCase() + ' pada tanggal ini.</div>';
+          }
+          html += '</div>';
+      });
+
+      wrap.innerHTML = html;
   };
 
   // 2. MUNCULKAN POPUP PENGATURAN CETAK (Dipanggil dari tombol di dalam Chart)
@@ -759,11 +831,9 @@ window.jalankanWidgetKiri = function() {
       document.getElementById('download-absen-modal').classList.remove('active');
   };
 
-  function weatherCodeToText(code){ var m={0:['Cerah','☀️'],1:['Cerah Berawan','🌤️'],2:['Berawan','⛅'],3:['Mendung','☁️'],45:['Kabut','🌫️'],51:['Gerimis','🌦️'],61:['Hujan','🌧️'],95:['Petir','⛈️']}; return m[code]||['Cuaca','🌈']; }
   function startClockLoop(){ setInterval(function(){ var now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now); }, 1000); }
-  async function fetchWeather(lat, lon){ var res=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=auto'); var j=await res.json(); var w=weatherCodeToText(j.current.weather_code); elWeatherIcon.textContent=w[1]; elWeatherDesc.textContent=w[0]; elWeatherTemp.textContent=Math.round(j.current.temperature_2m)+'°C'; }
   function startInitUI(){ var now = new Date(); elTime.textContent=formatClock(now); elDate.textContent=formatDate(now); elGreeting.textContent=greeting(now); currentNavDate=now; renderCalendar(currentNavDate); }
-  function startGeolocation(){ elChipLokasi.textContent='Lokasi: Jakarta (default)'; fetchWeather(-6.2,106.8); }
+  function startGeolocation(){ elChipLokasi.textContent='Lokasi: Jakarta (default)'; }
 
   startInitUI(); fetchAgendaDatabase(); fetchRekapAbsensi(); startClockLoop(); startGeolocation();
 };
