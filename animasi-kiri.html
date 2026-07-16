@@ -14,54 +14,69 @@
     --amber:#f59e0b;
   }
 
-  #widget-islam{ width: 100%; height: 100%; display:flex; flex-direction: column; padding: 10px 10px; box-sizing: border-box; gap: 10px; background: var(--bg); }
-  .widget-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+  #widget-islam{ width: 100%; height: 100%; display:flex; flex-direction: column; padding: 10px 10px; box-sizing: border-box; gap: 10px; background: var(--bg); overflow-y: auto;}
+  .widget-grid{ display:flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; }
 
-  .card{ background: var(--card); border: 1px solid var(--stroke); border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 12px; overflow:hidden; position: relative; }
-  .card::after{ content:""; position:absolute; inset:-40px -60px auto -60px; height: 90px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%); pointer-events:none; }
+  .card{ background: var(--card); border: 1px solid var(--stroke); border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 12px; position: relative; }
+  .card::after{ content:""; position:absolute; inset:-40px -60px auto -60px; height: 90px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%); pointer-events:none; border-radius: 18px;}
 
-  .brand{ display:flex; align-items:center; justify-content: space-between; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; } /* Added flex-wrap for responsiveness */
+  .brand{ display:flex; align-items:center; justify-content: space-between; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; } 
   .brand .title{ font-family: Georgia, serif; font-weight: 950; color: var(--green2); font-size: 13px; letter-spacing: .2px; }
-  .brand .chip{ font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900; white-space: nowrap; max-width: 100%; overflow:hidden; text-overflow: ellipsis; } /* max-width changed to 100% */
+  .brand .chip{ font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900; white-space: nowrap; max-width: 100%; overflow:hidden; text-overflow: ellipsis; } 
 
   .clock-now{ display:flex; flex-direction: column; gap: 8px; }
   .clock-time{ font-size: 34px; font-weight: 950; color:#1f2937; line-height: 1; letter-spacing: .4px; }
   .clock-date{ color: rgba(31,41,55,.75); font-weight: 850; font-size: 13px; display:flex; gap: 10px; flex-wrap: wrap; }
   .clock-dot{ width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 6px rgba(16,185,129,.12); margin-top: 4px; flex: 0 0 auto; }
   
-  #sidebar-calendar-card { cursor: pointer; transition: transform 0.2s; overflow: visible; }
-  #sidebar-calendar-card:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0,0,0,.1); }
+  /* --- DESAIN MENU DROPDOWN (AKORDEON) --- */
+  .dropdown-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 15px; background: rgba(255,255,255,0.8); border-radius: 12px;
+      cursor: pointer; border: 1px solid var(--stroke); transition: 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02); position: relative; z-index: 2;
+  }
+  .dropdown-header:hover { background: #ffffff; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3);}
+  .dropdown-header .title { font-weight: 950; color: var(--green2); font-size: 14px; display:flex; align-items:center; gap:8px;}
+  .icon-arrow { font-size: 12px; color: var(--green2); font-weight: bold; transition: transform 0.3s; }
+  
+  .dropdown-content { display: none; flex-direction: column; margin-top: 12px; animation: slideDown 0.3s ease-out forwards; transform-origin: top; padding: 0 5px;}
+  .dropdown-content.open { display: flex; }
+  @keyframes slideDown { from { opacity: 0; transform: scaleY(0.9); } to { opacity: 1; transform: scaleY(1); } }
 
-  .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; flex-wrap: wrap;} /* Added flex-wrap */
+  #sidebar-calendar-card { transition: transform 0.2s; overflow: visible; }
+  
+  .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; flex-wrap: wrap;} 
   .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
-  .nav-btn { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; flex-shrink: 0;} /* Added flex-shrink: 0 */
+  .nav-btn { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; flex-shrink: 0;} 
   .nav-btn:hover { background: var(--green); color: white; }
-  .btn-download-pdf { background: var(--pink); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3); white-space: nowrap; flex-shrink: 0;} /* Added white-space and flex-shrink */
+  .btn-download-pdf { background: var(--pink); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3); white-space: nowrap; flex-shrink: 0;} 
   .btn-download-pdf:hover { transform: scale(1.05); background: #db2777; }
 
   .cal-weekdays{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 11px; font-weight: 1000; color: rgba(0,0,0,.45); margin-bottom: 6px; position: relative; z-index: 1; }
   .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 12px; font-weight: 1000; position: relative; z-index: 1; }
-  .cal-day{ width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,.55); background: rgba(255,255,255,.25); border: 1px solid rgba(0,0,0,.05); overflow:hidden; }
-  .cal-day.muted{ opacity: .35; }
+  .cal-day{ width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,.55); background: rgba(255,255,255,.25); border: 1px solid rgba(0,0,0,.05); overflow:hidden; cursor: pointer;}
+  .cal-day:hover:not(.muted) { background: white; transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 2;}
+  .cal-day.muted{ opacity: .35; cursor: default; }
   .cal-day.today{ background: linear-gradient(180deg, rgba(16,185,129,.28), rgba(16,185,129,.08)); border: 1px solid rgba(16,185,129,.35); color: rgba(4,120,87,.98); box-shadow: 0 10px 18px rgba(16,185,129,.18); }
   .cal-day.is-libur { background: rgba(239, 68, 68, 0.15) !important; color: #dc2626 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
   .cal-day.has-agenda { border-bottom: 3px solid var(--amber); font-weight: 1000; color: var(--text); }
   .cal-day.has-ujian { border-bottom: 3px solid var(--pink); font-weight: 1000; color: var(--text); }
 
-  .agenda-list-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; overflow: visible; }
-  .agenda-item { background: rgba(255,255,255,.45); padding: 6px 10px; border-radius: 6px; font-size: 11px; border-left: 3px solid; }
+  .agenda-list-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; max-height: 200px; padding-right: 5px;}
+  .agenda-item { background: rgba(255,255,255,.6); padding: 8px 12px; border-radius: 8px; font-size: 11px; border-left: 4px solid; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
   .agenda-item.kat-kegiatan { border-left-color: var(--amber); }
   .agenda-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.12); }
   .agenda-item.kat-libur    { border-left-color: #ef4444; background: rgba(239,68,68,0.12); }
 
-  .agenda-item .tgl { font-weight: 850; color: rgba(0,0,0,.5); font-size: 9px; }
+  .agenda-item .tgl { font-weight: 850; color: rgba(0,0,0,.5); font-size: 10px; margin-bottom: 2px;}
   .agenda-item .kgt { font-weight: 950; color: var(--text); line-height: 1.4; margin-top: 3px;}
-  .badge-kategori { font-size: 8px; padding: 2px 6px; border-radius: 4px; color: white; display: inline-block; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-kategori { font-size: 9px; padding: 3px 6px; border-radius: 4px; color: white; display: inline-block; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-kategori.kegiatan { background: var(--amber); }
   .badge-kategori.ujian    { background: var(--pink); }
   .badge-kategori.libur    { background: #ef4444; }
 
-  .absensi-item { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.45); border: 1px solid rgba(0,0,0,.05); margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  .absensi-item { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.8); border: 1px solid rgba(0,0,0,.08); margin-bottom: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
   .absensi-item:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); border-color: var(--green); }
   .absensi-item .kelas-name { font-weight: 1000; font-size: 13px; color: var(--green2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
   .absensi-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; }
@@ -70,8 +85,8 @@
   .stat-value { font-size: 14px; font-weight: 1000; }
   .val-h { color: var(--green); } .val-i { color: var(--amber); } .val-s { color: var(--blue); } .val-a { color: #9ca3af; }
 
-  .absensi-nav-date { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 900; text-align:center; min-width: 92px; flex-shrink: 0;} /* Added flex-shrink */
-  .nav-btn.nav-btn-sm { width: 20px; height: 20px; font-size: 10px; }
+  .absensi-nav-date { font-size: 11px; color: rgba(0,0,0,0.6); font-weight: 900; text-align:center; min-width: 100px; flex-shrink: 0;} 
+  .nav-btn.nav-btn-sm { width: 22px; height: 22px; font-size: 11px; }
   .nav-btn.disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
 
   .absen-detail-group { background: rgba(255,255,255,.6); border-radius: 10px; padding: 8px 10px; border:1px solid rgba(0,0,0,.06); }
@@ -103,37 +118,14 @@
   .input-group { margin-bottom: 12px; text-align: left; }
   .input-group label { font-size: 11px; font-weight: bold; color: #4b5563; }
 
-  /* --- PERBAIKAN UNTUK MODE MOBILE (RESPONSIVE) --- */
+  /* RESPONSIVE MOBILE TWEAKS */
   @media (max-width: 768px){ 
-      .widget-grid{ 
-          grid-template-columns: 1fr; /* Memaksa elemen menjadi 1 kolom vertikal */
-      } 
-      .widget-grid > .card{ 
-          grid-column: 1 / -1 !important; /* Memastikan setiap card mengambil lebar penuh layar */
-      } 
-      .card{ 
-          padding: 15px; /* Sedikit memperbesar padding di mobile agar lebih nyaman disentuh */
-      } 
-      .clock-time{ 
-          font-size: 28px; /* Sedikit mengecilkan font jam agar tidak terlalu mendominasi */
-      } 
-      .brand .chip{ 
-          max-width: 100%; /* Membiarkan chip nama lokasi tampil utuh */
-          white-space: normal; /* Mengizinkan teks chip untuk turun ke baris baru jika sangat panjang */
-      }
-      .clock-now {
-          flex-direction: column !important; /* Kembalikan ke layout vertikal untuk jam di mobile */
-          align-items: flex-start !important;
-          gap: 4px !important;
-      }
-      .card[style*="flex-direction:row;"] {
-           flex-direction: column !important; /* Menjadikan card paling atas (jam & cuaca) bersusun vertikal di mobile */
-           align-items: flex-start !important;
-      }
-      .card[style*="flex-direction:row;"] > div:last-child {
-          text-align: left !important; /* Meratakan ucapan salam ke kiri di mode mobile */
-          margin-top: 10px;
-      }
+      .card{ padding: 10px; } 
+      .clock-time{ font-size: 28px; } 
+      .brand .chip{ white-space: normal; text-align: right;}
+      .clock-now { flex-direction: column !important; align-items: flex-start !important; gap: 4px !important; }
+      .card[style*="flex-direction:row;"] { flex-direction: column !important; align-items: flex-start !important; }
+      .card[style*="flex-direction:row;"] > div:last-child { text-align: left !important; margin-top: 10px; }
   }
 </style>
 
@@ -144,7 +136,8 @@
   </div>
 
   <div class="widget-grid">
-    <div class="card" style="grid-column: 1 / span 2; display:flex; flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+    <!-- WIDGET JAM & CUACA (TETAP TERBUKA) -->
+    <div class="card" style="display:flex; flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
       <div class="clock-now" style="flex-direction:row; align-items:center; gap:16px; flex-wrap:wrap; position:relative; z-index:1;">
         <div class="clock-time" id="clock-time">--:--:--</div>
         <div class="clock-date" style="margin:0;"><span class="clock-dot"></span><span id="clock-date">-</span></div>
@@ -152,34 +145,52 @@
       <div style="text-align:right; position:relative; z-index:1;"><div style="font-weight:950;color:rgba(0,0,0,.55);font-size:12px;">Ucapan</div><div id="clock-greeting" style="font-weight:1100;color:rgba(4,120,87,.95);font-size:14px;margin-top:2px;">—</div></div>
     </div>
 
-    <div class="card" style="grid-column: 1 / span 1; display:flex; flex-direction:column;" title="Klik kelas untuk melihat opsi cetak laporan">
-      <div class="cal-head" style="margin-bottom:8px;">
-        <div style="font-weight:950;color:var(--green2);font-size:13px;">📊 Rekap Kehadiran</div>
-        <div style="display:flex; align-items:center; gap:6px;">
-          <button class="nav-btn nav-btn-sm" id="btn-prev-absensi" title="Hari sebelumnya">❮</button>
-          <div class="absensi-nav-date" id="absensi-tanggal">-</div>
-          <button class="nav-btn nav-btn-sm" id="btn-next-absensi" title="Hari berikutnya">❯</button>
-        </div>
+    <!-- WIDGET REKAP KEHADIRAN (MENU DROP-DOWN) -->
+    <div class="card" title="Klik kelas untuk melihat opsi cetak laporan" style="padding: 10px;">
+      <div class="dropdown-header" onclick="window.toggleDropdown('content-absensi', this)">
+        <div class="title">📊 Rekap Kehadiran Harian</div>
+        <div class="icon-arrow">▲</div> <!-- ▲ Artinya terbuka di awal -->
       </div>
-      <div id="absensi-list-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; padding-right:4px;">
-        <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px;">
-           <div class="spinner-circle" style="margin: 0 auto 8px auto;"></div>Merekap data harian...
+      
+      <!-- Konten Absensi (Default Terbuka) -->
+      <div id="content-absensi" class="dropdown-content open">
+        <div class="cal-head" style="margin-top:10px; margin-bottom:10px; justify-content: center;">
+          <div style="display:flex; align-items:center; gap:8px; background: rgba(0,0,0,0.03); padding: 4px 10px; border-radius: 999px;">
+            <button class="nav-btn nav-btn-sm" id="btn-prev-absensi" title="Hari sebelumnya">❮</button>
+            <div class="absensi-nav-date" id="absensi-tanggal">-</div>
+            <button class="nav-btn nav-btn-sm" id="btn-next-absensi" title="Hari berikutnya">❯</button>
+          </div>
+        </div>
+        <div id="absensi-list-container" style="max-height: 250px; overflow-y:auto; display:flex; flex-direction:column; padding-right:4px;">
+          <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px;">
+             <div class="spinner-circle" style="margin: 0 auto 8px auto;"></div>Merekap data harian...
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="card" id="sidebar-calendar-card" style="grid-column: 2 / span 1;" title="Klik untuk memperbesar kalender">
-      <div class="cal-head">
-        <div style="display:flex; align-items:center; gap:6px;">
-          <button class="nav-btn" id="btn-prev-month">❮</button><div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div><button class="nav-btn" id="btn-next-month">❯</button>
-        </div>
-        <div style="display:flex; align-items:center; gap:6px;"><button class="btn-download-pdf" id="btn-open-download-1">📥 PDF</button></div>
+    <!-- WIDGET KALENDER KEGIATAN (MENU DROP-DOWN) -->
+    <div class="card" id="sidebar-calendar-card" style="padding: 10px;">
+      <div class="dropdown-header" onclick="window.toggleDropdown('content-calendar', this)">
+        <div class="title">📅 Kalender Kegiatan Sekolah</div>
+        <div class="icon-arrow">▼</div> <!-- ▼ Artinya tertutup di awal -->
       </div>
-      <div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
-      <div class="cal-grid" id="cal-grid"></div>
-      <div class="agenda-list-wrap" id="agenda-list-container"></div>
+      
+      <!-- Konten Kalender (Default Tertutup) -->
+      <div id="content-calendar" class="dropdown-content">
+        <div class="cal-head" style="margin-top:10px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="nav-btn" id="btn-prev-month">❮</button><div class="cal-month" id="cal-month" style="min-width:75px; text-align:center;">-</div><button class="nav-btn" id="btn-next-month">❯</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;"><button class="btn-download-pdf" id="btn-open-download-1">📥 PDF</button></div>
+        </div>
+        <div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
+        <div class="cal-grid" id="cal-grid" onclick="window.bukaModalCalendar(event)"></div>
+        <div class="agenda-list-wrap" id="agenda-list-container"></div>
+      </div>
     </div>
   </div>
+  
   <div class="footer-note">Data: Sistem Absensi SDIT Hidayatut Taufiq.</div>
 </div>
 
@@ -195,7 +206,7 @@ var isAgendaLoading = true;
 var modalsLama = document.querySelectorAll('.modal-overlay');
 modalsLama.forEach(function(m) { m.remove(); });
 
-// INJEKSI HTML MODAL (Sudah dikembalikan wadah Grafiknya!)
+// INJEKSI HTML MODAL 
 var htmlModal = `
 <!-- 1. Modal Preview Grafik -->
 <div class="modal-overlay" id="chart-modal">
@@ -253,7 +264,7 @@ var htmlModal = `
     </div>
 </div>
 
-<!-- 3. Modal Kalender & Download Kalender -->
+<!-- 3. Modal Kalender & Download Kalender (Preview Penuh) -->
 <div class="modal-overlay" id="calendar-modal">
     <div class="modal-calendar-card">
         <button class="modal-close-btn" id="btn-close-modal">✕</button>
@@ -267,6 +278,7 @@ var htmlModal = `
     </div>
 </div>
 
+<!-- 4. Modal Rentang Download PDF Kalender -->
 <div class="modal-overlay" id="download-modal">
     <div class="modal-download-card" style="max-width:340px;">
         <button class="modal-close-btn" id="btn-close-download">✕</button>
@@ -282,6 +294,28 @@ var htmlModal = `
 `;
 document.getElementById('tempat-modal-dinamis').innerHTML = htmlModal;
 
+// FUNGSI ANIMASI TOGGLE MENU DROP DOWN (AKORDEON)
+window.toggleDropdown = function(id, headerEl) {
+    var content = document.getElementById(id);
+    var arrow = headerEl.querySelector('.icon-arrow');
+    if(content.classList.contains('open')) {
+        content.classList.remove('open');
+        arrow.textContent = '▼';
+        arrow.style.transform = 'rotate(0deg)';
+    } else {
+        content.classList.add('open');
+        arrow.textContent = '▲';
+        arrow.style.transform = 'rotate(180deg)';
+    }
+};
+
+// TRIGGER BUKA MODAL KALENDER FULL SCREEN
+window.bukaModalCalendar = function(e) {
+    // Mencegah modal terbuka jika yang di klik adalah tombol navigasi
+    if (e.target.closest('.nav-btn') || e.target.closest('.btn-download-pdf')) return;
+    document.getElementById('calendar-modal').classList.add('active');
+};
+
 window.jalankanWidgetKiri = function() {
   var elTime = document.getElementById('clock-time');
   var elDate = document.getElementById('clock-date');
@@ -296,10 +330,8 @@ window.jalankanWidgetKiri = function() {
 
   var modalOverlay = document.getElementById('calendar-modal');
   var btnCloseModal = document.getElementById('btn-close-modal');
-  var sidebarCalendarCard = document.getElementById('sidebar-calendar-card');
   var modalDownload = document.getElementById('download-modal');
   
-  sidebarCalendarCard.addEventListener('click', function(e) { if (e.target.classList.contains('nav-btn') || e.target.classList.contains('btn-download-pdf')) return; modalOverlay.classList.add('active'); });
   btnCloseModal.addEventListener('click', function() { modalOverlay.classList.remove('active'); });
   modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
 
@@ -324,8 +356,8 @@ window.jalankanWidgetKiri = function() {
       window.open('print-kalender.html?start=' + start + '&end=' + end, '_blank');
   });
 
-  document.getElementById('btn-prev-month').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
-  document.getElementById('btn-next-month').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
+  document.getElementById('btn-prev-month').addEventListener('click', function(e) { e.stopPropagation(); currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
+  document.getElementById('btn-next-month').addEventListener('click', function(e) { e.stopPropagation(); currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
   document.getElementById('modal-btn-prev').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() - 1); renderCalendar(currentNavDate); });
   document.getElementById('modal-btn-next').addEventListener('click', function() { currentNavDate.setMonth(currentNavDate.getMonth() + 1); renderCalendar(currentNavDate); });
 
@@ -504,7 +536,7 @@ window.jalankanWidgetKiri = function() {
           var jsonSiswa = await responses[1].json();
 
           window.globalDataAbsensi = jsonAbsen.data || [];
-          window.globalDataSemuaSiswa = jsonSiswa.data || []; // Simpan semua siswa di memori
+          window.globalDataSemuaSiswa = jsonSiswa.data || []; 
 
           renderRekapAbsensi(currentAbsensiDate);
       } catch (e) {
@@ -512,11 +544,13 @@ window.jalankanWidgetKiri = function() {
       }
   };
 
-  document.getElementById('btn-prev-absensi').addEventListener('click', function() {
+  document.getElementById('btn-prev-absensi').addEventListener('click', function(e) {
+      e.stopPropagation();
       currentAbsensiDate.setDate(currentAbsensiDate.getDate() - 1);
       renderRekapAbsensi(currentAbsensiDate);
   });
-  document.getElementById('btn-next-absensi').addEventListener('click', function() {
+  document.getElementById('btn-next-absensi').addEventListener('click', function(e) {
+      e.stopPropagation();
       if(isSameOrAfterToday(currentAbsensiDate)) return;
       currentAbsensiDate.setDate(currentAbsensiDate.getDate() + 1);
       renderRekapAbsensi(currentAbsensiDate);
@@ -524,7 +558,7 @@ window.jalankanWidgetKiri = function() {
 
   // 1. MUNCULKAN CHART DENGAN MODEL BERDAMPINGAN SAAT DIKLIK
   window.bukaChartKelas = function(kelas) {
-      window.currentKelasAbsen = kelas; // Simpan memori kelas yang diklik
+      window.currentKelasAbsen = kelas; 
       document.getElementById('chart-kelas-title').textContent = kelas;
       document.getElementById('chart-modal').classList.add('active');
 
@@ -535,7 +569,6 @@ window.jalankanWidgetKiri = function() {
       var dataS = Array(12).fill(0); var dataI = Array(12).fill(0); var dataA = Array(12).fill(0);
       var totals = Array(12).fill(0);
 
-      // Hitung mentah jumlah S, I, A per bulan
       absenKelas.forEach(function(a) {
           if(!a.tanggal) return;
           var monthStr = String(a.tanggal).replace(/['"]/g, '').trim().substring(5, 7);
@@ -554,9 +587,7 @@ window.jalankanWidgetKiri = function() {
 
       var dataS_pct = [], dataI_pct = [], dataA_pct = [];
 
-      // Konversi ke Persentase dengan Rumus Bapak: (Jml * 100) / (Siswa * Hari Efektif)
       for(var i=0; i<12; i++){
-          // 1. Dapatkan Hari Efektif di bulan tersebut dari data unik (tanggal unik yang ada di absenKelas bulan itu)
           var hariEfektifSet = new Set();
           absenKelas.forEach(function(a) {
               if(a.tanggal && String(a.tanggal).substring(5,7) === monthsNumber[i]) {
@@ -564,8 +595,6 @@ window.jalankanWidgetKiri = function() {
               }
           });
           var hariEfektif = hariEfektifSet.size;
-          
-          // 2. Hitung berdasarkan Rumus Bapak
           var denominator = jmlSiswa * hariEfektif;
           
           if(denominator > 0) {
@@ -600,7 +629,6 @@ window.jalankanWidgetKiri = function() {
       renderDetailAbsenHarian(kelas, currentAbsensiDate);
   };
 
-  // 1b. TAMPILKAN NAMA SISWA SAKIT/IZIN/ALPA PADA TANGGAL YANG SEDANG DILIHAT
   function namaDariAbsen(a) {
       return a.nama || a.namaSiswa || a.nama_siswa || a.siswa || a.Nama || 'Tanpa Nama';
   }
@@ -651,7 +679,7 @@ window.jalankanWidgetKiri = function() {
       wrap.innerHTML = html;
   };
 
-  // 2. MUNCULKAN POPUP PENGATURAN CETAK (Dipanggil dari tombol di dalam Chart)
+  // 2. MUNCULKAN POPUP PENGATURAN CETAK
   window.bukaModalPengaturanAbsen = function() {
       var d = new Date();
       var endStr = d.getFullYear() + '-' + pad2(d.getMonth()+1);
@@ -664,7 +692,6 @@ window.jalankanWidgetKiri = function() {
       document.getElementById('download-absen-modal').classList.add('active');
   };
 
-  // GENERATE PDF LAPORAN ABSENSI (TAB BARU DENGAN CHART.JS)
   window.generatePdfAbsensi = function() {
       var start = document.getElementById('abs-start').value;
       var end = document.getElementById('abs-end').value;
@@ -850,7 +877,6 @@ window.jalankanWidgetKiri = function() {
           </div>
           
           <script>
-            // window.onload memastikan Chart.js sudah selesai didownload sebelum menggambar
             window.onload = function() {
               var ctx = document.getElementById('printChart').getContext('2d');
               new Chart(ctx, {
@@ -872,7 +898,6 @@ window.jalankanWidgetKiri = function() {
                   }
               });
               
-              // Tunggu 1 detik setelah grafik tergambar, baru otomatis print
               setTimeout(function(){ window.print(); }, 1000);
             };
           </${'script'}>
