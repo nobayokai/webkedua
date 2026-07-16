@@ -23,23 +23,26 @@
         .btn-rekap-mapel { background: #ca8a04; } .btn-rekap-mapel:hover { background: #a16207; }
 
         /* KOTAK MASTER DATA */
-        .master-data-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .master-data-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .master-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid #10b981; display: flex; flex-direction: column; }
         .master-card h4 { margin: 0 0 10px 0; color: #047857; border-bottom: 1px dashed #ccc; padding-bottom: 5px; display: flex; justify-content: space-between;}
         
-        .master-list { flex: 1; display: flex; flex-direction: column; gap: 5px; max-height: 150px; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
-        .master-item { background: #f9fafb; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 11px; transition: 0.2s; gap: 5px;}
+        .master-list { flex: 1; display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
+        .master-item { background: #f9fafb; padding: 6px 8px; border-radius: 6px; border: 1px solid #e5e7eb; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 11px; transition: 0.2s; gap: 5px;}
         .master-item:hover { border-color: #9ca3af; }
         
         .edit-input { border: 1px solid transparent; background: transparent; font-weight: bold; font-family: inherit; font-size: 11px; color: #1f2937; padding: 2px 4px; outline: none; border-radius: 4px; flex: 1; width: 100%; transition: 0.2s; }
         .edit-input:focus { background: white; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
-        .kode { color: #ef4444; font-weight: 900; display: inline-block; min-width: 20px; }
+        .kode { color: #ef4444; font-weight: 900; display: inline-block; min-width: 25px; text-align: center;}
         
-        .btn-delete { background: #fee2e2; color: #ef4444; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; padding: 2px 6px; font-size: 10px; }
+        .btn-delete { background: #fee2e2; color: #ef4444; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; padding: 4px 8px; font-size: 10px; }
         .btn-delete:hover { background: #ef4444; color: white; }
+        
+        .btn-move { background: #e5e7eb; color: #374151; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; padding: 4px 6px; font-size: 10px; display: flex; align-items: center; justify-content: center;}
+        .btn-move:hover { background: #9ca3af; color: white; }
 
         .form-add { display: flex; gap: 5px; margin-top: auto; flex-wrap: wrap;}
-        .form-add input, .form-add select { flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 11px; outline: none; }
+        .form-add input, .form-add select { flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 11px; outline: none; font-weight:bold;}
         .form-add input:focus { border-color: #10b981; }
         .btn-add { background: #10b981; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 11px; }
         .btn-add:hover { background: #059669; }
@@ -68,9 +71,7 @@
         .rekap-mapel-table th { background: #bef264; color: #1f2937; border: 1px solid #4b5563; padding: 10px; position: static; font-weight: 900; font-size: 13px;}
         .rekap-mapel-table td { border: 1px solid #4b5563; padding: 8px; text-align: center; font-weight: 900; color: #374151;}
         .rekap-mapel-table td:nth-child(1) { text-align: left; }
-        /* TEMA WARNA SELANG-SELING KURIKULUM 2025 */
-        .rekap-mapel-table tr:nth-child(odd) td { background-color: #ffffff; }
-        .rekap-mapel-table tr:nth-child(even) td { background-color: #fde047; }
+        .rekap-mapel-table tr.group-header td { background: #e5e7eb; color: #1f2937; font-weight: 900; letter-spacing: 1px; font-size: 11px;}
         .rekap-mapel-table tr:last-child th { background: #fcd34d; color: #1f2937; border: 1px solid #4b5563; font-size: 14px;}
 
         /* TEMA WARNA HARI */
@@ -93,7 +94,7 @@
         #toast-bentrok.show { visibility: visible; opacity: 1; bottom: 50px; }
 
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center; backdrop-filter: blur(3px); }
-        .modal-card { background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .modal-card { background:white; padding:25px; border-radius:12px; width:90%; max-width:450px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
         .modal-card input, .modal-card select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit;}
         .modal-card label { display: block; text-align: left; font-size: 11px; font-weight: bold; color: #4b5563; margin-bottom: 5px; }
     </style>
@@ -133,14 +134,18 @@
             </div>
         </div>
 
-        <!-- Master Mapel -->
+        <!-- Master Mapel (SEKARANG BISA DI-DRAG / DIPINDAH) -->
         <div class="master-card" style="border-top-color: #eab308;">
-            <h4>📚 Master Mapel</h4>
+            <h4>📚 Master Mapel (Bisa Diurutkan)</h4>
             <div class="master-list" id="list-mapel"></div>
             <div class="form-add">
                 <input type="text" id="add-mapel-kode" placeholder="Kode (AH)" style="flex:0.3;">
                 <input type="text" id="add-mapel-nama" placeholder="Nama Mapel">
-                <button class="btn-add" style="background:#eab308;" onclick="tambahMaster('mapel')">Tambah</button>
+                <select id="add-mapel-kelompok" style="flex:100%; margin-top:5px;">
+                    <option value="A. MATA PELAJARAN WAJIB">Kelompok A (Wajib)</option>
+                    <option value="B. MUATAN LOKAL">Kelompok B (Muatan Lokal)</option>
+                </select>
+                <button class="btn-add" style="background:#eab308; width:100%; margin-top:5px;" onclick="tambahMaster('mapel')">Tambah Mapel</button>
             </div>
         </div>
 
@@ -154,20 +159,21 @@
             </div>
         </div>
 
-        <!-- Master Jam Pelajaran -->
-        <div class="master-card" style="border-top-color: #a855f7;">
-            <h4>⏰ Master Jam / Waktu</h4>
-            <div class="master-list" id="list-jam"></div>
-            <div class="form-add" style="flex-wrap: wrap;">
-                <input type="text" id="add-jam-waktu" placeholder="07.00-08.00" style="flex:1; min-width:80px;" title="Format Jam">
+        <!-- Master Jam Pelajaran (SEKARANG FULL EDITABLE) -->
+        <div class="master-card" style="border-top-color: #a855f7; grid-column: 1 / -1;">
+            <h4>⏰ Master Jam / Waktu (Edit Langsung)</h4>
+            <div class="master-list" id="list-jam" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap:10px; max-height:250px;"></div>
+            <div class="form-add" style="flex-wrap: wrap; background:#faf5ff; padding:10px; border-radius:8px; border:1px solid #e9d5ff;">
+                <b style="width:100%; color:#a855f7; margin-bottom:5px;">➕ Tambah Jam Baru</b>
+                <input type="text" id="add-jam-waktu" placeholder="07.00-08.00" style="flex:1; min-width:80px;">
                 <select id="add-jam-tipe" style="flex:1;">
                     <option value="pelajaran">Pelajaran</option>
                     <option value="istirahat">Istirahat / Sholat</option>
                     <option value="kegiatan">Kegiatan Awal</option>
                 </select>
                 <input type="text" id="add-jam-label" placeholder="Nama Kegiatan" style="flex:1.5;">
-                <input type="text" id="add-jam-target-hari" placeholder="Target Hari (Kosong = Semua)" style="flex:100%; margin-top:5px;">
-                <input type="text" id="add-jam-target-kelas" placeholder="Target Kelas (Kosong = Semua)" style="flex:100%; margin-top:5px;">
+                <input type="text" id="add-jam-target-hari" placeholder="Target Hari (Kosong = Semua)" style="flex:1;">
+                <input type="text" id="add-jam-target-kelas" placeholder="Target Kelas (Kosong = Semua)" style="flex:1;">
                 <button class="btn-add" style="background:#a855f7; width:100%; margin-top:5px;" onclick="tambahMaster('jam')">Tambah Waktu</button>
             </div>
         </div>
@@ -184,19 +190,12 @@
     <!-- TABEL REKAPITULASI MINGGUAN GURU -->
     <div class="rekap-container" style="border-top: 4px solid #881337;">
         <h2 style="margin:0 0 5px 0; color:#881337; text-align:center; font-family:'Georgia',serif;">📊 REKAP JAM MENGAJAR GURU</h2>
-        <p style="margin:0; font-size:11px; text-align:center; color:#6b7280; font-weight:bold;">Tabel otomatis berdasarkan jadwal di atas.</p>
         <table class="rekap-table" id="tabel-rekap">
             <thead>
                 <tr>
-                    <th style="width:40px;">Kode</th>
-                    <th>Nama Guru</th>
-                    <th>Mata Pelajaran</th>
-                    <th style="width:60px;">Senin</th>
-                    <th style="width:60px;">Selasa</th>
-                    <th style="width:60px;">Rabu</th>
-                    <th style="width:60px;">Kamis</th>
-                    <th style="width:60px;">Jum'at</th>
-                    <th style="width:60px;">Jumlah</th>
+                    <th style="width:40px;">Kode</th><th>Nama Guru</th><th>Mata Pelajaran</th>
+                    <th style="width:60px;">Senin</th><th style="width:60px;">Selasa</th><th style="width:60px;">Rabu</th>
+                    <th style="width:60px;">Kamis</th><th style="width:60px;">Jum'at</th><th style="width:60px;">Jumlah</th>
                 </tr>
             </thead>
             <tbody id="body-rekap"></tbody>
@@ -205,16 +204,11 @@
 
     <!-- TABEL REKAPITULASI JP PER KELAS (KURIKULUM MERDEKA) -->
     <div class="rekap-container" style="border-top: 4px solid #ca8a04;">
-        <h2 style="margin:0 0 5px 0; color:#a16207; text-align:center; font-family:'Georgia',serif;">📑 JUMLAH JAM PER MINGGU SESUAI KURIKULUM</h2>
-        <p style="margin:0 0 10px 0; font-size:11px; text-align:center; color:#6b7280; font-weight:bold;">Total JP setiap Mata Pelajaran di setiap Kelas.</p>
+        <h2 style="margin:0 0 5px 0; color:#a16207; text-align:center; font-family:'Georgia',serif;">📑 JUMLAH JAM PER MINGGU SESUAI KURIKULUM 2025</h2>
         <div style="overflow-x:auto;">
             <table class="rekap-mapel-table" id="tabel-rekap-mapel">
-                <thead id="thead-rekap-mapel">
-                    <!-- Digenerate JS -->
-                </thead>
-                <tbody id="body-rekap-mapel">
-                    <!-- Digenerate JS -->
-                </tbody>
+                <thead id="thead-rekap-mapel"></thead>
+                <tbody id="body-rekap-mapel"></tbody>
             </table>
         </div>
     </div>
@@ -232,26 +226,14 @@
     <div class="modal" id="modal-cetak">
         <div class="modal-card">
             <h3 style="color:#047857; margin-top:0;">⚙️ Pengaturan Cetak & Sekolah</h3>
-            
-            <label>Nama Sekolah:</label>
-            <input type="text" id="set-nama-sekolah" placeholder="SDIT HIDAYATUT TAUFIQ">
-            <label>Tahun Ajaran / Semester:</label>
-            <input type="text" id="set-tahun-ajaran" placeholder="Genap - T.A 2024/2025">
-
+            <label>Nama Sekolah:</label><input type="text" id="set-nama-sekolah" placeholder="SDIT HIDAYATUT TAUFIQ">
+            <label>Tahun Ajaran / Semester:</label><input type="text" id="set-tahun-ajaran" placeholder="Genap - T.A 2024/2025">
             <div style="display:flex; gap:10px;">
-                <div style="flex:1;">
-                    <label>Kepala Sekolah:</label>
-                    <input type="text" id="set-nama-kepsek" placeholder="Muhammad Arif, S.Ag">
-                </div>
-                <div style="flex:1;">
-                    <label>Waka Kurikulum:</label>
-                    <input type="text" id="set-nama-waka" placeholder="Nama Waka...">
-                </div>
+                <div style="flex:1;"><label>Kepala Sekolah:</label><input type="text" id="set-nama-kepsek" placeholder="Muhammad Arif, S.Ag"></div>
+                <div style="flex:1;"><label>Waka Kurikulum:</label><input type="text" id="set-nama-waka" placeholder="Nama Waka..."></div>
             </div>
-
             <label>Upload Stempel & TTD Kepsek (PNG Transparan):</label>
             <input type="file" id="set-ttd-file" accept="image/png">
-            
             <button class="btn-action" style="background:#10b981; width:100%; justify-content:center; padding:12px;" onclick="simpanPengaturanCetak()">💾 Simpan Pengaturan</button>
             <button class="btn-action" style="background:#6b7280; width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('modal-cetak').style.display='none'">Tutup</button>
         </div>
@@ -263,7 +245,6 @@
             <h3 style="color:#d97706; margin-top:0;">🎨 Cetak Jadwal Per Kelas</h3>
             <label>Pilih Kelas yang ingin dicetak:</label>
             <select id="select-kelas-cetak"></select>
-            
             <button class="btn-action btn-perkelas" style="width:100%; justify-content:center; padding:12px; margin-top:10px;" onclick="eksekusiCetakPerKelas()">🚀 Generate & Print PDF</button>
             <button class="btn-action" style="background:#6b7280; width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('modal-cetak-perkelas').style.display='none'">Tutup</button>
         </div>
@@ -280,7 +261,21 @@ let dbGuru = {
     "9": { nama: "Nova Haryanto", jabatan: "TIK" }, 
     "11": { nama: "Nia Damarsari, S.Pd", jabatan: "PAI KELAS 4-6, QURDIS 1-6" } 
 };
-let dbMapel = { "AH": "Aqidah Akhlak", "TIK": "TIK", "F": "Fiqih", "UM": "Umum", "P5": "P5", "BA": "B. Arab", "O": "Olahraga" };
+
+// STRUKTUR BARU MASTER MAPEL (ARRAY AGAR BISA DIURUTKAN & DIGROUP)
+let mapelArray = [
+    { kode: "PA", nama: "Pendidikan Agama dan Budi Pekerti", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "PP", nama: "Pendidikan Pancasila", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "BI", nama: "Bahasa Indonesia", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "M", nama: "Matematika", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "IP", nama: "Ilmu Pengetahuan Alam dan Sosial", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "O", nama: "Pend. Jasmani Olahraga dan Kesehatan", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "S", nama: "Seni dan Budaya", kelompok: "A. MATA PELAJARAN WAJIB" },
+    { kode: "ING", nama: "Bahasa Inggris", kelompok: "B. MUATAN LOKAL" },
+    { kode: "PL", nama: "Mulok / PLSBQ", kelompok: "B. MUATAN LOKAL" },
+    { kode: "TIK", nama: "TIK", kelompok: "B. MUATAN LOKAL" }
+];
+
 let kelasArray = ["I", "IIA", "IIB", "III", "IV", "VA", "VB", "VI"];
 let hariArray = ["SENIN", "SELASA", "RABU", "KAMIS", "JUMAT"];
 
@@ -299,22 +294,34 @@ let waktuArray = [
 // 2. AUTO-SAVE & BACKUP SYSTEM
 // ==========================================
 function saveState() {
-    localStorage.setItem('jadwal_state_ultimate', JSON.stringify({ dbGuru, dbMapel, kelasArray, waktuArray, memoriJadwal }));
+    localStorage.setItem('jadwal_state_ultimate', JSON.stringify({ dbGuru, mapelArray, kelasArray, waktuArray, memoriJadwal }));
 }
 
 function loadState() {
     let saved = localStorage.getItem('jadwal_state_ultimate');
     if(saved) {
         let data = JSON.parse(saved);
-        for(let k in data.dbGuru) { if(typeof data.dbGuru[k] === 'string') data.dbGuru[k] = { nama: data.dbGuru[k], jabatan: "-" }; }
-        dbGuru = data.dbGuru; dbMapel = data.dbMapel; kelasArray = data.kelasArray; waktuArray = data.waktuArray; memoriJadwal = data.memoriJadwal;
+        if(data.dbGuru) {
+            for(let k in data.dbGuru) { if(typeof data.dbGuru[k] === 'string') data.dbGuru[k] = { nama: data.dbGuru[k], jabatan: "-" }; }
+            dbGuru = data.dbGuru;
+        }
+        
+        // Migrasi Mapel Lama ke Array Baru jika file backupnya dari versi sebelumnya
+        if(data.dbMapel && !Array.isArray(data.dbMapel) && !data.mapelArray) {
+            mapelArray = [];
+            for(let k in data.dbMapel) { mapelArray.push({ kode: k, nama: data.dbMapel[k], kelompok: "A. MATA PELAJARAN WAJIB" }); }
+        } else if (data.mapelArray) {
+            mapelArray = data.mapelArray;
+        }
+
+        kelasArray = data.kelasArray || kelasArray; waktuArray = data.waktuArray || waktuArray; memoriJadwal = data.memoriJadwal || memoriJadwal;
     }
 }
 
 function exportData() {
     saveState();
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('jadwal_state_ultimate'));
-    let dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "Backup_Jadwal_SDIT.json");
+    let dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "Backup_Jadwal_SDIT_V2.json");
     document.body.appendChild(dl); dl.click(); dl.remove();
 }
 
@@ -333,9 +340,6 @@ function importData(event) {
     reader.readAsText(file);
 }
 
-// ==========================================
-// 3. FUNGSI PENGATURAN KOP SURAT
-// ==========================================
 function loadPengaturan() {
     document.getElementById('kop-nama-sekolah').textContent = localStorage.getItem('jadwal_sekolah') || "SDIT HIDAYATUT TAUFIQ";
     document.getElementById('kop-ta').textContent = `JADWAL MATA PELAJARAN DINAMIS - ${localStorage.getItem('jadwal_ta') || "Semester Genap - T.A 2024/2025"}`;
@@ -351,21 +355,19 @@ function bukaPengaturan() {
 
 function simpanPengaturanCetak() {
     let f = document.getElementById('set-ttd-file');
-    if (f.files.length > 0) {
-        let r = new FileReader(); r.onload = function(e) { localStorage.setItem('jadwal_ttd', e.target.result); }; r.readAsDataURL(f.files[0]);
-    }
+    if (f.files.length > 0) { let r = new FileReader(); r.onload = function(e) { localStorage.setItem('jadwal_ttd', e.target.result); }; r.readAsDataURL(f.files[0]); }
     localStorage.setItem('jadwal_sekolah', document.getElementById('set-nama-sekolah').value.toUpperCase());
     localStorage.setItem('jadwal_ta', document.getElementById('set-tahun-ajaran').value.toUpperCase());
     localStorage.setItem('jadwal_kepsek', document.getElementById('set-nama-kepsek').value);
     localStorage.setItem('jadwal_waka', document.getElementById('set-nama-waka').value);
-    
     loadPengaturan(); alert('Pengaturan Berhasil Disimpan!'); document.getElementById('modal-cetak').style.display='none';
 }
 
 // ==========================================
-// 4. RENDER MASTER DATA
+// 4. RENDER MASTER DATA & EDIT LANGSUNG
 // ==========================================
 function renderMasterLists() {
+    // 1. GURU
     const listGuru = document.getElementById('list-guru'); listGuru.innerHTML = '';
     for(let k in dbGuru) { 
         listGuru.innerHTML += `
@@ -379,18 +381,56 @@ function renderMasterLists() {
             </div>`; 
     }
 
+    // 2. MAPEL (DENGAN FITUR RE-ORDER & GROUP)
     const listMapel = document.getElementById('list-mapel'); listMapel.innerHTML = '';
-    for(let k in dbMapel) { listMapel.innerHTML += `<div class="master-item"><span class="kode">${k}</span><input type="text" class="edit-input" value="${dbMapel[k]}" onchange="editMaster('mapel', '${k}', this.value)"><button class="btn-delete" onclick="hapusMaster('mapel', '${k}')">✕</button></div>`; }
+    let currentGroup = "";
+    mapelArray.forEach((m, idx) => {
+        if(m.kelompok !== currentGroup) {
+            listMapel.innerHTML += `<div style="background:#e5e7eb; padding:4px; font-size:10px; font-weight:900; margin-top:5px; border-radius:4px; color:#374151;">${m.kelompok}</div>`;
+            currentGroup = m.kelompok;
+        }
+        listMapel.innerHTML += `
+            <div class="master-item">
+                <span class="kode">${m.kode}</span>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                    <input type="text" class="edit-input" value="${m.nama}" onchange="editMapel(${idx}, 'nama', this.value)">
+                    <select class="edit-input" style="color:#6b7280; font-weight:normal;" onchange="editMapel(${idx}, 'kelompok', this.value)">
+                        <option value="A. MATA PELAJARAN WAJIB" ${m.kelompok === 'A. MATA PELAJARAN WAJIB' ? 'selected' : ''}>A. WAJIB</option>
+                        <option value="B. MUATAN LOKAL" ${m.kelompok === 'B. MUATAN LOKAL' ? 'selected' : ''}>B. MUATAN LOKAL</option>
+                    </select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                    <button class="btn-move" onclick="moveMapel(${idx}, -1)">▲</button>
+                    <button class="btn-move" onclick="moveMapel(${idx}, 1)">▼</button>
+                </div>
+                <button class="btn-delete" onclick="hapusMaster('mapel', ${idx})">✕</button>
+            </div>`; 
+    });
 
+    // 3. KELAS
     const listKelas = document.getElementById('list-kelas'); listKelas.innerHTML = '';
     kelasArray.forEach((k, idx) => { listKelas.innerHTML += `<div class="master-item">🏫 Kelas <input type="text" class="edit-input" value="${k}" onchange="editMaster('kelas', ${idx}, this.value)"><button class="btn-delete" onclick="hapusMaster('kelas', ${idx})">✕</button></div>`; });
 
+    // 4. JAM PELAJARAN (FULL EDITABLE)
     const listJam = document.getElementById('list-jam'); listJam.innerHTML = '';
     waktuArray.forEach((w, idx) => {
-        let lbl = w.tipe === 'pelajaran' ? 'Pelajaran' : w.label;
-        let tgtH = w.targetHari ? ` <span style="color:#3b82f6;">[H: ${w.targetHari}]</span>` : '';
-        let tgtK = w.targetKelas ? ` <span style="color:#ef4444;">[K: ${w.targetKelas}]</span>` : '';
-        listJam.innerHTML += `<div class="master-item"><span style="flex:1;">⏰ ${w.jam} <small style="color:#6b7280;">(${lbl})${tgtH}${tgtK}</small></span> <button class="btn-delete" onclick="hapusMaster('jam', ${idx})">✕</button></div>`;
+        listJam.innerHTML += `
+            <div class="master-item" style="flex-direction:column; gap:6px; align-items:stretch;">
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <input type="text" class="edit-input" style="width:75px; flex:none; border:1px solid #d1d5db;" value="${w.jam}" onchange="editJam(${idx}, 'jam', this.value)">
+                    <select class="edit-input" style="border:1px solid #d1d5db;" onchange="editJam(${idx}, 'tipe', this.value)">
+                        <option value="pelajaran" ${w.tipe==='pelajaran'?'selected':''}>Pelajaran</option>
+                        <option value="istirahat" ${w.tipe==='istirahat'?'selected':''}>Istirahat</option>
+                        <option value="kegiatan" ${w.tipe==='kegiatan'?'selected':''}>Kegiatan</option>
+                    </select>
+                    <button class="btn-delete" onclick="hapusMaster('jam', ${idx})">✕</button>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" class="edit-input" placeholder="Label Kegiatan" value="${w.label}" style="border:1px dashed #d1d5db;" onchange="editJam(${idx}, 'label', this.value)">
+                    <input type="text" class="edit-input" placeholder="T. Hari: SENIN" value="${w.targetHari}" style="border:1px dashed #d1d5db;" onchange="editJam(${idx}, 'targetHari', this.value)">
+                    <input type="text" class="edit-input" placeholder="T. Kelas: I, II" value="${w.targetKelas}" style="border:1px dashed #d1d5db;" onchange="editJam(${idx}, 'targetKelas', this.value)">
+                </div>
+            </div>`;
     });
 }
 
@@ -398,8 +438,35 @@ function editMaster(tipe, key, newVal) {
     let val = newVal.trim();
     if(tipe === 'guru_nama') { if(val) dbGuru[key].nama = val; }
     else if(tipe === 'guru_jabatan') { dbGuru[key].jabatan = val; }
-    else if(tipe === 'mapel') { if(val) dbMapel[key] = val; }
     else if(tipe === 'kelas') { if(val) kelasArray[key] = val.toUpperCase(); }
+    saveState(); renderSeluruhSistem();
+}
+
+function editMapel(idx, field, newVal) {
+    let val = newVal.trim();
+    if(field === 'nama') { if(val) mapelArray[idx].nama = val; }
+    else if(field === 'kelompok') { mapelArray[idx].kelompok = val; }
+    saveState(); renderSeluruhSistem();
+}
+
+function moveMapel(idx, dir) {
+    if(dir === -1 && idx > 0) {
+        let temp = mapelArray[idx-1]; mapelArray[idx-1] = mapelArray[idx]; mapelArray[idx] = temp;
+    } else if (dir === 1 && idx < mapelArray.length - 1) {
+        let temp = mapelArray[idx+1]; mapelArray[idx+1] = mapelArray[idx]; mapelArray[idx] = temp;
+    }
+    saveState(); renderSeluruhSistem();
+}
+
+function editJam(idx, field, newVal) {
+    let val = newVal.trim();
+    if(field === 'jam') { if(val) waktuArray[idx].jam = val; }
+    else if(field === 'tipe') waktuArray[idx].tipe = val;
+    else if(field === 'label') waktuArray[idx].label = val.toUpperCase();
+    else if(field === 'targetHari') waktuArray[idx].targetHari = val.toUpperCase();
+    else if(field === 'targetKelas') waktuArray[idx].targetKelas = val.toUpperCase();
+    
+    if(field === 'jam') waktuArray.sort((a,b) => a.jam.localeCompare(b.jam));
     saveState(); renderSeluruhSistem();
 }
 
@@ -408,8 +475,8 @@ function tambahMaster(tipe) {
         let kode = document.getElementById('add-guru-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-guru-nama').value.trim(); let jab = document.getElementById('add-guru-jabatan').value.trim();
         if(kode && nama) { dbGuru[kode] = { nama: nama, jabatan: jab || "-" }; document.getElementById('add-guru-kode').value=''; document.getElementById('add-guru-nama').value=''; document.getElementById('add-guru-jabatan').value=''; }
     } else if(tipe === 'mapel') {
-        let kode = document.getElementById('add-mapel-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-mapel-nama').value.trim();
-        if(kode && nama) { dbMapel[kode] = nama; document.getElementById('add-mapel-kode').value=''; document.getElementById('add-mapel-nama').value=''; }
+        let kode = document.getElementById('add-mapel-kode').value.trim().toUpperCase(); let nama = document.getElementById('add-mapel-nama').value.trim(); let kel = document.getElementById('add-mapel-kelompok').value;
+        if(kode && nama) { mapelArray.push({ kode: kode, nama: nama, kelompok: kel }); document.getElementById('add-mapel-kode').value=''; document.getElementById('add-mapel-nama').value=''; }
     } else if(tipe === 'kelas') {
         let nama = document.getElementById('add-kelas-nama').value.trim().toUpperCase();
         if(nama && !kelasArray.includes(nama)) { kelasArray.push(nama); document.getElementById('add-kelas-nama').value=''; }
@@ -424,7 +491,7 @@ function tambahMaster(tipe) {
 
 function hapusMaster(tipe, key) {
     if(confirm('Yakin ingin menghapus data ini?')) {
-        if(tipe === 'guru') delete dbGuru[key]; else if(tipe === 'mapel') delete dbMapel[key]; else if(tipe === 'kelas') kelasArray.splice(key, 1); else if(tipe === 'jam') waktuArray.splice(key, 1);
+        if(tipe === 'guru') delete dbGuru[key]; else if(tipe === 'mapel') mapelArray.splice(key, 1); else if(tipe === 'kelas') kelasArray.splice(key, 1); else if(tipe === 'jam') waktuArray.splice(key, 1);
         saveState(); renderSeluruhSistem();
     }
 }
@@ -491,7 +558,7 @@ function validasiBentrok(inputAktif) {
     if(!memoriJadwal[hariAktif]) memoriJadwal[hariAktif] = {}; if(!memoriJadwal[hariAktif][jamAktif]) memoriJadwal[hariAktif][jamAktif] = {};
     memoriJadwal[hariAktif][jamAktif][kelasAktif] = rawValue;
     
-    saveState(); renderSeluruhRekap(); // Update rekap setiap mengetik
+    saveState(); renderSeluruhRekap();
 
     if (!rawValue) { inputAktif.classList.remove('error'); return; }
 
@@ -519,17 +586,20 @@ function validasiBentrok(inputAktif) {
 }
 
 // ==========================================
-// 6. RENDER KEDUA TABEL REKAPITULASI (GURU & MAPEL)
+// 6. RENDER KEDUA TABEL REKAPITULASI
 // ==========================================
+function getNamaMapelDariKode(kodeHuruf) {
+    let found = mapelArray.find(m => m.kode === kodeHuruf);
+    return found ? found.nama : kodeHuruf;
+}
+
 function renderSeluruhRekap() {
     renderRekapGuru();
     renderRekapMapel();
 }
 
 function renderRekapGuru() {
-    const tbody = document.getElementById('body-rekap');
-    tbody.innerHTML = '';
-    
+    const tbody = document.getElementById('body-rekap'); tbody.innerHTML = '';
     let totalAll = { "SENIN":0, "SELASA":0, "RABU":0, "KAMIS":0, "JUMAT":0, "SUM":0 };
 
     for(let k in dbGuru) {
@@ -545,10 +615,7 @@ function renderRekapGuru() {
                         if(kodeAngka === k) {
                             harian[hari]++; totalAll[hari]++;
                             let kodeHuruf = val.replace(/[0-9]/g, '');
-                            if(kodeHuruf) {
-                                if(dbMapel[kodeHuruf]) mapelSet.add(dbMapel[kodeHuruf]);
-                                else mapelSet.add(kodeHuruf);
-                            }
+                            if(kodeHuruf) mapelSet.add(getNamaMapelDariKode(kodeHuruf));
                         }
                     }
                 }
@@ -562,14 +629,10 @@ function renderRekapGuru() {
 
         tbody.innerHTML += `
             <tr>
-                <td>${k}</td>
-                <td>${dbGuru[k].nama}</td>
-                <td>${stringMapel}</td>
+                <td>${k}</td><td>${dbGuru[k].nama}</td><td>${stringMapel}</td>
                 <td>${harian["SENIN"]}</td><td>${harian["SELASA"]}</td><td>${harian["RABU"]}</td>
-                <td>${harian["KAMIS"]}</td><td>${harian["JUMAT"]}</td>
-                <td style="font-weight:bold;">${sum}</td>
-            </tr>
-        `;
+                <td>${harian["KAMIS"]}</td><td>${harian["JUMAT"]}</td><td style="font-weight:bold;">${sum}</td>
+            </tr>`;
     }
 
     tbody.innerHTML += `
@@ -578,80 +641,79 @@ function renderRekapGuru() {
             <th>${totalAll["SENIN"]}</th><th>${totalAll["SELASA"]}</th><th>${totalAll["RABU"]}</th>
             <th>${totalAll["KAMIS"]}</th><th>${totalAll["JUMAT"]}</th>
             <th style="font-size:14px;">${totalAll["SUM"]}</th>
-        </tr>
-    `;
+        </tr>`;
 }
 
-// FITUR BARU: RENDER TABEL MAPEL PER KELAS
 function renderRekapMapel() {
-    const thead = document.getElementById('thead-rekap-mapel');
-    const tbody = document.getElementById('body-rekap-mapel');
+    const thead = document.getElementById('thead-rekap-mapel'); const tbody = document.getElementById('body-rekap-mapel');
     if(!thead || !tbody) return;
 
-    // Header Kelas
     let headerHtml = `<tr><th>MATA PELAJARAN</th>`;
     kelasArray.forEach(k => { headerHtml += `<th>KLS ${k}</th>`; });
     headerHtml += `<th>TOTAL JP</th></tr>`;
     thead.innerHTML = headerHtml;
 
-    // Inisialisasi Matrix Penghitung (Mapel x Kelas)
+    // Hitung JP berdasarkan Urutan di MapelArray
     let mapelCounts = {};
-    for(let m in dbMapel) {
-        mapelCounts[dbMapel[m]] = { total: 0 };
-        kelasArray.forEach(k => mapelCounts[dbMapel[m]][k] = 0);
-    }
-    mapelCounts["Guru Kelas / Tematik"] = { total: 0 };
-    kelasArray.forEach(k => mapelCounts["Guru Kelas / Tematik"][k] = 0);
+    mapelArray.forEach(m => {
+        mapelCounts[m.kode] = { total: 0 };
+        kelasArray.forEach(k => mapelCounts[m.kode][k] = 0);
+    });
+    mapelCounts["GURU KELAS"] = { total: 0 }; kelasArray.forEach(k => mapelCounts["GURU KELAS"][k] = 0);
+    
+    let totalPerKelas = {}; kelasArray.forEach(k => totalPerKelas[k] = 0);
 
-    let totalPerKelas = {};
-    kelasArray.forEach(k => totalPerKelas[k] = 0);
-
-    // Hitung JP dari memori
     for(let hari in memoriJadwal) {
         for(let jam in memoriJadwal[hari]) {
             for(let kls in memoriJadwal[hari][jam]) {
                 let val = memoriJadwal[hari][jam][kls];
                 if(val) {
                     let kodeHuruf = val.replace(/[0-9]/g, '');
-                    let namaMapel = dbMapel[kodeHuruf] || "Guru Kelas / Tematik";
+                    if(!kodeHuruf) kodeHuruf = "GURU KELAS";
                     
-                    if(!mapelCounts[namaMapel]) {
-                        mapelCounts[namaMapel] = { total: 0 };
-                        kelasArray.forEach(k => mapelCounts[namaMapel][k] = 0);
+                    if(mapelCounts[kodeHuruf] !== undefined) {
+                        mapelCounts[kodeHuruf][kls]++;
+                        mapelCounts[kodeHuruf].total++;
+                        totalPerKelas[kls]++;
+                    } else {
+                        // Fallback jika diketik sembarangan
+                        mapelCounts["GURU KELAS"][kls]++; mapelCounts["GURU KELAS"].total++; totalPerKelas[kls]++;
                     }
-                    
-                    mapelCounts[namaMapel][kls]++;
-                    mapelCounts[namaMapel].total++;
-                    totalPerKelas[kls]++;
                 }
             }
         }
     }
 
-    // Render Body Matrix
     tbody.innerHTML = '';
-    for(let m in mapelCounts) {
-        if(mapelCounts[m].total === 0 && m === "Guru Kelas / Tematik") continue; // Sembunyikan jika kosong
+    let currentGroup = "";
+    
+    mapelArray.forEach(m => {
+        if(m.kelompok !== currentGroup) {
+            tbody.innerHTML += `<tr class="group-header"><td colspan="${kelasArray.length + 2}">${m.kelompok}</td></tr>`;
+            currentGroup = m.kelompok;
+        }
         
-        let row = `<tr><td>${m}</td>`;
-        kelasArray.forEach(k => { row += `<td>${mapelCounts[m][k] > 0 ? mapelCounts[m][k] : '-'}</td>`; });
-        row += `<td>${mapelCounts[m].total}</td></tr>`;
+        let row = `<tr><td>${m.nama}</td>`;
+        kelasArray.forEach(k => { row += `<td>${mapelCounts[m.kode][k] > 0 ? mapelCounts[m.kode][k] : '-'}</td>`; });
+        row += `<td>${mapelCounts[m.kode].total}</td></tr>`;
+        tbody.innerHTML += row;
+    });
+
+    if(mapelCounts["GURU KELAS"].total > 0) {
+        tbody.innerHTML += `<tr class="group-header"><td colspan="${kelasArray.length + 2}">C. LAIN-LAIN</td></tr>`;
+        let row = `<tr><td>GURU KELAS / TEMATIK</td>`;
+        kelasArray.forEach(k => { row += `<td>${mapelCounts["GURU KELAS"][k] > 0 ? mapelCounts["GURU KELAS"][k] : '-'}</td>`; });
+        row += `<td>${mapelCounts["GURU KELAS"].total}</td></tr>`;
         tbody.innerHTML += row;
     }
 
-    // Footer Total
-    let grandTotal = 0;
-    let footerRow = `<tr><th style="text-align:right;">TOTAL JP / MINGGU</th>`;
-    kelasArray.forEach(k => {
-        footerRow += `<th>${totalPerKelas[k]}</th>`;
-        grandTotal += totalPerKelas[k];
-    });
+    let grandTotal = 0; let footerRow = `<tr><th style="text-align:right;">TOTAL JP / MINGGU</th>`;
+    kelasArray.forEach(k => { footerRow += `<th>${totalPerKelas[k]}</th>`; grandTotal += totalPerKelas[k]; });
     footerRow += `<th>${grandTotal}</th></tr>`;
     tbody.innerHTML += footerRow;
 }
 
 function renderSeluruhSistem() { loadPengaturan(); renderMasterLists(); renderTabelJadwal(); renderSeluruhRekap(); }
-
 
 // ==========================================
 // 7. FITUR CETAK
@@ -663,7 +725,7 @@ function getTtdElement() {
 
 function cetakJadwalGlobalPdf() {
     let htmlLegendaGuru = ''; for(let k in dbGuru) { htmlLegendaGuru += `<div><b>${k}</b> = ${dbGuru[k].nama}</div>`; }
-    let htmlLegendaMapel = ''; for(let k in dbMapel) { htmlLegendaMapel += `<div><b>${k}</b> = ${dbMapel[k]}</div>`; }
+    let htmlLegendaMapel = ''; mapelArray.forEach(m => { htmlLegendaMapel += `<div><b>${m.kode}</b> = ${m.nama}</div>`; });
 
     let printWin = window.open('', '', 'width=1200,height=800');
     let tabelAsli = document.getElementById('tabel-jadwal').outerHTML;
@@ -711,42 +773,19 @@ function cetakRekapPdf() {
             @page { size: landscape; margin: 15mm; }
             body { font-family: 'Times New Roman', serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
             .header-dinas { background: #881337; color: white; text-align: center; padding: 10px; margin-bottom: 10px; border: 2px solid #000;}
-            .header-dinas h1 { margin: 0; font-size: 14px; font-weight: normal; }
-            .header-dinas h2 { margin: 5px 0 0 0; font-size: 20px; font-weight: bold; }
+            .header-dinas h1 { margin: 0; font-size: 14px; font-weight: normal; } .header-dinas h2 { margin: 5px 0 0 0; font-size: 20px; font-weight: bold; }
             .sub-header { background: #881337; color: white; text-align: center; padding: 5px; margin-bottom: 20px; border: 2px solid #000; font-weight: bold; font-size: 14px;}
-            
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-family: Arial, sans-serif;}
-            th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 11px; }
-            th { background-color: #fca5a5; font-weight: bold; }
-            td:nth-child(2), td:nth-child(3) { text-align: left; }
-            tr:last-child th { background-color: #fff; }
-
-            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;}
-            .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; }
-            .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-family: Arial, sans-serif;} th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 11px; } th { background-color: #fca5a5; font-weight: bold; } td:nth-child(2), td:nth-child(3) { text-align: left; } tr:last-child th { background-color: #fff; }
+            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;} .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; } .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
         </style>
     </head>
     <body>
-        <div class="header-dinas">
-            <h1>DINAS PENDIDIKAN DAN KEBUDAYAAN KOTA BEKASI</h1>
-            <h2>${localStorage.getItem('jadwal_sekolah')}</h2>
-        </div>
-        <div class="sub-header">
-            REKAP JAM MENGAJAR GURU<br>${localStorage.getItem('jadwal_ta')}
-        </div>
-        
+        <div class="header-dinas"><h1>DINAS PENDIDIKAN DAN KEBUDAYAAN KOTA BEKASI</h1><h2>${localStorage.getItem('jadwal_sekolah')}</h2></div>
+        <div class="sub-header">REKAP JAM MENGAJAR GURU<br>${localStorage.getItem('jadwal_ta')}</div>
         ${tabelAsli}
-        
         <div class="footer-area">
-            <div class="ttd-box">
-                <br>Kepala Sekolah,<br><br>
-                ${getTtdElement()}
-                <span class="ttd-name" style="margin-top:5px;">${localStorage.getItem('jadwal_kepsek')}</span>
-            </div>
-            <div class="ttd-box">
-                ........, .................... 2026<br>Waka Bidang Kurikulum,<br>
-                <span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span>
-            </div>
+            <div class="ttd-box"><br>Kepala Sekolah,<br><br>${getTtdElement()}<span class="ttd-name" style="margin-top:5px;">${localStorage.getItem('jadwal_kepsek')}</span></div>
+            <div class="ttd-box">........, .................... 2026<br>Waka Bidang Kurikulum,<br><span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span></div>
         </div>
         <script>setTimeout(() => { window.print(); }, 800);<\/script>
     </body>
@@ -766,40 +805,22 @@ function cetakRekapMapelPdf() {
             @page { size: portrait; margin: 15mm; }
             body { font-family: Arial, sans-serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
             .header-dinas { background: #bef264; color: #1f2937; text-align: center; padding: 10px; margin-bottom: 20px; border: 2px solid #000;}
-            .header-dinas h1 { margin: 0; font-size: 18px; font-weight: 900; }
-            .header-dinas h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
-            
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px;}
-            th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;}
-            th { background-color: #bef264; }
-            td:nth-child(1) { text-align: left; }
-            tr:nth-child(even) td { background-color: #fde047; }
-            tr:nth-child(odd) td { background-color: #fff; }
+            .header-dinas h1 { margin: 0; font-size: 18px; font-weight: 900; } .header-dinas h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px;} th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;}
+            th { background-color: #bef264; } td:nth-child(1) { text-align: left; }
+            tr.group-header td { background-color: #e5e7eb; font-weight: 900; }
+            tr:nth-child(even):not(.group-header) td { background-color: #fde047; }
+            tr:nth-child(odd):not(.group-header) td { background-color: #fff; }
             tr:last-child th { background-color: #fcd34d; font-size:13px;}
-
-            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;}
-            .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; }
-            .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
+            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;} .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; } .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
         </style>
     </head>
     <body>
-        <div class="header-dinas">
-            <h1>REKAPITULASI JUMLAH JAM MATA PELAJARAN (JP)</h1>
-            <h2>${localStorage.getItem('jadwal_sekolah')} - ${localStorage.getItem('jadwal_ta')}</h2>
-        </div>
-        
+        <div class="header-dinas"><h1>REKAPITULASI JUMLAH JAM MATA PELAJARAN (JP)</h1><h2>${localStorage.getItem('jadwal_sekolah')} - ${localStorage.getItem('jadwal_ta')}</h2></div>
         ${tabelAsli}
-        
         <div class="footer-area">
-            <div class="ttd-box">
-                <br>Kepala Sekolah,<br><br>
-                ${getTtdElement()}
-                <span class="ttd-name" style="margin-top:5px;">${localStorage.getItem('jadwal_kepsek')}</span>
-            </div>
-            <div class="ttd-box">
-                ........, .................... 2026<br>Waka Bidang Kurikulum,<br>
-                <span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span>
-            </div>
+            <div class="ttd-box"><br>Kepala Sekolah,<br><br>${getTtdElement()}<span class="ttd-name" style="margin-top:5px;">${localStorage.getItem('jadwal_kepsek')}</span></div>
+            <div class="ttd-box">........, .................... 2026<br>Waka Bidang Kurikulum,<br><span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span></div>
         </div>
         <script>setTimeout(() => { window.print(); }, 800);<\/script>
     </body>
@@ -832,7 +853,7 @@ function eksekusiCetakPerKelas() {
             else if (configAktif.tipe === "istirahat" || configAktif.tipe === "kegiatan") { rowHtml += `<td class="td-kegiatan">${configAktif.label}</td>`; } 
             else {
                 let kode = (memoriJadwal[hari] && memoriJadwal[hari][jamStr] && memoriJadwal[hari][jamStr][kls]) ? memoriJadwal[hari][jamStr][kls] : "";
-                if (kode) { let kodeHurufMapel = kode.replace(/[0-9]/g, ''); let namaMapel = dbMapel[kodeHurufMapel] || kode; rowHtml += `<td class="td-pelajaran">${namaMapel}</td>`; } 
+                if (kode) { let kodeHurufMapel = kode.replace(/[0-9]/g, ''); let namaMapel = getNamaMapelDariKode(kodeHurufMapel); rowHtml += `<td class="td-pelajaran">${namaMapel}</td>`; } 
                 else { rowHtml += `<td class="td-empty">-</td>`; }
             }
         });
