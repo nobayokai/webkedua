@@ -134,7 +134,7 @@
             </div>
         </div>
 
-        <!-- Master Mapel (SEKARANG BISA DI-DRAG / DIPINDAH) -->
+        <!-- Master Mapel -->
         <div class="master-card" style="border-top-color: #eab308;">
             <h4>📚 Master Mapel (Bisa Diurutkan)</h4>
             <div class="master-list" id="list-mapel"></div>
@@ -159,7 +159,7 @@
             </div>
         </div>
 
-        <!-- Master Jam Pelajaran (SEKARANG FULL EDITABLE) -->
+        <!-- Master Jam Pelajaran -->
         <div class="master-card" style="border-top-color: #a855f7; grid-column: 1 / -1;">
             <h4>⏰ Master Jam / Waktu (Edit Langsung)</h4>
             <div class="master-list" id="list-jam" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap:10px; max-height:250px;"></div>
@@ -202,7 +202,7 @@
         </table>
     </div>
 
-    <!-- TABEL REKAPITULASI JP PER KELAS (KURIKULUM MERDEKA) -->
+    <!-- TABEL REKAPITULASI JP PER KELAS -->
     <div class="rekap-container" style="border-top: 4px solid #ca8a04;">
         <h2 style="margin:0 0 5px 0; color:#a16207; text-align:center; font-family:'Georgia',serif;">📑 JUMLAH JAM PER MINGGU SESUAI KURIKULUM 2025</h2>
         <div style="overflow-x:auto;">
@@ -262,7 +262,6 @@ let dbGuru = {
     "11": { nama: "Nia Damarsari, S.Pd", jabatan: "PAI KELAS 4-6, QURDIS 1-6" } 
 };
 
-// STRUKTUR BARU MASTER MAPEL (ARRAY AGAR BISA DIURUTKAN & DIGROUP)
 let mapelArray = [
     { kode: "PA", nama: "Pendidikan Agama dan Budi Pekerti", kelompok: "A. MATA PELAJARAN WAJIB" },
     { kode: "PP", nama: "Pendidikan Pancasila", kelompok: "A. MATA PELAJARAN WAJIB" },
@@ -306,7 +305,6 @@ function loadState() {
             dbGuru = data.dbGuru;
         }
         
-        // Migrasi Mapel Lama ke Array Baru jika file backupnya dari versi sebelumnya
         if(data.dbMapel && !Array.isArray(data.dbMapel) && !data.mapelArray) {
             mapelArray = [];
             for(let k in data.dbMapel) { mapelArray.push({ kode: k, nama: data.dbMapel[k], kelompok: "A. MATA PELAJARAN WAJIB" }); }
@@ -321,7 +319,7 @@ function loadState() {
 function exportData() {
     saveState();
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('jadwal_state_ultimate'));
-    let dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "Backup_Jadwal_SDIT_V2.json");
+    let dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "Backup_Jadwal_SDIT_V3.json");
     document.body.appendChild(dl); dl.click(); dl.remove();
 }
 
@@ -367,7 +365,6 @@ function simpanPengaturanCetak() {
 // 4. RENDER MASTER DATA & EDIT LANGSUNG
 // ==========================================
 function renderMasterLists() {
-    // 1. GURU
     const listGuru = document.getElementById('list-guru'); listGuru.innerHTML = '';
     for(let k in dbGuru) { 
         listGuru.innerHTML += `
@@ -381,7 +378,6 @@ function renderMasterLists() {
             </div>`; 
     }
 
-    // 2. MAPEL (DENGAN FITUR RE-ORDER & GROUP)
     const listMapel = document.getElementById('list-mapel'); listMapel.innerHTML = '';
     let currentGroup = "";
     mapelArray.forEach((m, idx) => {
@@ -407,11 +403,9 @@ function renderMasterLists() {
             </div>`; 
     });
 
-    // 3. KELAS
     const listKelas = document.getElementById('list-kelas'); listKelas.innerHTML = '';
     kelasArray.forEach((k, idx) => { listKelas.innerHTML += `<div class="master-item">🏫 Kelas <input type="text" class="edit-input" value="${k}" onchange="editMaster('kelas', ${idx}, this.value)"><button class="btn-delete" onclick="hapusMaster('kelas', ${idx})">✕</button></div>`; });
 
-    // 4. JAM PELAJARAN (FULL EDITABLE)
     const listJam = document.getElementById('list-jam'); listJam.innerHTML = '';
     waktuArray.forEach((w, idx) => {
         listJam.innerHTML += `
@@ -497,7 +491,7 @@ function hapusMaster(tipe, key) {
 }
 
 // ==========================================
-// 5. RENDER TABEL JADWAL & VALIDASI BENTROK
+// 5. RENDER TABEL JADWAL
 // ==========================================
 function renderTabelJadwal() {
     const thead = document.getElementById('thead-jadwal'); const tbody = document.getElementById('body-jadwal');
@@ -593,10 +587,7 @@ function getNamaMapelDariKode(kodeHuruf) {
     return found ? found.nama : kodeHuruf;
 }
 
-function renderSeluruhRekap() {
-    renderRekapGuru();
-    renderRekapMapel();
-}
+function renderSeluruhRekap() { renderRekapGuru(); renderRekapMapel(); }
 
 function renderRekapGuru() {
     const tbody = document.getElementById('body-rekap'); tbody.innerHTML = '';
@@ -653,7 +644,6 @@ function renderRekapMapel() {
     headerHtml += `<th>TOTAL JP</th></tr>`;
     thead.innerHTML = headerHtml;
 
-    // Hitung JP berdasarkan Urutan di MapelArray
     let mapelCounts = {};
     mapelArray.forEach(m => {
         mapelCounts[m.kode] = { total: 0 };
@@ -676,7 +666,6 @@ function renderRekapMapel() {
                         mapelCounts[kodeHuruf].total++;
                         totalPerKelas[kls]++;
                     } else {
-                        // Fallback jika diketik sembarangan
                         mapelCounts["GURU KELAS"][kls]++; mapelCounts["GURU KELAS"].total++; totalPerKelas[kls]++;
                     }
                 }
@@ -731,23 +720,7 @@ function cetakJadwalGlobalPdf() {
     let tabelAsli = document.getElementById('tabel-jadwal').outerHTML;
     
     let htmlPdf = `
-    <html>
-    <head>
-        <title>Cetak Jadwal Global</title>
-        <style>
-            @page { size: landscape; margin: 10mm; }
-            body { font-family: Arial, sans-serif; font-size: 10px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
-            .header { text-align: center; margin-bottom: 10px; border-bottom: 3px double #000; padding-bottom: 5px; }
-            .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; } .header h2 { margin: 3px 0; font-size: 12px; font-weight: normal; text-transform:uppercase;}
-            table { width: 100%; border-collapse: collapse; margin-bottom: 15px; } th, td { border: 1px solid #000; padding: 3px; text-align: center; font-size:9px;} th { background-color: #e5e7eb; font-weight: bold; }
-            input { border: none !important; background: transparent !important; width: 100%; text-align: center; font-size: 9px; font-weight: bold; font-family: Arial; padding:0; margin:0; outline:none;}
-            .td-disabled { background-color: #d1d5db !important; } .row-istirahat td { background-color: #f3f4f6 !important; font-weight: bold; letter-spacing: 2px;}
-            .footer-area { display: flex; justify-content: space-between; margin-top: 10px; page-break-inside: avoid;}
-            .legenda-box { border: 1px solid #000; padding: 10px; width: 65%; display: flex; gap: 20px; background: #fff;}
-            .legenda-col { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; font-size: 9px; } .legenda-title { grid-column: 1 / -1; font-weight: bold; font-size: 10px; border-bottom: 1px solid #000; margin-bottom: 5px; padding-bottom: 2px; text-align:center;}
-            .ttd-box { width: 25%; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;} .ttd-name { font-weight: bold; text-decoration: underline; text-transform: uppercase; }
-        </style>
-    </head>
+    <html><head><title>Cetak Jadwal Global</title><style>@page { size: landscape; margin: 10mm; } body { font-family: Arial, sans-serif; font-size: 10px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;} .header { text-align: center; margin-bottom: 10px; border-bottom: 3px double #000; padding-bottom: 5px; } .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; } .header h2 { margin: 3px 0; font-size: 12px; font-weight: normal; text-transform:uppercase;} table { width: 100%; border-collapse: collapse; margin-bottom: 15px; } th, td { border: 1px solid #000; padding: 3px; text-align: center; font-size:9px;} th { background-color: #e5e7eb; font-weight: bold; } input { border: none !important; background: transparent !important; width: 100%; text-align: center; font-size: 9px; font-weight: bold; font-family: Arial; padding:0; margin:0; outline:none;} .td-disabled { background-color: #d1d5db !important; } .row-istirahat td { background-color: #f3f4f6 !important; font-weight: bold; letter-spacing: 2px;} .footer-area { display: flex; justify-content: space-between; margin-top: 10px; page-break-inside: avoid;} .legenda-box { border: 1px solid #000; padding: 10px; width: 65%; display: flex; gap: 20px; background: #fff;} .legenda-col { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; font-size: 9px; } .legenda-title { grid-column: 1 / -1; font-weight: bold; font-size: 10px; border-bottom: 1px solid #000; margin-bottom: 5px; padding-bottom: 2px; text-align:center;} .ttd-box { width: 25%; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;} .ttd-name { font-weight: bold; text-decoration: underline; text-transform: uppercase; }</style></head>
     <body>
         <div class="header"><h1>JADWAL MATA PELAJARAN</h1><h2>${localStorage.getItem('jadwal_sekolah')} - ${localStorage.getItem('jadwal_ta')}</h2></div>
         ${tabelAsli}
@@ -756,29 +729,14 @@ function cetakJadwalGlobalPdf() {
             <div class="ttd-box">Mengetahui,<br>Kepala Sekolah<br>${getTtdElement()}<span class="ttd-name">${localStorage.getItem('jadwal_kepsek')}</span></div>
         </div>
         <script>setTimeout(() => { window.print(); }, 800);<\/script>
-    </body>
-    </html>`;
+    </body></html>`;
     printWin.document.open(); printWin.document.write(htmlPdf); printWin.document.close();
 }
 
 function cetakRekapPdf() {
-    let printWin = window.open('', '', 'width=1200,height=800');
-    let tabelAsli = document.getElementById('tabel-rekap').outerHTML;
-    
+    let printWin = window.open('', '', 'width=1200,height=800'); let tabelAsli = document.getElementById('tabel-rekap').outerHTML;
     let htmlPdf = `
-    <html>
-    <head>
-        <title>Cetak Rekap Jam Mengajar</title>
-        <style>
-            @page { size: landscape; margin: 15mm; }
-            body { font-family: 'Times New Roman', serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
-            .header-dinas { background: #881337; color: white; text-align: center; padding: 10px; margin-bottom: 10px; border: 2px solid #000;}
-            .header-dinas h1 { margin: 0; font-size: 14px; font-weight: normal; } .header-dinas h2 { margin: 5px 0 0 0; font-size: 20px; font-weight: bold; }
-            .sub-header { background: #881337; color: white; text-align: center; padding: 5px; margin-bottom: 20px; border: 2px solid #000; font-weight: bold; font-size: 14px;}
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-family: Arial, sans-serif;} th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 11px; } th { background-color: #fca5a5; font-weight: bold; } td:nth-child(2), td:nth-child(3) { text-align: left; } tr:last-child th { background-color: #fff; }
-            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;} .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; } .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
-        </style>
-    </head>
+    <html><head><title>Cetak Rekap Jam Mengajar</title><style>@page { size: landscape; margin: 15mm; } body { font-family: 'Times New Roman', serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;} .header-dinas { background: #881337; color: white; text-align: center; padding: 10px; margin-bottom: 10px; border: 2px solid #000;} .header-dinas h1 { margin: 0; font-size: 14px; font-weight: normal; } .header-dinas h2 { margin: 5px 0 0 0; font-size: 20px; font-weight: bold; } .sub-header { background: #881337; color: white; text-align: center; padding: 5px; margin-bottom: 20px; border: 2px solid #000; font-weight: bold; font-size: 14px;} table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-family: Arial, sans-serif;} th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 11px; } th { background-color: #fca5a5; font-weight: bold; } td:nth-child(2), td:nth-child(3) { text-align: left; } tr:last-child th { background-color: #fff; } .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;} .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; } .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }</style></head>
     <body>
         <div class="header-dinas"><h1>DINAS PENDIDIKAN DAN KEBUDAYAAN KOTA BEKASI</h1><h2>${localStorage.getItem('jadwal_sekolah')}</h2></div>
         <div class="sub-header">REKAP JAM MENGAJAR GURU<br>${localStorage.getItem('jadwal_ta')}</div>
@@ -788,33 +746,14 @@ function cetakRekapPdf() {
             <div class="ttd-box">........, .................... 2026<br>Waka Bidang Kurikulum,<br><span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span></div>
         </div>
         <script>setTimeout(() => { window.print(); }, 800);<\/script>
-    </body>
-    </html>`;
+    </body></html>`;
     printWin.document.open(); printWin.document.write(htmlPdf); printWin.document.close();
 }
 
 function cetakRekapMapelPdf() {
-    let printWin = window.open('', '', 'width=1200,height=800');
-    let tabelAsli = document.getElementById('tabel-rekap-mapel').outerHTML;
-    
+    let printWin = window.open('', '', 'width=1200,height=800'); let tabelAsli = document.getElementById('tabel-rekap-mapel').outerHTML;
     let htmlPdf = `
-    <html>
-    <head>
-        <title>Cetak Rekap Mata Pelajaran</title>
-        <style>
-            @page { size: portrait; margin: 15mm; }
-            body { font-family: Arial, sans-serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;}
-            .header-dinas { background: #bef264; color: #1f2937; text-align: center; padding: 10px; margin-bottom: 20px; border: 2px solid #000;}
-            .header-dinas h1 { margin: 0; font-size: 18px; font-weight: 900; } .header-dinas h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px;} th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;}
-            th { background-color: #bef264; } td:nth-child(1) { text-align: left; }
-            tr.group-header td { background-color: #e5e7eb; font-weight: 900; }
-            tr:nth-child(even):not(.group-header) td { background-color: #fde047; }
-            tr:nth-child(odd):not(.group-header) td { background-color: #fff; }
-            tr:last-child th { background-color: #fcd34d; font-size:13px;}
-            .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;} .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; } .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }
-        </style>
-    </head>
+    <html><head><title>Cetak Rekap Mata Pelajaran</title><style>@page { size: portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 12px; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin:0;} .header-dinas { background: #bef264; color: #1f2937; text-align: center; padding: 10px; margin-bottom: 20px; border: 2px solid #000;} .header-dinas h1 { margin: 0; font-size: 18px; font-weight: 900; } .header-dinas h2 { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; } table { width: 100%; border-collapse: collapse; margin-bottom: 30px;} th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;} th { background-color: #bef264; } td:nth-child(1) { text-align: left; } tr.group-header td { background-color: #e5e7eb; font-weight: 900; } tr:nth-child(even):not(.group-header) td { background-color: #fde047; } tr:nth-child(odd):not(.group-header) td { background-color: #fff; } tr:last-child th { background-color: #fcd34d; font-size:13px;} .footer-area { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; padding: 0 40px;} .ttd-box { text-align: left; font-size: 12px; display: flex; flex-direction: column; } .ttd-name { font-weight: bold; text-transform: uppercase; margin-top: 60px; text-decoration: underline; }</style></head>
     <body>
         <div class="header-dinas"><h1>REKAPITULASI JUMLAH JAM MATA PELAJARAN (JP)</h1><h2>${localStorage.getItem('jadwal_sekolah')} - ${localStorage.getItem('jadwal_ta')}</h2></div>
         ${tabelAsli}
@@ -823,8 +762,7 @@ function cetakRekapMapelPdf() {
             <div class="ttd-box">........, .................... 2026<br>Waka Bidang Kurikulum,<br><span class="ttd-name" style="margin-top:80px;">${localStorage.getItem('jadwal_waka')}</span></div>
         </div>
         <script>setTimeout(() => { window.print(); }, 800);<\/script>
-    </body>
-    </html>`;
+    </body></html>`;
     printWin.document.open(); printWin.document.write(htmlPdf); printWin.document.close();
 }
 
@@ -835,12 +773,15 @@ function bukaModalPerKelas() {
     document.getElementById('modal-cetak-perkelas').style.display = 'flex';
 }
 
+// FUNGSI INI TELAH DIPERBARUI UNTUK MENG-HIDE BARIS KOSONG & MERAPIKAN TABEL
 function eksekusiCetakPerKelas() {
     let kls = document.getElementById('select-kelas-cetak').value; document.getElementById('modal-cetak-perkelas').style.display = 'none';
     let trs = ''; let uniqueJams = [...new Set(waktuArray.map(w => w.jam))].sort();
 
     uniqueJams.forEach(jamStr => {
         let rowHtml = `<tr><td class="td-time">${jamStr}</td>`;
+        let hasContent = false;
+
         hariArray.forEach(hari => {
             let configsJamIni = waktuArray.filter(w => w.jam === jamStr);
             let configAktif = configsJamIni.find(w => w.targetHari && w.targetHari.includes(hari)) || configsJamIni.find(w => !w.targetHari || w.targetHari === "");
@@ -849,15 +790,27 @@ function eksekusiCetakPerKelas() {
             let targetArray = configAktif.targetKelas ? configAktif.targetKelas.split(',').map(x=>x.trim()) : [];
             let isTargeted = targetArray.length === 0 || targetArray.includes(kls);
 
-            if (!isTargeted) { rowHtml += `<td class="td-empty">-</td>`; } 
-            else if (configAktif.tipe === "istirahat" || configAktif.tipe === "kegiatan") { rowHtml += `<td class="td-kegiatan">${configAktif.label}</td>`; } 
+            if (!isTargeted) { 
+                rowHtml += `<td class="td-empty">-</td>`; 
+            } 
+            else if (configAktif.tipe === "istirahat" || configAktif.tipe === "kegiatan") { 
+                rowHtml += `<td class="td-kegiatan">${configAktif.label}</td>`; 
+                hasContent = true;
+            } 
             else {
                 let kode = (memoriJadwal[hari] && memoriJadwal[hari][jamStr] && memoriJadwal[hari][jamStr][kls]) ? memoriJadwal[hari][jamStr][kls] : "";
-                if (kode) { let kodeHurufMapel = kode.replace(/[0-9]/g, ''); let namaMapel = getNamaMapelDariKode(kodeHurufMapel); rowHtml += `<td class="td-pelajaran">${namaMapel}</td>`; } 
+                if (kode) { 
+                    let kodeHurufMapel = kode.replace(/[0-9]/g, ''); let namaMapel = getNamaMapelDariKode(kodeHurufMapel); 
+                    rowHtml += `<td class="td-pelajaran">${namaMapel}</td>`; 
+                    hasContent = true;
+                } 
                 else { rowHtml += `<td class="td-empty">-</td>`; }
             }
         });
-        rowHtml += `</tr>`; trs += rowHtml;
+        rowHtml += `</tr>`; 
+        
+        // HANYA MASUKKAN BARIS JIKA ADA ISINYA (HIDE BARIS KOSONG)
+        if(hasContent) trs += rowHtml;
     });
 
     let printWin = window.open('', '', 'width=1100,height=800');
@@ -875,11 +828,18 @@ function eksekusiCetakPerKelas() {
             .title { font-family: 'Fredoka One', cursive; font-size: 48px; margin: 0; color: #ef4444; text-shadow: 3px 3px 0 #fff; letter-spacing: 2px; } .title span { color: #3b82f6; }
             .subtitle { font-size: 24px; color: #1f2937; margin: 5px 0 0 0; font-weight: 900; background: #fde047; display: inline-block; padding: 5px 25px; border-radius: 20px; border: 3px solid #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
             .school-name { font-size: 14px; font-weight: bold; color: #374151; margin-top: 5px; text-transform: uppercase; }
-            table { width: 100%; border-collapse: separate; border-spacing: 6px; margin-top: 10px; flex: 1; }
+            
+            /* PERBAIKAN LEBAR KOLOM RAPIH */
+            table { width: 100%; border-collapse: separate; border-spacing: 6px; margin-top: 10px; flex: 1; table-layout: fixed;}
             th { border-radius: 12px; padding: 12px; font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
-            .th-time { background-color: #f97316; } .th-senin { background-color: #ef4444; } .th-selasa { background-color: #ec4899; } .th-rabu { background-color: #a855f7; } .th-kamis { background-color: #84cc16; } .th-jumat { background-color: #eab308; }
+            
+            .th-time { background-color: #f97316; width: 1%; white-space: nowrap; padding: 12px 15px; } 
+            .th-senin { background-color: #ef4444; } .th-selasa { background-color: #ec4899; } .th-rabu { background-color: #a855f7; } .th-kamis { background-color: #84cc16; } .th-jumat { background-color: #eab308; }
+            
             td { background: white; border-radius: 10px; padding: 8px; text-align: center; font-weight: 900; font-size: 15px; color: #1f2937; border: 2px solid #e5e7eb; box-shadow: 0 3px 0 rgba(0,0,0,0.05); }
-            .td-time { background: transparent; border: 2px solid #1f2937; color: #1f2937; font-size: 14px; box-shadow: none; } .td-empty { background: transparent; border-color: transparent; box-shadow: none; color: rgba(0,0,0,0.2); } .td-kegiatan { background: #fef08a; color: #854d0e; border-color: #facc15; font-size: 13px; } .td-pelajaran { color: #0369a1; }
+            .td-time { background: transparent; border: 2px solid #1f2937; color: #1f2937; font-size: 14px; box-shadow: none; white-space: nowrap;} 
+            
+            .td-empty { background: transparent; border-color: transparent; box-shadow: none; color: rgba(0,0,0,0.2); } .td-kegiatan { background: #fef08a; color: #854d0e; border-color: #facc15; font-size: 13px; } .td-pelajaran { color: #0369a1; }
         </style>
     </head>
     <body>
