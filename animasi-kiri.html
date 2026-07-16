@@ -63,7 +63,8 @@
   .cal-day.has-agenda { border-bottom: 3px solid var(--amber); font-weight: 1000; color: var(--text); }
   .cal-day.has-ujian { border-bottom: 3px solid var(--pink); font-weight: 1000; color: var(--text); }
 
-  .agenda-list-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; max-height: 200px; padding-right: 5px;}
+  /* MENGHILANGKAN MAX-HEIGHT & OVERFLOW SCROLL DI WIDGET */
+  .agenda-list-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; padding-right: 5px;}
   .agenda-item { background: rgba(255,255,255,.6); padding: 8px 12px; border-radius: 8px; font-size: 11px; border-left: 4px solid; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
   .agenda-item.kat-kegiatan { border-left-color: var(--amber); }
   .agenda-item.kat-ujian    { border-left-color: var(--pink); background: rgba(244,114,182,0.12); }
@@ -161,7 +162,8 @@
             <button class="nav-btn nav-btn-sm" id="btn-next-absensi" title="Hari berikutnya">❯</button>
           </div>
         </div>
-        <div id="absensi-list-container" style="max-height: 250px; overflow-y:auto; display:flex; flex-direction:column; padding-right:4px;">
+        <!-- MENGHILANGKAN OVERFLOW-Y:AUTO DAN MAX-HEIGHT -->
+        <div id="absensi-list-container" style="display:flex; flex-direction:column; padding-right:4px;">
           <div style="text-align:center; font-size:10px; color:rgba(0,0,0,0.5); margin-top:20px;">
              <div class="spinner-circle" style="margin: 0 auto 8px auto;"></div>Merekap data harian...
           </div>
@@ -186,6 +188,7 @@
         </div>
         <div class="cal-weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
         <div class="cal-grid" id="cal-grid" onclick="window.bukaModalCalendar(event)"></div>
+        <!-- KOTAK AGENDA SCROLL DIHAPUS, SEKARANG MEMANJANG BEBAS KE BAWAH -->
         <div class="agenda-list-wrap" id="agenda-list-container"></div>
       </div>
     </div>
@@ -274,7 +277,7 @@ var htmlModal = `
         </div>
         <div class="cal-weekdays" style="font-size:11px; margin-top:10px;"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div style="color:#ef4444;">Sab</div><div style="color:#ef4444;">Min</div></div>
         <div class="cal-grid" id="modal-cal-grid" style="gap:5px; font-size:12px;"></div>
-        <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px;"></div>
+        <div class="agenda-list-wrap" id="modal-agenda-list" style="margin-top: 15px; max-height: 250px; overflow-y:auto;"></div>
     </div>
 </div>
 
@@ -311,7 +314,6 @@ window.toggleDropdown = function(id, headerEl) {
 
 // TRIGGER BUKA MODAL KALENDER FULL SCREEN
 window.bukaModalCalendar = function(e) {
-    // Mencegah modal terbuka jika yang di klik adalah tombol navigasi
     if (e.target.closest('.nav-btn') || e.target.closest('.btn-download-pdf')) return;
     document.getElementById('calendar-modal').classList.add('active');
 };
@@ -402,14 +404,12 @@ window.jalankanWidgetKiri = function() {
         } else if (agendaBulanIni.length > 0) {
             var namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
 
-            // Normalisasi: pisahkan kategori & keterangan dari format "kategori|||keterangan"
             var flatAgenda = agendaBulanIni.map(function(ag) {
                 var finalKategori = ag.kategori || 'Kegiatan Sekolah'; var namaKgt = ag.kegiatan || '';
                 if(namaKgt.includes('|||')) { var p = namaKgt.split('|||'); finalKategori = p[0]; namaKgt = p.slice(1).join('|||'); }
                 return { tgl: ag.tanggalBersih, kategori: finalKategori, kegiatan: namaKgt };
             });
 
-            // Kelompokkan tanggal berurutan yang punya kategori & keterangan sama menjadi satu rentang
             var groupsAgenda = [];
             flatAgenda.forEach(function(item) {
                 var last = groupsAgenda[groupsAgenda.length - 1];
@@ -556,7 +556,6 @@ window.jalankanWidgetKiri = function() {
       renderRekapAbsensi(currentAbsensiDate);
   });
 
-  // 1. MUNCULKAN CHART DENGAN MODEL BERDAMPINGAN SAAT DIKLIK
   window.bukaChartKelas = function(kelas) {
       window.currentKelasAbsen = kelas; 
       document.getElementById('chart-kelas-title').textContent = kelas;
@@ -679,7 +678,6 @@ window.jalankanWidgetKiri = function() {
       wrap.innerHTML = html;
   };
 
-  // 2. MUNCULKAN POPUP PENGATURAN CETAK
   window.bukaModalPengaturanAbsen = function() {
       var d = new Date();
       var endStr = d.getFullYear() + '-' + pad2(d.getMonth()+1);
