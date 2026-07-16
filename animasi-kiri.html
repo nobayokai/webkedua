@@ -20,9 +20,9 @@
   .card{ background: var(--card); border: 1px solid var(--stroke); border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 12px; overflow:hidden; position: relative; }
   .card::after{ content:""; position:absolute; inset:-40px -60px auto -60px; height: 90px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%); pointer-events:none; }
 
-  .brand{ display:flex; align-items:center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+  .brand{ display:flex; align-items:center; justify-content: space-between; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; } /* Added flex-wrap for responsiveness */
   .brand .title{ font-family: Georgia, serif; font-weight: 950; color: var(--green2); font-size: 13px; letter-spacing: .2px; }
-  .brand .chip{ font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900; white-space: nowrap; max-width: 45%; overflow:hidden; text-overflow: ellipsis; }
+  .brand .chip{ font-size: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25); color: rgba(4,120,87,.95); font-weight: 900; white-space: nowrap; max-width: 100%; overflow:hidden; text-overflow: ellipsis; } /* max-width changed to 100% */
 
   .clock-now{ display:flex; flex-direction: column; gap: 8px; }
   .clock-time{ font-size: 34px; font-weight: 950; color:#1f2937; line-height: 1; letter-spacing: .4px; }
@@ -32,11 +32,11 @@
   #sidebar-calendar-card { cursor: pointer; transition: transform 0.2s; overflow: visible; }
   #sidebar-calendar-card:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0,0,0,.1); }
 
-  .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; }
+  .cal-head{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 1; flex-wrap: wrap;} /* Added flex-wrap */
   .cal-month{ font-weight: 1000; color: var(--text); font-size: 13px; }
-  .nav-btn { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
+  .nav-btn { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); color: var(--green2); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; flex-shrink: 0;} /* Added flex-shrink: 0 */
   .nav-btn:hover { background: var(--green); color: white; }
-  .btn-download-pdf { background: var(--pink); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3); }
+  .btn-download-pdf { background: var(--pink); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3); white-space: nowrap; flex-shrink: 0;} /* Added white-space and flex-shrink */
   .btn-download-pdf:hover { transform: scale(1.05); background: #db2777; }
 
   .cal-weekdays{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 11px; font-weight: 1000; color: rgba(0,0,0,.45); margin-bottom: 6px; position: relative; z-index: 1; }
@@ -70,7 +70,7 @@
   .stat-value { font-size: 14px; font-weight: 1000; }
   .val-h { color: var(--green); } .val-i { color: var(--amber); } .val-s { color: var(--blue); } .val-a { color: #9ca3af; }
 
-  .absensi-nav-date { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 900; text-align:center; min-width: 92px; }
+  .absensi-nav-date { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 900; text-align:center; min-width: 92px; flex-shrink: 0;} /* Added flex-shrink */
   .nav-btn.nav-btn-sm { width: 20px; height: 20px; font-size: 10px; }
   .nav-btn.disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
 
@@ -103,7 +103,38 @@
   .input-group { margin-bottom: 12px; text-align: left; }
   .input-group label { font-size: 11px; font-weight: bold; color: #4b5563; }
 
-  @media (max-width: 768px){ .widget-grid{ grid-template-columns: 1fr; } .widget-grid > .card{ grid-column: 1 / -1 !important; } .card{ padding: 10px; } .clock-time{ font-size: 30px; } .brand .chip{ max-width: 70%; } }
+  /* --- PERBAIKAN UNTUK MODE MOBILE (RESPONSIVE) --- */
+  @media (max-width: 768px){ 
+      .widget-grid{ 
+          grid-template-columns: 1fr; /* Memaksa elemen menjadi 1 kolom vertikal */
+      } 
+      .widget-grid > .card{ 
+          grid-column: 1 / -1 !important; /* Memastikan setiap card mengambil lebar penuh layar */
+      } 
+      .card{ 
+          padding: 15px; /* Sedikit memperbesar padding di mobile agar lebih nyaman disentuh */
+      } 
+      .clock-time{ 
+          font-size: 28px; /* Sedikit mengecilkan font jam agar tidak terlalu mendominasi */
+      } 
+      .brand .chip{ 
+          max-width: 100%; /* Membiarkan chip nama lokasi tampil utuh */
+          white-space: normal; /* Mengizinkan teks chip untuk turun ke baris baru jika sangat panjang */
+      }
+      .clock-now {
+          flex-direction: column !important; /* Kembalikan ke layout vertikal untuk jam di mobile */
+          align-items: flex-start !important;
+          gap: 4px !important;
+      }
+      .card[style*="flex-direction:row;"] {
+           flex-direction: column !important; /* Menjadikan card paling atas (jam & cuaca) bersusun vertikal di mobile */
+           align-items: flex-start !important;
+      }
+      .card[style*="flex-direction:row;"] > div:last-child {
+          text-align: left !important; /* Meratakan ucapan salam ke kiri di mode mobile */
+          margin-top: 10px;
+      }
+  }
 </style>
 
 <div id="widget-islam">
