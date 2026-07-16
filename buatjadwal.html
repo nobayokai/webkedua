@@ -830,14 +830,17 @@ function eksekusiCetakPerKelas() {
             .school-name { font-size: 14px; font-weight: bold; color: #374151; margin-top: 5px; text-transform: uppercase; }
             
             /* PERBAIKAN LEBAR KOLOM RAPIH */
+            table, th, td { box-sizing: border-box; }
             table { width: 100%; border-collapse: separate; border-spacing: 6px; margin-top: 10px; flex: 1; table-layout: fixed;}
-            th { border-radius: 12px; padding: 12px; font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+            th { border-radius: 12px; padding: 12px; font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; box-shadow: 0 4px 0 rgba(0,0,0,0.1); overflow: hidden; }
             
-            .th-time { background-color: #f97316; width: 1%; white-space: nowrap; padding: 12px 15px; } 
+            /* Kolom waktu diberi lebar tetap (px) agar satu baris & tidak menggeser kolom lain.
+               Kolom hari (tanpa width) otomatis presisi membagi sisa lebar secara merata karena table-layout: fixed. */
+            .th-time { background-color: #f97316; width: 120px; white-space: nowrap; padding: 12px 10px; } 
             .th-senin { background-color: #ef4444; } .th-selasa { background-color: #ec4899; } .th-rabu { background-color: #a855f7; } .th-kamis { background-color: #84cc16; } .th-jumat { background-color: #eab308; }
             
-            td { background: white; border-radius: 10px; padding: 8px; text-align: center; font-weight: 900; font-size: 15px; color: #1f2937; border: 2px solid #e5e7eb; box-shadow: 0 3px 0 rgba(0,0,0,0.05); }
-            .td-time { background: transparent; border: 2px solid #1f2937; color: #1f2937; font-size: 14px; box-shadow: none; white-space: nowrap;} 
+            td { background: white; border-radius: 10px; padding: 8px; text-align: center; font-weight: 900; font-size: 15px; color: #1f2937; border: 2px solid #e5e7eb; box-shadow: 0 3px 0 rgba(0,0,0,0.05); overflow: hidden; }
+            .td-time { background: transparent; border: 2px solid #1f2937; color: #1f2937; font-size: 13px; box-shadow: none; white-space: nowrap; padding: 8px 6px;} 
             
             .td-empty { background: transparent; border-color: transparent; box-shadow: none; color: rgba(0,0,0,0.2); } .td-kegiatan { background: #fef08a; color: #854d0e; border-color: #facc15; font-size: 13px; } .td-pelajaran { color: #0369a1; }
         </style>
