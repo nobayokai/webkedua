@@ -714,7 +714,6 @@ window.generateRekapStudi = function() {
     for(let b = bAwal; b <= bAkhir; b++) {
         arrayRangeBulan.push(b);
         monthsColsHtml += `<th colspan="5">${namaBulanFull[b].toUpperCase()}</th>`;
-        weeksColsHtml += `<th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>`;
         
         var datesInMonthForDay = [];
         var dTemp = new Date(y, b, 1);
@@ -724,20 +723,24 @@ window.generateRekapStudi = function() {
         }
         for(let w = 0; w < 5; w++) {
             if(w < datesInMonthForDay.length) {
+                // PERBAIKAN: Header kolom kini memakai TANGGAL AKTIF yang sebenarnya (bukan sekadar "Minggu ke-")
+                weeksColsHtml += `<th>${datesInMonthForDay[w]}</th>`;
                 mapKolomStudi.push({ bln: b, tgl: datesInMonthForDay[w], isLibur: mapLiburStudi[b + "-" + datesInMonthForDay[w]], valid: true });
             } else {
+                weeksColsHtml += `<th></th>`;
                 mapKolomStudi.push({ valid: false });
             }
         }
     }
 
-    // PERBAIKAN: Menambahkan <colgroup> untuk memaksa pengaturan grid yang akurat
+    // PERBAIKAN: Menambahkan <colgroup> untuk memaksa pengaturan grid yang akurat (+3 kolom untuk total S/I/A)
     var totalDynamicCols = arrayRangeBulan.length * 5;
     var colsHtml = `
         <colgroup>
             <col style="width: 3%;">
             <col style="width: 22%;">
             ${Array.from({length: totalDynamicCols}, () => `<col>`).join('')}
+            <col><col><col>
         </colgroup>
     `;
 
@@ -754,8 +757,9 @@ window.generateRekapStudi = function() {
                     <th rowspan="2">NO</th>
                     <th rowspan="2">NAMA SISWA</th>
                     ${monthsColsHtml}
+                    <th colspan="3">JUMLAH</th>
                 </tr>
-                <tr>${weeksColsHtml}</tr>
+                <tr>${weeksColsHtml}<th>S</th><th>I</th><th>A</th></tr>
             </thead>
             <tbody>
     `;
@@ -780,6 +784,7 @@ window.generateRekapStudi = function() {
 
     siswaKelas.forEach((s, idx) => {
         var tr = `<tr><td>${idx+1}</td><td class="left-align">${s.nama}</td>`;
+        var totS = 0, totI = 0, totA = 0;
         
         mapKolomStudi.forEach((k, indexKolom) => {
             var kolomKey = k.bln + '-' + (indexKolom % 5);
@@ -799,7 +804,10 @@ window.generateRekapStudi = function() {
                     });
 
                     if(absenSiswa) {
-                        mark = getWarnaAbsen((absenSiswa.status||"").toUpperCase());
+                        var st = (absenSiswa.status||"").toUpperCase();
+                        mark = getWarnaAbsen(st);
+                        // PERBAIKAN: Akumulasi total Sakit/Izin/Alpa per siswa
+                        if(st === 'SAKIT') totS++; else if(st === 'IZIN') totI++; else if(st.includes('ALP') || st.includes('ALF')) totA++;
                     }
                     tr += `<td>${mark}</td>`;
                 }
@@ -808,6 +816,8 @@ window.generateRekapStudi = function() {
             }
         });
         
+        // PERBAIKAN: Kolom agregat total S/I/A di sisi kanan tabel
+        tr += `<td>${totS||''}</td><td>${totI||''}</td><td>${totA||''}</td>`;
         tr += `</tr>`;
         htmlTabel += tr;
     });
