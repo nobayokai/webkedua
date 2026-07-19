@@ -128,7 +128,7 @@
         @media print {
             @page {
                 size: 215mm 330mm; /* Kertas F4 */
-                margin: 10mm;
+                margin: 15mm;
             }
             body { 
                 /* Memaksa Chrome menampilkan warna background saat print */
@@ -165,6 +165,11 @@
 <body>
 
 <div class="container">
+    <div>
+        <h1>RPPM Generator</h1>
+        <p class="subtitle">Print F4 Full Color • Fitur Batas Halaman (Page Break) • Tanda Tangan</p>
+    </div>
+    
     <div class="card no-print">
         <h3 style="margin-top:0;">Input Data RPP</h3>
         <div class="form-grid">
@@ -216,7 +221,7 @@
     // ==========================================
     // ⚠️ MASUKKAN URL WEB APP GAS ANDA DI SINI
     // ==========================================
-    const gasUrl = "https://script.google.com/macros/s/AKfycbzNNR8ao5lJ_ze_vVemKNtDogBFFciXmtFxjVjnbf3tzebWc6TVwiteClqa00wWwDqtnw/exec";
+    const gasUrl = "https://script.google.com/macros/s/AKfycbzT3l6WHm9bu9cJTlB0gFklXa8RGKeHg9tYHcaCBbxhPDpAcHHzx1hIlWVR6T_ZB_lWZQ/exec";
 
     async function generateRPPM() {
         const identitas = {
@@ -313,7 +318,10 @@
                     <th>Lingkungan Pembelajaran</th>
                     <td><strong>Ruang fisik:</strong> kelas, lab komputer<br><strong>Budaya belajar:</strong> memberikan kesempatan mengeksplorasi materi.</td>
                 </tr>
-                <tr><th>Pemanfaatan Digital</th><td class="ai-text">${data.digital || fallback}</td></tr>
+                <tr>
+                    <th>Pemanfaatan Digital</th>
+                    <td><strong>Perencanaan:</strong> -<br><strong>Proses:</strong> -<br><strong>Asesmen:</strong> Canva</td>
+                </tr>
             </table>
 
             <h3>IV. PENGALAMAN BELAJAR</h3>
