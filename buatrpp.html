@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator RPPM Final</title>
+    <title>Generator RPPM Final - Live Edit</title>
 
     <style>
         :root {
@@ -47,7 +47,7 @@
         th:last-child, td:last-child { border-right: none; }
         
         ul, ol { margin: 0; padding-left: 20px; }
-        .ai-text { white-space: pre-wrap; }
+        .ai-text { white-space: pre-wrap; display: block; }
         .tindak-lanjut-box { border: 2px dashed var(--border); border-radius: 8px; height: 120px; margin-bottom: 30px; background-color: #f8fafc; }
         
         .signature-box { display: flex; justify-content: space-between; margin-top: 40px; }
@@ -81,6 +81,22 @@
         .pb-mode-active .custom-page-break { height: auto; overflow: visible; padding: 8px 0; margin: 15px 0; background-color: #fee2e2; border: 2px dashed #ef4444; color: #ef4444; font-size: 0.9rem; line-height: 1.6; text-align: center; font-weight: bold; border-radius: 4px; cursor: pointer; }
         .pb-mode-active .custom-page-break:hover { background-color: #fca5a5; color: white; }
 
+        /* === FITUR BARU: LIVE EDIT STYLING === */
+        .editable-text {
+            outline: none;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: all 0.2s;
+            display: inline-block;
+            min-width: 20px;
+        }
+        .editable-text:hover, .editable-text:focus {
+            background-color: #fef9c3;
+            box-shadow: 0 0 0 2px #fde047;
+            cursor: text;
+        }
+
         @media print {
             @page { size: 215mm 330mm; margin: 10mm; }
             body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: white; }
@@ -91,6 +107,8 @@
             .custom-page-break { page-break-before: always !important; break-before: page !important; }
             tr, h3, .signature-box { page-break-inside: avoid; break-inside: avoid; }
             #ttd-wrapper { border: none !important; background-color: transparent !important; resize: none !important; }
+            /* Matikan efek hover kuning saat diprint */
+            .editable-text { padding: 0; margin: 0; background-color: transparent !important; box-shadow: none !important; }
         }
     </style>
 </head>
@@ -125,8 +143,8 @@
     <div id="output-rppm">
         <div class="print-controls no-print">
             <div style="flex-direction: column; align-items: flex-start; gap: 5px;">
-                <strong style="color:var(--text);">Langkah Persiapan:</strong>
-                <span style="font-size:0.85rem; color:#64748b;">1. Atur batas halaman &nbsp; | &nbsp; 2. Upload & atur TTD &nbsp; | &nbsp; 3. Print / Save PDF</span>
+                <strong style="color:var(--text);">Persiapan Cetak:</strong>
+                <span style="font-size:0.85rem; color:#64748b;">1. Klik teks untuk edit manual &nbsp;|&nbsp; 2. Atur batas halaman &nbsp;|&nbsp; 3. Upload & atur TTD &nbsp;|&nbsp; 4. Cetak PDF</span>
             </div>
             <div>
                 <button id="btn-pb" style="background-color: #ef4444; color:#fff;" onclick="togglePageBreakMode()">✂️ Atur Batas Halaman</button>
@@ -187,7 +205,6 @@
         }
     }
 
-    // Fungsi Render harus memiliki tag pembuka function
     function renderRPPM(data) {
         
         function bersihkanTeks(val) {
@@ -198,15 +215,16 @@
             return val.toString().replace(/\\n/g, '\n'); 
         }
 
+        // Teks dibungkus span berkelas "editable-text" dengan atribut "contenteditable=true"
         const html = `
             <h3>I. IDENTITAS RPP</h3>
             <table>
-                <tr><th>Nama Penyusun</th><td>${bersihkanTeks(data.nama)}</td></tr>
-                <tr><th>Mata Pelajaran</th><td>${bersihkanTeks(data.mapel)}</td></tr>
-                <tr><th>Unit/Materi</th><td>${bersihkanTeks(data.materi)}</td></tr>
-                <tr><th>Alokasi Waktu</th><td>${bersihkanTeks(data.waktu)}</td></tr>
-                <tr><th>Fase/Kelas</th><td>${bersihkanTeks(data.fase)}</td></tr>
-                <tr><th>Semester</th><td>${bersihkanTeks(data.semester)}</td></tr>
+                <tr><th>Nama Penyusun</th><td><span class="editable-text" contenteditable="true">${bersihkanTeks(data.nama)}</span></td></tr>
+                <tr><th>Mata Pelajaran</th><td><span class="editable-text" contenteditable="true">${bersihkanTeks(data.mapel)}</span></td></tr>
+                <tr><th>Unit/Materi</th><td><span class="editable-text" contenteditable="true">${bersihkanTeks(data.materi)}</span></td></tr>
+                <tr><th>Alokasi Waktu</th><td><span class="editable-text" contenteditable="true">${bersihkanTeks(data.waktu)}</span></td></tr>
+                <tr><th>Fase/Kelas</th><td><span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase)}</span></td></tr>
+                <tr><th>Semester</th><td><span class="editable-text" contenteditable="true">${bersihkanTeks(data.semester)}</span></td></tr>
             </table>
 
             <h3>II. IDENTIFIKASI</h3>
@@ -214,29 +232,29 @@
                 <tr>
                     <th>Profil Murid</th>
                     <td>
-                        <strong>Pengetahuan Awal:</strong><br><span class="ai-text">${bersihkanTeks(data.profil_pengetahuan)}</span><br><br>
-                        <strong>Minat Belajar:</strong><br><span class="ai-text">${bersihkanTeks(data.profil_minat)}</span>
+                        <strong>Pengetahuan Awal:</strong><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.profil_pengetahuan)}</span><br><br>
+                        <strong>Minat Belajar:</strong><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.profil_minat)}</span>
                     </td>
                 </tr>
                 <tr>
                     <th>Analisis Materi</th>
                     <td>
-                        <strong>Cakupan Materi:</strong><br><span class="ai-text">${bersihkanTeks(data.analisis_cakupan)}</span><br><br>
-                        <strong>Relevansi Kontekstual:</strong><br><span class="ai-text">${bersihkanTeks(data.analisis_relevansi)}</span>
+                        <strong>Cakupan Materi:</strong><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.analisis_cakupan)}</span><br><br>
+                        <strong>Relevansi Kontekstual:</strong><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.analisis_relevansi)}</span>
                     </td>
                 </tr>
                 <tr>
                     <th>Dimensi Profil Lulusan</th>
                     <td>
                         <ol type="a">
-                            <li><strong>Keimanan dan Ketaqwaan:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_keimanan)}</span></li>
-                            <li><strong>Kewargaan:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kewargaan)}</span></li>
-                            <li><strong>Penalaran Kritis:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_penalaran)}</span></li>
-                            <li><strong>Kreativitas:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kreativitas)}</span></li>
-                            <li><strong>Kolaborasi:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kolaborasi)}</span></li>
-                            <li><strong>Kemandirian:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kemandirian)}</span></li>
-                            <li><strong>Kesehatan:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kesehatan)}</span></li>
-                            <li><strong>Komunikasi:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_komunikasi)}</span></li>
+                            <li><strong>Keimanan dan Ketaqwaan:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_keimanan)}</span></li>
+                            <li><strong>Kewargaan:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_kewargaan)}</span></li>
+                            <li><strong>Penalaran Kritis:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_penalaran)}</span></li>
+                            <li><strong>Kreativitas:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_kreativitas)}</span></li>
+                            <li><strong>Kolaborasi:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_kolaborasi)}</span></li>
+                            <li><strong>Kemandirian:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_kemandirian)}</span></li>
+                            <li><strong>Kesehatan:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_kesehatan)}</span></li>
+                            <li><strong>Komunikasi:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.dimensi_komunikasi)}</span></li>
                         </ol>
                     </td>
                 </tr>
@@ -244,16 +262,16 @@
 
             <h3>III. DESAIN PEMBELAJARAN</h3>
             <table>
-                <tr><th>Capaian Pembelajaran</th><td class="ai-text">${bersihkanTeks(data.capaian)}</td></tr>
-                <tr><th>Lintas Disiplin Ilmu</th><td>-</td></tr>
-                <tr><th>Tujuan Pembelajaran</th><td class="ai-text">${bersihkanTeks(data.tujuan)}</td></tr>
-                <tr><th>Praktik Pedagogis</th><td>Pembelajaran kontekstual<br>Diskusi kelompok</td></tr>
-                <tr><th>Kemitraan Pembelajaran</th><td>-</td></tr>
+                <tr><th>Capaian Pembelajaran</th><td><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.capaian)}</span></td></tr>
+                <tr><th>Lintas Disiplin Ilmu</th><td><span class="editable-text" contenteditable="true">-</span></td></tr>
+                <tr><th>Tujuan Pembelajaran</th><td><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.tujuan)}</span></td></tr>
+                <tr><th>Praktik Pedagogis</th><td><span class="editable-text" contenteditable="true">Pembelajaran kontekstual<br>Diskusi kelompok</span></td></tr>
+                <tr><th>Kemitraan Pembelajaran</th><td><span class="editable-text" contenteditable="true">-</span></td></tr>
                 <tr>
                     <th>Lingkungan Pembelajaran</th>
-                    <td><strong>Ruang fisik:</strong> kelas, lab komputer<br><strong>Budaya belajar:</strong> memberikan kesempatan mengeksplorasi materi.</td>
+                    <td><strong>Ruang fisik:</strong> <span class="editable-text" contenteditable="true">kelas, lab komputer</span><br><strong>Budaya belajar:</strong> <span class="editable-text" contenteditable="true">memberikan kesempatan mengeksplorasi materi.</span></td>
                 </tr>
-                <tr><th>Pemanfaatan Digital</th><td class="ai-text">${bersihkanTeks(data.digital)}</td></tr>
+                <tr><th>Pemanfaatan Digital</th><td><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.digital)}</span></td></tr>
             </table>
 
             <h3>IV. PENGALAMAN BELAJAR</h3>
@@ -262,15 +280,15 @@
                     <th>Pertemuan I</th>
                     <td>
                         <strong>Kegiatan Awal (bermakna)</strong><br>
-                        - Guru memulai dengan salam, doa bersama, dan melakukan presensi.<br>
-                        - Memaparkan tujuan pembelajaran yang akan dicapai yaitu ${bersihkanTeks(data.tujuan)}<br><br>
+                        <span class="editable-text" contenteditable="true">- Guru memulai dengan salam, doa bersama, dan melakukan presensi.</span><br>
+                        <span class="editable-text" contenteditable="true">- Memaparkan tujuan pembelajaran yang akan dicapai yaitu ${bersihkanTeks(data.tujuan)}</span><br><br>
 
                         <strong>Kegiatan Inti</strong><br>
-                        <em>Memahami:</em><br><span class="ai-text">${bersihkanTeks(data.kegiatan_memahami)}</span><br><br>
-                        <em>Mengaplikasi:</em><br><span class="ai-text">${bersihkanTeks(data.kegiatan_mengaplikasi)}</span><br><br>
-                        <em>Merefleksi:</em><br><span class="ai-text">${bersihkanTeks(data.kegiatan_merefleksi)}</span><br><br>
+                        <em>Memahami:</em><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.kegiatan_memahami)}</span><br><br>
+                        <em>Mengaplikasi:</em><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.kegiatan_mengaplikasi)}</span><br><br>
+                        <em>Merefleksi:</em><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.kegiatan_merefleksi)}</span><br><br>
 
-                        <strong>Kegiatan Penutup</strong><br><span class="ai-text">${bersihkanTeks(data.kegiatan_penutup)}</span>
+                        <strong>Kegiatan Penutup</strong><br><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.kegiatan_penutup)}</span>
                     </td>
                 </tr>
             </table>
@@ -278,35 +296,35 @@
             <h3>V. ASESMEN PEMBELAJARAN</h3>
             <table>
                 <tr><th>Jenis Asesmen</th><td><strong>Teknik dan Instrumen</strong></td></tr>
-                <tr><th>1. Asesmen Awal</th><td>Pretest: kuis singkat</td></tr>
-                <tr><th>2. Asesmen Proses</th><td><strong>Observasi:</strong> <span class="ai-text">${bersihkanTeks(data.asesmen_observasi)}</span><br><br><strong>Penilaian Kinerja:</strong> <span class="ai-text">${bersihkanTeks(data.asesmen_kinerja)}</span></td></tr>
-                <tr><th>3. Asesmen Akhir</th><td>Latihan soal</td></tr>
+                <tr><th>1. Asesmen Awal</th><td><span class="editable-text" contenteditable="true">Pretest: kuis singkat</span></td></tr>
+                <tr><th>2. Asesmen Proses</th><td><strong>Observasi:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.asesmen_observasi)}</span><br><br><strong>Penilaian Kinerja:</strong> <span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.asesmen_kinerja)}</span></td></tr>
+                <tr><th>3. Asesmen Akhir</th><td><span class="editable-text" contenteditable="true">Latihan soal</span></td></tr>
             </table>
 
             <h3>VI. LAYANAN DIFERENSIASI</h3>
             <table>
-                <tr><th>1. Pengayaan</th><td class="ai-text">${bersihkanTeks(data.pengayaan)}</td></tr>
-                <tr><th>2. Remedial</th><td class="ai-text">${bersihkanTeks(data.remedial)}</td></tr>
+                <tr><th>1. Pengayaan</th><td><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.pengayaan)}</span></td></tr>
+                <tr><th>2. Remedial</th><td><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.remedial)}</span></td></tr>
             </table>
 
             <h3>VII. CATATAN TINDAK LANJUT</h3>
-            <div class="tindak-lanjut-box"></div>
+            <div class="tindak-lanjut-box" contenteditable="true" style="padding:10px;" class="editable-text"></div>
 
             <div class="signature-box">
                 <div class="sig-col">
                     <p>Mengetahui,<br>Kepala Sekolah</p>
                     <div class="sig-space"></div>
-                    <p><strong>${bersihkanTeks(data.kepsek)}</strong></p>
+                    <p><strong><span class="editable-text" contenteditable="true">${bersihkanTeks(data.kepsek)}</span></strong></p>
                 </div>
                 
                 <div class="sig-col">
-                    <p>${bersihkanTeks(data.tempat)}, ${bersihkanTeks(data.tanggal)}<br>${bersihkanTeks(data.jenis_guru)}</p>
+                    <p><span class="editable-text" contenteditable="true">${bersihkanTeks(data.tempat)}, ${bersihkanTeks(data.tanggal)}</span><br><span class="editable-text" contenteditable="true">${bersihkanTeks(data.jenis_guru)}</span></p>
                     <div class="sig-space">
                         <div id="ttd-wrapper">
                             <img id="ttd-image" src="" alt="Tanda Tangan">
                         </div>
                     </div>
-                    <p><strong>${bersihkanTeks(data.nama)}</strong></p>
+                    <p><strong><span class="editable-text" contenteditable="true">${bersihkanTeks(data.nama)}</span></strong></p>
                 </div>
             </div>
         `;
@@ -394,6 +412,11 @@
             alert("Harap selesaikan Mode Batas Halaman (klik 'Selesai Atur Batas') sebelum mencetak/save PDF.");
             return;
         }
+        
+        // Mematikan sementara mode edit sebelum dicetak agar tidak mengganggu layout
+        const editables = document.querySelectorAll('.editable-text');
+        editables.forEach(el => el.setAttribute('contenteditable', 'false'));
+        
         const originalTitle = document.title;
         let namaMateri = document.getElementById('materi').value.trim();
         namaMateri = namaMateri.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
@@ -404,6 +427,8 @@
         
         setTimeout(() => {
             document.title = originalTitle;
+            // Menghidupkan kembali mode edit setelah selesai dicetak
+            editables.forEach(el => el.setAttribute('contenteditable', 'true'));
         }, 1000);
     }
 </script>
