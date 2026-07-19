@@ -187,14 +187,19 @@
         }
     }
 
-    function renderRPPM(data) {
-        // Penyaring AI Teks/Object
+    // ========================================================
+        // FIX: PENYARING ANTI [object Object] & ANTI BOCORAN \n
+        // ========================================================
         function bersihkanTeks(val) {
             if (!val) return "-"; 
+            
+            // 1. Jika AI mengirimkan Object, gabungkan dengan Enter asli (\n)
             if (typeof val === 'object') {
-                return Object.values(val).join('\\n\\n'); 
+                val = Object.values(val).join('\n\n'); 
             }
-            return val; 
+            
+            // 2. Mengubah tulisan "\n" mentah dari AI menjadi perintah Enter asli
+            return val.toString().replace(/\\n/g, '\n'); 
         }
 
         const html = `
