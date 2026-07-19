@@ -6,7 +6,6 @@
     <title>Generator RPPM Final</title>
 
     <style>
-        /* === DESAIN TEMA COLORFUL === */
         :root {
             --primary: #0284c7; 
             --primary-hover: #0369a1;
@@ -35,7 +34,6 @@
         button:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
         .btn-generate { width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 15px; }
         
-        /* === DESAIN TABEL RPP === */
         #rppm-document { padding: 40px; background-color: #ffffff; position: relative; }
         .rppm-title { text-align: center; font-weight: 900; margin-bottom: 25px; font-size: 1.4rem; color: var(--primary); text-decoration: underline; text-underline-offset: 5px; }
         h3 { margin-top: 25px; margin-bottom: 15px; font-size: 1.2rem; color: var(--primary-hover); background: #e0f2fe; padding: 8px 15px; border-left: 5px solid var(--accent); border-radius: 4px; }
@@ -52,11 +50,8 @@
         .ai-text { white-space: pre-wrap; }
         .tindak-lanjut-box { border: 2px dashed var(--border); border-radius: 8px; height: 120px; margin-bottom: 30px; background-color: #f8fafc; }
         
-        /* === BAGIAN TANDA TANGAN === */
         .signature-box { display: flex; justify-content: space-between; margin-top: 40px; }
         .sig-col { width: 45%; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        
-        /* Ketinggian diset ke 60px */
         .sig-space { position: relative; width: 100%; height: 60px; display: flex; justify-content: center; align-items: center; margin: 10px 0; }
         
         #ttd-wrapper {
@@ -73,103 +68,35 @@
         }
         #ttd-image { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
         
-        /* === KONTROL CETAK & LOADING === */
         #loading { text-align: center; display: none; padding: 20px; font-weight: bold; color: var(--primary); font-size: 1.1rem; }
         #output-rppm { display: none; }
         
         .print-controls { background-color: #fffbeb; border-left: 5px solid var(--accent); padding: 15px; margin-bottom: 20px; border-radius: 6px; display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
         .print-controls div { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
         
-        /* === FITUR PAGE BREAK VIEW === */
-        .pb-mode-active {
-            outline: 3px dashed #ef4444;
-            background-color: #fef2f2 !important;
-        }
-        .pb-mode-active h3:hover, 
-        .pb-mode-active tr:hover, 
-        .pb-mode-active .signature-box:hover {
-            border-top: 5px solid #ef4444 !important;
-            cursor: crosshair;
-            opacity: 0.8;
-            box-shadow: 0 -5px 10px rgba(239, 68, 68, 0.2);
-        }
+        .pb-mode-active { outline: 3px dashed #ef4444; background-color: #fef2f2 !important; }
+        .pb-mode-active h3:hover, .pb-mode-active tr:hover, .pb-mode-active .signature-box:hover { border-top: 5px solid #ef4444 !important; cursor: crosshair; opacity: 0.8; box-shadow: 0 -5px 10px rgba(239, 68, 68, 0.2); }
         
-        .custom-page-break {
-            width: 100%;
-            height: 0;
-            overflow: hidden;
-            padding: 0;
-            margin: 0;
-            border: none;
-            background: transparent;
-            color: transparent;
-            font-size: 0;
-            line-height: 0;
-        }
-
-        .pb-mode-active .custom-page-break {
-            height: auto;
-            overflow: visible;
-            padding: 8px 0;
-            margin: 15px 0;
-            background-color: #fee2e2;
-            border: 2px dashed #ef4444;
-            color: #ef4444;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+        .custom-page-break { width: 100%; height: 0; overflow: hidden; padding: 0; margin: 0; border: none; background: transparent; color: transparent; font-size: 0; line-height: 0; }
+        .pb-mode-active .custom-page-break { height: auto; overflow: visible; padding: 8px 0; margin: 15px 0; background-color: #fee2e2; border: 2px dashed #ef4444; color: #ef4444; font-size: 0.9rem; line-height: 1.6; text-align: center; font-weight: bold; border-radius: 4px; cursor: pointer; }
         .pb-mode-active .custom-page-break:hover { background-color: #fca5a5; color: white; }
 
-        /* === PENGATURAN CETAK (NATIVE PRINT CHROME) === */
         @media print {
-            @page {
-                size: 215mm 330mm; /* Kertas F4 */
-                margin: 15mm;
-            }
-            body { 
-                /* Memaksa Chrome menampilkan warna background saat print */
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; 
-                background-color: white; 
-            }
+            @page { size: 215mm 330mm; margin: 10mm; }
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: white; }
             .container { max-width: 100%; width: 100%; padding: 0; }
             .card { box-shadow: none; border: none; padding: 0; margin: 0; }
             #rppm-document { padding: 0; }
-            
             .no-print { display: none !important; }
-            
-            /* Terapkan Page Break pada elemen yang disisipkan */
-            .custom-page-break {
-                page-break-before: always !important;
-                break-before: page !important;
-            }
-            /* Cegah tabel terpotong di tengah baris jika memungkinkan */
-            tr, h3, .signature-box {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-
-            /* Hilangkan border putus-putus TTD saat dicetak */
-            #ttd-wrapper {
-                border: none !important;
-                background-color: transparent !important;
-                resize: none !important;
-            }
+            .custom-page-break { page-break-before: always !important; break-before: page !important; }
+            tr, h3, .signature-box { page-break-inside: avoid; break-inside: avoid; }
+            #ttd-wrapper { border: none !important; background-color: transparent !important; resize: none !important; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div>
-        <h1>RPPM Generator</h1>
-        <p class="subtitle">Print F4 Full Color • Fitur Batas Halaman (Page Break) • Tanda Tangan</p>
-    </div>
-    
     <div class="card no-print">
         <h3 style="margin-top:0;">Input Data RPP</h3>
         <div class="form-grid">
@@ -196,7 +123,6 @@
     <div id="loading">✨ Sedang merakit modul pembelajaran dengan AI, mohon tunggu...</div>
 
     <div id="output-rppm">
-        <!-- Panel Kontrol Sebelum Download -->
         <div class="print-controls no-print">
             <div style="flex-direction: column; align-items: flex-start; gap: 5px;">
                 <strong style="color:var(--text);">Langkah Persiapan:</strong>
@@ -218,10 +144,10 @@
 </div>
 
 <script>
-    // ==========================================
-    // ⚠️ MASUKKAN URL WEB APP GAS ANDA DI SINI
-    // ==========================================
-    const gasUrl = "https://script.google.com/macros/s/AKfycbzT3l6WHm9bu9cJTlB0gFklXa8RGKeHg9tYHcaCBbxhPDpAcHHzx1hIlWVR6T_ZB_lWZQ/exec";
+    // =========================================================================
+    // ⚠️ PASTIKAN URL INI ADALAH URL DARI "DEPLOYMENT BARU" GOOGLE APPS SCRIPT
+    // =========================================================================
+    const gasUrl = "https://script.google.com/macros/s/AKfycbzNNR8ao5lJ_ze_vVemKNtDogBFFciXmtFxjVjnbf3tzebWc6TVwiteClqa00wWwDqtnw/exec";
 
     async function generateRPPM() {
         const identitas = {
@@ -256,22 +182,30 @@
 
         } catch (error) {
             console.error(error);
-            alert("Error: " + error.message);
+            alert("Koneksi ke AI Gagal. Pastikan URL GAS sudah diperbarui ke Deployment Terbaru!\nDetail Error: " + error.message);
             document.getElementById('loading').style.display = 'none';
         }
     }
 
     function renderRPPM(data) {
-        const fallback = "-";
+        // Penyaring AI Teks/Object
+        function bersihkanTeks(val) {
+            if (!val) return "-"; 
+            if (typeof val === 'object') {
+                return Object.values(val).join('\\n\\n'); 
+            }
+            return val; 
+        }
+
         const html = `
             <h3>I. IDENTITAS RPP</h3>
             <table>
-                <tr><th>Nama Penyusun</th><td>${data.nama}</td></tr>
-                <tr><th>Mata Pelajaran</th><td>${data.mapel}</td></tr>
-                <tr><th>Unit/Materi</th><td>${data.materi}</td></tr>
-                <tr><th>Alokasi Waktu</th><td>${data.waktu}</td></tr>
-                <tr><th>Fase/Kelas</th><td>${data.fase}</td></tr>
-                <tr><th>Semester</th><td>${data.semester}</td></tr>
+                <tr><th>Nama Penyusun</th><td>${bersihkanTeks(data.nama)}</td></tr>
+                <tr><th>Mata Pelajaran</th><td>${bersihkanTeks(data.mapel)}</td></tr>
+                <tr><th>Unit/Materi</th><td>${bersihkanTeks(data.materi)}</td></tr>
+                <tr><th>Alokasi Waktu</th><td>${bersihkanTeks(data.waktu)}</td></tr>
+                <tr><th>Fase/Kelas</th><td>${bersihkanTeks(data.fase)}</td></tr>
+                <tr><th>Semester</th><td>${bersihkanTeks(data.semester)}</td></tr>
             </table>
 
             <h3>II. IDENTIFIKASI</h3>
@@ -279,29 +213,29 @@
                 <tr>
                     <th>Profil Murid</th>
                     <td>
-                        <strong>Pengetahuan Awal:</strong><br><span class="ai-text">${data.profil_pengetahuan || fallback}</span><br><br>
-                        <strong>Minat Belajar:</strong><br><span class="ai-text">${data.profil_minat || fallback}</span>
+                        <strong>Pengetahuan Awal:</strong><br><span class="ai-text">${bersihkanTeks(data.profil_pengetahuan)}</span><br><br>
+                        <strong>Minat Belajar:</strong><br><span class="ai-text">${bersihkanTeks(data.profil_minat)}</span>
                     </td>
                 </tr>
                 <tr>
                     <th>Analisis Materi</th>
                     <td>
-                        <strong>Cakupan Materi:</strong><br><span class="ai-text">${data.analisis_cakupan || fallback}</span><br><br>
-                        <strong>Relevansi Kontekstual:</strong><br><span class="ai-text">${data.analisis_relevansi || fallback}</span>
+                        <strong>Cakupan Materi:</strong><br><span class="ai-text">${bersihkanTeks(data.analisis_cakupan)}</span><br><br>
+                        <strong>Relevansi Kontekstual:</strong><br><span class="ai-text">${bersihkanTeks(data.analisis_relevansi)}</span>
                     </td>
                 </tr>
                 <tr>
                     <th>Dimensi Profil Lulusan</th>
                     <td>
                         <ol type="a">
-                            <li><strong>Keimanan dan Ketaqwaan:</strong> <span class="ai-text">${data.dimensi_keimanan || fallback}</span></li>
-                            <li><strong>Kewargaan:</strong> <span class="ai-text">${data.dimensi_kewargaan || fallback}</span></li>
-                            <li><strong>Penalaran Kritis:</strong> <span class="ai-text">${data.dimensi_penalaran || fallback}</span></li>
-                            <li><strong>Kreativitas:</strong> <span class="ai-text">${data.dimensi_kreativitas || fallback}</span></li>
-                            <li><strong>Kolaborasi:</strong> <span class="ai-text">${data.dimensi_kolaborasi || fallback}</span></li>
-                            <li><strong>Kemandirian:</strong> <span class="ai-text">${data.dimensi_kemandirian || fallback}</span></li>
-                            <li><strong>Kesehatan:</strong> <span class="ai-text">${data.dimensi_kesehatan || fallback}</span></li>
-                            <li><strong>Komunikasi:</strong> <span class="ai-text">${data.dimensi_komunikasi || fallback}</span></li>
+                            <li><strong>Keimanan dan Ketaqwaan:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_keimanan)}</span></li>
+                            <li><strong>Kewargaan:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kewargaan)}</span></li>
+                            <li><strong>Penalaran Kritis:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_penalaran)}</span></li>
+                            <li><strong>Kreativitas:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kreativitas)}</span></li>
+                            <li><strong>Kolaborasi:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kolaborasi)}</span></li>
+                            <li><strong>Kemandirian:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kemandirian)}</span></li>
+                            <li><strong>Kesehatan:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_kesehatan)}</span></li>
+                            <li><strong>Komunikasi:</strong> <span class="ai-text">${bersihkanTeks(data.dimensi_komunikasi)}</span></li>
                         </ol>
                     </td>
                 </tr>
@@ -309,19 +243,16 @@
 
             <h3>III. DESAIN PEMBELAJARAN</h3>
             <table>
-                <tr><th>Capaian Pembelajaran</th><td class="ai-text">${data.capaian || fallback}</td></tr>
+                <tr><th>Capaian Pembelajaran</th><td class="ai-text">${bersihkanTeks(data.capaian)}</td></tr>
                 <tr><th>Lintas Disiplin Ilmu</th><td>-</td></tr>
-                <tr><th>Tujuan Pembelajaran</th><td class="ai-text">${data.tujuan || fallback}</td></tr>
+                <tr><th>Tujuan Pembelajaran</th><td class="ai-text">${bersihkanTeks(data.tujuan)}</td></tr>
                 <tr><th>Praktik Pedagogis</th><td>Pembelajaran kontekstual<br>Diskusi kelompok</td></tr>
                 <tr><th>Kemitraan Pembelajaran</th><td>-</td></tr>
                 <tr>
                     <th>Lingkungan Pembelajaran</th>
                     <td><strong>Ruang fisik:</strong> kelas, lab komputer<br><strong>Budaya belajar:</strong> memberikan kesempatan mengeksplorasi materi.</td>
                 </tr>
-                <tr>
-                    <th>Pemanfaatan Digital</th>
-                    <td><strong>Perencanaan:</strong> -<br><strong>Proses:</strong> -<br><strong>Asesmen:</strong> Canva</td>
-                </tr>
+                <tr><th>Pemanfaatan Digital</th><td class="ai-text">${bersihkanTeks(data.digital)}</td></tr>
             </table>
 
             <h3>IV. PENGALAMAN BELAJAR</h3>
@@ -331,14 +262,14 @@
                     <td>
                         <strong>Kegiatan Awal (bermakna)</strong><br>
                         - Guru memulai dengan salam, doa bersama, dan melakukan presensi.<br>
-                        - Memaparkan tujuan pembelajaran yang akan dicapai yaitu ${data.tujuan || fallback}<br><br>
+                        - Memaparkan tujuan pembelajaran yang akan dicapai yaitu ${bersihkanTeks(data.tujuan)}<br><br>
 
                         <strong>Kegiatan Inti</strong><br>
-                        <em>Memahami:</em><br><span class="ai-text">${data.kegiatan_memahami || fallback}</span><br><br>
-                        <em>Mengaplikasi:</em><br><span class="ai-text">${data.kegiatan_mengaplikasi || fallback}</span><br><br>
-                        <em>Merefleksi:</em><br><span class="ai-text">${data.kegiatan_merefleksi || fallback}</span><br><br>
+                        <em>Memahami:</em><br><span class="ai-text">${bersihkanTeks(data.kegiatan_memahami)}</span><br><br>
+                        <em>Mengaplikasi:</em><br><span class="ai-text">${bersihkanTeks(data.kegiatan_mengaplikasi)}</span><br><br>
+                        <em>Merefleksi:</em><br><span class="ai-text">${bersihkanTeks(data.kegiatan_merefleksi)}</span><br><br>
 
-                        <strong>Kegiatan Penutup</strong><br><span class="ai-text">${data.kegiatan_penutup || fallback}</span>
+                        <strong>Kegiatan Penutup</strong><br><span class="ai-text">${bersihkanTeks(data.kegiatan_penutup)}</span>
                     </td>
                 </tr>
             </table>
@@ -347,14 +278,14 @@
             <table>
                 <tr><th>Jenis Asesmen</th><td><strong>Teknik dan Instrumen</strong></td></tr>
                 <tr><th>1. Asesmen Awal</th><td>Pretest: kuis singkat</td></tr>
-                <tr><th>2. Asesmen Proses</th><td><strong>Observasi:</strong> <span class="ai-text">${data.asesmen_observasi || fallback}</span><br><br><strong>Penilaian Kinerja:</strong> <span class="ai-text">${data.asesmen_kinerja || fallback}</span></td></tr>
+                <tr><th>2. Asesmen Proses</th><td><strong>Observasi:</strong> <span class="ai-text">${bersihkanTeks(data.asesmen_observasi)}</span><br><br><strong>Penilaian Kinerja:</strong> <span class="ai-text">${bersihkanTeks(data.asesmen_kinerja)}</span></td></tr>
                 <tr><th>3. Asesmen Akhir</th><td>Latihan soal</td></tr>
             </table>
 
             <h3>VI. LAYANAN DIFERENSIASI</h3>
             <table>
-                <tr><th>1. Pengayaan</th><td class="ai-text">${data.pengayaan || fallback}</td></tr>
-                <tr><th>2. Remedial</th><td class="ai-text">${data.remedial || fallback}</td></tr>
+                <tr><th>1. Pengayaan</th><td class="ai-text">${bersihkanTeks(data.pengayaan)}</td></tr>
+                <tr><th>2. Remedial</th><td class="ai-text">${bersihkanTeks(data.remedial)}</td></tr>
             </table>
 
             <h3>VII. CATATAN TINDAK LANJUT</h3>
@@ -364,18 +295,17 @@
                 <div class="sig-col">
                     <p>Mengetahui,<br>Kepala Sekolah</p>
                     <div class="sig-space"></div>
-                    <p><strong>${data.kepsek}</strong></p>
+                    <p><strong>${bersihkanTeks(data.kepsek)}</strong></p>
                 </div>
                 
                 <div class="sig-col">
-                    <p>${data.tempat}, ${data.tanggal}<br>${data.jenis_guru}</p>
+                    <p>${bersihkanTeks(data.tempat)}, ${bersihkanTeks(data.tanggal)}<br>${bersihkanTeks(data.jenis_guru)}</p>
                     <div class="sig-space">
-                        <!-- Kotak Tanda Tangan -->
                         <div id="ttd-wrapper">
                             <img id="ttd-image" src="" alt="Tanda Tangan">
                         </div>
                     </div>
-                    <p><strong>${data.nama}</strong></p>
+                    <p><strong>${bersihkanTeks(data.nama)}</strong></p>
                 </div>
             </div>
         `;
@@ -383,11 +313,7 @@
         dragElement(document.getElementById("ttd-wrapper"));
     }
 
-    // ==========================================
-    // LOGIKA PAGE BREAK VIEW (Batas Halaman)
-    // ==========================================
     let isPageBreakMode = false;
-
     function togglePageBreakMode() {
         isPageBreakMode = !isPageBreakMode;
         const doc = document.getElementById('rppm-document');
@@ -407,7 +333,6 @@
 
     document.addEventListener('click', function(e) {
         if (!isPageBreakMode) return;
-        
         const doc = document.getElementById('rppm-document');
         if (doc.contains(e.target)) {
             if (e.target.classList.contains('custom-page-break')) {
@@ -417,17 +342,13 @@
             const target = e.target.closest('h3, tr, .signature-box');
             if (target) {
                 const pb = document.createElement('div');
-                pb.className = 'custom-page-break'; // Class dipanggil murni CSS saat diprint
+                pb.className = 'custom-page-break'; 
                 pb.innerHTML = '✂️ BATAS HALAMAN (Teks di bawah ini pindah ke halaman baru) - Klik untuk hapus';
                 target.parentNode.insertBefore(pb, target);
             }
         }
     });
 
-
-    // ==========================================
-    // LOGIKA TANDA TANGAN (Upload & Drag)
-    // ==========================================
     function loadSignature(event) {
         const image = document.getElementById('ttd-image');
         const wrapper = document.getElementById('ttd-wrapper');
@@ -467,30 +388,19 @@
         }
     }
 
-    // ==========================================
-    // LOGIKA PRINT & NAMA PDF DINAMIS
-    // ==========================================
     function downloadPDF() {
         if (isPageBreakMode) {
             alert("Harap selesaikan Mode Batas Halaman (klik 'Selesai Atur Batas') sebelum mencetak/save PDF.");
             return;
         }
-
-        // Trik menyimpan nama file asli tab browser (biasanya 'Generator RPPM Final')
         const originalTitle = document.title;
-        
-        // Ambil nama materi untuk jadi nama file
         let namaMateri = document.getElementById('materi').value.trim();
         namaMateri = namaMateri.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
         if(namaMateri === "") namaMateri = "Dokumen";
         
-        // Ubah judul tab browser SESAAT sebelum print dialog terbuka
         document.title = 'RPPM_' + namaMateri;
-
-        // Buka Jendela Print Bawaan Chrome
         window.print();
         
-        // Kembalikan nama tab ke aslinya setelah 1 detik (setelah dialog print muncul)
         setTimeout(() => {
             document.title = originalTitle;
         }, 1000);
