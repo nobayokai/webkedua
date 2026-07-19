@@ -187,18 +187,14 @@
         }
     }
 
-    // ========================================================
-        // FIX: PENYARING ANTI [object Object] & ANTI BOCORAN \n
-        // ========================================================
+    // Fungsi Render harus memiliki tag pembuka function
+    function renderRPPM(data) {
+        
         function bersihkanTeks(val) {
             if (!val) return "-"; 
-            
-            // 1. Jika AI mengirimkan Object, gabungkan dengan Enter asli (\n)
             if (typeof val === 'object') {
                 val = Object.values(val).join('\n\n'); 
             }
-            
-            // 2. Mengubah tulisan "\n" mentah dari AI menjadi perintah Enter asli
             return val.toString().replace(/\\n/g, '\n'); 
         }
 
