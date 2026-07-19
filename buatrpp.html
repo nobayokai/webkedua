@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator RPPM Final - Live Edit</title>
+    <title>Generator RPPM Final - Live Edit & Auto Save</title>
 
     <style>
         :root {
@@ -81,7 +81,6 @@
         .pb-mode-active .custom-page-break { height: auto; overflow: visible; padding: 8px 0; margin: 15px 0; background-color: #fee2e2; border: 2px dashed #ef4444; color: #ef4444; font-size: 0.9rem; line-height: 1.6; text-align: center; font-weight: bold; border-radius: 4px; cursor: pointer; }
         .pb-mode-active .custom-page-break:hover { background-color: #fca5a5; color: white; }
 
-        /* === FITUR BARU: LIVE EDIT STYLING === */
         .editable-text {
             outline: none;
             border-radius: 4px;
@@ -107,7 +106,6 @@
             .custom-page-break { page-break-before: always !important; break-before: page !important; }
             tr, h3, .signature-box { page-break-inside: avoid; break-inside: avoid; }
             #ttd-wrapper { border: none !important; background-color: transparent !important; resize: none !important; }
-            /* Matikan efek hover kuning saat diprint */
             .editable-text { padding: 0; margin: 0; background-color: transparent !important; box-shadow: none !important; }
         }
     </style>
@@ -167,7 +165,57 @@
     // =========================================================================
     const gasUrl = "https://script.google.com/macros/s/AKfycbzNNR8ao5lJ_ze_vVemKNtDogBFFciXmtFxjVjnbf3tzebWc6TVwiteClqa00wWwDqtnw/exec";
 
+    // =========================================================================
+    // FITUR AUTO SAVE (LOCAL STORAGE)
+    // =========================================================================
+    function saveInputData() {
+        const formData = {
+            nama: document.getElementById('nama').value,
+            mapel: document.getElementById('mapel').value,
+            materi: document.getElementById('materi').value,
+            waktu: document.getElementById('waktu').value,
+            fase: document.getElementById('fase').value,
+            semester: document.getElementById('semester').value,
+            jenis_guru: document.getElementById('jenis_guru').value,
+            kepsek: document.getElementById('kepsek').value,
+            tempat: document.getElementById('tempat').value,
+            tanggal: document.getElementById('tanggal').value
+        };
+        localStorage.setItem('rppmFormData', JSON.stringify(formData));
+    }
+
+    function loadInputData() {
+        const savedData = localStorage.getItem('rppmFormData');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            if(formData.nama) document.getElementById('nama').value = formData.nama;
+            if(formData.mapel) document.getElementById('mapel').value = formData.mapel;
+            if(formData.materi) document.getElementById('materi').value = formData.materi;
+            if(formData.waktu) document.getElementById('waktu').value = formData.waktu;
+            if(formData.fase) document.getElementById('fase').value = formData.fase;
+            if(formData.semester) document.getElementById('semester').value = formData.semester;
+            if(formData.jenis_guru) document.getElementById('jenis_guru').value = formData.jenis_guru;
+            if(formData.kepsek) document.getElementById('kepsek').value = formData.kepsek;
+            if(formData.tempat) document.getElementById('tempat').value = formData.tempat;
+            if(formData.tanggal) document.getElementById('tanggal').value = formData.tanggal;
+        }
+    }
+
+    // Jalankan load data saat halaman dimuat
+    window.addEventListener('DOMContentLoaded', loadInputData);
+
+    // Tambahkan event listener untuk memicu fungsi simpan otomatis saat input berubah
+    document.querySelectorAll('.form-grid input, .form-grid select').forEach(element => {
+        element.addEventListener('input', saveInputData);
+    });
+
+    // =========================================================================
+    // LOGIKA GENERATE RPPM (AI)
+    // =========================================================================
     async function generateRPPM() {
+        // Simpan manual sebelum memproses AI (berjaga-jaga)
+        saveInputData();
+
         const identitas = {
             nama: document.getElementById('nama').value,
             mapel: document.getElementById('mapel').value,
@@ -206,7 +254,6 @@
     }
 
     function renderRPPM(data) {
-        
         function bersihkanTeks(val) {
             if (!val) return "-"; 
             if (typeof val === 'object') {
@@ -215,7 +262,6 @@
             return val.toString().replace(/\\n/g, '\n'); 
         }
 
-        // Teks dibungkus span berkelas "editable-text" dengan atribut "contenteditable=true"
         const html = `
             <h3>I. IDENTITAS RPP</h3>
             <table>
@@ -413,7 +459,6 @@
             return;
         }
         
-        // Mematikan sementara mode edit sebelum dicetak agar tidak mengganggu layout
         const editables = document.querySelectorAll('.editable-text');
         editables.forEach(el => el.setAttribute('contenteditable', 'false'));
         
@@ -427,7 +472,6 @@
         
         setTimeout(() => {
             document.title = originalTitle;
-            // Menghidupkan kembali mode edit setelah selesai dicetak
             editables.forEach(el => el.setAttribute('contenteditable', 'true'));
         }, 1000);
     }
