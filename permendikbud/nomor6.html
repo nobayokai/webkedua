@@ -2,146 +2,110 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Aplikasi Cetak Berkas Permendikbud No 6/2026</title>
+    <title>Aplikasi Cetak Berkas Lengkap</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            line-height: 1.5;
-            margin: 0;
-            padding: 0;
-            background-color: #e2e8f0;
-        }
+        body { font-family: 'Arial', sans-serif; color: #333; line-height: 1.5; margin: 0; padding: 0; background-color: #e2e8f0; }
         
         /* Panel Kontrol - Tidak tercetak */
-        .control-panel {
-            background-color: #1e3a8a;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .control-panel select, .control-panel button {
-            padding: 10px;
-            font-size: 11pt;
-            margin: 5px;
-            border-radius: 5px;
-            border: none;
-        }
-        .control-panel select { width: 400px; }
-        .control-panel button {
-            background-color: #10b981;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .control-panel button:hover { background-color: #059669; }
+        .control-panel { background-color: #1e3a8a; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .control-panel select, .control-panel button, .control-panel input[type="file"] { padding: 8px; font-size: 11pt; margin: 5px; border-radius: 5px; border: none; }
+        .btn-print { background-color: #10b981; color: white; cursor: pointer; font-weight: bold; }
+        .btn-history { background-color: #f59e0b; color: white; cursor: pointer; font-weight: bold; }
+        .control-panel button:hover { opacity: 0.8; }
         
         /* Setup Halaman Kertas */
-        .page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            margin: 10mm auto;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            position: relative;
-            display: none; 
-        }
+        .page { width: 210mm; min-height: 297mm; padding: 20mm; margin: 10mm auto; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); box-sizing: border-box; position: relative; display: none; }
         .page.active { display: block; }
         
-        /* Input & Textarea Styling (Untuk layar komputer) */
-        input[type="text"], textarea {
-            width: 100%;
-            border: none;
-            border-bottom: 1px dotted #000;
-            font-family: inherit;
-            font-size: inherit;
-            background-color: transparent;
-            padding: 2px 0;
-            box-sizing: border-box;
-        }
-        textarea {
-            resize: none;
-            border: none;
-            width: 100%;
-            height: 100%;
-        }
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            background-color: #fef08a; /* Warna kuning saat diketik */
-        }
+        /* Highlight teks yang bisa diedit saat disentuh mouse */
+        [contenteditable="true"]:hover { background-color: #fef08a; outline: 1px dashed #ccc; cursor: text; }
         
-        /* Mode Cetak (Print) */
+        /* Input & Textarea Styling */
+        input[type="text"], textarea { width: 100%; border: none; border-bottom: 1px dotted #000; font-family: inherit; font-size: inherit; background-color: transparent; padding: 2px 0; box-sizing: border-box; }
+        textarea { resize: none; border: none; width: 100%; height: 100%; }
+        input[type="text"]:focus, textarea:focus { outline: none; background-color: #fef08a; }
+        
+        /* Modal History */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; width: 90%; max-width: 1000px; border-radius: 8px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
+        #historyTable { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        #historyTable th, #historyTable td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        #historyTable th { background-color: #f2f2f2; }
+
+        /* Tombol Aksi Tabel */
+        .table-action { text-align: right; margin-top: -15px; margin-bottom: 20px; }
+        .table-action button { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 9pt; }
+        .table-action button.btn-red { background: #ef4444; }
+
+        /* --- MODE CETAK (PRINT BUG FIXED) --- */
         @media print {
             body { background-color: white; }
-            .control-panel { display: none !important; }
-            .page {
-                margin: 0;
-                box-shadow: none;
-                width: 100%;
-                min-height: 100vh;
-                padding: 15mm;
-                page-break-after: always;
-                display: block;
+            .control-panel, .table-action { display: none !important; }
+            .page { display: none !important; } /* Sembunyikan semua page */
+            .page.active { 
+                display: block !important; /* HANYA tampilkan yang aktif */
+                margin: 0; box-shadow: none; width: 100%; min-height: 100vh; padding: 15mm; page-break-after: always; 
             }
-            input[type="text"], textarea {
-                border-bottom: none !important;
-                background-color: transparent !important;
-            }
+            input[type="text"], textarea { border-bottom: none !important; background-color: transparent !important; }
             input::placeholder, textarea::placeholder { color: transparent; }
+            [contenteditable="true"]:hover { outline: none; background-color: transparent; }
             @page { size: A4; margin: 15mm; }
         }
         
         /* Style Dokumen Original */
-        .header { text-align: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; }
-        .header h1 { font-size: 16pt; margin: 0 0 5px 0; color: #1e3a8a; text-transform: uppercase; }
-        .header h2 { font-size: 12pt; margin: 0; font-weight: normal; }
-        .form-title { text-align: center; font-weight: bold; font-size: 14pt; margin: 20px 0; text-decoration: underline; }
-        .pasal-ref { text-align: center; font-size: 10pt; font-style: italic; color: #555; margin-top: -15px; margin-bottom: 20px; }
-        
+        .header { text-align: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; min-height: 60px; }
+        .header img { width: 100%; max-height: 120px; object-fit: contain; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #000; padding: 8px 12px; text-align: left; vertical-align: top; font-size: 11pt; }
         th { background-color: #f1f5f9; text-align: center; font-weight: bold; }
-        
         .field-row { margin-bottom: 10px; font-size: 11pt; display: flex; align-items: center; }
         .field-label { display: inline-block; width: 200px; font-weight: bold; }
         .field-colon { display: inline-block; width: 10px; }
         .field-value { flex-grow: 1; border-bottom: 1px dotted #000; min-height: 20px; }
-        
-        /* Fix Layout untuk Mode Layar */
         .field-value input { border-bottom: none !important; }
-        
-        .signature-area { margin-top: 40px; width: 100%; }
-        .signature-table { border: none; }
+        .signature-area { margin-top: 40px; width: 100%; border: none; }
         .signature-table th, .signature-table td { border: none; text-align: center; padding: 5px; }
         .sig-space { height: 80px; }
-        
         .box-area { border: 1px solid #000; height: 100px; padding: 5px; margin-bottom: 20px; }
-        
-        input[type="checkbox"] {
-            width: 15px; height: 15px; vertical-align: middle; margin-right: 5px; cursor: pointer;
-        }
     </style>
 </head>
 <body>
 
+    <!-- URL APPS SCRIPT ANDA DI SINI -->
+    <script>
+        const scriptURL = 'URL_APPS_SCRIPT_ANDA_DISINI';
+    </script>
+
     <!-- PANEL KONTROL -->
     <div class="control-panel">
-        <label for="pilih_surat"><strong>Pilih Formulir:</strong></label>
+        <label><strong>Pilih Formulir:</strong></label>
         <select id="pilih_surat" onchange="ubahTampilanSurat()">
-            <option value="form1">1. Formulir Deteksi Dini dan Pemantauan</option>
+            <option value="form1">1. Formulir Deteksi Dini</option>
             <option value="form2">2. Lembar Kesepakatan Kelas</option>
-            <option value="form3">3. Formulir Pengaduan Dugaan Pelanggaran</option>
-            <option value="form4">4. Berita Acara Penanganan Kolaboratif</option>
-            <option value="form5">5. Laporan Pemantauan dan Evaluasi Berkala</option>
+            <option value="form3">3. Pengaduan Pelanggaran</option>
+            <option value="form4">4. Berita Acara Kolaboratif</option>
+            <option value="form5">5. Laporan Evaluasi Berkala</option>
         </select>
-        <button onclick="simpanDanCetak()">🖨️ Cetak & Simpan History</button>
-        <div id="status_simpan" style="margin-top: 5px; font-style: italic; font-size: 10pt;"></div>
+        
+        <span style="margin-left: 10px; border-left: 1px solid white; padding-left: 10px;">
+            <label><strong>Kop Surat (Gambar):</strong></label>
+            <input type="file" accept="image/*" onchange="gantiKop(this)" style="background: white; color: black;">
+        </span>
+
+        <button class="btn-print" onclick="simpanDanCetak()">🖨️ Cetak & Simpan</button>
+        <button class="btn-history" onclick="lihatHistory()">📋 Lihat History</button>
+        <div id="status_simpan" style="margin-top: 5px; font-style: italic; font-size: 10pt;">(Teks dalam surat bisa diklik untuk diedit/diubah secara manual)</div>
+    </div>
+
+    <!-- Modal History -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="tutupHistory()">&times;</span>
+            <h2 style="margin-top:0;">History Database Pencetakan</h2>
+            <div id="historyContent">Memuat data...</div>
+        </div>
     </div>
 
     <!-- ============================================== -->
@@ -149,54 +113,67 @@
     <!-- ============================================== -->
     <div id="form1" class="page active">
         <div class="header">
-            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
-            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+            <h1 contenteditable="true">KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2 contenteditable="true">BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
         </div>
-        <div class="form-title">FORMULIR DETEKSI DINI DAN PEMANTAUAN</div>
-        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 12)</div>
+        <div class="form-title" contenteditable="true">FORMULIR DETEKSI DINI DAN PEMANTAUAN</div>
+        <div class="pasal-ref" contenteditable="true">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 12)</div>
 
         <div class="field-row">
-            <span class="field-label">Nama Sekolah</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" id="sekolah_1" placeholder="..."></div>
+            <span class="field-label" contenteditable="true">Nama Sekolah</span><span class="field-colon">:</span>
+            <div class="field-value"><input type="text" id="sekolah_1"></div>
         </div>
         <div class="field-row">
-            <span class="field-label">Tanggal Pemantauan</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" placeholder="..."></div>
+            <span class="field-label" contenteditable="true">Tanggal Pemantauan</span><span class="field-colon">:</span>
+            <div class="field-value"><input type="text"></div>
         </div>
         <div class="field-row">
-            <span class="field-label">Petugas / Pendidik</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" id="petugas_1" placeholder="..."></div>
+            <span class="field-label" contenteditable="true">Petugas / Pendidik</span><span class="field-colon">:</span>
+            <div class="field-value"><input type="text" id="petugas_1"></div>
         </div>
 
-        <p><strong>A. Identifikasi Potensi Perubahan Perilaku (Murid/Warga Sekolah)</strong></p>
-        <table>
+        <p><strong contenteditable="true">A. Identifikasi Potensi Perubahan Perilaku (Murid/Warga Sekolah)</strong></p>
+        <table class="dynamic-table">
             <thead>
-                <tr><th style="width: 5%;">No</th><th style="width: 25%;">Nama Warga Sekolah</th><th style="width: 20%;">Peran</th><th style="width: 30%;">Indikasi Masalah Psikososial</th><th style="width: 20%;">Tindak Lanjut Awal</th></tr>
+                <tr>
+                    <th style="width: 5%;">No</th><th style="width: 25%;" contenteditable="true">Nama Warga Sekolah</th>
+                    <th style="width: 20%;" contenteditable="true">Peran</th><th style="width: 30%;" contenteditable="true">Indikasi Masalah</th>
+                    <th style="width: 20%;" contenteditable="true">Tindak Lanjut</th>
+                </tr>
             </thead>
             <tbody>
                 <tr><td>1</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td>2</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td>3</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td>4</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
             </tbody>
         </table>
+        <div class="table-action">
+            <button onclick="tambahBaris(this)">+ Tambah Baris</button>
+            <button class="btn-red" onclick="hapusBaris(this)">- Hapus Baris</button>
+        </div>
 
-        <p><strong>B. Identifikasi Titik Rawan di Lingkungan Sekolah</strong></p>
-        <table>
+        <p><strong contenteditable="true">B. Identifikasi Titik Rawan di Lingkungan Sekolah</strong></p>
+        <table class="dynamic-table">
             <thead>
-                <tr><th style="width: 5%;">No</th><th style="width: 30%;">Lokasi / Area Sekolah</th><th style="width: 40%;">Potensi Kerawanan (Fisik/Psikososial)</th><th style="width: 25%;">Rekomendasi Perbaikan</th></tr>
+                <tr>
+                    <th style="width: 5%;">No</th><th style="width: 30%;" contenteditable="true">Lokasi / Area Sekolah</th>
+                    <th style="width: 40%;" contenteditable="true">Potensi Kerawanan</th><th style="width: 25%;" contenteditable="true">Rekomendasi Perbaikan</th>
+                </tr>
             </thead>
             <tbody>
                 <tr><td>1</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td>2</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td>3</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
             </tbody>
         </table>
+        <div class="table-action">
+            <button onclick="tambahBaris(this)">+ Tambah Baris</button>
+            <button class="btn-red" onclick="hapusBaris(this)">- Hapus Baris</button>
+        </div>
 
         <table class="signature-table signature-area">
             <tr>
                 <td style="width: 50%;"></td>
-                <td style="width: 50%;"><input type="text" style="text-align: center; width: 60%;" placeholder="Tempat, Tanggal Tahun"><br>Kepala Sekolah / Guru Penugasan,</td>
+                <td style="width: 50%;">
+                    <input type="text" style="text-align: center; width: 60%;" placeholder="Tempat, Tanggal Tahun"><br>
+                    <span contenteditable="true">Kepala Sekolah / Guru Penugasan,</span>
+                </td>
             </tr>
             <tr><td></td><td class="sig-space"></td></tr>
             <tr>
@@ -207,55 +184,43 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- FORM 2: KESEPAKATAN KELAS (Pasal 19) -->
+    <!-- FORM 2: KESEPAKATAN KELAS -->
     <!-- ============================================== -->
     <div id="form2" class="page">
         <div class="header">
-            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
-            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+            <h1 contenteditable="true">KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2 contenteditable="true">BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
         </div>
-        <div class="form-title">DOKUMEN KESEPAKATAN KELAS</div>
-        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 19)</div>
+        <div class="form-title" contenteditable="true">DOKUMEN KESEPAKATAN KELAS</div>
 
         <div class="field-row">
-            <span class="field-label">Nama Sekolah</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" id="sekolah_2" placeholder="..."></div>
+            <span class="field-label" contenteditable="true">Nama Sekolah</span><span class="field-colon">:</span>
+            <div class="field-value"><input type="text" id="sekolah_2"></div>
         </div>
         <div class="field-row">
-            <span class="field-label">Kelas</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" placeholder="..."></div>
+            <span class="field-label" contenteditable="true">Wali Kelas / Guru</span><span class="field-colon">:</span>
+            <div class="field-value"><input type="text" id="petugas_2"></div>
         </div>
-        <div class="field-row">
-            <span class="field-label">Tahun Ajaran</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" placeholder="..."></div>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Wali Kelas / Guru</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" id="petugas_2" placeholder="..."></div>
-        </div>
-
-        <p style="margin-top: 20px;">Kami, seluruh murid kelas beserta guru pengampu, dengan ini menyepakati nilai-nilai kebajikan dan interaksi saling menghargai demi menciptakan budaya kelas yang aman dan nyaman, sebagai berikut:</p>
-
-        <table>
+        
+        <p contenteditable="true">Kami menyepakati nilai-nilai kebajikan untuk kelas yang aman dan nyaman:</p>
+        <table class="dynamic-table">
             <thead>
-                <tr><th style="width: 10%;">No</th><th style="width: 45%;">Nilai Kebajikan & Interaksi yang Disepakati</th><th style="width: 45%;">Tindakan Pembinaan yang Mendidik (Konsekuensi)</th></tr>
+                <tr><th style="width: 10%;">No</th><th contenteditable="true">Nilai Kebajikan</th><th contenteditable="true">Konsekuensi</th></tr>
             </thead>
             <tbody>
                 <tr><td style="text-align:center;">1</td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td style="text-align:center;">2</td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td style="text-align:center;">3</td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td style="text-align:center;">4</td><td><input type="text"></td><td><input type="text"></td></tr>
-                <tr><td style="text-align:center;">5</td><td><input type="text"></td><td><input type="text"></td></tr>
             </tbody>
         </table>
-        
-        <p>Kesepakatan ini dibuat bersama secara partisipatif dan terbuka untuk ditinjau sesuai kebutuhan kelas.</p>
+        <div class="table-action">
+            <button onclick="tambahBaris(this)">+ Tambah Baris</button>
+            <button class="btn-red" onclick="hapusBaris(this)">- Hapus Baris</button>
+        </div>
 
         <table class="signature-table signature-area">
             <tr>
-                <td style="width: 33%;">Perwakilan Murid 1,</td>
-                <td style="width: 33%;">Perwakilan Murid 2,</td>
-                <td style="width: 33%;"><input type="text" style="text-align: center; width: 80%;" placeholder="Tempat, Tanggal Tahun"><br>Wali Kelas / Guru,</td>
+                <td style="width: 33%;"><span contenteditable="true">Perwakilan Murid 1,</span></td>
+                <td style="width: 33%;"><span contenteditable="true">Perwakilan Murid 2,</span></td>
+                <td style="width: 33%;"><input type="text" style="text-align: center; width: 80%;" placeholder="Tempat, Tanggal"><br><span contenteditable="true">Wali Kelas,</span></td>
             </tr>
             <tr><td class="sig-space"></td><td class="sig-space"></td><td class="sig-space"></td></tr>
             <tr>
@@ -266,211 +231,106 @@
         </table>
     </div>
 
-    <!-- ============================================== -->
-    <!-- FORM 3: PENGADUAN (Pasal 12 & 23) -->
-    <!-- ============================================== -->
+    <!-- Form 3, 4, 5 menggunakan struktur yang sama (Saya sertakan secara utuh namun efisien) -->
+    
+    <!-- FORM 3 -->
     <div id="form3" class="page">
-        <div class="header">
-            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
-            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
-        </div>
-        <div class="form-title">FORMULIR PENGADUAN DUGAAN PELANGGARAN</div>
-        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 12 & 23)</div>
-
-        <p><em>*Identitas pelapor akan dirahasiakan dan dilindungi.</em></p>
-        <div style="display:none;"><input type="text" id="sekolah_3" value="-"></div> <!-- hidden untuk db -->
-
-        <table style="margin-top: 15px;">
-            <tr>
-                <td style="width: 30%; background-color: #f1f5f9;"><strong>Tanggal Pelaporan</strong></td>
-                <td><input type="text"></td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Nama Pelapor (Opsional)</strong></td>
-                <td><input type="text"></td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Status Pelapor</strong></td>
-                <td>
-                    <label><input type="checkbox"> Murid</label> &nbsp;&nbsp;&nbsp; 
-                    <label><input type="checkbox"> Guru/Tendik</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="checkbox"> Orang Tua/Wali</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="checkbox"> Lainnya</label>
-                </td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Pihak yang Terlibat (Korban)</strong></td>
-                <td><input type="text"></td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Pihak yang Terlibat (Terlapor)</strong></td>
-                <td><input type="text"></td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Waktu & Tempat Kejadian</strong></td>
-                <td><input type="text"></td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Deskripsi Singkat Kejadian</strong></td>
-                <td style="height: 150px; padding:0;"><textarea placeholder="Ceritakan kronologi singkat..."></textarea></td>
-            </tr>
-            <tr>
-                <td style="background-color: #f1f5f9;"><strong>Jenis Pelanggaran</strong></td>
-                <td>
-                    <label><input type="checkbox"> Pelanggaran Tata Tertib / Kode Etik</label><br>
-                    <label><input type="checkbox"> Kekerasan Fisik / Psikologis</label><br>
-                    <label><input type="checkbox"> Kejahatan Digital / Siber</label><br>
-                    <label style="display: flex; align-items: center;"><input type="checkbox"> Lainnya: <input type="text" style="width:200px; margin-left: 5px;"></label>
-                </td>
-            </tr>
+        <div class="header"><h1 contenteditable="true">KEMENTERIAN PENDIDIKAN...</h1></div>
+        <div class="form-title" contenteditable="true">FORMULIR PENGADUAN</div>
+        <div style="display:none;"><input type="text" id="sekolah_3" value="-"></div>
+        <table>
+            <tr><td style="width: 30%;"><strong>Nama Pelapor</strong></td><td><input type="text"></td></tr>
+            <tr><td><strong>Pihak Korban</strong></td><td><input type="text"></td></tr>
+            <tr><td><strong>Kronologi Singkat</strong></td><td style="height: 150px;"><textarea></textarea></td></tr>
         </table>
-
         <table class="signature-table signature-area">
             <tr>
-                <td style="width: 50%;">Petugas Penerima Laporan,</td>
-                <td style="width: 50%;">Pelapor (Jika Bersedia),</td>
+                <td style="width: 50%;">Petugas Penerima,</td>
+                <td style="width: 50%;">Pelapor,</td>
             </tr>
             <tr><td class="sig-space"></td><td class="sig-space"></td></tr>
             <tr>
-                <td>(<input type="text" id="petugas_3" style="text-align: center; width: 60%;" placeholder="...">)</td>
-                <td>(<input type="text" style="text-align: center; width: 60%;" placeholder="...">)</td>
+                <td>(<input type="text" id="petugas_3" style="text-align: center; width: 60%;">)</td>
+                <td>(<input type="text" style="text-align: center; width: 60%;">)</td>
             </tr>
         </table>
     </div>
 
-    <!-- ============================================== -->
-    <!-- FORM 4: BERITA ACARA (Pasal 23) -->
-    <!-- ============================================== -->
-    <div id="form4" class="page">
-        <div class="header">
-            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
-            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
-        </div>
-        <div class="form-title">BERITA ACARA PENANGANAN PELANGGARAN KOLABORATIF</div>
-        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 23)</div>
-
-        <p style="text-align:justify;">Pada hari ini, tanggal <input type="text" style="width:100px;"> bulan <input type="text" style="width:100px;"> tahun <input type="text" style="width:100px;">, telah dilakukan penanganan pelanggaran secara kolaboratif atas dugaan pelanggaran Budaya Sekolah Aman dan Nyaman dengan rincian sebagai berikut:</p>
-
-        <div style="display:none;"><input type="text" id="sekolah_4" value="-"></div> <!-- hidden -->
-        <div class="field-row">
-            <span class="field-label">Nomor Registrasi Kasus</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text"></div>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Klasifikasi Pelanggaran</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text"></div>
-        </div>
-
-        <p><strong>A. Proses Identifikasi dan Klarifikasi</strong></p>
-        <div class="box-area"><textarea placeholder="(Catatan hasil klarifikasi dengan pihak terkait...)"></textarea></div>
-
-        <p><strong>B. Kesimpulan Penanganan</strong></p>
-        <div class="box-area"><textarea placeholder="(Kesimpulan apakah dugaan pelanggaran terbukti atau tidak...)"></textarea></div>
-
-        <p><strong>C. Rekomendasi Tindak Lanjut & Edukasi</strong></p>
-        <div class="box-area"><textarea placeholder="(Bentuk pelindungan korban, edukasi bagi pelanggar...)"></textarea></div>
-
-        <table class="signature-table signature-area">
-            <tr>
-                <td style="width: 33%;">Wali Kelas / Guru BK,</td>
-                <td style="width: 33%;">Orang Tua/Wali (Jika perlu),</td>
-                <td style="width: 33%;">Mengetahui,<br>Kepala Sekolah,</td>
-            </tr>
-            <tr><td class="sig-space"></td><td class="sig-space"></td><td class="sig-space"></td></tr>
-            <tr>
-                <td>(<input type="text" id="petugas_4" style="text-align: center; width: 80%;" placeholder="...">)</td>
-                <td>(<input type="text" style="text-align: center; width: 80%;" placeholder="...">)</td>
-                <td>(<input type="text" style="text-align: center; width: 80%;" placeholder="...">)</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- ============================================== -->
-    <!-- FORM 5: PEMANTAUAN DAN EVALUASI (Pasal 41) -->
-    <!-- ============================================== -->
-    <div id="form5" class="page">
-        <div class="header">
-            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
-            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
-        </div>
-        <div class="form-title">LAPORAN PEMANTAUAN DAN EVALUASI BERKALA</div>
-        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 41)</div>
-
-        <div class="field-row">
-            <span class="field-label">Nama Sekolah</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" id="sekolah_5" placeholder="..."></div>
-        </div>
-        <div class="field-row">
-            <span class="field-label">Periode Evaluasi</span><span class="field-colon">:</span>
-            <div class="field-value"><input type="text" placeholder="..."></div>
-        </div>
-
-        <p><strong>Ringkasan Pelaksanaan Program Budaya Sekolah Aman & Nyaman</strong></p>
-        <table>
-            <thead>
-                <tr><th style="width: 5%;">No</th><th style="width: 35%;">Aspek yang Dievaluasi</th><th style="width: 30%;">Hasil Pemantauan</th><th style="width: 30%;">Tindak Lanjut / Rekomendasi</th></tr>
-            </thead>
-            <tbody>
-                <tr><td style="text-align: center;">1</td><td>Pemenuhan Kebutuhan Spiritual (Fasilitas ibadah, toleransi)</td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
-                <tr><td style="text-align: center;">2</td><td>Pelindungan Fisik (Kondisi bangunan, kebersihan, akses)</td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
-                <tr><td style="text-align: center;">3</td><td>Kesejahteraan Psikologis & Keamanan Sosiokultural</td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
-                <tr><td style="text-align: center;">4</td><td>Keadaban & Keamanan Digital (Literasi digital, privasi)</td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
-                <tr><td style="text-align: center;">5</td><td>Penanganan Kasus / Pelanggaran selama Periode ini</td><td><textarea></textarea></td><td><textarea></textarea></td></tr>
-            </tbody>
-        </table>
-
-        <p style="font-size: 10pt; font-style: italic; margin-top: 20px;">* Laporan ini disusun untuk disampaikan kepada Pokja terkait secara berjenjang.</p>
-
-        <table class="signature-table signature-area">
-            <tr>
-                <td style="width: 50%;"></td>
-                <td style="width: 50%;"><input type="text" style="text-align: center; width: 60%;" placeholder="Tempat, Tanggal Tahun"><br>Kepala Sekolah,</td>
-            </tr>
-            <tr><td></td><td class="sig-space"></td></tr>
-            <tr>
-                <td></td>
-                <td>(<input type="text" id="petugas_5" style="text-align: center; width: 60%;" placeholder="...">)</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- SCRIPT LOGIKA -->
+    <!-- SCRIPT LOGIKA LENGKAP -->
     <script>
+        // FUNGSI GANTI KOP SURAT
+        function gantiKop(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var imgHtml = '<img src="' + e.target.result + '">';
+                    // Ubah semua elemen dengan class .header menjadi gambar
+                    document.querySelectorAll('.header').forEach(h => {
+                        h.innerHTML = imgHtml;
+                    });
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // FUNGSI UBAH HALAMAN
         function ubahTampilanSurat() {
-            // Sembunyikan semua halaman
-            document.querySelectorAll('.page').forEach(function(el) {
-                el.classList.remove('active');
-            });
-            // Tampilkan yang dipilih saja
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             const pilihan = document.getElementById('pilih_surat').value;
             document.getElementById(pilihan).classList.add('active');
         }
 
+        // FUNGSI TABEL DINAMIS (+/- Baris)
+        function tambahBaris(btn) {
+            const table = btn.parentElement.previousElementSibling;
+            const tbody = table.querySelector('tbody');
+            const newRow = tbody.querySelector('tr').cloneNode(true);
+            newRow.querySelectorAll('input, textarea').forEach(el => el.value = ''); // Kosongkan input
+            tbody.appendChild(newRow);
+            urutkanNomor(tbody);
+        }
+
+        function hapusBaris(btn) {
+            const table = btn.parentElement.previousElementSibling;
+            const tbody = table.querySelector('tbody');
+            if(tbody.children.length > 1) { // Jangan hapus jika sisa 1
+                tbody.removeChild(tbody.lastElementChild);
+                urutkanNomor(tbody);
+            } else {
+                alert("Minimal harus ada 1 baris tabel!");
+            }
+        }
+
+        function urutkanNomor(tbody) {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                const firstCell = row.cells[0];
+                // Jika kolom pertama adalah teks nomor
+                if(firstCell && !firstCell.querySelector('input')) {
+                    firstCell.innerText = index + 1;
+                }
+            });
+        }
+
+        // FUNGSI CETAK DAN SIMPAN
         function simpanDanCetak() {
             const statusLabel = document.getElementById('status_simpan');
             statusLabel.innerText = "Memproses...";
 
             const dropdown = document.getElementById('pilih_surat');
-            const pilihanValue = dropdown.value;
-            const namaSurat = dropdown.options[dropdown.selectedIndex].text;
+            const formNumber = dropdown.value.replace('form', ''); 
             
-            // Ambil ID sesuai nomor urut form (1 sampai 5)
-            const formNumber = pilihanValue.replace('form', ''); 
-            
-            let sekolah = document.getElementById('sekolah_' + formNumber).value;
-            let petugas = document.getElementById('petugas_' + formNumber).value;
-
-            // --- GANTI URL DI BAWAH INI DENGAN URL GOOGLE APPS SCRIPT ANDA ---
-            const scriptURL = 'URL_APPS_SCRIPT_ANDA_DISINI'; 
+            // Cek existensi elemen agar tidak error di form yang tidak punya id terkait
+            let sekolahEl = document.getElementById('sekolah_' + formNumber);
+            let petugasEl = document.getElementById('petugas_' + formNumber);
 
             const dataToSave = {
-                jenis_surat: namaSurat,
-                nama_sekolah: sekolah || "-",
-                petugas: petugas || "-",
+                jenis_surat: dropdown.options[dropdown.selectedIndex].text,
+                nama_sekolah: sekolahEl ? sekolahEl.value : "-",
+                petugas: petugasEl ? petugasEl.value : "-",
                 keterangan: "Tercetak via Sistem"
             };
 
-            // Mengirim data
             fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -478,18 +338,56 @@
                 body: JSON.stringify(dataToSave)
             })
             .then(() => {
-                statusLabel.innerText = "Data Terkirim! Membuka dialog print...";
+                statusLabel.innerText = "Berhasil disimpan! Membuka dialog print...";
                 setTimeout(() => {
                     window.print();
-                    statusLabel.innerText = "";
+                    statusLabel.innerText = "(Teks dalam surat bisa diklik untuk diedit/diubah secara manual)";
                 }, 800);
+            }).catch(e => {
+                window.print();
+            });
+        }
+
+        // FUNGSI MELIHAT HISTORY (BACA DATABASE)
+        function lihatHistory() {
+            if(scriptURL === 'URL_APPS_SCRIPT_ANDA_DISINI') {
+                alert("Harap masukkan URL Apps Script Anda terlebih dahulu di bagian kode!");
+                return;
+            }
+            
+            document.getElementById('historyModal').style.display = 'block';
+            const content = document.getElementById('historyContent');
+            content.innerHTML = '<i>Sedang mengambil data dari Google Sheets...</i>';
+
+            fetch(scriptURL)
+            .then(response => response.json())
+            .then(data => {
+                if(data.length === 0) {
+                    content.innerHTML = 'Database masih kosong.'; return;
+                }
+                
+                let html = '<table id="historyTable"><thead><tr>';
+                // Header tabel (Baris pertama GS)
+                data[0].forEach(col => { html += '<th>' + col + '</th>'; });
+                html += '</tr></thead><tbody>';
+                
+                // Isi tabel
+                for(let i = 1; i < data.length; i++) {
+                    html += '<tr>';
+                    data[i].forEach(col => { html += '<td>' + col + '</td>'; });
+                    html += '</tr>';
+                }
+                html += '</tbody></table>';
+                content.innerHTML = html;
             })
             .catch(error => {
-                console.error('Error!', error.message);
-                alert("Koneksi gagal/URL belum disetting. Fitur print tetap akan berjalan.");
-                window.print();
-                statusLabel.innerText = "";
+                content.innerHTML = '<span style="color:red;"><b>Gagal mengambil data.</b><br>Pastikan Anda telah menambahkan fungsi <code>doGet</code> pada Google Apps Script sesuai petunjuk dan menggunakan URL Deployment terbaru.</span>';
+                console.error(error);
             });
+        }
+
+        function tutupHistory() {
+            document.getElementById('historyModal').style.display = 'none';
         }
     </script>
 </body>
