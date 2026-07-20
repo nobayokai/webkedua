@@ -1,0 +1,515 @@
+html_content = """<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Berkas Cetak Permendikbud No 6 Tahun 2026</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            background-color: #e2e8f0;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            page-break-after: always;
+            position: relative;
+        }
+        @media print {
+            body { background-color: white; }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                min-height: 100vh;
+                padding: 15mm;
+                page-break-after: always;
+            }
+            @page { size: A4; margin: 15mm; }
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #1e3a8a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 16pt;
+            margin: 0 0 5px 0;
+            color: #1e3a8a;
+            text-transform: uppercase;
+        }
+        .header h2 {
+            font-size: 12pt;
+            margin: 0;
+            font-weight: normal;
+        }
+        .form-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            margin: 20px 0;
+            text-decoration: underline;
+        }
+        .pasal-ref {
+            text-align: center;
+            font-size: 10pt;
+            font-style: italic;
+            color: #555;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px 12px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 11pt;
+        }
+        th {
+            background-color: #f1f5f9;
+            text-align: center;
+            font-weight: bold;
+        }
+        .field-row {
+            margin-bottom: 10px;
+            font-size: 11pt;
+        }
+        .field-label {
+            display: inline-block;
+            width: 200px;
+            font-weight: bold;
+        }
+        .field-colon {
+            display: inline-block;
+            width: 10px;
+        }
+        .field-value {
+            display: inline-block;
+            border-bottom: 1px dotted #000;
+            width: calc(100% - 220px);
+            min-height: 20px;
+        }
+        .signature-area {
+            margin-top: 40px;
+            width: 100%;
+        }
+        .signature-table {
+            width: 100%;
+            border: none;
+        }
+        .signature-table th, .signature-table td {
+            border: none;
+            text-align: center;
+            padding: 5px;
+        }
+        .sig-space {
+            height: 80px;
+        }
+        .checkbox {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 1px solid #000;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+        .cover-title {
+            font-size: 24pt;
+            color: #1e3a8a;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .cover-subtitle {
+            font-size: 14pt;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER PAGE -->
+    <div class="page cover-page" style="padding-top: 100px;">
+        <div class="cover-title">KUMPULAN FORMULIR & BERKAS<br>BUDAYA SEKOLAH AMAN DAN NYAMAN</div>
+        <div class="cover-subtitle">
+            Berdasarkan Peraturan Menteri Pendidikan Dasar dan Menengah<br>
+            Republik Indonesia Nomor 6 Tahun 2026
+        </div>
+        <div style="margin-top: 100px; text-align: left; width: 60%; margin-left: auto; margin-right: auto; font-size: 12pt; line-height: 2;">
+            <strong>Daftar Isi Berkas Cetak:</strong>
+            <ol>
+                <li>Formulir Deteksi Dini dan Pemantauan (Pasal 12)</li>
+                <li>Lembar Kesepakatan Kelas (Pasal 19)</li>
+                <li>Formulir Pengaduan Dugaan Pelanggaran (Pasal 12 & 23)</li>
+                <li>Berita Acara Penanganan Pelanggaran Kolaboratif (Pasal 23)</li>
+                <li>Laporan Pemantauan dan Evaluasi Berkala (Pasal 41)</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- FORM 1: DETEKSI DINI -->
+    <div class="page">
+        <div class="header">
+            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+        </div>
+        <div class="form-title">FORMULIR DETEKSI DINI DAN PEMANTAUAN</div>
+        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 12)</div>
+
+        <div class="field-row">
+            <span class="field-label">Nama Sekolah</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Tanggal Pemantauan</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Petugas / Pendidik</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+
+        <p><strong>A. Identifikasi Potensi Perubahan Perilaku (Murid/Warga Sekolah)</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">No</th>
+                    <th style="width: 25%;">Nama Warga Sekolah</th>
+                    <th style="width: 20%;">Peran (Murid/Guru/dll)</th>
+                    <th style="width: 30%;">Indikasi Masalah Psikososial / Potensi Gangguan</th>
+                    <th style="width: 20%;">Tindak Lanjut Awal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>3</td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>4</td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <p><strong>B. Identifikasi Titik Rawan di Lingkungan Sekolah</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">No</th>
+                    <th style="width: 30%;">Lokasi / Area Sekolah</th>
+                    <th style="width: 40%;">Potensi Kerawanan (Fisik/Psikososial)</th>
+                    <th style="width: 25%;">Rekomendasi Perbaikan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td></td><td></td><td></td></tr>
+                <tr><td>2</td><td></td><td></td><td></td></tr>
+                <tr><td>3</td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <table class="signature-table signature-area">
+            <tr>
+                <td style="width: 50%;"></td>
+                <td style="width: 50%;">....................., .......................... 20....<br>Kepala Sekolah / Guru Penugasan,</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="sig-space"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(_________________________________)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- FORM 2: KESEPAKATAN KELAS -->
+    <div class="page">
+        <div class="header">
+            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+        </div>
+        <div class="form-title">DOKUMEN KESEPAKATAN KELAS</div>
+        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 19)</div>
+
+        <div class="field-row">
+            <span class="field-label">Nama Sekolah</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Kelas</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Tahun Ajaran</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Wali Kelas / Guru</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+
+        <p style="margin-top: 20px;">Kami, seluruh murid kelas beserta guru pengampu, dengan ini menyepakati nilai-nilai kebajikan dan interaksi saling menghargai demi menciptakan budaya kelas yang aman dan nyaman, sebagai berikut:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">No</th>
+                    <th style="width: 45%;">Nilai Kebajikan & Interaksi yang Disepakati</th>
+                    <th style="width: 45%;">Tindakan Pembinaan yang Mendidik (Konsekuensi)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td style="text-align:center;">1</td><td style="height:40px;"></td><td></td></tr>
+                <tr><td style="text-align:center;">2</td><td style="height:40px;"></td><td></td></tr>
+                <tr><td style="text-align:center;">3</td><td style="height:40px;"></td><td></td></tr>
+                <tr><td style="text-align:center;">4</td><td style="height:40px;"></td><td></td></tr>
+                <tr><td style="text-align:center;">5</td><td style="height:40px;"></td><td></td></tr>
+            </tbody>
+        </table>
+        
+        <p>Kesepakatan ini dibuat bersama secara partisipatif dan terbuka untuk ditinjau sesuai kebutuhan kelas.</p>
+
+        <table class="signature-table signature-area">
+            <tr>
+                <td style="width: 33%;">Perwakilan Murid 1,</td>
+                <td style="width: 33%;">Perwakilan Murid 2,</td>
+                <td style="width: 33%;">....................., .......................... 20....<br>Wali Kelas / Guru,</td>
+            </tr>
+            <tr>
+                <td class="sig-space"></td>
+                <td class="sig-space"></td>
+                <td class="sig-space"></td>
+            </tr>
+            <tr>
+                <td>(____________________)</td>
+                <td>(____________________)</td>
+                <td>(____________________)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- FORM 3: PENGADUAN -->
+    <div class="page">
+        <div class="header">
+            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+        </div>
+        <div class="form-title">FORMULIR PENGADUAN DUGAAN PELANGGARAN</div>
+        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 12 & 23)</div>
+
+        <p><em>*Identitas pelapor akan dirahasiakan dan dilindungi.</em></p>
+
+        <table style="margin-top: 15px;">
+            <tr>
+                <td style="width: 30%; background-color: #f1f5f9;"><strong>Tanggal Pelaporan</strong></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Nama Pelapor (Opsional)</strong></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Status Pelapor</strong></td>
+                <td>
+                    <span class="checkbox"></span> Murid &nbsp;&nbsp;&nbsp; 
+                    <span class="checkbox"></span> Guru / Tenaga Kependidikan &nbsp;&nbsp;&nbsp;
+                    <span class="checkbox"></span> Orang Tua/Wali &nbsp;&nbsp;&nbsp;
+                    <span class="checkbox"></span> Lainnya
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Pihak yang Terlibat (Korban)</strong></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Pihak yang Terlibat (Terlapor)</strong></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Waktu & Tempat Kejadian</strong></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Deskripsi Singkat Kejadian</strong></td>
+                <td style="height: 150px;"></td>
+            </tr>
+            <tr>
+                <td style="background-color: #f1f5f9;"><strong>Jenis Pelanggaran</strong></td>
+                <td>
+                    <span class="checkbox"></span> Pelanggaran Tata Tertib / Kode Etik <br>
+                    <span class="checkbox"></span> Kekerasan Fisik / Psikologis <br>
+                    <span class="checkbox"></span> Kejahatan Digital / Siber <br>
+                    <span class="checkbox"></span> Lainnya: .......................................
+                </td>
+            </tr>
+        </table>
+
+        <table class="signature-table signature-area">
+            <tr>
+                <td style="width: 50%;">Petugas Penerima Laporan,</td>
+                <td style="width: 50%;">Pelapor (Jika Bersedia),</td>
+            </tr>
+            <tr>
+                <td class="sig-space"></td>
+                <td class="sig-space"></td>
+            </tr>
+            <tr>
+                <td>(_________________________________)</td>
+                <td>(_________________________________)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- FORM 4: BERITA ACARA -->
+    <div class="page">
+        <div class="header">
+            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+        </div>
+        <div class="form-title">BERITA ACARA PENANGANAN PELANGGARAN KOLABORATIF</div>
+        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 23)</div>
+
+        <p>Pada hari ini, tanggal ........................................ bulan .................................... tahun ................................., telah dilakukan penanganan pelanggaran secara kolaboratif atas dugaan pelanggaran Budaya Sekolah Aman dan Nyaman dengan rincian sebagai berikut:</p>
+
+        <div class="field-row">
+            <span class="field-label">Nomor Registrasi Kasus</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Klasifikasi Pelanggaran</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+
+        <p><strong>A. Proses Identifikasi dan Klarifikasi</strong></p>
+        <div style="border: 1px solid #000; height: 100px; padding: 10px; margin-bottom: 20px;">
+            (Catatan hasil klarifikasi dengan pihak terkait...)
+        </div>
+
+        <p><strong>B. Kesimpulan Penanganan</strong></p>
+        <div style="border: 1px solid #000; height: 100px; padding: 10px; margin-bottom: 20px;">
+            (Kesimpulan apakah dugaan pelanggaran terbukti atau tidak...)
+        </div>
+
+        <p><strong>C. Rekomendasi Tindak Lanjut & Edukasi</strong></p>
+        <div style="border: 1px solid #000; height: 100px; padding: 10px; margin-bottom: 20px;">
+            (Bentuk pelindungan korban, edukasi bagi pelanggar, dan/atau rujukan ke instansi lain jika diperlukan sesuai Pasal 24...)
+        </div>
+
+        <table class="signature-table signature-area">
+            <tr>
+                <td style="width: 33%;">Wali Kelas / Guru BK,</td>
+                <td style="width: 33%;">Orang Tua/Wali (Jika diperlukan),</td>
+                <td style="width: 33%;">Mengetahui,<br>Kepala Sekolah,</td>
+            </tr>
+            <tr>
+                <td class="sig-space"></td>
+                <td class="sig-space"></td>
+                <td class="sig-space"></td>
+            </tr>
+            <tr>
+                <td>(____________________)</td>
+                <td>(____________________)</td>
+                <td>(____________________)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- FORM 5: PEMANTAUAN DAN EVALUASI -->
+    <div class="page">
+        <div class="header">
+            <h1>KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH</h1>
+            <h2>BUDAYA SEKOLAH AMAN DAN NYAMAN</h2>
+        </div>
+        <div class="form-title">LAPORAN PEMANTAUAN DAN EVALUASI BERKALA</div>
+        <div class="pasal-ref">(Berdasarkan Permendikbud No. 6 Tahun 2026, Pasal 41)</div>
+
+        <div class="field-row">
+            <span class="field-label">Nama Sekolah</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">Periode Evaluasi</span><span class="field-colon">:</span><span class="field-value"></span>
+        </div>
+
+        <p><strong>Ringkasan Pelaksanaan Program Budaya Sekolah Aman & Nyaman</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">No</th>
+                    <th style="width: 35%;">Aspek yang Dievaluasi</th>
+                    <th style="width: 30%;">Hasil Pemantauan</th>
+                    <th style="width: 30%;">Tindak Lanjut / Rekomendasi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: center;">1</td>
+                    <td>Pemenuhan Kebutuhan Spiritual (Fasilitas ibadah, toleransi)</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">2</td>
+                    <td>Pelindungan Fisik (Kondisi bangunan, kebersihan, akses disabilitas)</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">3</td>
+                    <td>Kesejahteraan Psikologis & Keamanan Sosiokultural</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">4</td>
+                    <td>Keadaban & Keamanan Digital (Literasi digital, privasi)</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">5</td>
+                    <td>Penanganan Kasus / Pelanggaran selama Periode ini</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 10pt; font-style: italic; margin-top: 20px;">
+            * Laporan ini disusun untuk disampaikan kepada Pokja terkait secara berjenjang.
+        </p>
+
+        <table class="signature-table signature-area">
+            <tr>
+                <td style="width: 50%;"></td>
+                <td style="width: 50%;">....................., .......................... 20....<br>Kepala Sekolah,</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="sig-space"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(_________________________________)</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
+"""
+
+with open("Berkas_Cetak_Permendikbud_No_6_Tahun_2026.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("file saved: Berkas_Cetak_Permendikbud_No_6_Tahun_2026.html")
