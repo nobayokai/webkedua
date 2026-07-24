@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Nilai Siswa</title>
+    <style>
+        :root {
+            --bg-blue: #b4c6e7;
+            --bg-orange: #f8cbad;
+            --bg-yellow: #ffe699;
+            --bg-green: #c6e0b4;
+            --bg-header: #f4b084;
+            --text-dark: #1f2937;
+            --border-color: #8c8c8c;
+        }
+
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: #f3f4f6; 
+            margin: 0; 
+            padding: 20px; 
+            color: var(--text-dark); 
+            font-size: 12px;
+        }
+
+        .container { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            max-width: 100%; 
+            overflow-x: auto;
+        }
+
+        /* HEADER INFO */
+        .kop-nilai { text-align: center; margin-bottom: 20px; }
+        .kop-nilai h1 { margin: 0; background: var(--bg-header); padding: 5px; font-size: 18px; text-transform: uppercase; font-weight: bold; border: 1px solid var(--border-color);}
+        .kop-nilai h2 { margin: 5px 0 15px 0; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+
+        .info-grid { display: grid; grid-template-columns: 120px 1fr; gap: 5px; font-weight: bold; margin-bottom: 15px; font-size: 13px;}
+        .info-grid div { display: flex; align-items: center; }
+        
+        .toolbar { display: flex; gap: 10px; margin-bottom: 15px; background: #f9fafb; padding: 10px; border-radius: 8px; border: 1px solid #e5e7eb;}
+        .toolbar select, .toolbar input { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-family: inherit; font-size: 12px; font-weight: bold;}
+        .btn-load { background: #3b82f6; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .btn-load:hover { background: #2563eb; }
+        .btn-save { background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .btn-save:hover { background: #059669; }
+
+        /* TABEL NILAI */
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th, td { border: 1px solid var(--border-color); padding: 4px; text-align: center; vertical-align: middle; }
+        th { font-size: 11px; }
+        td:nth-child(2) { text-align: left; padding-left: 8px; white-space: nowrap; font-weight: bold;} /* Kolom Nama Siswa */
+        
+        /* PEWARNAAN KOLOM */
+        .c-blue { background-color: var(--bg-blue); }
+        .c-orange { background-color: var(--bg-orange); }
+        .c-yellow { background-color: var(--bg-yellow); }
+        .c-green { background-color: var(--bg-green); }
+        .c-akhir { background-color: var(--bg-header); font-weight: bold;}
+        .c-rata { background-color: #f3f4f6; font-weight: bold;}
+
+        /* INPUT NILAI */
+        .input-nilai { 
+            width: 30px; 
+            height: 25px; 
+            border: 1px solid transparent; 
+            background: transparent; 
+            text-align: center; 
+            font-size: 12px; 
+            font-family: inherit; 
+            outline: none; 
+            color: var(--text-dark);
+            transition: 0.2s;
+        }
+        .input-nilai:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+        .input-nilai.readonly { background: transparent; cursor: default; }
+
+        /* LOADING */
+        .loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: #6b7280; }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(59,130,246,0.3); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; vertical-align: middle; margin-right: 10px;}
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* TOAST */
+        #toast { visibility: hidden; min-width: 250px; background-color: #10b981; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold; opacity: 0; transition: 0.3s; box-shadow: 0 5px 15px rgba(16,185,129,0.4);}
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="kop-nilai">
+            <h1>DAFTAR NILAI</h1>
+            <h2>TAHUN AJARAN 2024/2025</h2>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="input-sekolah" value="SDIT Hidayatut Taufiq" style="width: 200px;">
+            <select id="select-kelas">
+                <option value="">-- Pilih Kelas --</option>
+                <option value="I">Kelas I</option>
+                <option value="IIA">Kelas IIA</option>
+                <option value="IIB">Kelas IIB</option>
+                <option value="III">Kelas III</option>
+                <option value="IV">Kelas IV</option>
+                <option value="VA">Kelas VA</option>
+                <option value="VB">Kelas VB</option>
+                <option value="VI">Kelas VI</option>
+            </select>
+            <select id="select-semester">
+                <option value="1">Semester 1 (Ganjil)</option>
+                <option value="2" selected>Semester 2 (Genap)</option>
+            </select>
+            <input type="text" id="input-mapel" placeholder="Mata Pelajaran (Contoh: IPAS)">
+            
+            <button class="btn-load" onclick="loadSiswa()">⬇️ Tampilkan Siswa</button>
+            <button class="btn-save" onclick="simpanNilai()" style="margin-left: auto;">💾 Simpan Nilai</button>
+        </div>
+
+        <div class="info-grid">
+            <div>SEKOLAH</div><div>: <span id="lbl-sekolah">SDIT Hidayatut Taufiq</span></div>
+            <div>KELAS/SEMESTER</div><div>: <span id="lbl-kelas">...</span> / <span id="lbl-semester">2</span></div>
+            <div>MATA PELAJARAN</div><div>: <span id="lbl-mapel">...</span></div>
+        </div>
+
+        <div id="loader" class="loader"><div class="spinner"></div> Mengambil data siswa...</div>
+
+        <div style="overflow-x: auto;">
+            <table id="tabel-nilai">
+                <thead>
+                    <tr>
+                        <th rowspan="3" class="c-orange">No</th>
+                        <th rowspan="3">Nama Siswa</th>
+                        <th colspan="12">Penilaian Formatif</th>
+                        <th colspan="4">Sumatif</th>
+                        <th rowspan="3" class="c-rata">Rata-<br>Rata</th>
+                        <th rowspan="3">STS</th>
+                        <th rowspan="3">SAS</th>
+                        <th rowspan="3" class="c-akhir">Nilai<br>Akhir</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="c-blue">L. Materi 1</th>
+                        <th colspan="3" class="c-orange">L. Materi 2</th>
+                        <th colspan="3" class="c-yellow">L. Materi 3</th>
+                        <th colspan="3" class="c-green">L. Materi 4</th>
+                        <th rowspan="2" class="c-blue">LM 1</th>
+                        <th rowspan="2" class="c-orange">LM 2</th>
+                        <th rowspan="2" class="c-yellow">LM 3</th>
+                        <th rowspan="2" class="c-green">LM 4</th>
+                    </tr>
+                    <tr>
+                        <th class="c-blue">TP1</th><th class="c-blue">TP2</th><th class="c-blue">TP3</th>
+                        <th class="c-orange">TP1</th><th class="c-orange">TP2</th><th class="c-orange">TP3</th>
+                        <th class="c-yellow">TP1</th><th class="c-yellow">TP2</th><th class="c-yellow">TP3</th>
+                        <th class="c-green">TP1</th><th class="c-green">TP2</th><th class="c-green">TP3</th>
+                    </tr>
+                </thead>
+                <tbody id="body-nilai">
+                    <!-- Baris siswa akan dimuat di sini oleh JavaScript -->
+                    <tr>
+                        <td colspan="22" style="padding: 30px; color: #6b7280; font-style: italic;">
+                            Silakan pilih kelas dan klik "Tampilkan Siswa"
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast">✅ Nilai berhasil disimpan!</div>
+
+<script>
+    // URL Web App Google Apps Script Anda (Gunakan URL yang sama dengan sistem absen)
+    const API_URL = "https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec";
+
+    // Update Label Kop saat input berubah
+    document.getElementById('input-sekolah').addEventListener('input', function() { document.getElementById('lbl-sekolah').textContent = this.value; });
+    document.getElementById('select-kelas').addEventListener('change', function() { document.getElementById('lbl-kelas').textContent = this.options[this.selectedIndex].text; });
+    document.getElementById('select-semester').addEventListener('change', function() { document.getElementById('lbl-semester').textContent = this.value; });
+    document.getElementById('input-mapel').addEventListener('input', function() { document.getElementById('lbl-mapel').textContent = this.value || '...'; });
+
+    let dataSiswaAktif = [];
+
+    // FUNGSI 1: MENGAMBIL DATA SISWA DARI DATABASE
+    async function loadSiswa() {
+        const kelas = document.getElementById('select-kelas').value;
+        const mapel = document.getElementById('input-mapel').value.trim();
+        
+        if (!kelas) return alert("⚠️ Silakan pilih kelas terlebih dahulu!");
+        if (!mapel) return alert("⚠️ Silakan ketik Mata Pelajaran terlebih dahulu!");
+
+        const loader = document.getElementById('loader');
+        const tbody = document.getElementById('body-nilai');
+        
+        loader.style.display = 'block';
+        tbody.innerHTML = '';
+
+        try {
+            // Memanggil data siswa dari GAS (Asumsi menggunakan action=get_siswa seperti di sistem absen)
+            const response = await fetch(API_URL + "?action=get_siswa");
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                // Filter siswa sesuai kelas yang dipilih
+                dataSiswaAktif = result.data.filter(s => s.kelas === kelas);
+                
+                // Urutkan berdasarkan nama
+                dataSiswaAktif.sort((a, b) => a.nama.localeCompare(b.nama));
+                
+                renderTabel(dataSiswaAktif);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="22" style="color:red;">Gagal mengambil data: ${result.message}</td></tr>`;
+            }
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `<tr><td colspan="22" style="color:red;">Terjadi kesalahan koneksi ke server.</td></tr>`;
+        } finally {
+            loader.style.display = 'none';
+        }
+    }
+
+    // FUNGSI 2: MERENDER BARIS TABEL DAN INPUT NILAI
+    function renderTabel(siswaData) {
+        const tbody = document.getElementById('body-nilai');
+        tbody.innerHTML = '';
+
+        if (siswaData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="22" style="color:#ef4444; font-weight:bold;">Tidak ada data siswa ditemukan untuk kelas ini.</td></tr>`;
+            return;
+        }
+
+        siswaData.forEach((siswa, index) => {
+            const tr = document.createElement('tr');
+            
+            // Definisikan urutan kolom dan kelas warnanya
+            const formatifCols = [
+                { id: 'f_m1_1', class: 'c-blue' }, { id: 'f_m1_2', class: 'c-blue' }, { id: 'f_m1_3', class: 'c-blue' },
+                { id: 'f_m2_1', class: 'c-orange' }, { id: 'f_m2_2', class: 'c-orange' }, { id: 'f_m2_3', class: 'c-orange' },
+                { id: 'f_m3_1', class: 'c-yellow' }, { id: 'f_m3_2', class: 'c-yellow' }, { id: 'f_m3_3', class: 'c-yellow' },
+                { id: 'f_m4_1', class: 'c-green' }, { id: 'f_m4_2', class: 'c-green' }, { id: 'f_m4_3', class: 'c-green' }
+            ];
+            
+            const sumatifCols = [
+                { id: 's_lm1', class: 'c-blue' }, { id: 's_lm2', class: 'c-orange' }, 
+                { id: 's_lm3', class: 'c-yellow' }, { id: 's_lm4', class: 'c-green' }
+            ];
+
+            let html = `
+                <td class="c-orange">${index + 1}</td>
+                <td>${siswa.nama}</td>
+            `;
+
+            // Render Input Formatif
+            formatifCols.forEach(col => {
+                html += `<td class="${col.class}"><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="formatif" name="${col.id}_${index}"></td>`;
+            });
+
+            // Render Input Sumatif
+            sumatifCols.forEach(col => {
+                html += `<td class="${col.class}"><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sumatif" name="${col.id}_${index}"></td>`;
+            });
+
+            // Render Kolom Hasil (Rata-rata, STS, SAS, Nilai Akhir)
+            html += `
+                <td class="c-rata"><input type="text" class="input-nilai readonly" id="rata_${index}" readonly tabindex="-1"></td>
+                <td><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sts" id="sts_${index}"></td>
+                <td><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sas" id="sas_${index}"></td>
+                <td class="c-akhir"><input type="text" class="input-nilai readonly" id="akhir_${index}" style="font-weight:bold;" readonly tabindex="-1"></td>
+            `;
+
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+
+        // Pasang Event Listener untuk Auto-Calculate
+        document.querySelectorAll('.calc-trigger').forEach(input => {
+            input.addEventListener('input', function() {
+                // Hanya izinkan angka
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value > 100) this.value = 100; // Maksimal nilai 100
+                
+                kalkulasiNilai(this.dataset.row);
+            });
+        });
+    }
+
+    // FUNGSI 3: AUTO CALCULATE RATA-RATA & NILAI AKHIR
+    function kalkulasiNilai(rowIndex) {
+        const rowInputs = document.querySelectorAll(`input[data-row="${rowIndex}"]`);
+        
+        let sumFormatifSumatif = 0;
+        let countFormatifSumatif = 0;
+        
+        let valSTS = 0;
+        let valSAS = 0;
+
+        rowInputs.forEach(input => {
+            const val = parseFloat(input.value);
+            if (!isNaN(val)) {
+                if (input.dataset.type === 'formatif' || input.dataset.type === 'sumatif') {
+                    sumFormatifSumatif += val;
+                    countFormatifSumatif++;
+                } else if (input.dataset.type === 'sts') {
+                    valSTS = val;
+                } else if (input.dataset.type === 'sas') {
+                    valSAS = val;
+                }
+            }
+        });
+
+        // 1. Hitung Rata-Rata (Dari Formatif & Sumatif yang terisi)
+        let rataRata = 0;
+        if (countFormatifSumatif > 0) {
+            rataRata = Math.round(sumFormatifSumatif / countFormatifSumatif);
+            document.getElementById(`rata_${rowIndex}`).value = rataRata;
+        } else {
+            document.getElementById(`rata_${rowIndex}`).value = '';
+        }
+
+        // 2. Hitung Nilai Akhir: (Rata-rata + STS + SAS) / 3
+        let pembagiAkhir = 0;
+        let sumAkhir = 0;
+        
+        if (rataRata > 0) { sumAkhir += rataRata; pembagiAkhir++; }
+        if (valSTS > 0) { sumAkhir += valSTS; pembagiAkhir++; }
+        if (valSAS > 0) { sumAkhir += valSAS; pembagiAkhir++; }
+
+        if (pembagiAkhir > 0) {
+            let nilaiAkhir = Math.round(sumAkhir / pembagiAkhir);
+            document.getElementById(`akhir_${rowIndex}`).value = nilaiAkhir;
+        } else {
+            document.getElementById(`akhir_${rowIndex}`).value = '';
+        }
+    }
+
+    // FUNGSI 4: SIMPAN KE DATABASE
+    async function simpanNilai() {
+        if (dataSiswaAktif.length === 0) return alert("Tabel masih kosong!");
+
+        const btnSave = document.querySelector('.btn-save');
+        btnSave.textContent = "⏳ Menyimpan...";
+        btnSave.disabled = true;
+
+        const info = {
+            sekolah: document.getElementById('input-sekolah').value,
+            kelas: document.getElementById('select-kelas').value,
+            semester: document.getElementById('select-semester').value,
+            mapel: document.getElementById('input-mapel').value,
+            tahun_ajaran: "2024/2025"
+        };
+
+        const dataNilai = [];
+
+        dataSiswaAktif.forEach((siswa, index) => {
+            const baris = {
+                nama_siswa: siswa.nama,
+                formatif: {},
+                sumatif: {},
+                rata_rata: document.getElementById(`rata_${index}`).value || 0,
+                sts: document.getElementById(`sts_${index}`).value || 0,
+                sas: document.getElementById(`sas_${index}`).value || 0,
+                nilai_akhir: document.getElementById(`akhir_${index}`).value || 0
+            };
+
+            // Ambil semua input di baris ini
+            document.querySelectorAll(`input[data-row="${index}"]`).forEach(input => {
+                const name = input.name.split('_')[0] + "_" + input.name.split('_')[1]; // hapus index row
+                if (input.dataset.type === 'formatif') baris.formatif[name] = input.value || 0;
+                if (input.dataset.type === 'sumatif') baris.sumatif[name] = input.value || 0;
+            });
+
+            dataNilai.push(baris);
+        });
+
+        const payload = {
+            action: "simpan_nilai_mapel",
+            info: info,
+            data: dataNilai
+        };
+
+        try {
+            // POST data ke Google Apps Script
+            await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            
+            // Tampilkan Notifikasi Sukses
+            const toast = document.getElementById("toast");
+            toast.classList.add("show");
+            setTimeout(() => { toast.classList.remove("show"); }, 3000);
+
+        } catch (error) {
+            console.error(error);
+            alert("⚠️ Terjadi kesalahan saat menyimpan data.");
+        } finally {
+            btnSave.textContent = "💾 Simpan Nilai";
+            btnSave.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
