@@ -65,19 +65,7 @@
         .c-rata { background-color: #e5e7eb; font-weight: bold;}
 
         /* INPUT NILAI */
-        .input-nilai { 
-            width: 32px; 
-            height: 25px; 
-            border: 1px solid transparent; 
-            background: transparent; 
-            text-align: center; 
-            font-size: 12px; 
-            font-family: inherit; 
-            outline: none; 
-            color: var(--text-dark);
-            transition: 0.2s;
-            font-weight: 600;
-        }
+        .input-nilai { width: 32px; height: 25px; border: 1px solid transparent; background: transparent; text-align: center; font-size: 12px; font-family: inherit; outline: none; color: var(--text-dark); transition: 0.2s; font-weight: 600;}
         .input-nilai:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
         .input-nilai.readonly { background: transparent; cursor: default; font-weight: bold; color: #b91c1c;}
 
@@ -100,17 +88,12 @@
 
         <div class="toolbar">
             <input type="text" id="input-sekolah" value="SDIT Hidayatut Taufiq" style="width: 180px;" title="Nama Sekolah">
+            
+            <!-- DROPDOWN KELAS OTOMATIS -->
             <select id="select-kelas" title="Pilih Kelas">
-                <option value="">-- Pilih Kelas --</option>
-                <option value="I">Kelas I</option>
-                <option value="IIA">Kelas IIA</option>
-                <option value="IIB">Kelas IIB</option>
-                <option value="III">Kelas III</option>
-                <option value="IV">Kelas IV</option>
-                <option value="VA">Kelas VA</option>
-                <option value="VB">Kelas VB</option>
-                <option value="VI">Kelas VI</option>
+                <option value="">⏳ Memuat Kelas...</option>
             </select>
+            
             <select id="select-semester" title="Pilih Semester">
                 <option value="1">Semester 1 (Ganjil)</option>
                 <option value="2" selected>Semester 2 (Genap)</option>
@@ -127,7 +110,7 @@
             <div>MATA PELAJARAN</div><div>: <span id="lbl-mapel">...</span></div>
         </div>
 
-        <div id="loader" class="loader"><div class="spinner"></div> Mengambil data siswa dari database...</div>
+        <div id="loader" class="loader"><div class="spinner"></div> Memproses database...</div>
 
         <div style="overflow-x: auto;">
             <table id="tabel-nilai">
@@ -173,8 +156,35 @@
     <div id="toast">✅ Nilai berhasil disimpan!</div>
 
 <script>
-    // URL Web App Google Apps Script (Tautkan dengan URL aktif Bapak)
+    // URL Web App Google Apps Script 
     const API_URL = "https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec";
+
+    // OTOMATIS AMBIL DAFTAR KELAS SAAT HALAMAN DIBUKA
+    window.onload = function() {
+        muatDaftarKelas();
+    };
+
+    async function muatDaftarKelas() {
+        const selectKelas = document.getElementById('select-kelas');
+        try {
+            const response = await fetch(API_URL + "?action=get_kelas_siswa");
+            const result = await response.json();
+            
+            if (result.status === 'success' && result.data.length > 0) {
+                selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+                result.data.forEach(kls => {
+                    const option = document.createElement('option');
+                    option.value = kls;
+                    option.textContent = kls;
+                    selectKelas.appendChild(option);
+                });
+            } else {
+                selectKelas.innerHTML = '<option value="">Data kelas kosong</option>';
+            }
+        } catch (error) {
+            selectKelas.innerHTML = '<option value="">Gagal memuat kelas</option>';
+        }
+    }
 
     // Sinkronisasi Label Kop Surat
     document.getElementById('input-sekolah').addEventListener('input', function() { document.getElementById('lbl-sekolah').textContent = this.value; });
@@ -184,7 +194,7 @@
 
     let dataSiswaAktif = [];
 
-    // FUNGSI 1: MENGAMBIL DATA SISWA DARI SHEET "Data Siswa"
+    // FUNGSI MENGAMBIL DATA SISWA DARI SHEET "Data Siswa"
     async function loadSiswa() {
         const kelas = document.getElementById('select-kelas').value;
         const mapel = document.getElementById('input-mapel').value.trim();
@@ -202,7 +212,6 @@
             const result = await response.json();
             
             if (result.status === 'success') {
-                // Filter siswa yang kelasnya sama dengan pilihan Dropdown
                 dataSiswaAktif = result.data.filter(s => s.kelas === kelas);
                 dataSiswaAktif.sort((a, b) => a.nama.localeCompare(b.nama)); // Urut Abjad
                 renderTabel(dataSiswaAktif);
@@ -216,7 +225,6 @@
         }
     }
 
-    // FUNGSI 2: MENYUSUN TABEL & KOTAK INPUT
     function renderTabel(siswaData) {
         const tbody = document.getElementById('body-nilai');
         tbody.innerHTML = '';
@@ -228,14 +236,12 @@
 
         siswaData.forEach((siswa, index) => {
             const tr = document.createElement('tr');
-            
             const formatifCols = [
                 { id: 'f_m1_1', class: 'c-blue' }, { id: 'f_m1_2', class: 'c-blue' }, { id: 'f_m1_3', class: 'c-blue' },
                 { id: 'f_m2_1', class: 'c-orange' }, { id: 'f_m2_2', class: 'c-orange' }, { id: 'f_m2_3', class: 'c-orange' },
                 { id: 'f_m3_1', class: 'c-yellow' }, { id: 'f_m3_2', class: 'c-yellow' }, { id: 'f_m3_3', class: 'c-yellow' },
                 { id: 'f_m4_1', class: 'c-green' }, { id: 'f_m4_2', class: 'c-green' }, { id: 'f_m4_3', class: 'c-green' }
             ];
-            
             const sumatifCols = [
                 { id: 's_lm1', class: 'c-blue' }, { id: 's_lm2', class: 'c-orange' }, 
                 { id: 's_lm3', class: 'c-yellow' }, { id: 's_lm4', class: 'c-green' }
@@ -257,20 +263,17 @@
             tbody.appendChild(tr);
         });
 
-        // Trigger Kalkulator saat Guru Mengetik
         document.querySelectorAll('.calc-trigger').forEach(input => {
             input.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, ''); // Kunci hanya bisa angka
-                if (this.value > 100) this.value = 100; // Mentok di 100
+                this.value = this.value.replace(/[^0-9]/g, ''); 
+                if (this.value > 100) this.value = 100; 
                 kalkulasiNilai(this.dataset.row);
             });
         });
     }
 
-    // FUNGSI 3: MESIN KALKULATOR OTOMATIS
     function kalkulasiNilai(rowIndex) {
         const rowInputs = document.querySelectorAll(`input[data-row="${rowIndex}"]`);
-        
         let sumFormSum = 0; let countFormSum = 0;
         let valSTS = 0; let valSAS = 0;
 
@@ -284,16 +287,13 @@
             }
         });
 
-        // Hitung Rata-Rata (Semua Nilai Formatif & Sumatif yang terisi)
         let rataRata = 0;
         if (countFormSum > 0) {
             rataRata = Math.round(sumFormSum / countFormSum);
             document.getElementById(`rata_${rowIndex}`).value = rataRata;
         } else { document.getElementById(`rata_${rowIndex}`).value = ''; }
 
-        // Hitung Nilai Akhir: Average dari (Rata-rata, STS, SAS)
         let pembagiAkhir = 0; let sumAkhir = 0;
-        
         if (rataRata > 0) { sumAkhir += rataRata; pembagiAkhir++; }
         if (valSTS > 0) { sumAkhir += valSTS; pembagiAkhir++; }
         if (valSAS > 0) { sumAkhir += valSAS; pembagiAkhir++; }
@@ -303,7 +303,6 @@
         } else { document.getElementById(`akhir_${rowIndex}`).value = ''; }
     }
 
-    // FUNGSI 4: SIMPAN DATA KE SPREADSHEET
     async function simpanNilai() {
         if (dataSiswaAktif.length === 0) return alert("Tabel masih kosong!");
 
@@ -330,7 +329,7 @@
             };
 
             document.querySelectorAll(`input[data-row="${index}"]`).forEach(input => {
-                const name = input.name.split('_').slice(0, -1).join('_'); // Buang index array
+                const name = input.name.split('_').slice(0, -1).join('_'); 
                 if (input.dataset.type === 'formatif') baris.formatif[name] = input.value || "";
                 if (input.dataset.type === 'sumatif') baris.sumatif[name] = input.value || "";
             });
