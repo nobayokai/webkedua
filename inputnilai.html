@@ -15,23 +15,8 @@
             --border-color: #8c8c8c;
         }
 
-        body { 
-            font-family: 'Arial', sans-serif; 
-            background: #f3f4f6; 
-            margin: 0; 
-            padding: 20px; 
-            color: var(--text-dark); 
-            font-size: 12px;
-        }
-
-        .container { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
-            max-width: 100%; 
-            overflow-x: auto;
-        }
+        body { font-family: 'Arial', sans-serif; background: #f3f4f6; margin: 0; padding: 20px; color: var(--text-dark); font-size: 12px;}
+        .container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 100%; overflow-x: auto;}
 
         /* HEADER INFO */
         .kop-nilai { text-align: center; margin-bottom: 20px; }
@@ -41,7 +26,7 @@
         .info-grid { display: grid; grid-template-columns: 120px 1fr; gap: 5px; font-weight: bold; margin-bottom: 15px; font-size: 13px;}
         .info-grid div { display: flex; align-items: center; }
         
-        .toolbar { display: flex; gap: 10px; margin-bottom: 15px; background: #f9fafb; padding: 10px; border-radius: 8px; border: 1px solid #e5e7eb;}
+        .toolbar { display: flex; gap: 10px; margin-bottom: 15px; background: #f9fafb; padding: 10px; border-radius: 8px; border: 1px solid #e5e7eb; flex-wrap: wrap;}
         .toolbar select, .toolbar input { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-family: inherit; font-size: 12px; font-weight: bold; outline:none;}
         .toolbar input:focus, .toolbar select:focus { border-color: #3b82f6;}
         
@@ -57,12 +42,9 @@
         td:nth-child(2) { text-align: left; padding-left: 8px; white-space: nowrap; font-weight: bold;} 
         
         /* PEWARNAAN KOLOM */
-        .c-blue { background-color: var(--bg-blue); }
-        .c-orange { background-color: var(--bg-orange); }
-        .c-yellow { background-color: var(--bg-yellow); }
-        .c-green { background-color: var(--bg-green); }
-        .c-akhir { background-color: var(--bg-header); font-weight: bold;}
-        .c-rata { background-color: #e5e7eb; font-weight: bold;}
+        .c-blue { background-color: var(--bg-blue); } .c-orange { background-color: var(--bg-orange); }
+        .c-yellow { background-color: var(--bg-yellow); } .c-green { background-color: var(--bg-green); }
+        .c-akhir { background-color: var(--bg-header); font-weight: bold;} .c-rata { background-color: #e5e7eb; font-weight: bold;}
 
         /* INPUT NILAI */
         .input-nilai { width: 32px; height: 25px; border: 1px solid transparent; background: transparent; text-align: center; font-size: 12px; font-family: inherit; outline: none; color: var(--text-dark); transition: 0.2s; font-weight: 600;}
@@ -89,7 +71,6 @@
         <div class="toolbar">
             <input type="text" id="input-sekolah" value="SDIT Hidayatut Taufiq" style="width: 180px;" title="Nama Sekolah">
             
-            <!-- DROPDOWN KELAS OTOMATIS -->
             <select id="select-kelas" title="Pilih Kelas">
                 <option value="">⏳ Memuat Kelas...</option>
             </select>
@@ -98,7 +79,10 @@
                 <option value="1">Semester 1 (Ganjil)</option>
                 <option value="2" selected>Semester 2 (Genap)</option>
             </select>
-            <input type="text" id="input-mapel" placeholder="Mata Pelajaran (Cth: IPAS)">
+            
+            <!-- INPUT MAPEL DENGAN AUTO-COMPLETE (DATALIST) -->
+            <input type="text" id="input-mapel" placeholder="Mata Pelajaran" list="list-mapel" title="Ketik atau pilih dari database">
+            <datalist id="list-mapel"></datalist>
             
             <button class="btn-load" onclick="loadSiswa()">⬇️ Tampilkan Siswa</button>
             <button class="btn-save" onclick="simpanNilai()" style="margin-left: auto;">💾 Simpan Nilai</button>
@@ -110,7 +94,7 @@
             <div>MATA PELAJARAN</div><div>: <span id="lbl-mapel">...</span></div>
         </div>
 
-        <div id="loader" class="loader"><div class="spinner"></div> Memproses database...</div>
+        <div id="loader" class="loader"><div class="spinner"></div> <span id="loading-text">Memproses database...</span></div>
 
         <div style="overflow-x: auto;">
             <table id="tabel-nilai">
@@ -156,12 +140,13 @@
     <div id="toast">✅ Nilai berhasil disimpan!</div>
 
 <script>
-    // URL Web App Google Apps Script 
+    // URL Web App Google Apps Script Anda
     const API_URL = "https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec";
 
-    // OTOMATIS AMBIL DAFTAR KELAS SAAT HALAMAN DIBUKA
+    // KETIKA HALAMAN DIBUKA: AMBIL KELAS & MAPEL DARI DATABASE
     window.onload = function() {
         muatDaftarKelas();
+        muatDaftarMapel();
     };
 
     async function muatDaftarKelas() {
@@ -169,24 +154,34 @@
         try {
             const response = await fetch(API_URL + "?action=get_kelas_siswa");
             const result = await response.json();
-            
             if (result.status === 'success' && result.data.length > 0) {
                 selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
                 result.data.forEach(kls => {
                     const option = document.createElement('option');
-                    option.value = kls;
-                    option.textContent = kls;
+                    option.value = kls; option.textContent = kls;
                     selectKelas.appendChild(option);
                 });
-            } else {
-                selectKelas.innerHTML = '<option value="">Data kelas kosong</option>';
-            }
-        } catch (error) {
-            selectKelas.innerHTML = '<option value="">Gagal memuat kelas</option>';
-        }
+            } else { selectKelas.innerHTML = '<option value="">Data kelas kosong</option>'; }
+        } catch (error) { selectKelas.innerHTML = '<option value="">Gagal memuat kelas</option>'; }
     }
 
-    // Sinkronisasi Label Kop Surat
+    async function muatDaftarMapel() {
+        const listMapel = document.getElementById('list-mapel');
+        try {
+            const response = await fetch(API_URL + "?action=get_mapel");
+            const result = await response.json();
+            if (result.status === 'success') {
+                listMapel.innerHTML = '';
+                result.data.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m;
+                    listMapel.appendChild(option);
+                });
+            }
+        } catch (error) {}
+    }
+
+    // UPDATE LABEL HEADER SAAT MENGETIK
     document.getElementById('input-sekolah').addEventListener('input', function() { document.getElementById('lbl-sekolah').textContent = this.value; });
     document.getElementById('select-kelas').addEventListener('change', function() { document.getElementById('lbl-kelas').textContent = this.options[this.selectedIndex].text; });
     document.getElementById('select-semester').addEventListener('change', function() { document.getElementById('lbl-semester').textContent = this.value; });
@@ -194,30 +189,49 @@
 
     let dataSiswaAktif = [];
 
-    // FUNGSI MENGAMBIL DATA SISWA DARI SHEET "Data Siswa"
+    // FUNGSI UTAMA: MENGAMBIL SISWA & NILAI SEBELUMNYA
     async function loadSiswa() {
         const kelas = document.getElementById('select-kelas').value;
+        const semester = document.getElementById('select-semester').value;
         const mapel = document.getElementById('input-mapel').value.trim();
         
         if (!kelas) return alert("⚠️ Silakan pilih kelas terlebih dahulu!");
         if (!mapel) return alert("⚠️ Silakan ketik Mata Pelajaran terlebih dahulu!");
 
         const loader = document.getElementById('loader');
+        const loadingText = document.getElementById('loading-text');
         const tbody = document.getElementById('body-nilai');
         
         loader.style.display = 'block'; tbody.innerHTML = '';
+        loadingText.textContent = "Mengambil data siswa dan nilai...";
 
         try {
-            const response = await fetch(API_URL + "?action=get_siswa");
-            const result = await response.json();
+            // 1. Ambil Data Semua Siswa
+            const resSiswa = await fetch(API_URL + "?action=get_siswa");
+            const jsonSiswa = await resSiswa.json();
             
-            if (result.status === 'success') {
-                dataSiswaAktif = result.data.filter(s => s.kelas === kelas);
-                dataSiswaAktif.sort((a, b) => a.nama.localeCompare(b.nama)); // Urut Abjad
-                renderTabel(dataSiswaAktif);
-            } else {
-                tbody.innerHTML = `<tr><td colspan="22" style="color:red;">Gagal: ${result.message}</td></tr>`;
+            // 2. Ambil Data Nilai (Jika ada yang sudah pernah disimpan)
+            const urlNilai = `${API_URL}?action=get_nilai_mapel&kelas=${encodeURIComponent(kelas)}&semester=${encodeURIComponent(semester)}&mapel=${encodeURIComponent(mapel)}`;
+            const resNilai = await fetch(urlNilai);
+            const jsonNilai = await resNilai.json();
+            
+            let dataSiswa = [];
+            let dataNilai = [];
+            
+            if (jsonSiswa.status === 'success') {
+                dataSiswa = jsonSiswa.data.filter(s => s.kelas === kelas);
+                dataSiswa.sort((a, b) => a.nama.localeCompare(b.nama));
             }
+            if (jsonNilai.status === 'success') { dataNilai = jsonNilai.data; }
+
+            // 3. Gabungkan Data Siswa dengan Nilainya
+            dataSiswaAktif = dataSiswa.map(s => {
+                const savedNilai = dataNilai.find(n => n.nama_siswa === s.nama);
+                return { ...s, nilai: savedNilai || {} }; // Jika belum ada nilai, jadikan objek kosong
+            });
+
+            renderTabel(dataSiswaAktif);
+
         } catch (error) {
             tbody.innerHTML = `<tr><td colspan="22" style="color:red;">Terjadi kesalahan koneksi. Pastikan internet aktif.</td></tr>`;
         } finally {
@@ -225,6 +239,7 @@
         }
     }
 
+    // MERENDER TABEL BESERTA ISI NILAI
     function renderTabel(siswaData) {
         const tbody = document.getElementById('body-nilai');
         tbody.innerHTML = '';
@@ -236,6 +251,8 @@
 
         siswaData.forEach((siswa, index) => {
             const tr = document.createElement('tr');
+            const n = siswa.nilai; // Objek berisi nilai-nilai sebelumnya
+
             const formatifCols = [
                 { id: 'f_m1_1', class: 'c-blue' }, { id: 'f_m1_2', class: 'c-blue' }, { id: 'f_m1_3', class: 'c-blue' },
                 { id: 'f_m2_1', class: 'c-orange' }, { id: 'f_m2_2', class: 'c-orange' }, { id: 'f_m2_3', class: 'c-orange' },
@@ -249,20 +266,31 @@
 
             let html = `<td class="c-orange">${index + 1}</td><td>${siswa.nama}</td>`;
 
-            formatifCols.forEach(col => { html += `<td class="${col.class}"><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="formatif" name="${col.id}_${index}" maxlength="3"></td>`; });
-            sumatifCols.forEach(col => { html += `<td class="${col.class}"><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sumatif" name="${col.id}_${index}" maxlength="3"></td>`; });
+            // Cetak Input Formatif beserta isinya
+            formatifCols.forEach(col => { 
+                const val = n[col.id] !== undefined ? n[col.id] : '';
+                html += `<td class="${col.class}"><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="formatif" name="${col.id}_${index}" maxlength="3" value="${val}"></td>`; 
+            });
+            
+            // Cetak Input Sumatif beserta isinya
+            sumatifCols.forEach(col => { 
+                const val = n[col.id] !== undefined ? n[col.id] : '';
+                html += `<td class="${col.class}"><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sumatif" name="${col.id}_${index}" maxlength="3" value="${val}"></td>`; 
+            });
 
+            // Cetak Hasil
             html += `
-                <td class="c-rata"><input type="text" class="input-nilai readonly" id="rata_${index}" readonly tabindex="-1"></td>
-                <td><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sts" id="sts_${index}" maxlength="3"></td>
-                <td><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sas" id="sas_${index}" maxlength="3"></td>
-                <td class="c-akhir"><input type="text" class="input-nilai readonly" id="akhir_${index}" readonly tabindex="-1"></td>
+                <td class="c-rata"><input type="text" class="input-nilai readonly" id="rata_${index}" readonly tabindex="-1" value="${n.rata_rata || ''}"></td>
+                <td><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sts" id="sts_${index}" maxlength="3" value="${n.sts || ''}"></td>
+                <td><input type="text" class="input-nilai calc-trigger" data-row="${index}" data-type="sas" id="sas_${index}" maxlength="3" value="${n.sas || ''}"></td>
+                <td class="c-akhir"><input type="text" class="input-nilai readonly" id="akhir_${index}" readonly tabindex="-1" value="${n.nilai_akhir || ''}"></td>
             `;
 
             tr.innerHTML = html;
             tbody.appendChild(tr);
         });
 
+        // Trigger Kalkulator saat Guru Mengetik
         document.querySelectorAll('.calc-trigger').forEach(input => {
             input.addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, ''); 
@@ -344,6 +372,10 @@
             const toast = document.getElementById("toast");
             toast.classList.add("show");
             setTimeout(() => { toast.classList.remove("show"); }, 3000);
+            
+            // Segarkan list datalist Mata Pelajaran (Siapa tahu mapel ini baru)
+            muatDaftarMapel();
+            
         } catch (error) {
             alert("⚠️ Terjadi kesalahan saat menyimpan data.");
         } finally {
