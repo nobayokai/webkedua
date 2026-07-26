@@ -211,15 +211,6 @@
         }
 
         const html = `
-            <table class="modul-header">
-                <tr><td>Nama Penyusun</td><td>: <span class="editable-text" contenteditable="true">${bersihkanTeks(data.nama)}</span></td></tr>
-                <tr><td>NIP</td><td>: <span class="editable-text" contenteditable="true">${bersihkanTeks(data.nip)}</span></td></tr>
-                <tr><td>Nama Sekolah</td><td>: <span class="editable-text" contenteditable="true">${bersihkanTeks(data.sekolah)}</span></td></tr>
-                <tr><td>Mata Pelajaran</td><td>: <span class="editable-text" contenteditable="true">${bersihkanTeks(data.mapel)}</span></td></tr>
-                <tr><td>Fase, Kelas / Semester</td><td>: <span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase)} / ${bersihkanTeks(data.semester)}</span></td></tr>
-                <tr><td>Tahun Ajaran</td><td>: <span class="editable-text" contenteditable="true">${bersihkanTeks(data.tahun)}</span></td></tr>
-            </table>
-
             <div class="modul-title">
                 MODUL PEMBELAJARAN<br>
                 KELAS <span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase).split('/')[1] || data.fase}</span> FASE <span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase).split('/')[0] || data.fase}</span>
@@ -254,7 +245,7 @@
                 </tr>
                 <tr>
                     <td style="font-weight:bold;">Fase</td>
-                    <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase)}</span></td>
+                    <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase)} Semester : ${bersihkanTeks(data.master)}</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight:bold;">Materi Pokok</td>
@@ -272,13 +263,13 @@
                     <td style="font-weight:bold;">8 Profil Lulusan</td>
                     <td colspan="2">
                         <div class="editable-text" contenteditable="true">
-                            <strong>Keimanan dan Ketakwaan terhadap Tuhan YME</strong><br>${bersihkanTeks(data.profil_keimanan)}<br><br>
-                            <strong>Kewargaan</strong><br>${bersihkanTeks(data.profil_kewargaan)}<br><br>
-                            <strong>Penalaran Kritis</strong><br>${bersihkanTeks(data.profil_penalaran)}<br><br>
-                            <strong>Kreativitas</strong><br>${bersihkanTeks(data.profil_kreativitas)}<br><br>
-                            <strong>Kolaborasi</strong><br>${bersihkanTeks(data.profil_kolaborasi)}<br><br>
-                            <strong>Kemandirian</strong><br>${bersihkanTeks(data.profil_kemandirian)}<br><br>
-                            <strong>Kesehatan</strong><br>${bersihkanTeks(data.profil_kesehatan)}<br><br>
+                            <strong>Keimanan dan Ketakwaan terhadap Tuhan YME</strong><br>${bersihkanTeks(data.profil_keimanan)}<br>
+                            <strong>Kewargaan</strong><br>${bersihkanTeks(data.profil_kewargaan)}<br>
+                            <strong>Penalaran Kritis</strong><br>${bersihkanTeks(data.profil_penalaran)}<br>
+                            <strong>Kreativitas</strong><br>${bersihkanTeks(data.profil_kreativitas)}<br>
+                            <strong>Kolaborasi</strong><br>${bersihkanTeks(data.profil_kolaborasi)}<br>
+                            <strong>Kemandirian</strong><br>${bersihkanTeks(data.profil_kemandirian)}<br>
+                            <strong>Kesehatan</strong><br>${bersihkanTeks(data.profil_kesehatan)}<br>
                             <strong>Komunikasi</strong><br>${bersihkanTeks(data.profil_komunikasi)}
                         </div>
                     </td>
