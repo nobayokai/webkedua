@@ -100,14 +100,14 @@
     <div class="card no-print">
         <h3 style="margin-top:0;">Input Data Modul Ajar</h3>
         <div class="form-grid">
-            <div class="form-group"><label>Nama Penyusun</label><input type="text" id="nama" value="RIA MARYANAH"></div>
+            <div class="form-group"><label>Nama Penyusun</label><input type="text" id="nama" value="Nova Haryanto"></div>
             <div class="form-group"><label>NIP</label><input type="text" id="nip" value="-"></div>
-            <div class="form-group"><label>Nama Sekolah</label><input type="text" id="sekolah" value="SDIT AL-BURHANIYAH"></div>
-            <div class="form-group"><label>Mata Pelajaran</label><input type="text" id="mapel" value="MATEMATIKA"></div>
+            <div class="form-group"><label>Nama Sekolah</label><input type="text" id="sekolah" value="SDIT Hidayatut Taufiq"></div>
+            <div class="form-group"><label>Mata Pelajaran</label><input type="text" id="mapel" value="Informatika"></div>
             <div class="form-group"><label>Fase / Kelas</label><input type="text" id="fase" value="A / 2 (Dua)"></div>
             <div class="form-group"><label>Semester</label><input type="text" id="semester" value="1"></div>
             <div class="form-group"><label>Tahun Ajaran</label><input type="text" id="tahun" value="2026 - 2027"></div>
-            <div class="form-group"><label>Materi Pokok</label><input type="text" id="materi" value="Ayo Membilang sampai dengan 50"></div>
+            <div class="form-group"><label>Materi Pokok</label><input type="text" id="materi" value="Ayo Belajar Algoritma"></div>
             <div class="form-group"><label>Alokasi Waktu</label><input type="text" id="waktu" value="2 JP = 2 x 35 menit"></div>
             <div class="form-group"><label>Jumlah Siswa</label><input type="text" id="siswa" value="28 Siswa"></div>
             <div class="form-group">
@@ -210,8 +210,7 @@
             return val.toString().replace(/\\n/g, '\n'); 
         }
 
-        const html = `
-            <div class="modul-title">
+        const html = `<div class="modul-title">
                 MODUL PEMBELAJARAN<br>
                 KELAS <span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase).split('/')[1] || data.fase}</span> FASE <span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase).split('/')[0] || data.fase}</span>
             </div>
@@ -222,10 +221,6 @@
                 <tr>
                     <td style="width: 30%; font-weight:bold;">Nama Penyusun</td>
                     <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.nama)}</span></td>
-                </tr>
-                <tr>
-                    <td style="font-weight:bold;">NIP</td>
-                    <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.nip)}</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight:bold;">Nama Sekolah</td>
@@ -244,8 +239,12 @@
                     <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.siswa)}</span></td>
                 </tr>
                 <tr>
-                    <td style="font-weight:bold;">Fase</td>
-                    <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase)} Semester : ${bersihkanTeks(data.master)}</span></td>
+                    <td style="font-weight:bold;">Fase / Kelas</td>
+                    <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.fase)}</span></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;">Semester</td>
+                    <td colspan="2"><span class="editable-text" contenteditable="true">${bersihkanTeks(data.semester)}</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight:bold;">Materi Pokok</td>
@@ -337,7 +336,6 @@
                 </tr>
 
                 <tr><td colspan="3" class="section-header">ALUR TUJUAN PEMBELAJARAN</td></tr>
-                <tr><td colspan="3" style="background:#f8fafc; font-weight:bold; text-align:center;">PEMBELAJARAN 1 PERTEMUAN</td></tr>
                 <tr>
                     <td style="font-weight:bold;">PENDAHULUAN</td>
                     <td colspan="2"><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.p1_pendahuluan)}</span></td>
