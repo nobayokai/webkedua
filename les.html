@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Honor Les ke Database</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
+        .container { max-width: 400px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
+        input, select, button { width: 100%; padding: 8px; box-sizing: border-box; }
+        .result { margin-top: 15px; padding: 15px; background-color: #eef2f3; border-radius: 5px; font-size: 14px;}
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #45a049; }
+        #statusMessage { margin-top: 10px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Form Input Honor Les</h2>
+    <form id="lesForm">
+        
+        <div class="form-group">
+            <label>Nama Wali Kelas / Guru</label>
+            <input type="text" id="namaGuru" name="nama_guru" required>
+        </div>
+
+        <div class="form-group">
+            <label>Kelas</label>
+            <input type="text" id="kelas" name="kelas" placeholder="Contoh: 3A, 4, 5" required>
+        </div>
+
+        <div class="form-group">
+            <label>Kategori Les</label>
+            <select id="kategori" name="kategori" onchange="hitungHonor()">
+                <option value="Umum">Umum / Agama / TIK</option>
+                <option value="Ekskul">Ekstrakurikuler</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Jumlah Murid Ikut Les</label>
+            <input type="number" id="jmlMurid" name="jml_murid" value="0" oninput="hitungHonor()" required>
+        </div>
+
+        <div class="form-group">
+            <label>Pendingan Bulan Lalu</label>
+            <input type="number" id="pendingan" name="pendingan" value="0" oninput="hitungHonor()">
+        </div>
+
+        <div class="form-group">
+            <label>Murid Belum Bayar Bulan Ini</label>
+            <input type="number" id="belumBayar" name="belum_bayar" value="0" oninput="hitungHonor()">
+        </div>
+
+        <div class="result">
+            <p><strong>Total Siswa Dihitung:</strong> <span id="tampilSiswa">0</span></p>
+            <p><strong>Total Kotor:</strong> Rp <span id="tampilKotor">0</span></p>
+            <p><strong>Total Bersih (Diterima):</strong> Rp <span id="tampilBersih">0</span></p>
+        </div>
+
+        <!-- Hidden inputs to send calculated data to Apps Script -->
+        <input type="hidden" id="totalSiswa" name="total_siswa">
+        <input type="hidden" id="totalKotor" name="total_kotor">
+        <input type="hidden" id="totalBersih" name="total_bersih">
+
+        <button type="submit" id="btnSubmit">Simpan ke Database</button>
+        <div id="statusMessage"></div>
+    </form>
+</div>
+
+<script>
+    // URL Web App dari Google Apps Script
+    const scriptURL = 'URL_APPS_SCRIPT_ANDA_DISINI';
+    const form = document.getElementById('lesForm');
+    const statusMsg = document.getElementById('statusMessage');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    function hitungHonor() {
+        let kategori = document.getElementById("kategori").value;
+        let jmlMurid = parseInt(document.getElementById("jmlMurid").value) || 0;
+        let pendingan = parseInt(document.getElementById("pendingan").value) || 0;
+        let belumBayar = parseInt(document.getElementById("belumBayar").value) || 0;
+
+        let totalSiswa = (jmlMurid + pendingan) - belumBayar;
+        let tarifKotor = (kategori === "Umum") ? 75000 : 65000;
+        let tarifBersih = (kategori === "Umum") ? 70000 : 60000;
+
+        let totalKotor = totalSiswa * tarifKotor;
+        let totalBersih = totalSiswa * tarifBersih;
+
+        // Update tampilan
+        document.getElementById("tampilSiswa").innerText = totalSiswa;
+        document.getElementById("tampilKotor").innerText = totalKotor.toLocaleString('id-ID');
+        document.getElementById("tampilBersih").innerText = totalBersih.toLocaleString('id-ID');
+
+        // Update hidden inputs untuk dikirim ke database
+        document.getElementById("totalSiswa").value = totalSiswa;
+        document.getElementById("totalKotor").value = totalKotor;
+        document.getElementById("totalBersih").value = totalBersih;
+    }
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Menyimpan Data...";
+        statusMsg.innerText = "";
+        statusMsg.style.color = "black";
+
+        let requestBody = new FormData(form);
+
+        fetch(scriptURL, { method: 'POST', body: requestBody })
+            .then(response => {
+                statusMsg.innerText = "Data berhasil disimpan!";
+                statusMsg.style.color = "green";
+                form.reset();
+                hitungHonor(); // Reset kalkulasi
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "Simpan ke Database";
+            })
+            .catch(error => {
+                statusMsg.innerText = "Gagal menyimpan data!";
+                statusMsg.style.color = "red";
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "Simpan ke Database";
+                console.error('Error!', error.message);
+            });
+    });
+</script>
+
+</body>
+</html>
