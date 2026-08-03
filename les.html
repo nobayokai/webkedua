@@ -111,6 +111,14 @@
                 background: #fff;
                 box-shadow: inset 0 0 0 4px #e3f2fd;
             }
+            .kw-card-yayasan {
+                border-color: #b71c1c; /* Merah untuk Yayasan */
+                box-shadow: inset 0 0 0 4px #ffebee;
+            }
+            .kw-card-yayasan .kw-logo { color: #b71c1c; }
+            .kw-card-yayasan .kw-nominal { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
+            .kw-card-yayasan .kw-header { border-bottom-color: #b71c1c; }
+
             .kw-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #004494; padding-bottom: 10px; margin-bottom: 20px; }
             .kw-logo { font-size: 1.2em; font-weight: 900; color: #004494; letter-spacing: 1px; }
             .kw-title { font-size: 1.4em; font-weight: bold; color: #333; text-decoration: underline; letter-spacing: 2px; }
@@ -192,7 +200,7 @@
                 <div class="action-buttons">
                     <button class="btn-add" id="btnSimpan" onclick="simpanData()">+ Simpan Data (Otomatis ke Sheets)</button>
                     <button class="btn-print" onclick="cetakTabel()">🖨️ Cetak Tabel Laporan</button>
-                    <button class="btn-print-kw" onclick="cetakKwitansi()">🎫 Cetak Kwitansi (Estetik)</button>
+                    <button class="btn-print-kw" onclick="cetakKwitansi()">🎫 Cetak Kwitansi (Termasuk Yayasan)</button>
                 </div>
             </div>
         </div>
@@ -253,6 +261,7 @@
         let incrementId = 1;
         let editModeId = null;
         let syncTimeout = null;
+        let totalYayasanGlobal = 0; // Untuk mencatat total potongan yayasan
 
         window.onload = function() {
             if(localStorage.getItem('honorLes_LastTahun')) {
@@ -554,6 +563,8 @@
                 });
                 no++;
             }
+            
+            totalYayasanGlobal = sumYayasan; // Simpan ke variabel global untuk kwitansi
 
             tfoot.innerHTML = `
                 <tr style="background-color: #f1f3f5; font-weight: 600;">
@@ -614,13 +625,12 @@
             const container = document.getElementById('kwitansiContainer');
             container.innerHTML = '';
             
-            let groups = Object.values(globalGroupedData).filter(g => g.groupNet > 0); // Hanya yg terima honor
-            if(groups.length === 0) {
-                alert("Tidak ada data honor guru untuk dicetak kwitansi.");
+            let groups = Object.values(globalGroupedData).filter(g => g.groupNet > 0); 
+            if(groups.length === 0 && totalYayasanGlobal <= 0) {
+                alert("Tidak ada data honor guru/yayasan untuk dicetak kwitansi.");
                 return;
             }
 
-            // Generate Tanggal Hari Ini (Otomatis Bekasi)
             const d = new Date();
             const bulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
             const tglStr = `${d.getDate()} ${bulanArr[d.getMonth()]} ${d.getFullYear()}`;
@@ -629,13 +639,15 @@
             let currentPage = document.createElement('div');
             currentPage.className = 'kwitansi-page';
             
-            groups.forEach((group, index) => {
-                let terbilangStr = terbilang(group.groupNet).trim() + " Rupiah";
+            // FUNGSI HELPER UNTUK RENDER CARD
+            const renderCard = (nama, nominal, keperluan, isYayasan = false) => {
+                let terbilangStr = terbilang(nominal).trim() + " Rupiah";
                 let bulanText = document.getElementById('bulan').value.toUpperCase();
                 let tahunText = document.getElementById('tahunAjaran').value;
-
-                let card = `
-                <div class="kwitansi-card">
+                let addClass = isYayasan ? "kw-card-yayasan" : "";
+                
+                let cardHTML = `
+                <div class="kwitansi-card ${addClass}">
                     <div class="kw-header">
                         <div class="kw-logo">SDIT Hidayatut Taufiq</div>
                         <div class="kw-title">KWITANSI PEMBAYARAN</div>
@@ -651,30 +663,44 @@
                         </div>
                         <div class="kw-row">
                             <span class="kw-label">Untuk pembayaran</span><span class="kw-colon">:</span>
-                            <span class="kw-value">Honor Les ${group.jenisLes} - Bulan ${bulanText} (${tahunText})</span>
+                            <span class="kw-value">${keperluan} - Bulan ${bulanText} (${tahunText})</span>
                         </div>
                     </div>
                     <div class="kw-footer">
-                        <div class="kw-nominal">Rp ${formatRp(group.groupNet).replace('Rp','').trim()}</div>
+                        <div class="kw-nominal">Rp ${formatRp(nominal).replace('Rp','').trim()}</div>
                         <div class="kw-ttd">
                             <p>Bekasi, ${tglStr}</p>
                             <p>Penerima,</p>
                             <div class="ttd-space"></div>
-                            <p class="ttd-name">(${group.namaGuru})</p>
+                            <p class="ttd-name">(${nama})</p>
                         </div>
                     </div>
                 </div>`;
                 
-                currentPage.innerHTML += card;
+                currentPage.innerHTML += cardHTML;
                 cardCount++;
                 
-                // Tiap 2 kwitansi atau kwitansi terakhir, masukkan ke page baru
-                if(cardCount % 2 === 0 || index === groups.length - 1) {
+                if(cardCount % 2 === 0) {
                     container.appendChild(currentPage);
                     currentPage = document.createElement('div');
                     currentPage.className = 'kwitansi-page';
                 }
+            };
+
+            // RENDER KWITANSI YAYASAN (Paling Atas)
+            if(totalYayasanGlobal > 0) {
+                renderCard("Penny Sulistiati", totalYayasanGlobal, "Honor Yayasan (Potongan Sekolah)", true);
+            }
+
+            // RENDER KWITANSI GURU / EKSKUL
+            groups.forEach((group) => {
+                renderCard(group.namaGuru, group.groupNet, `Honor Les ${group.jenisLes}`);
             });
+
+            // Append sisa page jika angkanya ganjil (1 card di page terakhir)
+            if(cardCount % 2 !== 0) {
+                container.appendChild(currentPage);
+            }
 
             // Jalankan Print
             document.body.classList.add('printing-kwitansi');
