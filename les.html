@@ -3,132 +3,549 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Honor Les ke Database</title>
+    <title>Sistem Manajemen Honor Les - Terhubung Google Sheets</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
-        .container { max-width: 400px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
-        input, select, button { width: 100%; padding: 8px; box-sizing: border-box; }
-        .result { margin-top: 15px; padding: 15px; background-color: #eef2f3; border-radius: 5px; font-size: 14px;}
-        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { background-color: #45a049; }
-        #statusMessage { margin-top: 10px; font-weight: bold; text-align: center; }
+        /* Modern Web Styling */
+        :root {
+            --primary: #004494;
+            --primary-hover: #003377;
+            --success: #28a745;
+            --success-hover: #218838;
+            --info: #17a2b8;
+            --info-hover: #138496;
+            --warning: #ff9800;
+            --bg-color: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1380px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .status-badge { font-size: 0.4em; background: #6c757d; color: white; padding: 5px 10px; border-radius: 20px; vertical-align: middle; transition: background 0.3s; }
+        .status-syncing { background: var(--warning) !important; }
+        .status-success { background: var(--success) !important; }
+        .status-error { background: #dc3545 !important; }
+
+        /* Form Section */
+        .form-panel { background: #fdfdfd; padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 6px; font-size: 0.85em; color: #555; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95em; transition: border 0.3s; }
+        input:focus, select:focus { border-color: var(--primary); outline: none; }
+        
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        button { padding: 10px 20px; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95em; transition: background 0.2s; }
+        .btn-add { background: var(--primary); flex: 1; min-width: 200px; }
+        .btn-add:hover { background: var(--primary-hover); }
+        .btn-print { background: var(--success); }
+        .btn-print:hover { background: var(--success-hover); }
+
+        /* Action Buttons in Table */
+        .btn-edit, .btn-delete { padding: 4px 8px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
+        .btn-edit { background: #ffc107; color: #333; }
+        .btn-edit:hover { background: #e0a800; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:hover { background: #c82333; }
+        .action-cell { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; justify-content: center; border: none; }
+
+        /* Table Styling */
+        .table-responsive { overflow-x: auto; margin-top: 20px; position: relative;}
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        th, td { border: 1px solid #dee2e6; padding: 8px 6px; text-align: center; vertical-align: middle; }
+        th { background-color: #e9ecef; font-weight: 600; }
+        .text-left { text-align: left; }
+        .editable { width: 100%; box-sizing: border-box; background: #fffde7; border: 1px dashed #bcaaa4; padding: 4px; text-align: center; border-radius: 3px; font-size: 0.9em; }
+        .editable:focus { border-color: #ff9800; outline: none; }
+        .ket-input { width: 100%; box-sizing: border-box; background: #f1f8e9; border: 1px solid #c5e1a5; padding: 4px; border-radius: 3px; font-size: 0.8em; margin-top: 4px; }
+        .ket-input::placeholder { color: #999; font-style: italic; }
+        .override-field { background: #e3f2fd; border-color: #90caf9; font-weight: bold;}
+        .grouped-row td { border-bottom: 2px solid #aaa; } 
+
+        #loadingOverlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center;
+            font-size: 1.5em; font-weight: bold; color: var(--primary); z-index: 10; border-radius: 5px;
+        }
+
+        /* Print Layout (A4 Portrait - 1 Page Fit) */
+        @media print {
+            @page { size: A4 portrait; margin: 5mm; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; max-width: 100%; padding: 0; }
+            .no-print { display: none !important; }
+            
+            .table-responsive { overflow: visible; zoom: 0.82; }
+            table { font-size: 8pt; border-color: #000; width: 100%; }
+            th, td { border: 1px solid #000 !important; padding: 3px 2px; }
+            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 7.5pt; }
+            
+            .header-print { display: block !important; text-align: center; margin-bottom: 10px; line-height: 1.2; }
+            .header-print h3 { margin: 0; font-size: 12pt; font-weight: bold; }
+            .header-print p { margin: 3px 0 0 0; font-size: 9pt; }
+            
+            input.editable { display: none; }
+            span.print-value { display: inline !important; font-weight: bold; }
+            
+            input.ket-input { display: none; }
+            span.print-ket { display: block !important; font-size: 6.5pt; color: #444; margin-top: 2px; font-style: italic; line-height: 1.1; word-wrap: break-word; max-width: 80px;}
+        }
+        .header-print { display: none; }
+        span.print-value, span.print-ket { display: none; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="no-print">
+            <h2>
+                Data Honor Les - Sync G-Sheets
+                <span class="status-badge" id="statusSimpan">⚪ Menunggu Koneksi</span>
+            </h2>
+            
+            <div class="form-panel">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tahun Ajaran</label>
+                        <input type="text" id="tahunAjaran" value="2025-2026" onchange="gantiPeriode()">
+                    </div>
+                    <div class="form-group">
+                        <label>Bulan Pembayaran</label>
+                        <select id="bulan" onchange="gantiPeriode()">
+                            <option value="AGUSTUS">Agustus</option>
+                            <option value="SEPTEMBER">September</option>
+                            <option value="OKTOBER">Oktober</option>
+                            <option value="NOVEMBER">November</option>
+                            <option value="DESEMBER">Desember</option>
+                            <option value="JANUARI">Januari</option>
+                            <option value="FEBRUARI">Februari</option>
+                            <option value="MARET">Maret</option>
+                            <option value="APRIL">April</option>
+                            <option value="MEI">Mei</option>
+                            <option value="JUNI" selected>Juni</option>
+                            <option value="JULI">Juli</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Guru / Wali Kelas</label>
+                        <input type="text" id="namaGuru" placeholder="Cth: Nova Haryanto">
+                    </div>
+                    <div class="form-group">
+                        <label>Les / Ekstrakurikuler</label>
+                        <input type="text" id="jenisLes" placeholder="Umum / TIK / Agama / Karate">
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <input type="text" id="kelas" placeholder="Cth: 1, 2, 3A...">
+                    </div>
+                    <div class="form-group">
+                        <label>Jml Murid Ikut Les</label>
+                        <input type="number" id="jumlahSiswa" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Harga Les / Siswa</label>
+                        <input type="number" id="hargaLes" min="0" value="75000">
+                    </div>
+                    <div class="form-group">
+                        <label>Potongan ke Sekolah</label>
+                        <input type="number" id="potonganSekolah" min="0" value="5000">
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn-add" id="btnSimpan" onclick="simpanData()">+ Simpan Data (Otomatis ke Sheets)</button>
+                    <button class="btn-print" onclick="window.print()">🖨️ Cetak (Portrait)</button>
+                </div>
+            </div>
+        </div>
 
-<div class="container">
-    <h2>Form Input Honor Les</h2>
-    <form id="lesForm">
+        <!-- Print Header -->
+        <div class="header-print">
+            <h3>DATA HONOR LES SDIT HIDAYATUT TAUFIQ</h3>
+            <p>Bulan: <strong id="printBulan">JUNI</strong> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; TAHUN AJARAN: <strong id="printTahun">2025-2026</strong></p>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-responsive">
+            <div id="loadingOverlay">🔄 Sinkronisasi Data Google Sheets...</div>
+            <table id="tabelHonor">
+                <thead>
+                    <tr>
+                        <th rowspan="2" width="3%">NO</th>
+                        <th rowspan="2" width="13%">Nama Wali Kelas / Guru</th>
+                        <th rowspan="2" width="7%">Les</th>
+                        <th rowspan="2" width="5%">Kls</th>
+                        <th rowspan="2" width="5%">Jml Murid</th>
+                        <th rowspan="2" width="9%">Pending sblmnya<br><small>(+ Keterangan)</small></th>
+                        <th rowspan="2" width="9%">Blm bayar<br><small>(+ Keterangan)</small></th>
+                        <th rowspan="2" width="4%">Total Bayar</th>
+                        <th colspan="2">Penerimaan Kotor (Gross)</th>
+                        <th colspan="2" class="no-print">Edit Honor Bersih (Per Kelas)</th>
+                        <th rowspan="2" width="12%">TOTAL DITERIMA (Guru/Ekskul)</th>
+                        <th rowspan="2" width="8%">TANDA TANGAN</th>
+                        <th rowspan="2" width="6%" class="no-print">AKSI</th>
+                    </tr>
+                    <tr>
+                        <th width="7%">Per Siswa</th>
+                        <th width="9%">Jumlah Kotor</th>
+                        <th width="8%" class="no-print">Tarif (Net)</th>
+                        <th width="9%" class="no-print">Net Kelas Ini</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyData">
+                    <!-- Dynamic Rows -->
+                </tbody>
+                <tfoot>
+                    <!-- Subtotals -->
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // URL GOOGLE APPS SCRIPT HARDCODED
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyYnTaFvOnlTdZIxfRxjorGT_2_-QVxBvr5gPq_CDgn5_YWZQrUcStAIgtFLjXCMm3D/exec';
         
-        <div class="form-group">
-            <label>Nama Wali Kelas / Guru</label>
-            <input type="text" id="namaGuru" name="nama_guru" required>
-        </div>
+        let dataLes = []; 
+        let incrementId = 1;
+        let editModeId = null;
+        let syncTimeout = null;
 
-        <div class="form-group">
-            <label>Kelas</label>
-            <input type="text" id="kelas" name="kelas" placeholder="Contoh: 3A, 4, 5" required>
-        </div>
+        window.onload = function() {
+            if(localStorage.getItem('honorLes_LastTahun')) {
+                document.getElementById('tahunAjaran').value = localStorage.getItem('honorLes_LastTahun');
+            }
+            if(localStorage.getItem('honorLes_LastBulan')) {
+                document.getElementById('bulan').value = localStorage.getItem('honorLes_LastBulan');
+            }
+            
+            // Langsung load data dari G-Sheets
+            gantiPeriode();
+        };
 
-        <div class="form-group">
-            <label>Kategori Les</label>
-            <select id="kategori" name="kategori" onchange="hitungHonor()">
-                <option value="Umum">Umum / Agama / TIK</option>
-                <option value="Ekskul">Ekstrakurikuler</option>
-            </select>
-        </div>
+        function setStatus(type, msg) {
+            const badge = document.getElementById('statusSimpan');
+            badge.innerText = msg;
+            badge.className = 'status-badge'; // reset class
+            if(type === 'sync') badge.classList.add('status-syncing');
+            else if(type === 'success') badge.classList.add('status-success');
+            else if(type === 'error') badge.classList.add('status-error');
+        }
 
-        <div class="form-group">
-            <label>Jumlah Murid Ikut Les</label>
-            <input type="number" id="jmlMurid" name="jml_murid" value="0" oninput="hitungHonor()" required>
-        </div>
+        // FUNGSI TARIK DATA DARI GOOGLE SHEETS
+        async function gantiPeriode() {
+            const tahun = document.getElementById('tahunAjaran').value.trim();
+            const bulan = document.getElementById('bulan').value;
+            
+            localStorage.setItem('honorLes_LastTahun', tahun);
+            localStorage.setItem('honorLes_LastBulan', bulan);
+            document.getElementById('printBulan').innerText = bulan.toUpperCase();
+            document.getElementById('printTahun').innerText = tahun;
 
-        <div class="form-group">
-            <label>Pendingan Bulan Lalu</label>
-            <input type="number" id="pendingan" name="pendingan" value="0" oninput="hitungHonor()">
-        </div>
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            setStatus('sync', '🔄 Memuat Data...');
 
-        <div class="form-group">
-            <label>Murid Belum Bayar Bulan Ini</label>
-            <input type="number" id="belumBayar" name="belum_bayar" value="0" oninput="hitungHonor()">
-        </div>
+            try {
+                // Request GET ke Google Apps Script
+                const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
+                const result = await response.json();
+                
+                dataLes = result || [];
+                incrementId = dataLes.length > 0 ? Math.max(...dataLes.map(d => parseInt(d.id) || 0)) + 1 : 1;
+                
+                setStatus('success', '🟢 Sinkronisasi Selesai');
+                renderTabel();
+            } catch (error) {
+                console.error(error);
+                setStatus('error', '🔴 Gagal Memuat Data');
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
 
-        <div class="result">
-            <p><strong>Total Siswa Dihitung:</strong> <span id="tampilSiswa">0</span></p>
-            <p><strong>Total Kotor:</strong> Rp <span id="tampilKotor">0</span></p>
-            <p><strong>Total Bersih (Diterima):</strong> Rp <span id="tampilBersih">0</span></p>
-        </div>
+        // FUNGSI SIMPAN (PUSH) KE GOOGLE SHEETS
+        async function syncToDatabase() {
+            const tahun = document.getElementById('tahunAjaran').value.trim();
+            const bulan = document.getElementById('bulan').value;
+            
+            setStatus('sync', '🔄 Menyimpan ke G-Sheets...');
 
-        <!-- Hidden inputs to send calculated data to Apps Script -->
-        <input type="hidden" id="totalSiswa" name="total_siswa">
-        <input type="hidden" id="totalKotor" name="total_kotor">
-        <input type="hidden" id="totalBersih" name="total_bersih">
+            const payload = {
+                action: 'saveData',
+                tahun: tahun,
+                bulan: bulan,
+                data: dataLes
+            };
 
-        <button type="submit" id="btnSubmit">Simpan ke Database</button>
-        <div id="statusMessage"></div>
-    </form>
-</div>
+            try {
+                // Menggunakan POST request dengan content-type text/plain untuk menghindari preflight CORS error di browser
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if(result.status === 'success') {
+                    setStatus('success', '🟢 Tersimpan di G-Sheets');
+                } else {
+                    setStatus('error', '🔴 Error Menyimpan');
+                }
+            } catch (error) {
+                console.error(error);
+                setStatus('error', '🔴 Gagal Terhubung');
+            }
+        }
 
-<script>
-    // URL Web App dari Google Apps Script
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyYnTaFvOnlTdZIxfRxjorGT_2_-QVxBvr5gPq_CDgn5_YWZQrUcStAIgtFLjXCMm3D/exec';
-    const form = document.getElementById('lesForm');
-    const statusMsg = document.getElementById('statusMessage');
-    const btnSubmit = document.getElementById('btnSubmit');
+        // Delay sync untuk input typing agar tidak spam request ke server
+        function triggerAutoSync() {
+            if(syncTimeout) clearTimeout(syncTimeout);
+            setStatus('sync', '⏳ Menunggu diketik...');
+            syncTimeout = setTimeout(() => {
+                syncToDatabase();
+            }, 1500); // Tunggu 1.5 detik setelah berhenti mengetik
+        }
 
-    function hitungHonor() {
-        let kategori = document.getElementById("kategori").value;
-        let jmlMurid = parseInt(document.getElementById("jmlMurid").value) || 0;
-        let pendingan = parseInt(document.getElementById("pendingan").value) || 0;
-        let belumBayar = parseInt(document.getElementById("belumBayar").value) || 0;
+        function simpanData() {
+            const namaGuru = document.getElementById('namaGuru').value.trim();
+            const jenisLes = document.getElementById('jenisLes').value.trim();
+            const kelas = document.getElementById('kelas').value;
+            const jumlahSiswa = parseInt(document.getElementById('jumlahSiswa').value) || 0;
+            const hargaLes = parseInt(document.getElementById('hargaLes').value) || 0;
+            const potongan = parseInt(document.getElementById('potonganSekolah').value) || 0;
 
-        let totalSiswa = (jmlMurid + pendingan) - belumBayar;
-        let tarifKotor = (kategori === "Umum") ? 75000 : 65000;
-        let tarifBersih = (kategori === "Umum") ? 70000 : 60000;
+            if(!namaGuru || !jenisLes) {
+                alert("Harap isi Nama Guru dan Jenis Les!");
+                return;
+            }
 
-        let totalKotor = totalSiswa * tarifKotor;
-        let totalBersih = totalSiswa * tarifBersih;
+            let netPerSiswa = hargaLes - potongan;
 
-        // Update tampilan
-        document.getElementById("tampilSiswa").innerText = totalSiswa;
-        document.getElementById("tampilKotor").innerText = totalKotor.toLocaleString('id-ID');
-        document.getElementById("tampilBersih").innerText = totalBersih.toLocaleString('id-ID');
+            if (editModeId !== null) {
+                // UPDATE EKSISTING
+                let index = dataLes.findIndex(d => d.id === editModeId);
+                if (index !== -1) {
+                    let d = dataLes[index];
+                    let totalBayar = jumlahSiswa + parseInt(d.pendingan) - parseInt(d.belumBayar);
+                    
+                    let grossTotal = totalBayar * hargaLes;
+                    let netTotal = totalBayar * netPerSiswa;
+                    
+                    if(jenisLes.toLowerCase().includes('karate')) {
+                        let firstKarateId = Math.min(...dataLes.filter(x => x.namaGuru === namaGuru && x.jenisLes === jenisLes).map(x => x.id));
+                        netTotal = (d.id === firstKarateId) ? 1500000 : 0;
+                    }
 
-        // Update hidden inputs untuk dikirim ke database
-        document.getElementById("totalSiswa").value = totalSiswa;
-        document.getElementById("totalKotor").value = totalKotor;
-        document.getElementById("totalBersih").value = totalBersih;
-    }
+                    dataLes[index] = {
+                        ...d, kelas: kelas, namaGuru: namaGuru, jenisLes: jenisLes,
+                        jumlahSiswa: jumlahSiswa, totalBayar: totalBayar,
+                        hargaLes: hargaLes, netPerSiswa: netPerSiswa,
+                        grossTotal: grossTotal, netTotal: netTotal, potonganPerSiswaAsli: potongan
+                    };
+                }
+                editModeId = null;
+                const btnSimpan = document.getElementById('btnSimpan');
+                btnSimpan.innerHTML = '+ Simpan Data (Otomatis ke Sheets)';
+                btnSimpan.style.backgroundColor = 'var(--primary)';
+            } else {
+                // TAMBAH BARU
+                let totalBayar = jumlahSiswa;
+                let grossTotal = totalBayar * hargaLes;
+                let netTotal = totalBayar * netPerSiswa;
+                
+                if(jenisLes.toLowerCase().includes('karate')) {
+                    let isExist = dataLes.some(d => d.namaGuru === namaGuru && d.jenisLes === jenisLes);
+                    netTotal = isExist ? 0 : 1500000; 
+                }
 
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        btnSubmit.disabled = true;
-        btnSubmit.innerText = "Menyimpan Data...";
-        statusMsg.innerText = "";
-        statusMsg.style.color = "black";
+                dataLes.push({
+                    id: incrementId++,
+                    kelas: kelas, namaGuru: namaGuru, jenisLes: jenisLes,
+                    jumlahSiswa: jumlahSiswa, pendingan: 0, belumBayar: 0,
+                    ketPending: "", ketBelumBayar: "",
+                    totalBayar: totalBayar, hargaLes: hargaLes, netPerSiswa: netPerSiswa,
+                    grossTotal: grossTotal, netTotal: netTotal, potonganPerSiswaAsli: potongan
+                });
+            }
 
-        let requestBody = new FormData(form);
+            document.getElementById('kelas').value = '';
+            document.getElementById('jumlahSiswa').value = '0';
+            document.getElementById('namaGuru').focus();
 
-        fetch(scriptURL, { method: 'POST', body: requestBody })
-            .then(response => {
-                statusMsg.innerText = "Data berhasil disimpan!";
-                statusMsg.style.color = "green";
-                form.reset();
-                hitungHonor(); // Reset kalkulasi
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = "Simpan ke Database";
-            })
-            .catch(error => {
-                statusMsg.innerText = "Gagal menyimpan data!";
-                statusMsg.style.color = "red";
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = "Simpan ke Database";
-                console.error('Error!', error.message);
+            renderTabel();
+            syncToDatabase(); // Langsung sync
+        }
+
+        function updateCellData(id, field, value) {
+            let index = dataLes.findIndex(d => d.id == id); // Gunakan == karena id mungkin string dari JSON
+            if(index !== -1) {
+                if(field === 'ketPending' || field === 'ketBelumBayar') {
+                    dataLes[index][field] = value;
+                    triggerAutoSync(); // Auto sync dengan delay saat ngetik nama siswa
+                } else {
+                    dataLes[index][field] = parseInt(value) || 0;
+                    let row = dataLes[index];
+
+                    if(['jumlahSiswa', 'pendingan', 'belumBayar'].includes(field)) {
+                        row.totalBayar = parseInt(row.jumlahSiswa) + parseInt(row.pendingan) - parseInt(row.belumBayar);
+                        row.grossTotal = row.totalBayar * parseInt(row.hargaLes);
+                        
+                        if(!row.jenisLes.toLowerCase().includes('karate')) {
+                            row.netTotal = row.totalBayar * parseInt(row.netPerSiswa);
+                        }
+                    }
+
+                    if(field === 'netTotal') {
+                        row.netTotal = parseInt(value) || 0;
+                    }
+                    
+                    renderTabel();
+                    triggerAutoSync();
+                }
+            }
+        }
+
+        function formatRp(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
+        }
+
+        function editData(id) {
+            let item = dataLes.find(d => d.id == id);
+            if(item) {
+                document.getElementById('namaGuru').value = item.namaGuru;
+                document.getElementById('jenisLes').value = item.jenisLes;
+                document.getElementById('kelas').value = item.kelas;
+                document.getElementById('jumlahSiswa').value = item.jumlahSiswa;
+                document.getElementById('hargaLes').value = item.hargaLes;
+                document.getElementById('potonganSekolah').value = item.potonganPerSiswaAsli;
+
+                editModeId = item.id; 
+                const btnSimpan = document.getElementById('btnSimpan');
+                btnSimpan.innerHTML = '✓ Update & Sync Data';
+                btnSimpan.style.backgroundColor = '#ff9800';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function hapusData(id) {
+            if(confirm('Yakin ingin menghapus data kelas ini dari Google Sheets?')) {
+                dataLes = dataLes.filter(d => d.id != id);
+                renderTabel();
+                syncToDatabase();
+            }
+        }
+
+        function renderTabel() {
+            const tbody = document.getElementById('tbodyData');
+            const tfoot = document.querySelector('tfoot');
+            tbody.innerHTML = '';
+            
+            let sumKotor = 0;
+            let sumBersihGuru = 0;
+            let sumYayasan = 0;
+
+            let groupedData = {};
+            dataLes.forEach(d => {
+                let key = String(d.namaGuru).trim().toLowerCase() + "_" + String(d.jenisLes).trim().toLowerCase();
+                if(!groupedData[key]) {
+                    groupedData[key] = { namaGuru: d.namaGuru, jenisLes: d.jenisLes, items: [], groupGross: 0, groupNet: 0 };
+                }
+                groupedData[key].items.push(d);
+                groupedData[key].groupGross += parseInt(d.grossTotal) || 0;
+                groupedData[key].groupNet += parseInt(d.netTotal) || 0;
             });
-    });
-</script>
 
+            let no = 1;
+            for(let key in groupedData) {
+                let group = groupedData[key];
+                let rowspan = group.items.length;
+                
+                sumKotor += group.groupGross;
+                sumBersihGuru += group.groupNet;
+                sumYayasan += (group.groupGross - group.groupNet);
+
+                group.items.forEach((d, index) => {
+                    const tr = document.createElement('tr');
+                    if(index === rowspan - 1) tr.classList.add('grouped-row');
+                    
+                    if(index === 0) {
+                        tr.innerHTML += `<td rowspan="${rowspan}">${no}</td>`;
+                        tr.innerHTML += `<td rowspan="${rowspan}" class="text-left" style="font-weight:600;">${group.namaGuru}</td>`;
+                        tr.innerHTML += `<td rowspan="${rowspan}">${group.jenisLes}</td>`;
+                    }
+
+                    tr.innerHTML += `
+                        <td>${d.kelas}</td>
+                        <td>
+                            <input class="editable no-print" type="number" value="${d.jumlahSiswa}" onchange="updateCellData('${d.id}', 'jumlahSiswa', this.value)">
+                            <span class="print-value">${d.jumlahSiswa}</span>
+                        </td>
+                        <td>
+                            <input class="editable no-print" type="number" value="${d.pendingan}" onchange="updateCellData('${d.id}', 'pendingan', this.value)">
+                            <input class="ket-input no-print" type="text" placeholder="Nama siswa..." value="${d.ketPending || ''}" onchange="updateCellData('${d.id}', 'ketPending', this.value)">
+                            <span class="print-value">${d.pendingan || ''}</span>
+                            <span class="print-ket">${d.ketPending ? '(' + d.ketPending + ')' : ''}</span>
+                        </td>
+                        <td>
+                            <input class="editable no-print" type="number" value="${d.belumBayar}" onchange="updateCellData('${d.id}', 'belumBayar', this.value)">
+                            <input class="ket-input no-print" type="text" placeholder="Nama siswa..." value="${d.ketBelumBayar || ''}" onchange="updateCellData('${d.id}', 'ketBelumBayar', this.value)">
+                            <span class="print-value">${d.belumBayar || ''}</span>
+                            <span class="print-ket">${d.ketBelumBayar ? '(' + d.ketBelumBayar + ')' : ''}</span>
+                        </td>
+                        <td><strong>${d.totalBayar}</strong></td>
+                        <td>${formatRp(d.hargaLes)}</td>
+                        <td>${formatRp(d.grossTotal)}</td>
+                        
+                        <td class="no-print">${String(d.jenisLes).toLowerCase().includes('karate') ? '-' : formatRp(d.netPerSiswa)}</td>
+                        <td class="no-print">
+                            <input class="editable override-field" type="number" value="${d.netTotal}" onchange="updateCellData('${d.id}', 'netTotal', this.value)" step="10000">
+                        </td>
+                    `;
+
+                    if(index === 0) {
+                        tr.innerHTML += `<td rowspan="${rowspan}" style="font-weight:bold; font-size:1.05em; background-color:#f8f9fa;">${formatRp(group.groupNet)}</td>`;
+                        tr.innerHTML += `<td rowspan="${rowspan}"></td>`;
+                    }
+
+                    tr.innerHTML += `
+                        <td class="no-print">
+                            <div class="action-cell">
+                                <button class="btn-edit" onclick="editData('${d.id}')" title="Edit">✏️</button>
+                                <button class="btn-delete" onclick="hapusData('${d.id}')" title="Hapus">🗑️</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                no++;
+            }
+
+            tfoot.innerHTML = `
+                <tr style="background-color: #f1f3f5; font-weight: 600;">
+                    <td colspan="9" style="text-align: right; padding-right:10px;">Sub Total Pemasukan Kotor:</td>
+                    <td>${formatRp(sumKotor)}</td>
+                    <td colspan="2" class="no-print" style="text-align: right;">Sub Total Honor Guru:</td>
+                    <td style="font-weight:bold;">${formatRp(sumBersihGuru)}</td>
+                    <td></td>
+                    <td class="no-print"></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: right; font-weight:bold;">YAYASAN</td>
+                    <td colspan="6" class="text-left">Penny Sulistiati (Dari Potongan Ke Sekolah)</td>
+                    <td></td>
+                    <td colspan="2" class="no-print"></td>
+                    <td style="font-weight:bold; color:#d32f2f;">${formatRp(sumYayasan)}</td>
+                    <td></td>
+                    <td class="no-print"></td>
+                </tr>
+                <tr style="background-color: #e2e6ea; font-size: 1.05em; font-weight: bold;">
+                    <td colspan="9" style="text-align: right; padding-right:10px;">TOTAL KESELURUHAN (Alokasi & Pengeluaran):</td>
+                    <td>${formatRp(sumKotor)}</td>
+                    <td colspan="2" class="no-print" style="text-align:right;">JUMLAH TOTAL:</td>
+                    <td style="font-weight:bold; font-size:1.1em;">${formatRp(sumBersihGuru + sumYayasan)}</td>
+                    <td></td>
+                    <td class="no-print"></td>
+                </tr>
+            `;
+        }
+    </script>
 </body>
 </html>
