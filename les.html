@@ -119,17 +119,24 @@
             .kw-card-yayasan .kw-nominal { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
             .kw-card-yayasan .kw-header { border-bottom-color: #b71c1c; }
 
-            .kw-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #004494; padding-bottom: 10px; margin-bottom: 20px; }
+            .kw-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #004494; padding-bottom: 10px; margin-bottom: 15px; }
             .kw-logo { font-size: 1.2em; font-weight: 900; color: #004494; letter-spacing: 1px; }
             .kw-title { font-size: 1.4em; font-weight: bold; color: #333; text-decoration: underline; letter-spacing: 2px; }
-            .kw-body { font-size: 1.1em; line-height: 1.6; margin-bottom: 20px; }
-            .kw-row { display: flex; margin-bottom: 10px; align-items: center; }
+            .kw-body { font-size: 1.1em; line-height: 1.6; margin-bottom: 15px; }
+            .kw-row { display: flex; margin-bottom: 8px; align-items: flex-start; }
             .kw-label { width: 170px; font-weight: 600; color: #555; }
             .kw-colon { width: 20px; font-weight: bold; }
             .kw-value { flex: 1; border-bottom: 1px dashed #999; padding-bottom: 2px; }
             .kw-bold { font-weight: bold; color: #000; }
             .kw-highlight-text { background: #f1f3f5; font-style: italic; font-weight: bold; padding: 2px 10px; border-radius: 4px; display: inline-block; border-bottom: none; }
-            .kw-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+            
+            /* Keterangan Tambahan (Rincian Siswa) */
+            .kw-detail-box { font-size: 0.85em; background: #f8f9fa; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; margin-top: 5px; color: #555; line-height: 1.4;}
+            .kw-detail-item { display: inline-block; margin-right: 15px; }
+            .kw-detail-val { font-weight: bold; color: #004494; }
+            .kw-detail-names { display: block; font-size: 0.9em; font-style: italic; color: #777; margin-top: 2px; }
+
+            .kw-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto;}
             .kw-nominal { font-size: 1.8em; font-weight: 900; background: #e3f2fd; padding: 8px 25px; border-radius: 8px; border: 2px solid #90caf9; color: #0d47a1; }
             .kw-ttd { text-align: center; font-size: 1em; }
             .kw-ttd p { margin: 2px 0; }
@@ -487,11 +494,32 @@
             dataLes.forEach(d => {
                 let key = String(d.namaGuru).trim().toLowerCase() + "_" + String(d.jenisLes).trim().toLowerCase();
                 if(!groupedData[key]) {
-                    groupedData[key] = { namaGuru: d.namaGuru, jenisLes: d.jenisLes, items: [], groupGross: 0, groupNet: 0 };
+                    groupedData[key] = { 
+                        namaGuru: d.namaGuru, 
+                        jenisLes: d.jenisLes, 
+                        items: [], 
+                        groupGross: 0, 
+                        groupNet: 0,
+                        totalJmlSiswa: 0,
+                        totalPending: 0,
+                        totalBelumBayar: 0,
+                        totalBayarKeseluruhan: 0,
+                        rincianPending: [],
+                        rincianBelumBayar: []
+                    };
                 }
                 groupedData[key].items.push(d);
                 groupedData[key].groupGross += parseInt(d.grossTotal) || 0;
                 groupedData[key].groupNet += parseInt(d.netTotal) || 0;
+                
+                // Kalkulasi untuk Rincian di Kwitansi
+                groupedData[key].totalJmlSiswa += parseInt(d.jumlahSiswa) || 0;
+                groupedData[key].totalPending += parseInt(d.pendingan) || 0;
+                groupedData[key].totalBelumBayar += parseInt(d.belumBayar) || 0;
+                groupedData[key].totalBayarKeseluruhan += parseInt(d.totalBayar) || 0;
+                
+                if(d.ketPending && d.ketPending.trim() !== '') groupedData[key].rincianPending.push(`Kls ${d.kelas}: ${d.ketPending}`);
+                if(d.ketBelumBayar && d.ketBelumBayar.trim() !== '') groupedData[key].rincianBelumBayar.push(`Kls ${d.kelas}: ${d.ketBelumBayar}`);
             });
 
             globalGroupedData = groupedData; // Simpan untuk dipakai Kwitansi
@@ -631,6 +659,7 @@
                 return;
             }
 
+            // Generate Tanggal Hari Ini Sesuai dengan Zona Waktu (Bekasi)
             const d = new Date();
             const bulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
             const tglStr = `${d.getDate()} ${bulanArr[d.getMonth()]} ${d.getFullYear()}`;
@@ -640,11 +669,38 @@
             currentPage.className = 'kwitansi-page';
             
             // FUNGSI HELPER UNTUK RENDER CARD
-            const renderCard = (nama, nominal, keperluan, isYayasan = false) => {
+            const renderCard = (group, isYayasan = false) => {
+                let nama = isYayasan ? "Penny Sulistiati" : group.namaGuru;
+                let nominal = isYayasan ? totalYayasanGlobal : group.groupNet;
+                let keperluan = isYayasan ? "Honor Yayasan (Potongan Sekolah)" : `Honor Les ${group.jenisLes}`;
+                
                 let terbilangStr = terbilang(nominal).trim() + " Rupiah";
                 let bulanText = document.getElementById('bulan').value.toUpperCase();
                 let tahunText = document.getElementById('tahunAjaran').value;
                 let addClass = isYayasan ? "kw-card-yayasan" : "";
+
+                // Susun HTML Rincian Siswa jika bukan yayasan
+                let htmlRincian = "";
+                if(!isYayasan) {
+                    htmlRincian = `<div class="kw-detail-box">`;
+                    htmlRincian += `<div style="margin-bottom:4px;"><b>Rincian Les Siswa:</b></div>`;
+                    htmlRincian += `<span class="kw-detail-item">Jml Murid: <span class="kw-detail-val">${group.totalJmlSiswa}</span></span>`;
+                    htmlRincian += `<span class="kw-detail-item">Total Bayar: <span class="kw-detail-val">${group.totalBayarKeseluruhan}</span></span>`;
+                    
+                    if(group.totalPending > 0) {
+                        htmlRincian += `<br><span class="kw-detail-item" style="color:#d32f2f;">Pending: <span class="kw-detail-val" style="color:#d32f2f;">${group.totalPending}</span></span>`;
+                        if(group.rincianPending.length > 0) {
+                            htmlRincian += `<span class="kw-detail-names">(${group.rincianPending.join(' | ')})</span>`;
+                        }
+                    }
+                    if(group.totalBelumBayar > 0) {
+                        htmlRincian += `<br><span class="kw-detail-item" style="color:#d32f2f;">Belum Bayar: <span class="kw-detail-val" style="color:#d32f2f;">${group.totalBelumBayar}</span></span>`;
+                        if(group.rincianBelumBayar.length > 0) {
+                            htmlRincian += `<span class="kw-detail-names">(${group.rincianBelumBayar.join(' | ')})</span>`;
+                        }
+                    }
+                    htmlRincian += `</div>`;
+                }
                 
                 let cardHTML = `
                 <div class="kwitansi-card ${addClass}">
@@ -665,6 +721,7 @@
                             <span class="kw-label">Untuk pembayaran</span><span class="kw-colon">:</span>
                             <span class="kw-value">${keperluan} - Bulan ${bulanText} (${tahunText})</span>
                         </div>
+                        ${htmlRincian}
                     </div>
                     <div class="kw-footer">
                         <div class="kw-nominal">Rp ${formatRp(nominal).replace('Rp','').trim()}</div>
@@ -689,12 +746,12 @@
 
             // RENDER KWITANSI YAYASAN (Paling Atas)
             if(totalYayasanGlobal > 0) {
-                renderCard("Penny Sulistiati", totalYayasanGlobal, "Honor Yayasan (Potongan Sekolah)", true);
+                renderCard({}, true); // Lempar object kosong dan flag true
             }
 
             // RENDER KWITANSI GURU / EKSKUL
             groups.forEach((group) => {
-                renderCard(group.namaGuru, group.groupNet, `Honor Les ${group.jenisLes}`);
+                renderCard(group, false);
             });
 
             // Append sisa page jika angkanya ganjil (1 card di page terakhir)
