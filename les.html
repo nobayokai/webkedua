@@ -14,10 +14,12 @@
             --info: #17a2b8;
             --info-hover: #138496;
             --warning: #ff9800;
+            --purple: #6f42c1;
+            --purple-hover: #5a32a3;
             --bg-color: #f8f9fa;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1380px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         
         .status-badge { font-size: 0.4em; background: #6c757d; color: white; padding: 5px 10px; border-radius: 20px; vertical-align: middle; transition: background 0.3s; }
@@ -39,6 +41,8 @@
         .btn-add:hover { background: var(--primary-hover); }
         .btn-print { background: var(--success); }
         .btn-print:hover { background: var(--success-hover); }
+        .btn-print-kw { background: var(--purple); }
+        .btn-print-kw:hover { background: var(--purple-hover); }
 
         /* Action Buttons in Table */
         .btn-edit, .btn-delete { padding: 4px 8px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
@@ -67,27 +71,62 @@
             font-size: 1.5em; font-weight: bold; color: var(--primary); z-index: 10; border-radius: 5px;
         }
 
-        /* Print Layout (A4 Portrait - 1 Page Fit) */
+        /* KHUSUS CSS PRINT */
+        #kwitansiContainer { display: none; }
+        
         @media print {
-            @page { size: A4 portrait; margin: 5mm; }
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border-radius: 0; max-width: 100%; padding: 0; }
-            .no-print { display: none !important; }
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background: white; padding: 0; margin: 0; }
             
-            .table-responsive { overflow: visible; zoom: 0.82; }
-            table { font-size: 8pt; border-color: #000; width: 100%; }
-            th, td { border: 1px solid #000 !important; padding: 3px 2px; }
-            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 7.5pt; }
+            /* PRINT MODE: TABEL LAPORAN */
+            body.printing-table .no-print { display: none !important; }
+            body.printing-table .container { box-shadow: none; border-radius: 0; max-width: 100%; padding: 0; }
+            body.printing-table .table-responsive { overflow: visible; zoom: 0.82; }
+            body.printing-table table { font-size: 8pt; border-color: #000; width: 100%; }
+            body.printing-table th, body.printing-table td { border: 1px solid #000 !important; padding: 3px 2px; }
+            body.printing-table th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 7.5pt; }
+            body.printing-table .header-print { display: block !important; text-align: center; margin-bottom: 10px; line-height: 1.2; }
+            body.printing-table .header-print h3 { margin: 0; font-size: 12pt; font-weight: bold; }
+            body.printing-table .header-print p { margin: 3px 0 0 0; font-size: 9pt; }
+            body.printing-table input.editable { display: none; }
+            body.printing-table span.print-value { display: inline !important; font-weight: bold; }
+            body.printing-table input.ket-input { display: none; }
+            body.printing-table span.print-ket { display: block !important; font-size: 6.5pt; color: #444; margin-top: 2px; font-style: italic; line-height: 1.1; word-wrap: break-word; max-width: 80px;}
             
-            .header-print { display: block !important; text-align: center; margin-bottom: 10px; line-height: 1.2; }
-            .header-print h3 { margin: 0; font-size: 12pt; font-weight: bold; }
-            .header-print p { margin: 3px 0 0 0; font-size: 9pt; }
+            /* PRINT MODE: KWITANSI MASAL */
+            body.printing-kwitansi .container { display: none !important; } /* Sembunyikan semua UI & Tabel */
+            body.printing-kwitansi #kwitansiContainer { display: block !important; }
             
-            input.editable { display: none; }
-            span.print-value { display: inline !important; font-weight: bold; }
-            
-            input.ket-input { display: none; }
-            span.print-ket { display: block !important; font-size: 6.5pt; color: #444; margin-top: 2px; font-style: italic; line-height: 1.1; word-wrap: break-word; max-width: 80px;}
+            .kwitansi-page { page-break-after: always; display: flex; flex-direction: column; height: 277mm; }
+            .kwitansi-card {
+                height: 125mm; /* Pas setengah A4 dengan margin */
+                margin-bottom: 15mm;
+                border: 2px solid #004494;
+                border-radius: 12px;
+                padding: 25px;
+                box-sizing: border-box;
+                position: relative;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background: #fff;
+                box-shadow: inset 0 0 0 4px #e3f2fd;
+            }
+            .kw-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #004494; padding-bottom: 10px; margin-bottom: 20px; }
+            .kw-logo { font-size: 1.2em; font-weight: 900; color: #004494; letter-spacing: 1px; }
+            .kw-title { font-size: 1.4em; font-weight: bold; color: #333; text-decoration: underline; letter-spacing: 2px; }
+            .kw-body { font-size: 1.1em; line-height: 1.6; margin-bottom: 20px; }
+            .kw-row { display: flex; margin-bottom: 10px; align-items: center; }
+            .kw-label { width: 170px; font-weight: 600; color: #555; }
+            .kw-colon { width: 20px; font-weight: bold; }
+            .kw-value { flex: 1; border-bottom: 1px dashed #999; padding-bottom: 2px; }
+            .kw-bold { font-weight: bold; color: #000; }
+            .kw-highlight-text { background: #f1f3f5; font-style: italic; font-weight: bold; padding: 2px 10px; border-radius: 4px; display: inline-block; border-bottom: none; }
+            .kw-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+            .kw-nominal { font-size: 1.8em; font-weight: 900; background: #e3f2fd; padding: 8px 25px; border-radius: 8px; border: 2px solid #90caf9; color: #0d47a1; }
+            .kw-ttd { text-align: center; font-size: 1em; }
+            .kw-ttd p { margin: 2px 0; }
+            .ttd-space { height: 60px; }
+            .ttd-name { font-weight: bold; text-decoration: underline; }
         }
         .header-print { display: none; }
         span.print-value, span.print-ket { display: none; }
@@ -152,42 +191,44 @@
                 
                 <div class="action-buttons">
                     <button class="btn-add" id="btnSimpan" onclick="simpanData()">+ Simpan Data (Otomatis ke Sheets)</button>
-                    <button class="btn-print" onclick="window.print()">🖨️ Cetak (Portrait)</button>
+                    <button class="btn-print" onclick="cetakTabel()">🖨️ Cetak Tabel Laporan</button>
+                    <button class="btn-print-kw" onclick="cetakKwitansi()">🎫 Cetak Kwitansi (Estetik)</button>
                 </div>
             </div>
         </div>
 
-        <!-- Print Header -->
-        <div class="header-print">
+        <!-- Print Header untuk Mode Tabel -->
+        <div class="header-print no-print-kwitansi">
             <h3>DATA HONOR LES SDIT HIDAYATUT TAUFIQ</h3>
             <p>Bulan: <strong id="printBulan">JUNI</strong> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; TAHUN AJARAN: <strong id="printTahun">2025-2026</strong></p>
         </div>
 
         <!-- Data Table -->
-        <div class="table-responsive">
+        <div class="table-responsive no-print-kwitansi">
             <div id="loadingOverlay">🔄 Sinkronisasi Data Google Sheets...</div>
             <table id="tabelHonor">
                 <thead>
                     <tr>
                         <th rowspan="2" width="3%">NO</th>
-                        <th rowspan="2" width="13%">Nama Wali Kelas / Guru</th>
-                        <th rowspan="2" width="7%">Les</th>
-                        <th rowspan="2" width="5%">Kls</th>
-                        <th rowspan="2" width="5%">Jml Murid</th>
-                        <th rowspan="2" width="9%">Pending sblmnya<br><small>(+ Keterangan)</small></th>
-                        <th rowspan="2" width="9%">Blm bayar<br><small>(+ Keterangan)</small></th>
+                        <th rowspan="2" width="12%">Nama Wali Kelas / Guru</th>
+                        <th rowspan="2" width="5%">Les</th>
+                        <th rowspan="2" width="4%">Kls</th>
+                        <th rowspan="2" width="4%">Jml Murid</th>
+                        <th rowspan="2" width="8%">Pending sblmnya<br><small>(+ Ket)</small></th>
+                        <th rowspan="2" width="8%">Blm bayar<br><small>(+ Ket)</small></th>
                         <th rowspan="2" width="4%">Total Bayar</th>
                         <th colspan="2">Penerimaan Kotor (Gross)</th>
                         <th colspan="2" class="no-print">Edit Honor Bersih (Per Kelas)</th>
-                        <th rowspan="2" width="12%">TOTAL DITERIMA (Guru/Ekskul)</th>
+                        <th rowspan="2" width="8%">POTONGAN<br>(YAYASAN)</th>
+                        <th rowspan="2" width="10%">TOTAL DITERIMA (Guru/Ekskul)</th>
                         <th rowspan="2" width="8%">TANDA TANGAN</th>
                         <th rowspan="2" width="6%" class="no-print">AKSI</th>
                     </tr>
                     <tr>
                         <th width="7%">Per Siswa</th>
-                        <th width="9%">Jumlah Kotor</th>
-                        <th width="8%" class="no-print">Tarif (Net)</th>
-                        <th width="9%" class="no-print">Net Kelas Ini</th>
+                        <th width="8%">Jumlah Kotor</th>
+                        <th width="7%" class="no-print">Tarif (Net)</th>
+                        <th width="8%" class="no-print">Net Kelas Ini</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyData">
@@ -200,11 +241,15 @@
         </div>
     </div>
 
+    <!-- Container Khusus Kwitansi Saat Diprint -->
+    <div id="kwitansiContainer"></div>
+
     <script>
         // URL GOOGLE APPS SCRIPT HARDCODED
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbyYnTaFvOnlTdZIxfRxjorGT_2_-QVxBvr5gPq_CDgn5_YWZQrUcStAIgtFLjXCMm3D/exec';
         
         let dataLes = []; 
+        let globalGroupedData = {}; // Menyimpan data grup untuk dipakai di Kwitansi
         let incrementId = 1;
         let editModeId = null;
         let syncTimeout = null;
@@ -216,21 +261,18 @@
             if(localStorage.getItem('honorLes_LastBulan')) {
                 document.getElementById('bulan').value = localStorage.getItem('honorLes_LastBulan');
             }
-            
-            // Langsung load data dari G-Sheets
             gantiPeriode();
         };
 
         function setStatus(type, msg) {
             const badge = document.getElementById('statusSimpan');
             badge.innerText = msg;
-            badge.className = 'status-badge'; // reset class
+            badge.className = 'status-badge'; 
             if(type === 'sync') badge.classList.add('status-syncing');
             else if(type === 'success') badge.classList.add('status-success');
             else if(type === 'error') badge.classList.add('status-error');
         }
 
-        // FUNGSI TARIK DATA DARI GOOGLE SHEETS
         async function gantiPeriode() {
             const tahun = document.getElementById('tahunAjaran').value.trim();
             const bulan = document.getElementById('bulan').value;
@@ -244,7 +286,6 @@
             setStatus('sync', '🔄 Memuat Data...');
 
             try {
-                // Request GET ke Google Apps Script
                 const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
                 const result = await response.json();
                 
@@ -261,7 +302,6 @@
             }
         }
 
-        // FUNGSI SIMPAN (PUSH) KE GOOGLE SHEETS
         async function syncToDatabase() {
             const tahun = document.getElementById('tahunAjaran').value.trim();
             const bulan = document.getElementById('bulan').value;
@@ -276,7 +316,6 @@
             };
 
             try {
-                // Menggunakan POST request dengan content-type text/plain untuk menghindari preflight CORS error di browser
                 const response = await fetch(GAS_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -295,13 +334,12 @@
             }
         }
 
-        // Delay sync untuk input typing agar tidak spam request ke server
         function triggerAutoSync() {
             if(syncTimeout) clearTimeout(syncTimeout);
             setStatus('sync', '⏳ Menunggu diketik...');
             syncTimeout = setTimeout(() => {
                 syncToDatabase();
-            }, 1500); // Tunggu 1.5 detik setelah berhenti mengetik
+            }, 1500); 
         }
 
         function simpanData() {
@@ -320,12 +358,10 @@
             let netPerSiswa = hargaLes - potongan;
 
             if (editModeId !== null) {
-                // UPDATE EKSISTING
                 let index = dataLes.findIndex(d => d.id === editModeId);
                 if (index !== -1) {
                     let d = dataLes[index];
                     let totalBayar = jumlahSiswa + parseInt(d.pendingan) - parseInt(d.belumBayar);
-                    
                     let grossTotal = totalBayar * hargaLes;
                     let netTotal = totalBayar * netPerSiswa;
                     
@@ -346,7 +382,6 @@
                 btnSimpan.innerHTML = '+ Simpan Data (Otomatis ke Sheets)';
                 btnSimpan.style.backgroundColor = 'var(--primary)';
             } else {
-                // TAMBAH BARU
                 let totalBayar = jumlahSiswa;
                 let grossTotal = totalBayar * hargaLes;
                 let netTotal = totalBayar * netPerSiswa;
@@ -371,15 +406,15 @@
             document.getElementById('namaGuru').focus();
 
             renderTabel();
-            syncToDatabase(); // Langsung sync
+            syncToDatabase(); 
         }
 
         function updateCellData(id, field, value) {
-            let index = dataLes.findIndex(d => d.id == id); // Gunakan == karena id mungkin string dari JSON
+            let index = dataLes.findIndex(d => d.id == id); 
             if(index !== -1) {
                 if(field === 'ketPending' || field === 'ketBelumBayar') {
                     dataLes[index][field] = value;
-                    triggerAutoSync(); // Auto sync dengan delay saat ngetik nama siswa
+                    triggerAutoSync(); 
                 } else {
                     dataLes[index][field] = parseInt(value) || 0;
                     let row = dataLes[index];
@@ -392,10 +427,7 @@
                             row.netTotal = row.totalBayar * parseInt(row.netPerSiswa);
                         }
                     }
-
-                    if(field === 'netTotal') {
-                        row.netTotal = parseInt(value) || 0;
-                    }
+                    if(field === 'netTotal') row.netTotal = parseInt(value) || 0;
                     
                     renderTabel();
                     triggerAutoSync();
@@ -453,14 +485,17 @@
                 groupedData[key].groupNet += parseInt(d.netTotal) || 0;
             });
 
+            globalGroupedData = groupedData; // Simpan untuk dipakai Kwitansi
+
             let no = 1;
             for(let key in groupedData) {
                 let group = groupedData[key];
                 let rowspan = group.items.length;
+                let groupPotongan = group.groupGross - group.groupNet;
                 
                 sumKotor += group.groupGross;
                 sumBersihGuru += group.groupNet;
-                sumYayasan += (group.groupGross - group.groupNet);
+                sumYayasan += groupPotongan;
 
                 group.items.forEach((d, index) => {
                     const tr = document.createElement('tr');
@@ -501,6 +536,8 @@
                     `;
 
                     if(index === 0) {
+                        // Tambahkan Kolom Potongan Yayasan Per Guru
+                        tr.innerHTML += `<td rowspan="${rowspan}" style="color:#d32f2f; font-weight:bold;">${formatRp(groupPotongan)}</td>`;
                         tr.innerHTML += `<td rowspan="${rowspan}" style="font-weight:bold; font-size:1.05em; background-color:#f8f9fa;">${formatRp(group.groupNet)}</td>`;
                         tr.innerHTML += `<td rowspan="${rowspan}"></td>`;
                     }
@@ -523,6 +560,7 @@
                     <td colspan="9" style="text-align: right; padding-right:10px;">Sub Total Pemasukan Kotor:</td>
                     <td>${formatRp(sumKotor)}</td>
                     <td colspan="2" class="no-print" style="text-align: right;">Sub Total Honor Guru:</td>
+                    <td style="color:#d32f2f;">${formatRp(sumYayasan)}</td>
                     <td style="font-weight:bold;">${formatRp(sumBersihGuru)}</td>
                     <td></td>
                     <td class="no-print"></td>
@@ -534,17 +572,114 @@
                     <td colspan="2" class="no-print"></td>
                     <td style="font-weight:bold; color:#d32f2f;">${formatRp(sumYayasan)}</td>
                     <td></td>
+                    <td></td>
                     <td class="no-print"></td>
                 </tr>
                 <tr style="background-color: #e2e6ea; font-size: 1.05em; font-weight: bold;">
                     <td colspan="9" style="text-align: right; padding-right:10px;">TOTAL KESELURUHAN (Alokasi & Pengeluaran):</td>
                     <td>${formatRp(sumKotor)}</td>
                     <td colspan="2" class="no-print" style="text-align:right;">JUMLAH TOTAL:</td>
+                    <td></td>
                     <td style="font-weight:bold; font-size:1.1em;">${formatRp(sumBersihGuru + sumYayasan)}</td>
                     <td></td>
                     <td class="no-print"></td>
                 </tr>
             `;
+        }
+
+        /* LOGIKA TERBILANG RUPIAH */
+        function terbilang(angka) {
+            let bilangan = ['','Satu','Dua','Tiga','Empat','Lima','Enam','Tujuh','Delapan','Sembilan','Sepuluh','Sebelas'];
+            angka = Math.floor(angka);
+            if(angka === 0) return 'Nol';
+            if(angka < 12) return bilangan[angka];
+            if(angka < 20) return terbilang(angka - 10) + ' Belas';
+            if(angka < 100) return terbilang(Math.floor(angka / 10)) + ' Puluh ' + (angka % 10 > 0 ? terbilang(angka % 10) : '');
+            if(angka < 200) return 'Seratus ' + (angka - 100 > 0 ? terbilang(angka - 100) : '');
+            if(angka < 1000) return terbilang(Math.floor(angka / 100)) + ' Ratus ' + (angka % 100 > 0 ? terbilang(angka % 100) : '');
+            if(angka < 2000) return 'Seribu ' + (angka - 1000 > 0 ? terbilang(angka - 1000) : '');
+            if(angka < 1000000) return terbilang(Math.floor(angka / 1000)) + ' Ribu ' + (angka % 1000 > 0 ? terbilang(angka % 1000) : '');
+            if(angka < 1000000000) return terbilang(Math.floor(angka / 1000000)) + ' Juta ' + (angka % 1000000 > 0 ? terbilang(angka % 1000000) : '');
+            return 'Nominal Terlalu Besar';
+        }
+
+        /* LOGIKA PRINT */
+        function cetakTabel() {
+            document.body.classList.add('printing-table');
+            window.print();
+            document.body.classList.remove('printing-table');
+        }
+
+        function cetakKwitansi() {
+            const container = document.getElementById('kwitansiContainer');
+            container.innerHTML = '';
+            
+            let groups = Object.values(globalGroupedData).filter(g => g.groupNet > 0); // Hanya yg terima honor
+            if(groups.length === 0) {
+                alert("Tidak ada data honor guru untuk dicetak kwitansi.");
+                return;
+            }
+
+            // Generate Tanggal Hari Ini (Otomatis Bekasi)
+            const d = new Date();
+            const bulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const tglStr = `${d.getDate()} ${bulanArr[d.getMonth()]} ${d.getFullYear()}`;
+            
+            let cardCount = 0;
+            let currentPage = document.createElement('div');
+            currentPage.className = 'kwitansi-page';
+            
+            groups.forEach((group, index) => {
+                let terbilangStr = terbilang(group.groupNet).trim() + " Rupiah";
+                let bulanText = document.getElementById('bulan').value.toUpperCase();
+                let tahunText = document.getElementById('tahunAjaran').value;
+
+                let card = `
+                <div class="kwitansi-card">
+                    <div class="kw-header">
+                        <div class="kw-logo">SDIT Hidayatut Taufiq</div>
+                        <div class="kw-title">KWITANSI PEMBAYARAN</div>
+                    </div>
+                    <div class="kw-body">
+                        <div class="kw-row">
+                            <span class="kw-label">Telah terima dari</span><span class="kw-colon">:</span>
+                            <span class="kw-value kw-bold">Bendahara SDIT Hidayatut Taufiq</span>
+                        </div>
+                        <div class="kw-row">
+                            <span class="kw-label">Uang sejumlah</span><span class="kw-colon">:</span>
+                            <span class="kw-value"><span class="kw-highlight-text"># ${terbilangStr} #</span></span>
+                        </div>
+                        <div class="kw-row">
+                            <span class="kw-label">Untuk pembayaran</span><span class="kw-colon">:</span>
+                            <span class="kw-value">Honor Les ${group.jenisLes} - Bulan ${bulanText} (${tahunText})</span>
+                        </div>
+                    </div>
+                    <div class="kw-footer">
+                        <div class="kw-nominal">Rp ${formatRp(group.groupNet).replace('Rp','').trim()}</div>
+                        <div class="kw-ttd">
+                            <p>Bekasi, ${tglStr}</p>
+                            <p>Penerima,</p>
+                            <div class="ttd-space"></div>
+                            <p class="ttd-name">(${group.namaGuru})</p>
+                        </div>
+                    </div>
+                </div>`;
+                
+                currentPage.innerHTML += card;
+                cardCount++;
+                
+                // Tiap 2 kwitansi atau kwitansi terakhir, masukkan ke page baru
+                if(cardCount % 2 === 0 || index === groups.length - 1) {
+                    container.appendChild(currentPage);
+                    currentPage = document.createElement('div');
+                    currentPage.className = 'kwitansi-page';
+                }
+            });
+
+            // Jalankan Print
+            document.body.classList.add('printing-kwitansi');
+            window.print();
+            document.body.classList.remove('printing-kwitansi');
         }
     </script>
 </body>
