@@ -460,7 +460,7 @@
         closeAlertBtn.addEventListener('click', closeAlert);
 
         // URL Web App dari Google Apps Script (GANTI DENGAN URL MILIK ANDA NANTI)
-        const scriptURL = 'MASUKKAN_URL_WEB_APP_GOOGLE_APPS_SCRIPT_DI_SINI';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwtzmr_BUQ_5xcdngzUQvQzVw-wTB6AgviUl3YZmyKYVZQUmZIUu1uJJy4eOGDSBCx6/exec';
 
         // Submit Button Logic
         submitBtn.addEventListener('click', function() {
@@ -474,7 +474,7 @@
             }
 
             // Peringatan jika URL belum diganti oleh guru
-            if (scriptURL === 'https://script.google.com/macros/s/AKfycbwtzmr_BUQ_5xcdngzUQvQzVw-wTB6AgviUl3YZmyKYVZQUmZIUu1uJJy4eOGDSBCx6/exec') {
+            if (scriptURL === 'MASUKKAN_URL_WEB_APP_GOOGLE_APPS_SCRIPT_DI_SINI') {
                 showAlert('Simulasi Selesai!', 'Kerja bagus, ' + nama + '! (Catatan untuk Guru: Masukkan URL Apps Script pada kode HTML agar data benar-benar tersimpan ke Google Sheets)', '💡');
                 return;
             }
