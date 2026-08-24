@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LKPD Pendidikan Pancasila: Norma - Kelas IV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4; /* Light green background */
+            background-image: radial-gradient(#bbf7d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        h1, h2, h3, .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        
+        /* Custom styles for radio buttons to make them look friendlier */
+        .radio-custom:checked + label {
+            background-color: #dbeafe; /* Light blue */
+            border-color: #3b82f6; /* Blue border */
+            font-weight: 700;
+        }
+        
+        /* Input and textarea styling */
+        .input-custom {
+            transition: all 0.3s ease;
+        }
+        .input-custom:focus {
+            transform: scale(1.01);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Fun header pattern */
+        .header-pattern {
+            background-image: repeating-linear-gradient(45deg, #10b981, #10b981 10px, #059669 10px, #059669 20px);
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen py-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-emerald-500">
+        
+        <!-- Header -->
+        <div class="header-pattern text-white p-6 md:p-8 text-center relative">
+            <div class="absolute top-4 left-4 bg-white text-emerald-600 font-bold py-1 px-3 rounded-full shadow text-sm">
+                Kelas IV
+            </div>
+            <div class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 font-bold py-1 px-3 rounded-full shadow text-sm flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                </svg>
+                Pendidikan Pancasila
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mt-4 mb-2 drop-shadow-md">LKPD SERU!</h1>
+            <h2 class="text-2xl md:text-3xl font-semibold opacity-90">Mari Belajar Tentang Norma</h2>
+            <p class="mt-4 text-emerald-100 font-medium">Kerjakan dengan jujur dan teliti ya! ✨</p>
+        </div>
+
+        <!-- Student Info Form -->
+        <div class="bg-emerald-50 p-6 border-b-4 border-emerald-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-emerald-800 font-bold mb-1 ml-1" for="nama">Nama Lengkap:</label>
+                    <input type="text" id="nama" class="w-full border-2 border-emerald-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 input-custom" placeholder="Tulis namamu di sini...">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-emerald-800 font-bold mb-1 ml-1" for="kelas">Kelas:</label>
+                        <select id="kelas" class="w-full border-2 border-emerald-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 input-custom bg-white">
+                            <option value="">Pilih Kelas</option>
+                            <option value="4A">4 A</option>
+                            <option value="4B">4 B</option>
+                            <option value="4C">4 C</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-emerald-800 font-bold mb-1 ml-1" for="tanggal">Tanggal:</label>
+                        <input type="date" id="tanggal" class="w-full border-2 border-emerald-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 input-custom">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="lkpdForm" class="p-6 md:p-8 space-y-12">
+
+            <!-- BAGIAN A: PILIHAN GANDA -->
+            <section>
+                <div class="flex items-center gap-3 mb-6 bg-blue-100 p-3 rounded-2xl border-l-8 border-blue-500 inline-flex">
+                    <span class="text-3xl">🎯</span>
+                    <h3 class="text-2xl font-bold text-blue-800 heading-font">Bagian A: Pilihlah Jawaban yang Tepat! (10 Soal)</h3>
+                </div>
+
+                <div class="space-y-8 pl-2 md:pl-6 border-l-4 border-blue-200 ml-4">
+                    
+                    <!-- Soal 1 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">1. Aturan yang mengatur tingkah laku manusia disebut...</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q1a" name="q1" value="A" class="radio-custom hidden">
+                                <label for="q1a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Hukum</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q1b" name="q1" value="B" class="radio-custom hidden">
+                                <label for="q1b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Adat</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q1c" name="q1" value="C" class="radio-custom hidden">
+                                <label for="q1c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Norma</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q1d" name="q1" value="D" class="radio-custom hidden">
+                                <label for="q1d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Sanksi</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 2 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">2. Menurut cerita dalam pelajaran, siapakah yang selalu taat aturan berkendaraan saat mengantar Reva ke sekolah?</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q2a" name="q2" value="A" class="radio-custom hidden">
+                                <label for="q2a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Paman Reva</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q2b" name="q2" value="B" class="radio-custom hidden">
+                                <label for="q2b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Ayah Reva</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q2c" name="q2" value="C" class="radio-custom hidden">
+                                <label for="q2c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Kakek Reva</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q2d" name="q2" value="D" class="radio-custom hidden">
+                                <label for="q2d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Kakak Reva</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 3 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">3. Apa tujuan utama dibuatnya aturan dalam masyarakat?</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q3a" name="q3" value="A" class="radio-custom hidden">
+                                <label for="q3a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Untuk membuat orang merasa takut</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q3b" name="q3" value="B" class="radio-custom hidden">
+                                <label for="q3b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Untuk menghukum orang yang bersalah</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q3c" name="q3" value="C" class="radio-custom hidden">
+                                <label for="q3c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Menciptakan kehidupan yang aman, damai, dan tentram</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q3d" name="q3" value="D" class="radio-custom hidden">
+                                <label for="q3d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Agar polisi bisa menilang</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 4 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">4. Jika seseorang melanggar lalu lintas, misalnya menerobos lampu merah, apa yang dilakukan polisi?</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q4a" name="q4" value="A" class="radio-custom hidden">
+                                <label for="q4a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Menegakkan aturan dengan menilang</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q4b" name="q4" value="B" class="radio-custom hidden">
+                                <label for="q4b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Membiarkan saja agar jalanan lancar</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q4c" name="q4" value="C" class="radio-custom hidden">
+                                <label for="q4c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Menasihati pelan-pelan lalu melepaskannya</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q4d" name="q4" value="D" class="radio-custom hidden">
+                                <label for="q4d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Menyuruhnya kembali ke rumah</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 5 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">5. Apa yang akan terjadi jika setiap pengendara di jalan raya bersikap "mau menang sendiri"?</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q5a" name="q5" value="A" class="radio-custom hidden">
+                                <label for="q5a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Perjalanan menjadi lebih cepat sampai</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q5b" name="q5" value="B" class="radio-custom hidden">
+                                <label for="q5b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Lalu lintas menjadi tertib</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q5c" name="q5" value="C" class="radio-custom hidden">
+                                <label for="q5c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Jalanan akan macet, kacau, dan tidak aman</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q5d" name="q5" value="D" class="radio-custom hidden">
+                                <label for="q5d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Polisi tidak perlu lagi bekerja keras</label>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- Soal 6 -->
+                     <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">6. Terdapat dua unsur penting dalam sebuah aturan (norma). Unsur pertama adalah...</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q6a" name="q6" value="A" class="radio-custom hidden">
+                                <label for="q6a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Hadiah dan Pujian</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q6b" name="q6" value="B" class="radio-custom hidden">
+                                <label for="q6b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Perintah dan Larangan</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q6c" name="q6" value="C" class="radio-custom hidden">
+                                <label for="q6c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Sanksi dan Denda</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q6d" name="q6" value="D" class="radio-custom hidden">
+                                <label for="q6d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Kewajiban dan Hak</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 7 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">7. Jika seseorang melanggar aturan, maka ia akan mendapatkan unsur kedua dari norma, yaitu...</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q7a" name="q7" value="A" class="radio-custom hidden">
+                                <label for="q7a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Pujian</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q7b" name="q7" value="B" class="radio-custom hidden">
+                                <label for="q7b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Bebas</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q7c" name="q7" value="C" class="radio-custom hidden">
+                                <label for="q7c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Sanksi dan Hukuman</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q7d" name="q7" value="D" class="radio-custom hidden">
+                                <label for="q7d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Maaf</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 8 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">8. Seseorang dikatakan manusia yang bertingkah laku baik apabila ia...</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q8a" name="q8" value="A" class="radio-custom hidden">
+                                <label for="q8a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Menaati aturan</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q8b" name="q8" value="B" class="radio-custom hidden">
+                                <label for="q8b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Melanggar aturan</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q8c" name="q8" value="C" class="radio-custom hidden">
+                                <label for="q8c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Berbuat semaunya</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q8d" name="q8" value="D" class="radio-custom hidden">
+                                <label for="q8d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Tidak tahu aturan</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 9 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">9. Di mana sajakah aturan atau norma itu dibuat dan ditetapkan?</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q9a" name="q9" value="A" class="radio-custom hidden">
+                                <label for="q9a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Hanya di jalan raya</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q9b" name="q9" value="B" class="radio-custom hidden">
+                                <label for="q9b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Hanya di sekolah</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q9c" name="q9" value="C" class="radio-custom hidden">
+                                <label for="q9c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Hanya di kantor polisi</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q9d" name="q9" value="D" class="radio-custom hidden">
+                                <label for="q9d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Di lingkungan rumah, sekolah, dan masyarakat</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soal 10 -->
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <p class="font-bold text-lg mb-4 text-gray-800">10. Mengapa kita harus tahu aturan yang berlaku di manapun kita berada?</p>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="q10a" name="q10" value="A" class="radio-custom hidden">
+                                <label for="q10a" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">A</span>Agar dipuji oleh teman-teman</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q10b" name="q10" value="B" class="radio-custom hidden">
+                                <label for="q10b" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">B</span>Untuk ditaati agar tercipta ketertiban dan ketentraman</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q10c" name="q10" value="C" class="radio-custom hidden">
+                                <label for="q10c" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">C</span>Agar kita bisa menghukum orang lain</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="q10d" name="q10" value="D" class="radio-custom hidden">
+                                <label for="q10d" class="w-full p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3"><span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">D</span>Supaya terlihat pintar</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- BAGIAN B: ISIAN SINGKAT -->
+            <section>
+                <div class="flex items-center gap-3 mb-6 bg-yellow-100 p-3 rounded-2xl border-l-8 border-yellow-500 inline-flex mt-8">
+                    <span class="text-3xl">✍️</span>
+                    <h3 class="text-2xl font-bold text-yellow-800 heading-font">Bagian B: Isilah Titik-Titik di Bawah Ini! (8 Soal)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pl-2 md:pl-6 border-l-4 border-yellow-200 ml-4">
+                    
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian1" class="block font-bold text-gray-800 mb-2">1. Norma adalah aturan yang mengatur <span class="text-yellow-500">...</span> manusia.</label>
+                        <input type="text" id="isian1" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian2" class="block font-bold text-gray-800 mb-2">2. Jika lalu lintas tertib dan teratur, maka semua berjalan lancar dan <span class="text-yellow-500">...</span></label>
+                        <input type="text" id="isian2" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian3" class="block font-bold text-gray-800 mb-2">3. Orang yang melanggar aturan akan dikenai <span class="text-yellow-500">...</span></label>
+                        <input type="text" id="isian3" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian4" class="block font-bold text-gray-800 mb-2">4. Salah satu perlengkapan keselamatan saat naik motor adalah memakai <span class="text-yellow-500">...</span></label>
+                        <input type="text" id="isian4" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian5" class="block font-bold text-gray-800 mb-2">5. Aturan mengikat masyarakat agar mencegah perlakuan <span class="text-yellow-500">...</span> terhadap orang lain.</label>
+                        <input type="text" id="isian5" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian6" class="block font-bold text-gray-800 mb-2">6. Unsur pertama dalam aturan adalah adanya <span class="text-yellow-500">...</span> dan larangan.</label>
+                        <input type="text" id="isian6" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian7" class="block font-bold text-gray-800 mb-2">7. Apabila manusia melanggar aturan, maka dia disebut manusia berperilaku <span class="text-yellow-500">...</span></label>
+                        <input type="text" id="isian7" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="isian8" class="block font-bold text-gray-800 mb-2">8. Aturan dibuat dan ditetapkan di lingkungan rumah, sekolah, dan <span class="text-yellow-500">...</span></label>
+                        <input type="text" id="isian8" class="w-full border-b-2 border-dashed border-gray-400 focus:border-yellow-500 outline-none py-2 text-lg input-custom bg-transparent">
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- BAGIAN C: ESSAY -->
+            <section>
+                <div class="flex items-center gap-3 mb-6 bg-pink-100 p-3 rounded-2xl border-l-8 border-pink-500 inline-flex mt-8">
+                    <span class="text-3xl">🤔</span>
+                    <h3 class="text-2xl font-bold text-pink-800 heading-font">Bagian C: Jawablah Pertanyaan dengan Tepat! (3 Soal)</h3>
+                </div>
+
+                <div class="space-y-6 pl-2 md:pl-6 border-l-4 border-pink-200 ml-4">
+                    
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="essay1" class="block font-bold text-lg text-gray-800 mb-3">1. Jelaskan menurut bahasamu sendiri, apa yang dimaksud dengan norma dan apa tujuan dibuatnya norma?</label>
+                        <textarea id="essay1" rows="3" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-pink-500 outline-none input-custom resize-y" placeholder="Tulis jawabanmu di sini..."></textarea>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="essay2" class="block font-bold text-lg text-gray-800 mb-3">2. Sebutkan 3 contoh perilaku buruk/pelanggaran di jalan raya jika tidak ada aturan lalu lintas!</label>
+                        <textarea id="essay2" rows="3" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-pink-500 outline-none input-custom resize-y" placeholder="1. ...&#10;2. ...&#10;3. ..."></textarea>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <label for="essay3" class="block font-bold text-lg text-gray-800 mb-3">3. Aturan berlaku di berbagai lingkungan. Berikan masing-masing 1 contoh aturan yang ada di Lingkungan Rumah dan Lingkungan Sekolah!</label>
+                        <textarea id="essay3" rows="3" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-pink-500 outline-none input-custom resize-y" placeholder="- Aturan di Rumah: ...&#10;- Aturan di Sekolah: ..."></textarea>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Tombol Selesai -->
+            <div class="text-center mt-12 pt-6 border-t-2 border-emerald-100">
+                <button type="button" id="submitBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl heading-font tracking-wide">
+                    Selesai & Kumpulkan! 🚀
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Alert Modal (Custom since alert() is not allowed) -->
+    <div id="customAlert" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform transition-all scale-95 opacity-0" id="alertContent">
+            <div class="text-5xl mb-4" id="alertIcon">🌟</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2 heading-font" id="alertTitle">Kerja Bagus!</h3>
+            <p class="text-gray-600 mb-6" id="alertMessage">Jawaban LKPD kamu sudah tersimpan.</p>
+            <button id="closeAlertBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-full w-full">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Custom Alert Logic
+        const customAlert = document.getElementById('customAlert');
+        const alertContent = document.getElementById('alertContent');
+        const closeAlertBtn = document.getElementById('closeAlertBtn');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showAlert(title, message, icon = '🌟') {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('alertIcon').textContent = icon;
+            
+            customAlert.classList.remove('hidden');
+            // Trigger animation
+            setTimeout(() => {
+                alertContent.classList.remove('scale-95', 'opacity-0');
+                alertContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeAlert() {
+            alertContent.classList.remove('scale-100', 'opacity-100');
+            alertContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                customAlert.classList.add('hidden');
+            }, 300); // match transition duration
+        }
+
+        closeAlertBtn.addEventListener('click', closeAlert);
+
+        // URL Web App dari Google Apps Script (GANTI DENGAN URL MILIK ANDA NANTI)
+        const scriptURL = 'MASUKKAN_URL_WEB_APP_GOOGLE_APPS_SCRIPT_DI_SINI';
+
+        // Submit Button Logic
+        submitBtn.addEventListener('click', function() {
+            const nama = document.getElementById('nama').value;
+            const kelas = document.getElementById('kelas').value;
+            const tanggal = document.getElementById('tanggal').value;
+
+            if (!nama || !kelas) {
+                showAlert('Oops!', 'Jangan lupa isi Nama dan Kelasmu dulu ya!', '📝');
+                return;
+            }
+
+            // Peringatan jika URL belum diganti oleh guru
+            if (scriptURL === 'https://script.google.com/macros/s/AKfycbwtzmr_BUQ_5xcdngzUQvQzVw-wTB6AgviUl3YZmyKYVZQUmZIUu1uJJy4eOGDSBCx6/exec') {
+                showAlert('Simulasi Selesai!', 'Kerja bagus, ' + nama + '! (Catatan untuk Guru: Masukkan URL Apps Script pada kode HTML agar data benar-benar tersimpan ke Google Sheets)', '💡');
+                return;
+            }
+
+            submitBtn.textContent = 'Menyimpan... ⏳';
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            // Fungsi pembantu untuk mengambil nilai pilihan ganda
+            const getRadioValue = (name) => {
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                return checked ? checked.value : '-';
+            };
+
+            // Mengumpulkan semua data ke dalam objek
+            const data = {
+                nama: nama,
+                kelas: kelas,
+                tanggal: tanggal,
+                q1: getRadioValue('q1'), q2: getRadioValue('q2'), q3: getRadioValue('q3'), 
+                q4: getRadioValue('q4'), q5: getRadioValue('q5'), q6: getRadioValue('q6'), 
+                q7: getRadioValue('q7'), q8: getRadioValue('q8'), q9: getRadioValue('q9'), 
+                q10: getRadioValue('q10'),
+                isian1: document.getElementById('isian1').value || '-',
+                isian2: document.getElementById('isian2').value || '-',
+                isian3: document.getElementById('isian3').value || '-',
+                isian4: document.getElementById('isian4').value || '-',
+                isian5: document.getElementById('isian5').value || '-',
+                isian6: document.getElementById('isian6').value || '-',
+                isian7: document.getElementById('isian7').value || '-',
+                isian8: document.getElementById('isian8').value || '-',
+                essay1: document.getElementById('essay1').value || '-',
+                essay2: document.getElementById('essay2').value || '-',
+                essay3: document.getElementById('essay3').value || '-',
+            };
+
+            // Mengubah format data menjadi URLSearchParams (format form-urlencoded)
+            const formData = new URLSearchParams();
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
+
+            // Melakukan request ke Google Apps Script
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => {
+                    showAlert('Hebat ' + nama + '!', 'Jawaban LKPD kamu telah berhasil tersimpan di sistem. Terima kasih!', '🎉');
+                    document.getElementById('lkpdForm').reset();
+                    document.getElementById('nama').value = '';
+                    document.getElementById('kelas').value = '';
+                    document.getElementById('tanggal').value = '';
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    showAlert('Maaf!', 'Terjadi kesalahan saat menyimpan data (mungkin masalah internet). Coba lagi ya.', '😥');
+                })
+                .finally(() => {
+                    submitBtn.textContent = 'Selesai & Kumpulkan! 🚀';
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                });
+        });
+    </script>
+</body>
+</html>
