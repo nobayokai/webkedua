@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda Dashboard Akademik</title>
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Background gradient yang colorful dan modern */
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Container untuk kartu-kartu widget */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Styling dasar kartu */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 220px;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ikon di dalam kartu */
+        .card i {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover i {
+            transform: scale(1.1);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Warna spesifik untuk masing-masing kartu */
+        .card.nilai i { color: #FF6B6B; } /* Merah Muda/Coral */
+        .card.nilai:hover { border-bottom: 5px solid #FF6B6B; }
+
+        .card.rpp i { color: #4ECDC4; } /* Tosca/Mint */
+        .card.rpp:hover { border-bottom: 5px solid #4ECDC4; }
+
+        .card.les i { color: #9D50BB; } /* Ungu */
+        .card.les:hover { border-bottom: 5px solid #9D50BB; }
+
+        .card.jadwal i { color: #FCA048; } /* Oranye */
+        .card.jadwal:hover { border-bottom: 5px solid #FCA048; }
+
+        .card.keuangan i { color: #2B5876; } /* Biru Gelap */
+        .card.keuangan:hover { border-bottom: 5px solid #2B5876; }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding-top: 3rem;
+            color: #fff;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsivitas untuk layar kecil */
+        @media (max-width: 600px) {
+            header h1 { font-size: 2rem; }
+            .card-container { gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Portal Akademik</h1>
+        <p>Silakan pilih menu layanan di bawah ini</p>
+    </header>
+
+    <main class="card-container">
+        <!-- 1. Input Nilai -->
+        <a href="inputnilai.html" class="card nilai">
+            <i class="fas fa-chart-bar"></i>
+            <h2>Input Nilai</h2>
+            <p>Kelola data dan rekap nilai siswa</p>
+        </a>
+
+        <!-- 2. Buat RPP -->
+        <a href="buatrpp.html" class="card rpp">
+            <i class="fas fa-book-open"></i>
+            <h2>Buat RPP</h2>
+            <p>Rencana Pelaksanaan Pembelajaran</p>
+        </a>
+
+        <!-- 3. Les -->
+        <a href="les.html" class="card les">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h2>Jadwal Les</h2>
+            <p>Manajemen kelas les tambahan</p>
+        </a>
+
+        <!-- 4. Buat Jadwal -->
+        <a href="buatjadwal.html" class="card jadwal">
+            <i class="fas fa-calendar-alt"></i>
+            <h2>Buat Jadwal</h2>
+            <p>Atur jadwal pelajaran dan ujian</p>
+        </a>
+
+        <!-- 5. Laporan Keuangan PSB -->
+        <!-- Pastikan nama file HTML Anda sesuai. Di sini saya asumsikan laporankeuanganpsb.html -->
+        <a href="laporankeuanganpsb.html" class="card keuangan">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <h2>Keuangan PSB</h2>
+            <p>Laporan Penerimaan Siswa Baru</p>
+        </a>
+    </main>
+
+    <footer>
+        &copy; 2026 Sistem Informasi Pendidikan
+    </footer>
+
+</body>
+</html>
