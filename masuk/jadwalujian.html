@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Penjadwalan Pengawas V10 - HD Image Fix</title>
-    <!-- Ganti library ke html-to-image yang jauh lebih canggih & tidak menghilangkan garis -->
+    <title>Aplikasi Penjadwalan Pengawas V11 - Auto Sort</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
@@ -53,7 +52,6 @@
         .cetak-header .e-name { font-size: 18px; font-weight: 700; color: #0984e3; margin: 5px 0; text-transform: uppercase; }
         .cetak-header .y-name { font-size: 16px; font-weight: 700; color: #00b894; margin: 0; }
 
-        /* Fix border table khusus untuk image generator */
         table.jadwal-table { width: 100%; border-collapse: collapse; font-family: 'Nunito', 'Segoe UI', sans-serif; font-size: 13px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 2px var(--tbl-border); }
         table.jadwal-table th, table.jadwal-table td { border: 2px solid var(--tbl-border); padding: 8px; text-align: center; vertical-align: middle; background-clip: padding-box; }
         
@@ -88,7 +86,7 @@
 </head>
 <body>
 
-    <h1 class="no-print">✨ Generator Jadwal V10 (HD Image Fix) ✨</h1>
+    <h1 class="no-print">✨ Generator Jadwal V11 (Auto-Sort Fix) ✨</h1>
     
     <div class="container no-print">
         
@@ -156,7 +154,7 @@
 
         <div class="panel">
             <h3>📅 5. Input Jadwal</h3>
-            <p style="font-size: 13px; color: #666; margin-top: -10px;">Jika ada kelas yang <b>tidak ujian</b>, isi di kolom <b>"Kecuali Rombel"</b> (contoh: <b>1, 2</b>).</p>
+            <p style="font-size: 13px; color: #666; margin-top: -10px;">Masukan jadwal secara bebas, sistem akan <b>mengurutkannya secara otomatis</b> berdasarkan waktu. Jika ada kelas yang <b>tidak ujian</b>, isi di kolom <b>"Kecuali Rombel"</b>.</p>
             <div id="jadwal-container"></div>
             <button onclick="addJadwalRow(); autoSave();">➕ Tambah Baris Jadwal</button>
         </div>
@@ -241,7 +239,7 @@
 
     function exportJSON() {
         autoSave(); 
-        const dataStr = localStorage.getItem('jadwalPengawasV8'); // Tetap pakai key ini agar data bersambung
+        const dataStr = localStorage.getItem('jadwalPengawasV8'); 
         if(!dataStr) return alert("Belum ada data untuk di-backup!");
         
         const blob = new Blob([dataStr], {type: "application/json"});
@@ -271,19 +269,16 @@
         reader.readAsText(file);
     }
 
-    // FUNGSI BARU DOWNLOAD GAMBAR DENGAN HTML-TO-IMAGE
     function downloadImage() {
         const targetElement = document.getElementById('print-area');
         
-        // Buang bingkai luar sementara agar hasil gambar bersih (seperti kertas asli)
         const oldBorder = targetElement.style.border;
         targetElement.style.border = "none";
-        targetElement.style.padding = "40px"; // Tambah padding agar ada ruang putih di pinggir
+        targetElement.style.padding = "40px"; 
 
-        // Menggunakan library htmlToImage (Anti Bug Garis Hilang)
         htmlToImage.toPng(targetElement, { 
             backgroundColor: '#ffffff',
-            pixelRatio: 2 // Membuatnya tajam / HD
+            pixelRatio: 2 
         })
         .then(function (dataUrl) {
             const link = document.createElement('a');
@@ -291,7 +286,6 @@
             link.href = dataUrl;
             link.click();
             
-            // Kembalikan style
             targetElement.style.border = oldBorder;
             targetElement.style.padding = "30px";
         })
@@ -476,8 +470,8 @@
             document.getElementById('in-rooms').value = "1, 2, 3A, 3B, 4, 5, 6A, 6B";
             document.getElementById('in-teachers').value = "BU LINA, BU SEPTI, BU AYU, BU NURUL, BU SYIFA, BU SENA, BU NIA, BU NURHA, BU RITA, BU ROHATI, BU SARI, BU DINDA, PA ENDI";
             document.getElementById('in-kepsek').value = "Ghoniyah Nasrullah, S.Pd., Gr.";
-            addJadwalRow({ tgl: '2025-12-01', hari: 'Senin', mulai: '07:30', selesai: '08:10', mapel: 'PAI', jenis: 'exam', kecuali: '' });
-            addJadwalRow({ tgl: '2025-12-01', hari: 'Senin', mulai: '09:10', selesai: '09:50', mapel: 'SKI', jenis: 'exam', kecuali: '1, 2' });
+            addJadwalRow({ tgl: '2026-09-14', hari: 'Senin', mulai: '07:30', selesai: '08:10', mapel: 'PAI', jenis: 'exam', kecuali: '' });
+            addJadwalRow({ tgl: '2026-09-14', hari: 'Senin', mulai: '09:10', selesai: '09:50', mapel: 'SKI', jenis: 'exam', kecuali: '1, 2' });
         }
         
         applyColors();
@@ -507,6 +501,18 @@
                 jenis: row.querySelector('.j-jenis').value,
                 kecuali: row.querySelector('.j-kecuali').value.trim() 
             });
+        });
+
+        // ==========================================
+        // FITUR BARU: AUTO SORT BERDASARKAN WAKTU
+        // ==========================================
+        jadwalList.sort((a, b) => {
+            if (a.tgl === b.tgl) {
+                // Jika tanggal sama, urutkan berdasarkan jam mulai
+                return a.mulai.localeCompare(b.mulai);
+            }
+            // Urutkan berdasarkan tanggal
+            return a.tgl.localeCompare(b.tgl);
         });
 
         const specialPlots = [];
