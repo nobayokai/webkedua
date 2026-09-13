@@ -43,9 +43,6 @@
         .btn-print:hover { background: var(--success-hover); }
         .btn-print-kw { background: var(--purple); }
         .btn-print-kw:hover { background: var(--purple-hover); }
-        .btn-next-month { background: #17a2b8; }
-        .btn-next-month:hover { background: #138496; }
-        
 
         /* Action Buttons in Table */
         .btn-edit, .btn-delete { padding: 4px 8px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
@@ -209,9 +206,10 @@
                 
                 <div class="action-buttons">
                     <button class="btn-add" id="btnSimpan" onclick="simpanData()">+ Simpan Data (Otomatis ke Sheets)</button>
-                    <button class="btn-next-month" onclick="lanjutBulanBerikutnya()">⏩ Lanjut ke Bulan Berikutnya</button>
                     <button class="btn-print" onclick="cetakTabel()">🖨️ Cetak Tabel Laporan</button>
                     <button class="btn-print-kw" onclick="cetakKwitansi()">🎫 Cetak Kwitansi (Termasuk Yayasan)</button>
+                    <!-- TOMBOL BARU LANJUT BULAN BERIKUTNYA -->
+                    <button class="btn-add" style="background: var(--info);" onclick="salinKeBulanBerikutnya()">⏭️ Lanjut ke Bulan Berikutnya</button>
                 </div>
             </div>
         </div>
@@ -272,7 +270,10 @@
         let incrementId = 1;
         let editModeId = null;
         let syncTimeout = null;
+        
         let totalYayasanGlobal = 0; // Untuk mencatat total potongan yayasan
+        let currentTahun = ''; // TAMBAHAN: Mengunci Tahun saat ini agar sinkronisasi tidak tertukar
+        let currentBulan = ''; // TAMBAHAN: Mengunci Bulan saat ini agar sinkronisasi tidak tertukar
 
         window.onload = function() {
             if(localStorage.getItem('honorLes_LastTahun')) {
@@ -293,168 +294,45 @@
             else if(type === 'error') badge.classList.add('status-error');
         }
 
-            async function gantiPeriode() {
-                if (syncTimeout) clearTimeout(syncTimeout);
-                
-                editModeId = null;
-                const btnSimpan = document.getElementById('btnSimpan');
-                if (btnSimpan) {
-                    btnSimpan.innerHTML = '+ Simpan Data (Otomatis ke Sheets)';
-                    btnSimpan.style.backgroundColor = 'var(--primary)';
-                }
-            
-                const tahun = document.getElementById('tahunAjaran').value.trim();
-                const bulan = document.getElementById('bulan').value;
-                
-                localStorage.setItem('honorLes_LastTahun', tahun);
-                localStorage.setItem('honorLes_LastBulan', bulan);
-                document.getElementById('printBulan').innerText = bulan.toUpperCase();
-                document.getElementById('printTahun').innerText = tahun;
-            
-                document.getElementById('loadingOverlay').style.display = 'flex';
-                setStatus('sync', '🔄 Memuat Data...');
-            
-                try {
-                    const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP Status: ${response.status}`);
-                    }
-                    
-                    const result = await response.json();
-                    
-                    if (result && result.error) {
-                        throw new Error(result.error);
-                    }
-            
-                    dataLes = Array.isArray(result) ? result : [];
-                    incrementId = dataLes.length > 0 ? Math.max(...dataLes.map(d => parseInt(d.id) || 0)) + 1 : 1;
-                    
-                    setStatus('success', '🟢 Sinkronisasi Selesai');
-                    renderTabel();
-                } catch (error) {
-                    console.error("Gagal sinkronisasi:", error);
-                    setStatus('error', '🔴 Gagal Memuat Data: ' + error.message);
-                } finally {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                }
-            }
+        async function gantiPeriode() {
+            if (syncTimeout) clearTimeout(syncTimeout); // TAMBAHAN: Mencegah save bocor ke bulan lain saat dropdown diubah
 
-        async function lanjutBulanBerikutnya() {
-            if (!dataLes || dataLes.length === 0) {
-                alert("Tidak ada data pada bulan ini untuk dilanjutkan ke bulan berikutnya!");
-                return;
+            const tahun = document.getElementById('tahunAjaran').value.trim();
+            const bulan = document.getElementById('bulan').value;
+            
+            localStorage.setItem('honorLes_LastTahun', tahun);
+            localStorage.setItem('honorLes_LastBulan', bulan);
+            document.getElementById('printBulan').innerText = bulan.toUpperCase();
+            document.getElementById('printTahun').innerText = tahun;
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            setStatus('sync', '🔄 Memuat Data...');
+
+            try {
+                const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
+                const result = await response.json();
+                
+                dataLes = result || [];
+                incrementId = dataLes.length > 0 ? Math.max(...dataLes.map(d => parseInt(d.id) || 0)) + 1 : 1;
+                
+                // TAMBAHAN: Kunci bulan dan tahun untuk dataLes yang sedang aktif dimuat
+                currentTahun = tahun;
+                currentBulan = bulan;
+
+                setStatus('success', '🟢 Sinkronisasi Selesai');
+                renderTabel();
+            } catch (error) {
+                console.error(error);
+                setStatus('error', '🔴 Gagal Memuat Data');
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
-        
-            const daftarBulan = [
-                "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER", 
-                "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI"
-            ];
-        
-            const bulanElem = document.getElementById('bulan');
-            const tahunElem = document.getElementById('tahunAjaran');
-            
-            let bulanSekarang = bulanElem.value.toUpperCase();
-            let tahunSekarang = tahunElem.value.trim();
-            
-            let indexBulan = daftarBulan.indexOf(bulanSekarang);
-            let bulanBerikutnya = "";
-            let tahunBerikutnya = tahunSekarang;
-        
-            // Tentukan bulan berikutnya & tahun ajaran baru jika dari Juli ke Agustus
-            if (indexBulan === -1 || indexBulan === daftarBulan.length - 1) {
-                bulanBerikutnya = "AGUSTUS";
-                const bagianTahun = tahunSekarang.split('-');
-                if (bagianTahun.length === 2 && !isNaN(bagianTahun[0]) && !isNaN(bagianTahun[1])) {
-                    tahunBerikutnya = `${parseInt(bagianTahun[0]) + 1}-${parseInt(bagianTahun[1]) + 1}`;
-                }
-            } else {
-                bulanBerikutnya = daftarBulan[indexBulan + 1];
-            }
-        
-            const konfirmasi = confirm(
-                `Apakah Anda ingin menyalin data ke Bulan ${bulanBerikutnya} (${tahunBerikutnya})?\n\n` +
-                `• Data 'Belum Bayar' & Keterangannya akan dipindah jadi 'Pending' di bulan baru.\n` +
-                `• Data Nama Guru, Les, Kelas, Jumlah Murid & Tarif akan disalin otomatis.\n` +
-                `• Kolom 'Belum Bayar' bulan baru akan di-reset ke 0.`
-            );
-        
-            if (!konfirmasi) return;
-        
-            // Olah data baru berdasarkan data bulan sekarang
-            let newData = [];
-            let newId = 1;
-        
-            dataLes.forEach(d => {
-                let pendingBaru = parseInt(d.belumBayar) || 0;
-                let ketPendingBaru = d.ketBelumBayar || "";
-                let jmlSiswa = parseInt(d.jumlahSiswa) || 0;
-                let harga = parseInt(d.hargaLes) || 0;
-                let netSiswa = parseInt(d.netPerSiswa) || 0;
-                let potAsli = parseInt(d.potonganPerSiswaAsli) || 0;
-        
-                // Total Bayar di bulan baru (Awalnya: Jml Murid + Pendingan baru)
-                let totalBayarBaru = jmlSiswa + pendingBaru; 
-                let grossTotalBaru = totalBayarBaru * harga;
-                let netTotalBaru = totalBayarBaru * netSiswa;
-        
-                newData.push({
-                    id: newId++,
-                    kelas: d.kelas,
-                    namaGuru: d.namaGuru,
-                    jenisLes: d.jenisLes,
-                    jumlahSiswa: jmlSiswa,
-                    pendingan: pendingBaru,           // Pindah dari Belum Bayar
-                    ketPending: ketPendingBaru,       // Pindah dari Ket Belum Bayar
-                    belumBayar: 0,                    // Reset di bulan baru
-                    ketBelumBayar: "",                // Reset di bulan baru
-                    totalBayar: totalBayarBaru,
-                    hargaLes: harga,
-                    netPerSiswa: netSiswa,
-                    grossTotal: grossTotalBaru,
-                    netTotal: netTotalBaru,
-                    potonganPerSiswaAsli: potAsli
-                });
-            });
-        
-            // Penanganan khusus honor Karate (tetap 1.500.000 per grup jika ada)
-            let processedKarateGroups = new Set();
-            newData.forEach(d => {
-                if (String(d.jenisLes).toLowerCase().includes('karate')) {
-                    let key = d.namaGuru.toLowerCase() + "_" + d.jenisLes.toLowerCase();
-                    if (!processedKarateGroups.has(key)) {
-                        d.netTotal = 1500000;
-                        processedKarateGroups.add(key);
-                    } else {
-                        d.netTotal = 0;
-                    }
-                }
-            });
-        
-            // Perbarui dropdown & state UI ke bulan baru
-            bulanElem.value = bulanBerikutnya;
-            tahunElem.value = tahunBerikutnya;
-            
-            localStorage.setItem('honorLes_LastTahun', tahunBerikutnya);
-            localStorage.setItem('honorLes_LastBulan', bulanBerikutnya);
-            
-            document.getElementById('printBulan').innerText = bulanBerikutnya;
-            document.getElementById('printTahun').innerText = tahunBerikutnya;
-        
-            // Perbarui variabel global data
-            dataLes = newData;
-            incrementId = newId;
-        
-            // Rendertabel dan langsung sync/simpan ke Google Sheets
-            renderTabel();
-            await syncToDatabase();
-        
-            alert(`✅ Data bulan ${bulanBerikutnya} (${tahunBerikutnya}) berhasil dibuat dan tersimpan di Google Sheets!`);
         }
 
         async function syncToDatabase() {
-            const tahun = document.getElementById('tahunAjaran').value.trim();
-            const bulan = document.getElementById('bulan').value;
+            // TAMBAHAN: Gunakan currentTahun & currentBulan yang terkunci, bukan membaca langsung dari dropdown yang mungkin sedang diubah user
+            const tahun = currentTahun || document.getElementById('tahunAjaran').value.trim();
+            const bulan = currentBulan || document.getElementById('bulan').value;
             
             setStatus('sync', '🔄 Menyimpan ke G-Sheets...');
 
@@ -482,6 +360,75 @@
                 console.error(error);
                 setStatus('error', '🔴 Gagal Terhubung');
             }
+        }
+
+        // FUNGSI BARU: Lanjut ke Bulan Berikutnya
+        function salinKeBulanBerikutnya() {
+            if (syncTimeout) clearTimeout(syncTimeout); // Hentikan autosync sementara
+
+            const blnSelect = document.getElementById('bulan');
+            const currIndex = blnSelect.selectedIndex;
+
+            if(currIndex === blnSelect.options.length - 1) {
+                alert('Ini adalah bulan terakhir dalam daftar. Silakan sesuaikan Tahun Ajaran jika menyeberang tahun.');
+                return;
+            }
+
+            if(!confirm('Salin data ke bulan berikutnya?\n\nData "Belum Bayar" bulan ini akan otomatis pindah menjadi "Pending" di bulan depan.')) return;
+
+            // 1. Pindah bulan di dropdown
+            blnSelect.selectedIndex = currIndex + 1;
+            const nextBulan = blnSelect.value;
+            const tahun = document.getElementById('tahunAjaran').value.trim();
+
+            // 2. Siapkan data baru: Guru, Kelas, Jml Murid tetap. Belum bayar -> Pending
+            let newData = dataLes.map(d => {
+                let carryPending = parseInt(d.belumBayar) || 0;
+                let carryKetPending = d.ketBelumBayar || "";
+
+                let totalBayar = parseInt(d.jumlahSiswa) + carryPending; // Karena belum bayar di-reset 0
+                let grossTotal = totalBayar * parseInt(d.hargaLes);
+                let netTotal = totalBayar * parseInt(d.netPerSiswa);
+
+                return {
+                    ...d,
+                    pendingan: carryPending,      // Data belum bayar masuk ke pending
+                    ketPending: carryKetPending,  // Keterangan ikut pindah
+                    belumBayar: 0,                // Reset jadi 0 di bulan baru
+                    ketBelumBayar: "",
+                    totalBayar: totalBayar,
+                    grossTotal: grossTotal,
+                    netTotal: netTotal
+                };
+            });
+
+            // 3. Perbaiki khusus nominal net karate jika ada (Syarat: Karate net = 1.500.000)
+            let karateDone = false;
+            newData.forEach(d => {
+                if(String(d.jenisLes).toLowerCase().includes('karate')) {
+                    if(!karateDone) {
+                        d.netTotal = 1500000;
+                        karateDone = true;
+                    } else {
+                        d.netTotal = 0;
+                    }
+                }
+            });
+
+            // 4. Timpa data lama dengan data baru di sistem frontend
+            dataLes = newData;
+            currentBulan = nextBulan;
+            currentTahun = tahun;
+            
+            // 5. Update UI
+            localStorage.setItem('honorLes_LastBulan', currentBulan);
+            document.getElementById('printBulan').innerText = currentBulan.toUpperCase();
+            renderTabel();
+            
+            // 6. Langsung tembak save ke Google Sheets untuk bulan depan
+            syncToDatabase(); 
+            
+            alert(`Berhasil disalin! Sekarang Anda sedang mengedit data bulan ${currentBulan}`);
         }
 
         function triggerAutoSync() {
