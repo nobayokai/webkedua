@@ -289,7 +289,18 @@
             else if(type === 'error') badge.classList.add('status-error');
         }
 
-        async function gantiPeriode() {
+                async function gantiPeriode() {
+            // 1. Batalkan autosync yang sedang berjalan dari bulan sebelumnya agar tidak menimpa data baru
+            if (syncTimeout) clearTimeout(syncTimeout);
+            
+            // 2. Reset status edit form
+            editModeId = null;
+            const btnSimpan = document.getElementById('btnSimpan');
+            if (btnSimpan) {
+                btnSimpan.innerHTML = '+ Simpan Data (Otomatis ke Sheets)';
+                btnSimpan.style.backgroundColor = 'var(--primary)';
+            }
+        
             const tahun = document.getElementById('tahunAjaran').value.trim();
             const bulan = document.getElementById('bulan').value;
             
@@ -297,10 +308,10 @@
             localStorage.setItem('honorLes_LastBulan', bulan);
             document.getElementById('printBulan').innerText = bulan.toUpperCase();
             document.getElementById('printTahun').innerText = tahun;
-
+        
             document.getElementById('loadingOverlay').style.display = 'flex';
             setStatus('sync', '🔄 Memuat Data...');
-
+        
             try {
                 const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
                 const result = await response.json();
