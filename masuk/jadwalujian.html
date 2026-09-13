@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Penjadwalan Pengawas V11 - Auto Sort</title>
+    <title>Aplikasi Penjadwalan Pengawas V13 - Excel Style Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
@@ -12,6 +12,13 @@
             --tbl-head-bg: #ffb3c6;
             --tbl-border: #ffb3c6;
             --tbl-row-main: #fff9db;
+            
+            /* Variabel Baru untuk Kustomisasi Ala Excel */
+            --tbl-border-width: 2px;
+            --tbl-text-color: #2d3436;
+            --tbl-head-text: #ffffff;
+            --tbl-font-size: 13px;
+            --tbl-font-family: 'Nunito', 'Segoe UI', sans-serif;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background: #fdf6fd; color: #444; }
@@ -33,8 +40,13 @@
         button:hover { background: #ff748e; box-shadow: 0 4px 10px rgba(255, 116, 142, 0.3); transform: translateY(-2px); }
         .btn-danger { background: #ff6b6b; padding: 10px; }
         .btn-danger:hover { background: #ff4757; }
-        .btn-success { background: #4cd137; font-size: 18px; padding: 15px; width: 100%; margin-top: 10px; border-radius: 12px; }
-        .btn-success:hover { background: #44bd32; }
+        
+        .btn-success { background: #4cd137; font-size: 18px; padding: 15px; width: 100%; border-radius: 12px; }
+        .btn-success:hover { background: #44bd32; box-shadow: 0 4px 10px rgba(76, 209, 55, 0.3); transform: translateY(-2px); }
+        
+        .btn-warning { background: #f39c12; font-size: 18px; padding: 15px; width: 100%; border-radius: 12px; }
+        .btn-warning:hover { background: #e67e22; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3); transform: translateY(-2px); }
+
         .btn-print { background: #0984e3; font-size: 16px; padding: 15px; width: 100%; border-radius: 12px; margin-bottom: 5px;}
         .btn-print:hover { background: #74b9ff; }
         .btn-image { background: #e17055; font-size: 16px; padding: 15px; width: 100%; border-radius: 12px; margin-bottom: 5px;}
@@ -47,25 +59,57 @@
         
         .output-wrapper, .beban-wrapper { overflow-x: auto; background: white; padding: 30px; border-radius: 20px; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 4px solid var(--tbl-border); }
         
-        .cetak-header { font-family: 'Nunito', sans-serif; text-align: center; color: #2d3436; margin-bottom: 20px; }
+        .cetak-header { font-family: var(--tbl-font-family); text-align: center; color: var(--tbl-text-color); margin-bottom: 20px; }
         .cetak-header .s-name { font-size: 24px; font-weight: 800; color: #d63384; margin: 0; text-transform: uppercase; }
         .cetak-header .e-name { font-size: 18px; font-weight: 700; color: #0984e3; margin: 5px 0; text-transform: uppercase; }
         .cetak-header .y-name { font-size: 16px; font-weight: 700; color: #00b894; margin: 0; }
 
-        table.jadwal-table { width: 100%; border-collapse: collapse; font-family: 'Nunito', 'Segoe UI', sans-serif; font-size: 13px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 2px var(--tbl-border); }
-        table.jadwal-table th, table.jadwal-table td { border: 2px solid var(--tbl-border); padding: 8px; text-align: center; vertical-align: middle; background-clip: padding-box; }
-        
-        table.jadwal-table thead { background: var(--tbl-head-bg); color: #fff; font-weight: 800; font-size: 14px; text-shadow: 1px 1px 1px rgba(0,0,0,0.15); }
+        /* Kustomisasi Tabel Menggunakan Variabel CSS */
+        table.jadwal-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-family: var(--tbl-font-family); 
+            font-size: var(--tbl-font-size); 
+            color: var(--tbl-text-color);
+            margin-bottom: 20px; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 0 0 var(--tbl-border-width) var(--tbl-border); 
+        }
+        table.jadwal-table th, table.jadwal-table td { 
+            border: var(--tbl-border-width) solid var(--tbl-border); 
+            padding: 8px; 
+            text-align: center; 
+            vertical-align: middle; 
+            background-clip: padding-box; 
+        }
+        table.jadwal-table thead { 
+            background: var(--tbl-head-bg); 
+            color: var(--tbl-head-text); 
+            font-weight: 800; 
+            font-size: calc(var(--tbl-font-size) + 1px); 
+        }
         table.jadwal-table th { padding: 12px; }
         
         .row-yellow { background-color: var(--tbl-row-main); transition: 0.2s; }
         .row-yellow:hover { filter: brightness(0.95); }
         
         .row-blue { background-color: rgba(0,0,0,0.1); height: 8px;} 
-        .col-hari { font-weight: bold; color: #e84393; background-color: rgba(255,255,255,0.4); }
-        .col-mapel { text-align: left !important; font-weight: 800; color: #0984e3; }
         
-        .ttd-section { margin-top: 40px; width: 300px; float: right; text-align: center; font-family: 'Nunito', sans-serif; page-break-inside: avoid; color: #2d3436; font-size: 15px;}
+        /* Indikator Sel Editable */
+        td[contenteditable="true"]:hover, th[contenteditable="true"]:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: text;
+            outline: 2px dashed #0984e3;
+            outline-offset: -2px;
+        }
+        td[contenteditable="true"]:focus {
+            background-color: #fff;
+            outline: 2px solid #0984e3;
+            outline-offset: -2px;
+        }
+        
+        .ttd-section { margin-top: 40px; width: 300px; float: right; text-align: center; font-family: var(--tbl-font-family); page-break-inside: avoid; color: var(--tbl-text-color); font-size: 15px;}
         .ttd-img { max-width: 150px; max-height: 100px; margin: 5px auto; display: block; }
         .ttd-name { font-weight: 800; text-decoration: underline; color: #d63384; font-size: 16px; }
 
@@ -77,7 +121,8 @@
             .output-wrapper { page-break-after: always; }
             .beban-wrapper { page-break-before: always; page-break-after: auto; }
             .row-blue { height: 6px; }
-            table.jadwal-table { box-shadow: 0 0 0 2px var(--tbl-border); }
+            table.jadwal-table { box-shadow: 0 0 0 var(--tbl-border-width) var(--tbl-border); }
+            td[contenteditable="true"], th[contenteditable="true"] { outline: none !important; }
         }
     </style>
     <style id="print-page-style">
@@ -86,23 +131,39 @@
 </head>
 <body>
 
-    <h1 class="no-print">✨ Generator Jadwal V11 (Auto-Sort Fix) ✨</h1>
+    <h1 class="no-print">✨ Generator Jadwal V13 (Editor Layout Excel) ✨</h1>
     
     <div class="container no-print">
         
         <div class="panel">
-            <h3>⚙️ 1. Pengaturan Tampilan, Cetak & Backup JSON</h3>
+            <h3>⚙️ 1. Pengaturan Layout, Tampilan & Backup</h3>
             <div class="flex-row">
-                <div><label>Ukuran Kertas Cetak</label>
+                <div><label>Kertas Cetak</label>
                     <select id="in-paper" onchange="applyPageSize()">
-                        <option value="a4">A4 Landscape (29,7 x 21 cm)</option>
-                        <option value="f4">F4 / Folio Landscape (33 x 21,5 cm)</option>
+                        <option value="a4">A4 Landscape</option>
+                        <option value="f4">F4 (Folio) Landscape</option>
                     </select>
                 </div>
-                <div><label>Warna Kepala Tabel</label><input type="color" id="c-head" value="#ffb3c6" onchange="applyColors()"></div>
-                <div><label>Warna Garis (Border)</label><input type="color" id="c-border" value="#ffb3c6" onchange="applyColors()"></div>
-                <div><label>Warna Baris Jadwal</label><input type="color" id="c-main" value="#fff9db" onchange="applyColors()"></div>
+                <div><label>Gaya Tulisan (Font)</label>
+                    <select id="s-font-family" onchange="applyColors()">
+                        <option value="'Nunito', 'Segoe UI', sans-serif">Nunito (Modern)</option>
+                        <option value="Arial, Helvetica, sans-serif">Arial (Standar)</option>
+                        <option value="'Times New Roman', Times, serif">Times New Roman (Resmi)</option>
+                        <option value="'Courier New', Courier, monospace">Courier New (Klasik)</option>
+                    </select>
+                </div>
+                <div><label>Ukuran Font (px)</label><input type="number" id="s-font-size" value="13" onchange="applyColors()"></div>
+                <div><label>Tebal Garis (px)</label><input type="number" id="s-border-w" value="2" min="0" onchange="applyColors()"></div>
             </div>
+            
+            <div class="flex-row">
+                <div><label>Warna Header</label><input type="color" id="c-head" value="#ffb3c6" onchange="applyColors()"></div>
+                <div><label>Warna Teks Header</label><input type="color" id="c-head-text" value="#ffffff" onchange="applyColors()"></div>
+                <div><label>Warna Garis</label><input type="color" id="c-border" value="#ffb3c6" onchange="applyColors()"></div>
+                <div><label>Warna Baris</label><input type="color" id="c-main" value="#fff9db" onchange="applyColors()"></div>
+                <div><label>Warna Teks Tabel</label><input type="color" id="c-text" value="#2d3436" onchange="applyColors()"></div>
+            </div>
+
             <div class="flex-row no-border" style="margin-top: 10px;">
                 <div style="flex: 0.5;">
                     <label>💾 Simpan Data (Backup)</label>
@@ -154,7 +215,6 @@
 
         <div class="panel">
             <h3>📅 5. Input Jadwal</h3>
-            <p style="font-size: 13px; color: #666; margin-top: -10px;">Masukan jadwal secara bebas, sistem akan <b>mengurutkannya secara otomatis</b> berdasarkan waktu. Jika ada kelas yang <b>tidak ujian</b>, isi di kolom <b>"Kecuali Rombel"</b>.</p>
             <div id="jadwal-container"></div>
             <button onclick="addJadwalRow(); autoSave();">➕ Tambah Baris Jadwal</button>
         </div>
@@ -179,7 +239,10 @@
             </div>
         </div>
 
-        <button class="btn-success" onclick="generateJadwal()">✨ SIMPAN & BUAT JADWAL SEKARANG ✨</button>
+        <div class="flex-row no-border" style="margin-top: 15px; gap: 10px;">
+            <button class="btn-success" onclick="generateJadwal(false)">✨ SIMPAN & BUAT JADWAL</button>
+            <button class="btn-warning" onclick="generateJadwal(true)">🎲 ACAK POSISI GURU</button>
+        </div>
         
         <div class="flex-row no-border" style="margin-top: 15px;">
             <button class="btn-print" onclick="window.print()">🖨️ PRINT JADWAL (PDF / KERTAS)</button>
@@ -190,18 +253,20 @@
     <!-- Output Lembar 1: Jadwal -->
     <div class="output-wrapper" id="print-area">
         <div class="cetak-header">
-            <div class="s-name" id="out-school">NAMA SEKOLAH</div>
-            <div class="e-name" id="out-exam">JUDUL UJIAN</div>
-            <div class="y-name" id="out-year">TAHUN AJARAN</div>
+            <div class="s-name" id="out-school" contenteditable="true">NAMA SEKOLAH</div>
+            <div class="e-name" id="out-exam" contenteditable="true">JUDUL UJIAN</div>
+            <div class="y-name" id="out-year" contenteditable="true">TAHUN AJARAN</div>
         </div>
+        
+        <p class="no-print" style="text-align: center; font-size: 12px; color: #0984e3; margin-top: -10px; font-weight: bold;">💡 Tip: Anda bisa mengklik teks mana saja di dalam tabel dan kop di bawah ini untuk mengeditnya secara manual sebelum dicetak.</p>
         
         <div id="tabel-output" style="margin-top: 15px;"></div>
         
         <div class="ttd-section">
-            <div>MENGETAHUI</div>
-            <div>KEPALA SEKOLAH</div>
+            <div contenteditable="true">MENGETAHUI</div>
+            <div contenteditable="true">KEPALA SEKOLAH</div>
             <img id="out-ttd" class="ttd-img" src="" alt="">
-            <div class="ttd-name" id="out-kepsek"></div>
+            <div class="ttd-name" id="out-kepsek" contenteditable="true"></div>
         </div>
         <div style="clear:both;"></div>
     </div>
@@ -209,8 +274,8 @@
     <!-- Output Lembar 2: Tabel Beban Mengawas -->
     <div class="beban-wrapper">
         <div class="cetak-header">
-            <div class="s-name">REKAPITULASI BEBAN MENGAWAS</div>
-            <div class="y-name" id="out-year-beban">TAHUN AJARAN</div>
+            <div class="s-name" contenteditable="true">REKAPITULASI BEBAN MENGAWAS</div>
+            <div class="y-name" id="out-year-beban" contenteditable="true">TAHUN AJARAN</div>
         </div>
         <div id="tabel-beban" style="margin-top: 15px;"></div>
     </div>
@@ -221,12 +286,14 @@
     const bulanArray = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
     function applyColors() {
-        let h = document.getElementById('c-head').value;
-        let b = document.getElementById('c-border').value;
-        let m = document.getElementById('c-main').value;
-        document.documentElement.style.setProperty('--tbl-head-bg', h);
-        document.documentElement.style.setProperty('--tbl-border', b);
-        document.documentElement.style.setProperty('--tbl-row-main', m);
+        document.documentElement.style.setProperty('--tbl-head-bg', document.getElementById('c-head').value);
+        document.documentElement.style.setProperty('--tbl-border', document.getElementById('c-border').value);
+        document.documentElement.style.setProperty('--tbl-row-main', document.getElementById('c-main').value);
+        document.documentElement.style.setProperty('--tbl-text-color', document.getElementById('c-text').value);
+        document.documentElement.style.setProperty('--tbl-head-text', document.getElementById('c-head-text').value);
+        document.documentElement.style.setProperty('--tbl-border-width', document.getElementById('s-border-w').value + 'px');
+        document.documentElement.style.setProperty('--tbl-font-size', document.getElementById('s-font-size').value + 'px');
+        document.documentElement.style.setProperty('--tbl-font-family', document.getElementById('s-font-family').value);
         autoSave();
     }
 
@@ -239,7 +306,7 @@
 
     function exportJSON() {
         autoSave(); 
-        const dataStr = localStorage.getItem('jadwalPengawasV8'); 
+        const dataStr = localStorage.getItem('jadwalPengawasV13'); 
         if(!dataStr) return alert("Belum ada data untuk di-backup!");
         
         const blob = new Blob([dataStr], {type: "application/json"});
@@ -259,7 +326,7 @@
             try {
                 const jsonStr = e.target.result;
                 JSON.parse(jsonStr);
-                localStorage.setItem('jadwalPengawasV8', jsonStr);
+                localStorage.setItem('jadwalPengawasV13', jsonStr);
                 alert('Data berhasil di-restore! Halaman akan dimuat ulang.');
                 location.reload();
             } catch(err) {
@@ -271,26 +338,20 @@
 
     function downloadImage() {
         const targetElement = document.getElementById('print-area');
-        
         const oldBorder = targetElement.style.border;
         targetElement.style.border = "none";
         targetElement.style.padding = "40px"; 
 
-        htmlToImage.toPng(targetElement, { 
-            backgroundColor: '#ffffff',
-            pixelRatio: 2 
-        })
+        htmlToImage.toPng(targetElement, { backgroundColor: '#ffffff', pixelRatio: 2 })
         .then(function (dataUrl) {
             const link = document.createElement('a');
             link.download = 'Jadwal-Pengawas-HD.png';
             link.href = dataUrl;
             link.click();
-            
             targetElement.style.border = oldBorder;
             targetElement.style.padding = "30px";
-        })
-        .catch(function (error) {
-            alert('Terjadi kesalahan saat memproses gambar. Error: ' + error);
+        }).catch(function (error) {
+            alert('Terjadi kesalahan: ' + error);
             targetElement.style.border = oldBorder;
             targetElement.style.padding = "30px";
         });
@@ -374,7 +435,7 @@
                     <option value="les" ${data.jenis === 'les'?'selected':''}>LES</option>
                 </select>
             </div>
-            <div><label>Kecuali Rombel</label><input type="text" class="j-kecuali" value="${data.kecuali || ''}" placeholder="Cth: 1, 2"></div>
+            <div><label>Kecuali Rombel</label><input type="text" class="j-kecuali" value="${data.kecuali || ''}"></div>
             <button class="btn-danger" onclick="this.parentElement.remove(); autoSave();">❌</button>
         `;
         document.getElementById('jadwal-container').appendChild(div);
@@ -412,6 +473,12 @@
             cHead: document.getElementById('c-head').value,
             cBorder: document.getElementById('c-border').value,
             cMain: document.getElementById('c-main').value,
+            cText: document.getElementById('c-text').value,
+            cHeadText: document.getElementById('c-head-text').value,
+            sBorderW: document.getElementById('s-border-w').value,
+            sFontSize: document.getElementById('s-font-size').value,
+            sFontFamily: document.getElementById('s-font-family').value,
+            
             school: document.getElementById('in-school').value,
             exam: document.getElementById('in-exam').value,
             year: document.getElementById('in-year').value,
@@ -436,17 +503,23 @@
                 nama: row.querySelector('.i-nama').value, tgl: row.querySelector('.i-tgl').value
             }))
         };
-        localStorage.setItem('jadwalPengawasV8', JSON.stringify(appState));
+        localStorage.setItem('jadwalPengawasV13', JSON.stringify(appState));
     }
 
     function loadState() {
-        const saved = localStorage.getItem('jadwalPengawasV8');
+        const saved = localStorage.getItem('jadwalPengawasV13') || localStorage.getItem('jadwalPengawasV8');
         if(saved) {
             const state = JSON.parse(saved);
             document.getElementById('in-paper').value = state.paperSize || "a4";
             document.getElementById('c-head').value = state.cHead || "#ffb3c6";
             document.getElementById('c-border').value = state.cBorder || "#ffb3c6";
             document.getElementById('c-main').value = state.cMain || "#fff9db";
+            
+            document.getElementById('c-text').value = state.cText || "#2d3436";
+            document.getElementById('c-head-text').value = state.cHeadText || "#ffffff";
+            document.getElementById('s-border-w').value = state.sBorderW || "2";
+            document.getElementById('s-font-size').value = state.sFontSize || "13";
+            document.getElementById('s-font-family').value = state.sFontFamily || "'Nunito', 'Segoe UI', sans-serif";
             
             document.getElementById('in-school').value = state.school || "SDIT HIDAYATUT TAUFIQ";
             document.getElementById('in-exam').value = state.exam || "JADWAL ASESMEN SUMATIF AKHIR SEMESTER GANJIL DAN PENGAWAS";
@@ -471,14 +544,13 @@
             document.getElementById('in-teachers').value = "BU LINA, BU SEPTI, BU AYU, BU NURUL, BU SYIFA, BU SENA, BU NIA, BU NURHA, BU RITA, BU ROHATI, BU SARI, BU DINDA, PA ENDI";
             document.getElementById('in-kepsek').value = "Ghoniyah Nasrullah, S.Pd., Gr.";
             addJadwalRow({ tgl: '2026-09-14', hari: 'Senin', mulai: '07:30', selesai: '08:10', mapel: 'PAI', jenis: 'exam', kecuali: '' });
-            addJadwalRow({ tgl: '2026-09-14', hari: 'Senin', mulai: '09:10', selesai: '09:50', mapel: 'SKI', jenis: 'exam', kecuali: '1, 2' });
         }
         
         applyColors();
         applyPageSize();
     }
 
-    function generateJadwal() {
+    function generateJadwal(isShuffle = false) {
         autoSave();
         
         document.getElementById('out-school').innerText = document.getElementById('in-school').value;
@@ -503,15 +575,8 @@
             });
         });
 
-        // ==========================================
-        // FITUR BARU: AUTO SORT BERDASARKAN WAKTU
-        // ==========================================
         jadwalList.sort((a, b) => {
-            if (a.tgl === b.tgl) {
-                // Jika tanggal sama, urutkan berdasarkan jam mulai
-                return a.mulai.localeCompare(b.mulai);
-            }
-            // Urutkan berdasarkan tanggal
+            if (a.tgl === b.tgl) { return a.mulai.localeCompare(b.mulai); }
             return a.tgl.localeCompare(b.tgl);
         });
 
@@ -549,6 +614,13 @@
         const listHariUnik = Array.from(hariKerjaSet);
         let teacherStats = regularTeachers.map(t => ({ name: t, totalAssigned: 0, roomCounts: Object.fromEntries(rooms.map(r => [r, 0])) }));
 
+        if (isShuffle) {
+            for (let i = teacherStats.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [teacherStats[i], teacherStats[j]] = [teacherStats[j], teacherStats[i]];
+            }
+        }
+
         let dailyWorkload = {};
         let allTeachers = new Set([...regularTeachers, ...specialPlots.map(sp => sp.nama)]);
         allTeachers.forEach(t => { if(t) dailyWorkload[t] = { total: 0, days: {} }; });
@@ -556,14 +628,14 @@
         let html = `<table class="jadwal-table">
             <thead>
                 <tr>
-                    <th rowspan="2" style="width: 30px;">NO</th>
-                    <th rowspan="2" style="width: 140px;">HARI / TANGGAL</th>
-                    <th rowspan="2" colspan="3" style="width: 120px;">JAM</th>
-                    <th rowspan="2" style="width: 220px;">MATA PELAJARAN</th>
-                    <th colspan="${rooms.length}">PENGAWAS RUANGAN</th>
+                    <th rowspan="2" style="width: 30px;" contenteditable="true">NO</th>
+                    <th rowspan="2" style="width: 140px;" contenteditable="true">HARI / TANGGAL</th>
+                    <th rowspan="2" colspan="3" style="width: 120px;" contenteditable="true">JAM</th>
+                    <th rowspan="2" style="width: 220px;" contenteditable="true">MATA PELAJARAN</th>
+                    <th colspan="${rooms.length}" contenteditable="true">PENGAWAS RUANGAN</th>
                 </tr>
                 <tr>`;
-        rooms.forEach(r => { html += `<th>${r}</th>`; });
+        rooms.forEach(r => { html += `<th contenteditable="true">${r}</th>`; });
         html += `</tr></thead><tbody>`;
 
         let noHari = 1;
@@ -577,20 +649,23 @@
                 html += `<tr class="row-yellow">`;
                 
                 if (slotIndex === 0) {
-                    html += `<td rowspan="${rowSpanHari}" style="font-weight:bold; color:#d63384; vertical-align:middle;">${noHari}</td>`;
-                    html += `<td rowspan="${rowSpanHari}" class="col-hari" style="vertical-align:middle;">${day.hari}<br><span style="font-size:11px; font-weight:normal; color:#555;">${displayTanggal}</span></td>`;
+                    html += `<td rowspan="${rowSpanHari}" style="font-weight:bold; color:#d63384; vertical-align:middle;" contenteditable="true">${noHari}</td>`;
+                    html += `<td rowspan="${rowSpanHari}" style="vertical-align:middle; font-weight: bold; color: #e84393; background-color: rgba(255,255,255,0.4);" contenteditable="true">${day.hari}<br><span style="font-size:11px; font-weight:normal; color:#555;">${displayTanggal}</span></td>`;
                 }
 
-                html += `<td style="color:#555;">${slot.mulai}</td><td style="color:#aaa;">-</td><td style="color:#555;">${slot.selesai}</td>`;
-                html += `<td class="col-mapel">${slot.mapel}</td>`;
+                html += `<td contenteditable="true">${slot.mulai}</td><td contenteditable="true">-</td><td contenteditable="true">${slot.selesai}</td>`;
+                html += `<td style="text-align: left; font-weight: 800; color: #0984e3;" contenteditable="true">${slot.mapel}</td>`;
 
                 if (slot.jenis === 'istirahat' || slot.jenis === 'les') {
-                    html += `<td colspan="${rooms.length}" style="font-weight: 800; color: #e17055; letter-spacing: 2px;">${slot.jenis.toUpperCase()}</td>`;
+                    html += `<td colspan="${rooms.length}" style="font-weight: 800; color: #e17055; letter-spacing: 2px;" contenteditable="true">${slot.jenis.toUpperCase()}</td>`;
                 } else if (slot.jenis === 'exam') {
                     let assignedInThisSlot = [];
                     let roomAssignments = {}; 
-                    
                     let excludedRooms = slot.kecuali.split(',').map(s => s.trim()).filter(s => s);
+                    
+                    let blockedTeachersInThisSlot = specialPlots
+                        .filter(sp => sp.tgl === day.tgl && sp.mapel === slot.mapel && (sp.ruang === "" || sp.ruang === "-" || sp.ruang.toLowerCase() === "kosong"))
+                        .map(sp => sp.nama);
 
                     rooms.forEach(room => {
                         if (excludedRooms.includes(room)) {
@@ -618,14 +693,14 @@
                         if (!roomAssignments[room]) {
                             let available = teacherStats.filter(t => 
                                 !absences.some(a => a.nama === t.name && a.tgl === day.tgl) && 
-                                !assignedInThisSlot.includes(t.name)
+                                !assignedInThisSlot.includes(t.name) &&
+                                !blockedTeachersInThisSlot.includes(t.name)
                             );
                             
                             available.sort((a, b) => {
-                                if (a.roomCounts[room] !== b.roomCounts[room]) {
-                                    return a.roomCounts[room] - b.roomCounts[room];
-                                }
-                                return a.totalAssigned - b.totalAssigned;
+                                if (a.roomCounts[room] !== b.roomCounts[room]) return a.roomCounts[room] - b.roomCounts[room];
+                                if (a.totalAssigned !== b.totalAssigned) return a.totalAssigned - b.totalAssigned;
+                                return isShuffle ? Math.random() - 0.5 : 0;
                             });
 
                             let selectedTeacher = available[0];
@@ -647,13 +722,13 @@
                     rooms.forEach(room => {
                         let assignment = roomAssignments[room];
                         if (assignment.type === 'special') {
-                            html += `<td style="background-color:rgba(46, 204, 113, 0.2); color:#155724; font-weight:bold;">${assignment.name}</td>`;
+                            html += `<td style="background-color:rgba(46, 204, 113, 0.2); font-weight:bold;" contenteditable="true">${assignment.name}</td>`;
                         } else if (assignment.type === 'error') {
-                            html += `<td style="background:#ff7675; color:white; font-weight:bold;">${assignment.name}</td>`;
+                            html += `<td style="background:#ff7675; color:white; font-weight:bold;" contenteditable="true">${assignment.name}</td>`;
                         } else if (assignment.type === 'excluded') {
-                            html += `<td style="background-color:rgba(0,0,0,0.05); color:#b2bec3; font-style:italic;">-</td>`;
+                            html += `<td style="background-color:rgba(0,0,0,0.05); font-style:italic;" contenteditable="true">-</td>`;
                         } else {
-                            html += `<td style="color:#2d3436; font-weight:600;">${assignment.name}</td>`;
+                            html += `<td style="font-weight:600;" contenteditable="true">${assignment.name}</td>`;
                         }
                     });
                 }
@@ -672,15 +747,15 @@
         let hBeban = `<table class="jadwal-table" style="margin-bottom:0;">
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:40px;">NO</th>
-                    <th rowspan="2" style="width:180px;">NAMA GURU</th>
-                    <th colspan="${listHariUnik.length || 1}">RUANGAN YANG DIAWASI PER HARI</th>
-                    <th rowspan="2" style="width:100px;">TOTAL</th>
+                    <th rowspan="2" style="width:40px;" contenteditable="true">NO</th>
+                    <th rowspan="2" style="width:180px;" contenteditable="true">NAMA GURU</th>
+                    <th colspan="${listHariUnik.length || 1}" contenteditable="true">RUANGAN YANG DIAWASI PER HARI</th>
+                    <th rowspan="2" style="width:100px;" contenteditable="true">TOTAL</th>
                 </tr>
                 <tr>`;
         
-        listHariUnik.forEach(hari => { hBeban += `<th>${hari}</th>`; });
-        if(listHariUnik.length === 0) hBeban += `<th>-</th>`;
+        listHariUnik.forEach(hari => { hBeban += `<th contenteditable="true">${hari}</th>`; });
+        if(listHariUnik.length === 0) hBeban += `<th contenteditable="true">-</th>`;
         
         hBeban += `</tr></thead><tbody>`;
 
@@ -688,22 +763,22 @@
         
         sortedTeachers.forEach((guru, idx) => {
             hBeban += `<tr class="row-yellow">
-                <td style="font-weight:bold; color:#d63384;">${idx + 1}</td>
-                <td style="text-align:left; font-weight:800; color:#0984e3;">${guru}</td>`;
+                <td style="font-weight:bold;" contenteditable="true">${idx + 1}</td>
+                <td style="text-align:left; font-weight:800;" contenteditable="true">${guru}</td>`;
             
             listHariUnik.forEach(hari => {
                 let rL = dailyWorkload[guru].days[hari];
                 if(rL && rL.length > 0) {
-                    hBeban += `<td><span style="background:rgba(0,0,0,0.05); padding:2px 8px; border-radius:12px; border:1px solid rgba(0,0,0,0.1);">${rL.join(', ')}</span></td>`;
+                    hBeban += `<td contenteditable="true"><span style="background:rgba(0,0,0,0.05); padding:2px 8px; border-radius:12px; border:1px solid rgba(0,0,0,0.1);">${rL.join(', ')}</span></td>`;
                 } else {
-                    hBeban += `<td style="color:#b2bec3;">-</td>`;
+                    hBeban += `<td contenteditable="true">-</td>`;
                 }
             });
 
-            if(listHariUnik.length === 0) hBeban += `<td>-</td>`;
+            if(listHariUnik.length === 0) hBeban += `<td contenteditable="true">-</td>`;
             
             let wT = dailyWorkload[guru].total;
-            hBeban += `<td style="font-weight:900; font-size: 16px; color: ${wT === 0 ? '#d63031' : '#00b894'};">${wT}</td>
+            hBeban += `<td style="font-weight:900; font-size: 16px;" contenteditable="true">${wT}</td>
             </tr>`;
         });
 
@@ -713,7 +788,7 @@
 
     window.onload = () => {
         loadState();
-        generateJadwal();
+        generateJadwal(false);
     };
 </script>
 </body>
