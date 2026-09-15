@@ -108,7 +108,7 @@
         /* DENAH STYLES */
         #allRoomsContainer { display: flex; flex-direction: column; gap: 40px; width: 100%; max-width: 900px; }
         .container {
-            width: 100%; box-sizing: border-box; background: white; padding: 40px;
+            width: 100%; box-sizing: border-box; background: white; padding: 30px 40px;
             border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); position: relative; overflow: hidden;
         }
         .room-config {
@@ -123,30 +123,39 @@
             background-color: #e2ede7; border-bottom-right-radius: 100%; z-index: 0; opacity: 0.6;
         }
         .content-wrapper { position: relative; z-index: 1; }
-        h1 { text-align: center; color: var(--dark-blue); font-size: 24px; letter-spacing: 1px; margin-bottom: 30px; line-height: 1.4; }
+        h1 { text-align: center; color: var(--dark-blue); font-size: 22px; letter-spacing: 1px; margin-bottom: 25px; line-height: 1.4; }
         h1 span { color: #d9534f; }
 
-        .room-elements { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 40px; }
-        .papan-tulis { background-color: var(--board-green); color: #2c4436; font-weight: 700; padding: 10px 80px; border-radius: 8px; }
-        .meja-guru { background-color: var(--desk-pink); color: #5c3c38; font-weight: 700; padding: 10px 40px; border-radius: 8px; }
+        .room-elements { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .papan-tulis { background-color: var(--board-green); color: #2c4436; font-weight: 700; padding: 8px 80px; border-radius: 8px; }
+        .meja-guru { background-color: var(--desk-pink); color: #5c3c38; font-weight: 700; padding: 8px 40px; border-radius: 8px; }
 
-        .grid-kursi { display: grid; gap: 25px 15px; margin-bottom: 40px; }
+        .grid-kursi { display: grid; gap: 20px 15px; margin-bottom: 25px; }
         .kursi {
             border: 2px dashed var(--dark-blue); border-radius: 12px; position: relative;
-            padding: 22px 5px 10px; text-align: center; min-height: 60px;
+            padding: 20px 5px 8px; text-align: center; min-height: 58px;
             display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; box-sizing: border-box;
         }
         .nomor-kursi {
-            background-color: var(--dark-blue); color: white; font-size: 13px; font-weight: 600;
-            padding: 4px 14px; border-radius: 20px; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            background-color: var(--dark-blue); color: white; font-size: 12px; font-weight: 600;
+            padding: 3px 12px; border-radius: 20px; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
         }
-        .nama-siswa { font-weight: 600; font-size: 11px; margin-bottom: 4px; line-height: 1.3; word-wrap: break-word; width: 100%; }
-        .kelas-siswa { font-size: 11px; color: #fff; background: #d9534f; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+        .nama-siswa { font-weight: 600; font-size: 11px; margin-bottom: 3px; line-height: 1.2; word-wrap: break-word; width: 100%; }
+        .kelas-siswa { font-size: 10px; color: #fff; background: #d9534f; padding: 2px 6px; border-radius: 4px; margin-top: 2px; display: inline-block; }
 
-        .footer-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 2px solid #eee; padding-top: 20px; font-size: 13px; }
-        .info-kiri p { margin: 8px 0; display: flex; }
-        .info-kiri span { display: inline-block; width: 100px; font-weight: 600; }
-        .info-kanan { border: 1px solid #ccc; border-radius: 8px; padding: 10px; min-height: 80px; }
+        /* FOOTER CATATAN DENGAN URUTAN KE BAWAH DULU */
+        .footer-info { border-top: 2px solid #eee; padding-top: 15px; font-size: 13px; width: 100%; }
+        .info-catatan { border: 1px solid #ccc; border-radius: 8px; padding: 10px 15px; background-color: #fff; }
+        .catatan-title { font-weight: 700; margin-bottom: 6px; font-size: 13px; color: #111; }
+        .catatan-grid { 
+            column-count: 2; 
+            column-gap: 20px; 
+            font-size: 12px; 
+        }
+        .catatan-grid div {
+            break-inside: avoid;
+            margin-bottom: 4px;
+        }
 
         /* KARTU UJIAN STYLES */
         #kartuUjianContainer { display: none; width: 100%; max-width: 900px; }
@@ -317,7 +326,6 @@
 
             const sortedClasses = Object.keys(classCounts).sort();
             
-            // Nama Ruang Kembali seperti semula ("Ruang " + kls)
             roomsData = sortedClasses.map(kls => {
                 return {
                     namaRuang: "Ruang " + kls,
@@ -332,18 +340,14 @@
             const numRooms = roomsData.length;
             const remCap = roomsData.map(r => r.kapasitas);
 
-            // Acak siswa di setiap kelas
             sortedClasses.forEach(kls => shuffleArray(studentsByClass[kls]));
 
-            // Pembagian Proporsional agar SELURUH kelas masuk ke SELURUH ruangan
             sortedClasses.forEach(kls => {
                 const stList = studentsByClass[kls];
                 const numSt = stList.length;
 
-                // Hitung kuota awal tiap ruangan untuk kelas ini
                 let quotas = roomsData.map(r => Math.floor(numSt * (r.kapasitas / totalCap)));
 
-                // Pastikan tiap ruangan berkapasitas dapat minimal 1 siswa
                 for (let r = 0; r < numRooms; r++) {
                     if (remCap[r] > 0 && stList.length > 0 && quotas[r] === 0) {
                         quotas[r] = 1;
@@ -352,7 +356,6 @@
 
                 let sumQuotas = quotas.reduce((a, b) => a + b, 0);
 
-                // Sesuaikan jika jumlah kuota kurang dari total siswa kelas
                 while (sumQuotas < numSt) {
                     let bestR = 0;
                     let maxDiff = -Infinity;
@@ -367,7 +370,6 @@
                     sumQuotas++;
                 }
 
-                // Sesuaikan jika jumlah kuota lebih dari total siswa kelas
                 while (sumQuotas > numSt) {
                     let bestR = 0;
                     let maxQ = -1;
@@ -381,7 +383,6 @@
                     sumQuotas--;
                 }
 
-                // Masukkan siswa ke ruangan sesuai kuota
                 for (let r = 0; r < numRooms; r++) {
                     let q = Math.min(quotas[r], remCap[r], stList.length);
                     for (let i = 0; i < q; i++) {
@@ -392,7 +393,6 @@
                     }
                 }
 
-                // Jika masih ada siswa tersisa karena pembulatan, masukkan ke ruangan yang masih muat
                 while (stList.length > 0) {
                     let bestR = -1;
                     let maxCap = 0;
@@ -411,7 +411,6 @@
                 }
             });
 
-            // Selang-selingkan urutan siswa di tiap ruangan agar siswa sekelas tidak berdampingan
             roomsData.forEach(room => {
                 const byClass = {};
                 room.siswaTertampung.forEach(st => {
@@ -481,7 +480,6 @@
             const container = document.getElementById('allRoomsContainer');
             container.innerHTML = '';
             const judul = document.getElementById('inputJudul').value;
-            const tahun = document.getElementById('inputTahun').value;
 
             roomsData.forEach((room, index) => {
                 const roomWrapper = document.createElement('div');
@@ -503,13 +501,7 @@
                         </div>
                         <div class="grid-kursi" id="grid_${index}"></div>
                         <div class="footer-info">
-                            <div class="info-kiri">
-                                <p><span>Tahun Ajaran</span> : ${tahun}</p>
-                                <p><span>Ruangan</span> : ${room.namaRuang}</p>
-                                <p><span>Pengawas</span> : ..............................</p>
-                            </div>
-                            <div class="info-kanan" id="stats_${index}">
-                            </div>
+                            <div class="info-catatan" id="stats_${index}"></div>
                         </div>
                     </div>
                 `;
@@ -547,16 +539,17 @@
                 levelStats[t] = (levelStats[t] || 0) + 1;
             });
             
-            let statsText = `<strong>Catatan Kapasitas (${room.kapasitas} Kursi):</strong><br>`;
+            let statsHTML = `<div class="catatan-title">Catatan Kapasitas (${room.kapasitas} Kursi):</div>`;
+            statsHTML += `<div class="catatan-grid">`;
             const sortedLevels = Object.keys(levelStats).sort();
             let alphabet = 97; 
             sortedLevels.forEach(t => {
-                // Perbaikan Teks "Kelas Kelas X" menjadi "Kelas X" saja
                 let labelKelas = t.toLowerCase().startsWith('kelas') ? t : 'Kelas ' + t;
-                statsText += `${String.fromCharCode(alphabet)}. ${labelKelas} = ${levelStats[t]} siswa<br>`;
+                statsHTML += `<div>${String.fromCharCode(alphabet)}. ${labelKelas} = ${levelStats[t]} siswa</div>`;
                 alphabet++;
             });
-            document.getElementById('stats_' + roomIndex).innerHTML = statsText;
+            statsHTML += `</div>`;
+            document.getElementById('stats_' + roomIndex).innerHTML = statsHTML;
 
             let seatNumber = 1;
             for (let r = 0; r < rowInput; r++) {
