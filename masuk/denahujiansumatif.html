@@ -148,57 +148,30 @@
         .info-kiri span { display: inline-block; width: 100px; font-weight: 600; }
         .info-kanan { border: 1px solid #ccc; border-radius: 8px; padding: 10px; min-height: 80px; }
 
-        /* KARTU UJIAN STYLES - DIRAPIKAN (TIDAK BERTUMPUK) */
+        /* KARTU UJIAN STYLES */
         #kartuUjianContainer { display: none; width: 100%; max-width: 900px; }
         .kartu-page {
             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(7, 1fr);
-            gap: 10px; /* Jarak antar kartu dikurangi sedikit agar aman di kertas */
-            padding: 0; box-sizing: border-box; page-break-after: always; height: 100%;
+            gap: 10px; padding: 0; box-sizing: border-box; page-break-after: always; height: 100%;
         }
         .kartu {
-    border: 1px solid #ccc; 
-    border-radius: 12px; 
-    padding: 10px;
-    position: relative; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: flex-start; /* Mengubah dari 'center' ke 'flex-start' agar posisi teks mengikuti batas atas */
-    align-items: center;
-    background: white; 
-    text-align: center; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    padding-top: 52px; /* Angka ini dinaikkan untuk mendorong nama lebih ke bawah */
-    padding-bottom: 20px;
-}
+            border: 1px solid #ccc; border-radius: 12px; padding: 10px; position: relative; 
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+            background: white; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding-top: 52px; padding-bottom: 20px;
+        }
 
-.kartu-lingkaran {
-    width: 32px; /* Ukuran lingkaran diperkecil sedikit agar tidak memakan banyak ruang */
-    height: 32px; 
-    background-color: #f1f4f8; 
-    border: 2px solid #ddd;
-    border-radius: 50%; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-    font-size: 14px; 
-    font-weight: 800; 
-    color: #333; 
-    position: absolute; 
-    top: 6px; /* Posisi lingkaran dinaikkan lebih mendekati tepi atas */
-    left: 50%; 
-    transform: translateX(-50%);
-}
+        .kartu-lingkaran {
+            width: 32px; height: 32px; background-color: #f1f4f8; border: 2px solid #ddd;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 14px; font-weight: 800; color: #333; position: absolute; 
+            top: 6px; left: 50%; transform: translateX(-50%);
+        }
 
-.kartu-nama-peserta {
-    font-size: 14px; 
-    font-weight: 800; 
-    font-family: 'Times New Roman', serif; 
-    margin: 9px 0 9px 0; 
-    color: #000; 
-    width: 95%; 
-    word-wrap: break-word; 
-    line-height: 1.15;
-}
+        .kartu-nama-peserta {
+            font-size: 14px; font-weight: 800; font-family: 'Times New Roman', serif; 
+            margin: 9px 0 9px 0; color: #000; width: 95%; word-wrap: break-word; line-height: 1.15;
+        }
         .kartu-kelas-peserta { 
             font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: #444; margin: 0;
         }
@@ -211,12 +184,10 @@
             body { background: white; padding: 0; }
             .no-print, .controls-container { display: none !important; }
             
-            /* Print Denah Mode */
             body.print-denah #allRoomsContainer { gap: 0; display: block; }
             body.print-denah #kartuUjianContainer { display: none !important; }
             body.print-denah .container { box-shadow: none; border: none; page-break-after: always; padding: 0; margin-bottom: 0; }
             
-            /* Print Kartu Mode */
             body.print-kartu #allRoomsContainer { display: none !important; }
             body.print-kartu #kartuUjianContainer { display: block !important; }
             body.print-kartu .kartu { border: 1px solid #999; box-shadow: none; }
@@ -345,6 +316,8 @@
             });
 
             const sortedClasses = Object.keys(classCounts).sort();
+            
+            // Nama Ruang Kembali seperti semula ("Ruang " + kls)
             roomsData = sortedClasses.map(kls => {
                 return {
                     namaRuang: "Ruang " + kls,
@@ -355,30 +328,112 @@
                 };
             });
 
-            let mixedStudentQueue = [];
-            sortedClasses.forEach(k => shuffleArray(studentsByClass[k]));
+            const totalCap = roomsData.reduce((sum, r) => sum + r.kapasitas, 0);
+            const numRooms = roomsData.length;
+            const remCap = roomsData.map(r => r.kapasitas);
 
-            let hasMoreStudents = true;
-            while (hasMoreStudents) {
-                hasMoreStudents = false;
-                for (let i = 0; i < sortedClasses.length; i++) {
-                    let kls = sortedClasses[i];
-                    if (studentsByClass[kls].length > 0) {
-                        mixedStudentQueue.push(studentsByClass[kls].shift());
-                        hasMoreStudents = true;
+            // Acak siswa di setiap kelas
+            sortedClasses.forEach(kls => shuffleArray(studentsByClass[kls]));
+
+            // Pembagian Proporsional agar SELURUH kelas masuk ke SELURUH ruangan
+            sortedClasses.forEach(kls => {
+                const stList = studentsByClass[kls];
+                const numSt = stList.length;
+
+                // Hitung kuota awal tiap ruangan untuk kelas ini
+                let quotas = roomsData.map(r => Math.floor(numSt * (r.kapasitas / totalCap)));
+
+                // Pastikan tiap ruangan berkapasitas dapat minimal 1 siswa
+                for (let r = 0; r < numRooms; r++) {
+                    if (remCap[r] > 0 && stList.length > 0 && quotas[r] === 0) {
+                        quotas[r] = 1;
                     }
                 }
-            }
 
-            let studentIndex = 0;
-            roomsData.forEach(room => {
-                for (let i = 0; i < room.kapasitas; i++) {
-                    if (studentIndex < mixedStudentQueue.length) {
-                        room.siswaTertampung.push(mixedStudentQueue[studentIndex]);
-                        studentIndex++;
+                let sumQuotas = quotas.reduce((a, b) => a + b, 0);
+
+                // Sesuaikan jika jumlah kuota kurang dari total siswa kelas
+                while (sumQuotas < numSt) {
+                    let bestR = 0;
+                    let maxDiff = -Infinity;
+                    for (let r = 0; r < numRooms; r++) {
+                        let diff = remCap[r] - quotas[r];
+                        if (diff > maxDiff) {
+                            maxDiff = diff;
+                            bestR = r;
+                        }
+                    }
+                    quotas[bestR]++;
+                    sumQuotas++;
+                }
+
+                // Sesuaikan jika jumlah kuota lebih dari total siswa kelas
+                while (sumQuotas > numSt) {
+                    let bestR = 0;
+                    let maxQ = -1;
+                    for (let r = 0; r < numRooms; r++) {
+                        if (quotas[r] > maxQ) {
+                            maxQ = quotas[r];
+                            bestR = r;
+                        }
+                    }
+                    quotas[bestR]--;
+                    sumQuotas--;
+                }
+
+                // Masukkan siswa ke ruangan sesuai kuota
+                for (let r = 0; r < numRooms; r++) {
+                    let q = Math.min(quotas[r], remCap[r], stList.length);
+                    for (let i = 0; i < q; i++) {
+                        if (stList.length > 0) {
+                            roomsData[r].siswaTertampung.push(stList.pop());
+                            remCap[r]--;
+                        }
+                    }
+                }
+
+                // Jika masih ada siswa tersisa karena pembulatan, masukkan ke ruangan yang masih muat
+                while (stList.length > 0) {
+                    let bestR = -1;
+                    let maxCap = 0;
+                    for (let r = 0; r < numRooms; r++) {
+                        if (remCap[r] > maxCap) {
+                            maxCap = remCap[r];
+                            bestR = r;
+                        }
+                    }
+                    if (bestR !== -1) {
+                        roomsData[bestR].siswaTertampung.push(stList.pop());
+                        remCap[bestR]--;
+                    } else {
+                        break;
                     }
                 }
             });
+
+            // Selang-selingkan urutan siswa di tiap ruangan agar siswa sekelas tidak berdampingan
+            roomsData.forEach(room => {
+                const byClass = {};
+                room.siswaTertampung.forEach(st => {
+                    const k = st.kelas;
+                    if (!byClass[k]) byClass[k] = [];
+                    byClass[k].push(st);
+                });
+                const kList = Object.keys(byClass).sort();
+                const interleaved = [];
+                let hasMore = true;
+                while (hasMore) {
+                    hasMore = false;
+                    kList.forEach(k => {
+                        if (byClass[k].length > 0) {
+                            interleaved.push(byClass[k].shift());
+                            hasMore = true;
+                        }
+                    });
+                }
+                room.siswaTertampung = interleaved;
+            });
+
             saveDataToLocal();
         }
 
@@ -488,14 +543,17 @@
             
             const levelStats = {};
             room.siswaTertampung.forEach(s => {
-                const t = getTingkat(s.kelas);
+                const t = s.kelas;
                 levelStats[t] = (levelStats[t] || 0) + 1;
             });
+            
             let statsText = `<strong>Catatan Kapasitas (${room.kapasitas} Kursi):</strong><br>`;
             const sortedLevels = Object.keys(levelStats).sort();
             let alphabet = 97; 
             sortedLevels.forEach(t => {
-                statsText += `${String.fromCharCode(alphabet)}. Kelas ${t} = ${levelStats[t]} siswa<br>`;
+                // Perbaikan Teks "Kelas Kelas X" menjadi "Kelas X" saja
+                let labelKelas = t.toLowerCase().startsWith('kelas') ? t : 'Kelas ' + t;
+                statsText += `${String.fromCharCode(alphabet)}. ${labelKelas} = ${levelStats[t]} siswa<br>`;
                 alphabet++;
             });
             document.getElementById('stats_' + roomIndex).innerHTML = statsText;
@@ -527,7 +585,7 @@
             saveDataToLocal(); 
         }
 
-function generateKartuUjian() {
+        function generateKartuUjian() {
             finalAssignedStudents = [];
             roomsData.forEach(room => {
                 if (room.savedArrangement) {
@@ -539,10 +597,9 @@ function generateKartuUjian() {
                 }
             });
 
-            // PERUBAHAN DI SINI: Mengelompokkan berdasarkan nama KELAS utuh (misal: 3A, 3B terpisah)
             const groupedByClass = {};
             finalAssignedStudents.forEach(s => {
-                const kls = s.kelas; // Tidak lagi menggunakan getTingkat(), melainkan mengambil string kelas seutuhnya
+                const kls = s.kelas; 
                 if (!groupedByClass[kls]) groupedByClass[kls] = [];
                 groupedByClass[kls].push(s);
             });
@@ -550,16 +607,13 @@ function generateKartuUjian() {
             const kartuContainer = document.getElementById('kartuUjianContainer');
             kartuContainer.innerHTML = '';
 
-            // Looping berdasarkan kelas yang sudah terpisah
             Object.keys(groupedByClass).sort().forEach(kls => {
                 let studentsInClass = groupedByClass[kls];
                 
-                // Urutkan nama siswa sesuai abjad di dalam kelas tersebut
                 studentsInClass.sort((a,b) => a.nama.localeCompare(b.nama));
                 
-                // Pisahkan per 14 kartu agar berganti halaman (page break)
-                for (let i = 0; i < studentsInClass.length; i += 16) {
-                    const chunk = studentsInClass.slice(i, i + 16);
+                for (let i = 0; i < studentsInClass.length; i += 14) {
+                    const chunk = studentsInClass.slice(i, i + 14);
                     const pageDiv = document.createElement('div');
                     pageDiv.className = 'kartu-page';
                     
