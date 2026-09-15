@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Denah & Kartu Ujian</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
+        :root {
+            --dark-blue: #1b365d;
+            --board-green: #a7c4b5;
+            --desk-pink: #dfb6b2;
+            --bg-color: #f7f9f8;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls-container {
+            margin-bottom: 30px;
+            text-align: center;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 860px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label { font-weight: 600; font-size: 14px; color: var(--dark-blue); }
+        .input-group input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: var(--dark-blue); }
+        .btn-primary:hover { background-color: #122643; }
+        .btn-success { background-color: #28a745; }
+        .btn-success:hover { background-color: #218838; }
+        .btn-warning { background-color: #f0ad4e; color: #333; }
+        .btn-warning:hover { background-color: #ec971f; color: white; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-info:hover { background-color: #117a8b; }
+
+        button:disabled { background-color: #8898aa; cursor: not-allowed; }
+
+        #printControls {
+            display: none; 
+            margin-top: 20px; 
+            gap: 15px; 
+            justify-content: center; 
+            align-items: center; 
+            background: #e2ede7; 
+            padding: 15px; 
+            border-radius: 8px;
+            flex-wrap: wrap;
+            border: 2px dashed var(--board-green);
+        }
+
+        #printControls select {
+            padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Poppins', sans-serif;
+        }
+
+        #loading { display: none; color: var(--dark-blue); font-weight: 600; margin-top: 10px; }
+
+        /* DENAH STYLES */
+        #allRoomsContainer { display: flex; flex-direction: column; gap: 40px; width: 100%; max-width: 900px; }
+        .container {
+            width: 100%; box-sizing: border-box; background: white; padding: 40px;
+            border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); position: relative; overflow: hidden;
+        }
+        .room-config {
+            background-color: #e2ede7; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center; gap: 15px; position: relative; z-index: 2; flex-wrap: wrap;
+        }
+        .room-config input { width: 50px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .btn-apply { background-color: #d9534f; padding: 6px 12px; font-size: 13px; }
+        
+        .container::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 150px; height: 150px;
+            background-color: #e2ede7; border-bottom-right-radius: 100%; z-index: 0; opacity: 0.6;
+        }
+        .content-wrapper { position: relative; z-index: 1; }
+        h1 { text-align: center; color: var(--dark-blue); font-size: 24px; letter-spacing: 1px; margin-bottom: 30px; line-height: 1.4; }
+        h1 span { color: #d9534f; }
+
+        .room-elements { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 40px; }
+        .papan-tulis { background-color: var(--board-green); color: #2c4436; font-weight: 700; padding: 10px 80px; border-radius: 8px; }
+        .meja-guru { background-color: var(--desk-pink); color: #5c3c38; font-weight: 700; padding: 10px 40px; border-radius: 8px; }
+
+        .grid-kursi { display: grid; gap: 25px 15px; margin-bottom: 40px; }
+        .kursi {
+            border: 2px dashed var(--dark-blue); border-radius: 12px; position: relative;
+            padding: 22px 5px 10px; text-align: center; min-height: 60px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; box-sizing: border-box;
+        }
+        .nomor-kursi {
+            background-color: var(--dark-blue); color: white; font-size: 13px; font-weight: 600;
+            padding: 4px 14px; border-radius: 20px; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+        }
+        .nama-siswa { font-weight: 600; font-size: 11px; margin-bottom: 4px; line-height: 1.3; word-wrap: break-word; width: 100%; }
+        .kelas-siswa { font-size: 11px; color: #fff; background: #d9534f; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+
+        .footer-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 2px solid #eee; padding-top: 20px; font-size: 13px; }
+        .info-kiri p { margin: 8px 0; display: flex; }
+        .info-kiri span { display: inline-block; width: 100px; font-weight: 600; }
+        .info-kanan { border: 1px solid #ccc; border-radius: 8px; padding: 10px; min-height: 80px; }
+
+        /* KARTU UJIAN STYLES - DIRAPIKAN (TIDAK BERTUMPUK) */
+        #kartuUjianContainer { display: none; width: 100%; max-width: 900px; }
+        .kartu-page {
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(7, 1fr);
+            gap: 10px; /* Jarak antar kartu dikurangi sedikit agar aman di kertas */
+            padding: 0; box-sizing: border-box; page-break-after: always; height: 100%;
+        }
+        .kartu {
+    border: 1px solid #ccc; 
+    border-radius: 12px; 
+    padding: 10px;
+    position: relative; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-start; /* Mengubah dari 'center' ke 'flex-start' agar posisi teks mengikuti batas atas */
+    align-items: center;
+    background: white; 
+    text-align: center; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding-top: 52px; /* Angka ini dinaikkan untuk mendorong nama lebih ke bawah */
+    padding-bottom: 20px;
+}
+
+.kartu-lingkaran {
+    width: 32px; /* Ukuran lingkaran diperkecil sedikit agar tidak memakan banyak ruang */
+    height: 32px; 
+    background-color: #f1f4f8; 
+    border: 2px solid #ddd;
+    border-radius: 50%; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    font-size: 14px; 
+    font-weight: 800; 
+    color: #333; 
+    position: absolute; 
+    top: 6px; /* Posisi lingkaran dinaikkan lebih mendekati tepi atas */
+    left: 50%; 
+    transform: translateX(-50%);
+}
+
+.kartu-nama-peserta {
+    font-size: 14px; 
+    font-weight: 800; 
+    font-family: 'Times New Roman', serif; 
+    margin: 9px 0 9px 0; 
+    color: #000; 
+    width: 95%; 
+    word-wrap: break-word; 
+    line-height: 1.15;
+}
+        .kartu-kelas-peserta { 
+            font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: #444; margin: 0;
+        }
+        .kartu-ruangan-peserta { 
+            position: absolute; bottom: 8px; left: 15px; font-size: 9px; font-weight: 600; text-transform: uppercase; color: #555; 
+        }
+
+        /* PRINT MEDIA QUERIES */
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print, .controls-container { display: none !important; }
+            
+            /* Print Denah Mode */
+            body.print-denah #allRoomsContainer { gap: 0; display: block; }
+            body.print-denah #kartuUjianContainer { display: none !important; }
+            body.print-denah .container { box-shadow: none; border: none; page-break-after: always; padding: 0; margin-bottom: 0; }
+            
+            /* Print Kartu Mode */
+            body.print-kartu #allRoomsContainer { display: none !important; }
+            body.print-kartu #kartuUjianContainer { display: block !important; }
+            body.print-kartu .kartu { border: 1px solid #999; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls-container no-print">
+        <div class="input-group">
+            <label>Judul Denah & Kartu:</label>
+            <input type="text" id="inputJudul" value="DENAH TEMPAT DUDUK PENILAIAN TENGAH SEMESTER" placeholder="Contoh: DENAH TEMPAT DUDUK UJIAN">
+            
+            <label>Tahun Ajaran:</label>
+            <input type="text" id="inputTahun" value="2026/2027" placeholder="Contoh: 2026/2027">
+        </div>
+
+        <div class="button-group">
+            <button id="btnAcak" class="btn-primary" onclick="fetchData()">⬇️ Tarik Data Server</button>
+            <button class="btn-info" onclick="document.getElementById('uploadFile').click()">📂 Upload Data (.json)</button>
+            <input type="file" id="uploadFile" accept=".json" style="display:none" onchange="importJSON(event)">
+            <button class="btn-warning" id="btnDownload" onclick="exportJSON()" style="display:none;">💾 Download Backup (.json)</button>
+        </div>
+        <div id="loading">Memproses data...</div>
+        
+        <div id="printControls">
+            <label style="font-weight: 600;">Ukuran Kertas:</label>
+            <select id="paperSize">
+                <option value="A4">A4</option>
+                <option value="F4">F4 / Folio</option>
+            </select>
+            
+            <label style="font-weight: 600; margin-left:10px;">Orientasi:</label>
+            <select id="paperOrientation">
+                <option value="portrait">Potrait (Tegak)</option>
+                <option value="landscape">Landscape (Mendatar)</option>
+            </select>
+            
+            <div style="width: 100%; margin-top: 10px; display: flex; justify-content: center; gap: 15px;">
+                <button class="btn-success" onclick="executePrint('denah')">🖨️ Cetak Denah</button>
+                <button class="btn-success" onclick="executePrint('kartu')" style="background-color: #20c997;">💳 Cetak Kartu Ujian (14/Hal)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="allRoomsContainer"></div>
+    <div id="kartuUjianContainer"></div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec?action=get_siswa';
+        
+        let roomsData = [];
+        let finalAssignedStudents = []; 
+
+        window.onload = () => {
+            const savedData = localStorage.getItem('seatingAppData');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    document.getElementById('inputJudul').value = parsed.judul || "DENAH TEMPAT DUDUK";
+                    document.getElementById('inputTahun').value = parsed.tahun || "2026/2027";
+                    roomsData = parsed.roomsData;
+                    renderAllRoomsBase();
+                    showPrintControls();
+                } catch(e) {
+                    console.log("Tidak ada data tersimpan yang valid");
+                }
+            }
+        };
+
+        function saveDataToLocal() {
+            const state = {
+                judul: document.getElementById('inputJudul').value,
+                tahun: document.getElementById('inputTahun').value,
+                roomsData: roomsData
+            };
+            localStorage.setItem('seatingAppData', JSON.stringify(state));
+        }
+
+        function getTingkat(kelasString) {
+            if (!kelasString) return "";
+            const match = kelasString.match(/\d+/);
+            return match ? match[0] : kelasString.trim();
+        }
+
+        function showPrintControls() {
+            document.getElementById('printControls').style.display = 'flex';
+            document.getElementById('btnDownload').style.display = 'flex';
+        }
+
+        async function fetchData() {
+            const btn = document.getElementById('btnAcak');
+            const loading = document.getElementById('loading');
+            
+            btn.disabled = true; loading.style.display = 'block';
+            
+            try {
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data.length > 0) {
+                    distributeStudents(result.data);
+                    renderAllRoomsBase();
+                    showPrintControls();
+                } else {
+                    alert('Data siswa kosong atau gagal diambil.');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi. Pastikan membuka file ini menggunakan Local Server (Live Server). \nError: ' + error.message);
+            } finally {
+                btn.disabled = false; loading.style.display = 'none';
+            }
+        }
+
+        function distributeStudents(dataSiswa) {
+            roomsData = [];
+            const classCounts = {};
+            const studentsByClass = {};
+
+            dataSiswa.forEach(siswa => {
+                const kls = siswa.kelas || 'Tanpa Kelas';
+                classCounts[kls] = (classCounts[kls] || 0) + 1;
+                
+                if (!studentsByClass[kls]) studentsByClass[kls] = [];
+                studentsByClass[kls].push(siswa);
+            });
+
+            const sortedClasses = Object.keys(classCounts).sort();
+            roomsData = sortedClasses.map(kls => {
+                return {
+                    namaRuang: "Ruang " + kls,
+                    kapasitas: classCounts[kls],
+                    siswaTertampung: [],
+                    colInput: 4, 
+                    rowInput: Math.ceil(classCounts[kls] / 4)
+                };
+            });
+
+            let mixedStudentQueue = [];
+            sortedClasses.forEach(k => shuffleArray(studentsByClass[k]));
+
+            let hasMoreStudents = true;
+            while (hasMoreStudents) {
+                hasMoreStudents = false;
+                for (let i = 0; i < sortedClasses.length; i++) {
+                    let kls = sortedClasses[i];
+                    if (studentsByClass[kls].length > 0) {
+                        mixedStudentQueue.push(studentsByClass[kls].shift());
+                        hasMoreStudents = true;
+                    }
+                }
+            }
+
+            let studentIndex = 0;
+            roomsData.forEach(room => {
+                for (let i = 0; i < room.kapasitas; i++) {
+                    if (studentIndex < mixedStudentQueue.length) {
+                        room.siswaTertampung.push(mixedStudentQueue[studentIndex]);
+                        studentIndex++;
+                    }
+                }
+            });
+            saveDataToLocal();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function findValidArrangement(students, cols, rows) {
+            const maxAttempts = 1000;
+            let bestGrid = null; let minViolations = Infinity;
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                let currentStudents = [...students];
+                shuffleArray(currentStudents);
+                
+                let grid = []; let index = 0;
+                for (let r = 0; r < rows; r++) {
+                    grid[r] = [];
+                    for (let c = 0; c < cols; c++) {
+                        grid[r][c] = index < currentStudents.length ? currentStudents[index++] : null;
+                    }
+                }
+
+                let violations = 0;
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        let s = grid[r][c];
+                        if (!s) continue;
+                        let t = getTingkat(s.kelas);
+                        if (c < cols - 1 && grid[r][c+1] && getTingkat(grid[r][c+1].kelas) === t) violations++;
+                        if (r < rows - 1 && grid[r+1][c] && getTingkat(grid[r+1][c].kelas) === t) violations++;
+                    }
+                }
+
+                if (violations === 0) return grid;
+                if (violations < minViolations) { minViolations = violations; bestGrid = grid; }
+            }
+            return bestGrid; 
+        }
+
+        function renderAllRoomsBase() {
+            const container = document.getElementById('allRoomsContainer');
+            container.innerHTML = '';
+            const judul = document.getElementById('inputJudul').value;
+            const tahun = document.getElementById('inputTahun').value;
+
+            roomsData.forEach((room, index) => {
+                const roomWrapper = document.createElement('div');
+                roomWrapper.className = 'container';
+                roomWrapper.id = 'room_container_' + index;
+
+                roomWrapper.innerHTML = `
+                    <div class="room-config no-print">
+                        <span style="font-weight:bold; color:var(--dark-blue);">Pengaturan ${room.namaRuang}</span>
+                        <label>Kolom: <input type="number" id="col_${index}" value="${room.colInput}" min="1"></label>
+                        <label>Baris: <input type="number" id="row_${index}" value="${room.rowInput}" min="1"></label>
+                        <button class="btn-apply" onclick="applyAndRenderGrid(${index})">Terapkan & Acak Ulang</button>
+                    </div>
+                    <div class="content-wrapper">
+                        <h1>${judul} <br><span>${room.namaRuang}</span></h1>
+                        <div class="room-elements">
+                            <div class="papan-tulis">PAPAN TULIS</div>
+                            <div class="meja-guru">MEJA GURU</div>
+                        </div>
+                        <div class="grid-kursi" id="grid_${index}"></div>
+                        <div class="footer-info">
+                            <div class="info-kiri">
+                                <p><span>Tahun Ajaran</span> : ${tahun}</p>
+                                <p><span>Ruangan</span> : ${room.namaRuang}</p>
+                                <p><span>Pengawas</span> : ..............................</p>
+                            </div>
+                            <div class="info-kanan" id="stats_${index}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(roomWrapper);
+                applyAndRenderGrid(index, true);
+            });
+        }
+
+        function applyAndRenderGrid(roomIndex, isLoading = false) {
+            const room = roomsData[roomIndex];
+            const colInput = parseInt(document.getElementById('col_' + roomIndex).value);
+            const rowInput = parseInt(document.getElementById('row_' + roomIndex).value);
+
+            if (colInput * rowInput < room.kapasitas) {
+                alert(`Kapasitas tidak cukup! Butuh ${room.kapasitas} kursi.`);
+                return;
+            }
+
+            room.colInput = colInput;
+            room.rowInput = rowInput;
+
+            const gridContainer = document.getElementById('grid_' + roomIndex);
+            gridContainer.innerHTML = '';
+            gridContainer.style.gridTemplateColumns = `repeat(${colInput}, 1fr)`;
+
+            let arrangement = room.savedArrangement;
+            if (!isLoading || !arrangement) {
+                arrangement = findValidArrangement(room.siswaTertampung, colInput, rowInput);
+                room.savedArrangement = arrangement; 
+            }
+            
+            const levelStats = {};
+            room.siswaTertampung.forEach(s => {
+                const t = getTingkat(s.kelas);
+                levelStats[t] = (levelStats[t] || 0) + 1;
+            });
+            let statsText = `<strong>Catatan Kapasitas (${room.kapasitas} Kursi):</strong><br>`;
+            const sortedLevels = Object.keys(levelStats).sort();
+            let alphabet = 97; 
+            sortedLevels.forEach(t => {
+                statsText += `${String.fromCharCode(alphabet)}. Kelas ${t} = ${levelStats[t]} siswa<br>`;
+                alphabet++;
+            });
+            document.getElementById('stats_' + roomIndex).innerHTML = statsText;
+
+            let seatNumber = 1;
+            for (let r = 0; r < rowInput; r++) {
+                for (let c = 0; c < colInput; c++) {
+                    const student = arrangement[r] ? arrangement[r][c] : null;
+                    const kursiHTML = document.createElement('div');
+                    
+                    if (seatNumber <= room.kapasitas) {
+                        kursiHTML.className = 'kursi';
+                        let innerHTML = `<div class="nomor-kursi">${seatNumber < 10 ? '0' + seatNumber : seatNumber}</div>`;
+                        if (student) {
+                            student.nomorMeja = seatNumber;
+                            student.ruangUjian = room.namaRuang;
+                            innerHTML += `<div class="nama-siswa">${student.nama}</div><div class="kelas-siswa">${student.kelas}</div>`;
+                        }
+                        kursiHTML.innerHTML = innerHTML;
+                    } else {
+                        kursiHTML.style.border = "none";
+                        kursiHTML.style.background = "transparent";
+                    }
+
+                    gridContainer.appendChild(kursiHTML);
+                    seatNumber++;
+                }
+            }
+            saveDataToLocal(); 
+        }
+
+function generateKartuUjian() {
+            finalAssignedStudents = [];
+            roomsData.forEach(room => {
+                if (room.savedArrangement) {
+                    room.savedArrangement.forEach(row => {
+                        row.forEach(student => {
+                            if (student) finalAssignedStudents.push(student);
+                        });
+                    });
+                }
+            });
+
+            // PERUBAHAN DI SINI: Mengelompokkan berdasarkan nama KELAS utuh (misal: 3A, 3B terpisah)
+            const groupedByClass = {};
+            finalAssignedStudents.forEach(s => {
+                const kls = s.kelas; // Tidak lagi menggunakan getTingkat(), melainkan mengambil string kelas seutuhnya
+                if (!groupedByClass[kls]) groupedByClass[kls] = [];
+                groupedByClass[kls].push(s);
+            });
+
+            const kartuContainer = document.getElementById('kartuUjianContainer');
+            kartuContainer.innerHTML = '';
+
+            // Looping berdasarkan kelas yang sudah terpisah
+            Object.keys(groupedByClass).sort().forEach(kls => {
+                let studentsInClass = groupedByClass[kls];
+                
+                // Urutkan nama siswa sesuai abjad di dalam kelas tersebut
+                studentsInClass.sort((a,b) => a.nama.localeCompare(b.nama));
+                
+                // Pisahkan per 14 kartu agar berganti halaman (page break)
+                for (let i = 0; i < studentsInClass.length; i += 16) {
+                    const chunk = studentsInClass.slice(i, i + 16);
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'kartu-page';
+                    
+                    chunk.forEach(s => {
+                        const kartu = document.createElement('div');
+                        kartu.className = 'kartu';
+                        kartu.innerHTML = `
+                            <div class="kartu-lingkaran">${s.nomorMeja < 10 ? '0'+s.nomorMeja : s.nomorMeja}</div>
+                            <div class="kartu-nama-peserta">${s.nama}</div>
+                            <div class="kartu-kelas-peserta">${s.kelas}</div>
+                            <div class="kartu-ruangan-peserta">${s.ruangUjian}</div>
+                        `;
+                        pageDiv.appendChild(kartu);
+                    });
+                    kartuContainer.appendChild(pageDiv);
+                }
+            });
+        }
+
+        function executePrint(mode) {
+            const size = document.getElementById('paperSize').value;
+            const orientation = document.getElementById('paperOrientation').value;
+            
+            let sizeString = '';
+            if (size === 'A4') sizeString = orientation === 'landscape' ? '297mm 210mm' : '210mm 297mm';
+            else if (size === 'F4') sizeString = orientation === 'landscape' ? '330mm 215mm' : '215mm 330mm';
+            
+            let styleTag = document.getElementById('dynamicPrintStyle');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'dynamicPrintStyle';
+                document.head.appendChild(styleTag);
+            }
+            
+            const margin = mode === 'kartu' ? '7mm' : '10mm';
+            styleTag.innerHTML = `@page { size: ${sizeString}; margin: ${margin}; }`;
+            
+            if (mode === 'kartu') {
+                document.body.className = 'print-kartu';
+                generateKartuUjian();
+            } else {
+                document.body.className = 'print-denah';
+            }
+            
+            window.print();
+            
+            setTimeout(() => { document.body.className = ''; }, 500);
+        }
+
+        function exportJSON() {
+            const state = {
+                judul: document.getElementById('inputJudul').value,
+                tahun: document.getElementById('inputTahun').value,
+                roomsData: roomsData
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "Backup_Denah_Ujian.json");
+            dlAnchorElem.click();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    document.getElementById('inputJudul').value = parsed.judul || "";
+                    document.getElementById('inputTahun').value = parsed.tahun || "";
+                    roomsData = parsed.roomsData;
+                    saveDataToLocal();
+                    renderAllRoomsBase();
+                    showPrintControls();
+                    alert("Data berhasil dipulihkan!");
+                } catch (err) {
+                    alert("Gagal membaca file JSON. Format tidak sesuai.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        }
+    </script>
+</body>
+</html>
