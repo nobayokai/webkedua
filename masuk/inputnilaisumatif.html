@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekap Nilai Sumatif (Spreadsheet Mode)</title>
+    <title>Rekap Nilai Sumatif (Smart Mode)</title>
     <style>
-        :root { --header-bg: #f0f0f0; --header-color: #000000; --body-color: #000000; --col-bg: #ffffff; }
-        body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; color: var(--body-color); user-select: none; } /* Mencegah blok teks biasa saat drag */
+        :root { --header-bg: #f0f0f0; --header-color: #000000; --body-color: #000000; --col-bg: #ffffff; --bg-benar: #c8e6c9; --bg-salah: #ffcdd2; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; margin: 20px; color: var(--body-color); user-select: none; } 
         .setup-panel { background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
         .setup-panel h3 { margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
         .form-group { margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .form-group label { font-weight: bold; width: 140px; }
-        input[type="text"], input[type="number"] { padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        input[type="color"] { border: 1px solid #ccc; border-radius: 4px; cursor: pointer; height: 30px; width: 40px; padding: 2px; }
-        button { padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        input[type="text"], input[type="number"], select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         button:hover { background: #0056b3; }
-        .btn-success { background: #28a745; }
-        .btn-success:hover { background: #218838; }
-        .btn-print { background: #6c757d; }
-        .btn-print:hover { background: #5a6268; }
+        .btn-success { background: #28a745; } .btn-success:hover { background: #218838; }
+        .btn-print { background: #6c757d; } .btn-print:hover { background: #5a6268; }
 
         .header-info { width: 100%; margin-bottom: 20px; }
         .header-info td { padding: 3px; font-weight: bold; font-size: 14px; }
@@ -27,43 +24,59 @@
         .table-wrapper { max-height: 70vh; overflow-y: auto; border: 1px solid black; margin-bottom: 20px; }
         table.data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
         table.data-table th, table.data-table td { border-right: 1px solid black; border-bottom: 1px solid black; padding: 4px; text-align: center; vertical-align: middle; background-color: var(--col-bg); position: relative;}
-        
-        table.data-table thead th { position: sticky; top: 0; z-index: 3; background-color: var(--header-bg); color: var(--header-color); border-top: 1px solid black; }
-        table.data-table thead tr.kunci-row td { position: sticky; top: 30px; z-index: 2; background-color: var(--header-bg); color: var(--header-color); font-weight: bold; }
+        table.data-table thead th { position: sticky; top: 0; z-index: 3; background-color: var(--header-bg); border-top: 1px solid black; }
+        table.data-table thead tr.kunci-row td { position: sticky; top: 30px; z-index: 2; background-color: var(--header-bg); font-weight: bold; }
         table.data-table th:first-child, table.data-table td:first-child { border-left: 1px solid black; }
-
         table.data-table .col-nama { text-align: left; white-space: nowrap; min-width: 250px; padding-left: 8px; }
         
-        /* Modifikasi Input agar interaktif seperti sel Spreadsheet */
-        .answer-input, .score-input { width: 35px; border: 1px solid transparent; text-align: center; font-weight: bold; font-size: 11px; background: transparent; color: inherit; box-sizing: border-box; cursor: cell; }
+        .answer-input, .score-input { width: 35px; border: 1px solid transparent; text-align: center; font-weight: bold; font-size: 11px; background: transparent; cursor: cell; }
         .answer-input { text-transform: uppercase; }
         .score-input { color: #0056b3; }
         
-        /* CSS UNTUK SELEKSI (BLOK) ALA SPREADSHEET */
         .cell-input:focus { outline: none; background-color: #fff; border: 2px solid #1a73e8; z-index: 10; position: relative;}
+        .cell-input[readonly] { cursor: not-allowed; opacity: 0.8; }
         .selected-cell { background-color: #e4f0fa !important; border: 1px solid #1a73e8 !important; }
         
         .pgk-settings { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .pgk-settings input { width: 35px; font-size: 9px; padding: 1px; text-align: center; border: 1px solid #ccc; }
         
-        .bg-green { background-color: #c8e6c9 !important; color: #000 !important; }
-        .bg-red { background-color: #ffcdd2 !important; color: #000 !important; }
+        .bg-benar { background-color: var(--bg-benar) !important; color: #000 !important; }
+        .bg-salah { background-color: var(--bg-salah) !important; color: #000 !important; }
 
-        .footer-area { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; font-size: 13px; }
-        .stats-box { border: 1px solid #000; padding: 15px; border-radius: 5px; min-width: 300px; background-color: var(--col-bg); }
+        .footer-area { display: flex; justify-content: space-between; font-size: 13px; margin-top: 20px; }
+        .stats-box { border: 1px solid #000; padding: 15px; border-radius: 5px; min-width: 300px; }
         .stats-box div { margin-bottom: 8px; }
-        .signature-box { text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .sig-image-container { width: 150px; height: 100px; border: 1px dashed #ccc; margin: 10px 0; position: relative; overflow: hidden; resize: both; background: #fafafa; }
-        .sig-image-container.has-image { border: none; background: transparent; }
         
+        .signature-area { width: 250px; text-align: center; margin-right: 20px; font-size: 13px; display: flex; flex-direction: column; justify-content: flex-end; }
+        .signature-area .date { margin-bottom: 5px; }
+        .signature-area .role { margin-bottom: 70px; }
+        .signature-area .name { font-weight: bold; text-decoration: underline; }
+
+        /* ======== TAMPILAN POPUP iOS ======== */
+        .ios-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .ios-overlay.active { opacity: 1; pointer-events: auto; }
+        .ios-modal { background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border-radius: 14px; width: 300px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s ease; overflow: hidden; }
+        .ios-overlay.active .ios-modal { transform: scale(1); }
+        .ios-title { font-weight: 600; font-size: 17px; padding: 20px 16px 5px; margin: 0; }
+        .ios-msg { font-size: 13px; padding: 5px 16px 15px; color: #333; margin: 0; line-height: 1.3; }
+        
+        .ios-inputs { display: flex; justify-content: space-around; padding: 0 10px 20px; }
+        .ios-inputs div { display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold;}
+        .ios-inputs input { width: 40px; text-align: center; margin-top: 5px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; padding: 4px; }
+        
+        .ios-actions { display: flex; border-top: 1px solid rgba(60,60,67,0.29); }
+        .ios-btn { flex: 1; padding: 12px; font-size: 17px; color: #007aff; background: none; border: none; cursor: pointer; font-family: inherit; }
+        .ios-btn:active { background: rgba(0,0,0,0.05); }
+        .ios-btn.bold { font-weight: 600; }
+        .ios-btn:first-child { border-right: 1px solid rgba(60,60,67,0.29); }
+
         @media print {
             .no-print { display: none !important; } body { margin: 0; }
             .table-wrapper { max-height: none; overflow: visible; border: none; }
             table.data-table thead th, table.data-table thead tr.kunci-row td { position: static; } 
-            .answer-input, .score-input, .pgk-settings input { border: none !important; outline: none !important; appearance: none; background: transparent !important; }
-            .selected-cell { background-color: transparent !important; border: none !important; }
+            .answer-input, .score-input, .pgk-settings input { border: none !important; }
+            .selected-cell { background-color: transparent !important; }
             @page { size: landscape; margin: 10mm; }
-            .sig-image-container { border: none !important; }
         }
     </style>
 </head>
@@ -74,56 +87,42 @@
         <div class="form-group">
             <label>Sekolah & Mapel:</label> 
             <input type="text" id="sekolah" value="SDIT Hidayatut Taufiq" placeholder="Nama Sekolah">
-            <input type="text" id="mapel" value="Teknologi Informasi Dan Komunikasi" style="width: 250px;">
+            <input type="text" id="mapel" list="list_mapel" style="width: 250px;" placeholder="Ketik Mapel (Otomatis dari DB)...">
+            <datalist id="list_mapel"></datalist>
         </div>
         <div class="form-group">
             <label>Kelas & Tahun:</label> 
-            <input type="text" id="kelas" value="6A" style="width: 60px;">
-            <input type="text" id="tahun" value="2025/2026" style="width: 100px;">
+            <select id="kelas" style="width: 80px;"></select>
+            <input type="text" id="tahun" list="list_tahun" style="width: 100px;" placeholder="Tahun Ajaran...">
+            <datalist id="list_tahun"></datalist>
+            
             <label style="width:auto; margin-left:10px;">Judul Ujian:</label> 
-            <input type="text" id="jenis_ujian" value="REKAP PENILAIAN SUMATIF HIDAYATUT TAUFIQ GANJIL" style="width:300px;">
+            <input type="text" id="jenis_ujian" list="list_judul" style="width:300px;" placeholder="Ketik Judul Ujian...">
+            <datalist id="list_judul"></datalist>
+        </div>
+        <div class="form-group">
+            <label>Penandatangan (Ttd):</label> 
+            <input type="text" id="input_jabatan" value="Guru Kelas" placeholder="Jabatan (Misal: Guru Mapel)">
+            <input type="text" id="input_nama_guru" style="width: 250px;" placeholder="Nama Lengkap & Gelar">
         </div>
         
-        <div class="form-group">
-            <label>Tanda Tangan:</label> 
-            <input type="text" id="jabatan_guru" value="Guru Bidang Studi" oninput="updateSignatureText()">
-            <input type="text" id="nama_guru" value="Nama Guru, S.Pd" oninput="updateSignatureText()">
-        </div>
-
-        <div class="form-group" style="background:#e9ecef; padding:8px; border-radius:4px;">
-            <label>Warna Tema:</label> 
-            <span>Header Bg: <input type="color" id="color_header_bg" value="#f0f0f0" onchange="applyColors()"></span>
-            <span>Header Teks: <input type="color" id="color_header_text" value="#000000" onchange="applyColors()"></span>
-            <span>Isi Tabel Bg: <input type="color" id="color_col_bg" value="#ffffff" onchange="applyColors()"></span>
-            <span>Isi Teks: <input type="color" id="color_body_text" value="#000000" onchange="applyColors()"></span>
-        </div>
-
-        <div class="form-group">
-            <label>Konfigurasi Soal:</label> 
-            <span>PG: <input type="number" id="jml_pg" value="24" min="0" style="width: 50px;"></span>
-            <span>PGK: <input type="number" id="jml_pgk" value="5" min="0" style="width: 50px;"></span>
-            <span>Isian: <input type="number" id="jml_isian" value="0" min="0" style="width: 50px;"></span>
-            <span>Esai: <input type="number" id="jml_esai" value="4" min="0" style="width: 50px;"></span>
-        </div>
-
         <div class="form-group" style="margin-top:15px;">
-            <button onclick="fetchSiswaAndGenerate()">1. Buat Tabel & Ambil Data Database</button>
+            <button onclick="fetchSiswaAndGenerate()">1. Buat Tabel & Ambil Data</button>
             <button class="btn-print" onclick="window.print()">2. Cetak (Print)</button>
-            <button class="btn-success" onclick="simpanKeSpreadsheet()">3. Simpan ke Database</button>
-            <small style="margin-left: 10px; font-style: italic;">💡 Klik dan Drag sel untuk memblok. Ctrl+C untuk Salin, Ctrl+V untuk Tempel.</small>
+            <button class="btn-success" onclick="simpanKeSpreadsheet()">3. Simpan (Smart Sync)</button>
         </div>
-        <p style="color:red; font-weight:bold;" id="statusMsg"></p>
+        <p style="color:red; font-weight:bold; margin:0;" id="statusMsg"></p>
     </div>
 
-    <!-- Area Cetak -->
-    <div id="printArea">
+    <!-- AREA CETAK -->
+    <div id="printArea" style="display:none;">
         <table class="header-info">
-            <tr><td width="120">Nama Sekolah</td><td width="10">:</td><td id="lbl_sekolah">SDIT Hidayatut Taufiq</td></tr>
-            <tr><td>Mata Pelajaran</td><td>:</td><td id="lbl_mapel">Teknologi Informasi Dan Komunikasi</td></tr>
-            <tr><td>Kelas</td><td>:</td><td id="lbl_kelas">6A</td></tr>
-            <tr><td>Tahun Ajaran</td><td>:</td><td id="lbl_tahun">2025/2026</td></tr>
+            <tr><td width="120">Nama Sekolah</td><td width="10">:</td><td id="lbl_sekolah"></td></tr>
+            <tr><td>Mata Pelajaran</td><td>:</td><td id="lbl_mapel"></td></tr>
+            <tr><td>Kelas</td><td>:</td><td id="lbl_kelas"></td></tr>
+            <tr><td>Tahun Ajaran</td><td>:</td><td id="lbl_tahun"></td></tr>
         </table>
-        <div class="title" id="lbl_judul">REKAP PENILAIAN SUMATIF HIDAYATUT TAUFIQ GANJIL</div>
+        <div class="title" id="lbl_judul">REKAP PENILAIAN SUMATIF</div>
 
         <div class="table-wrapper">
             <div id="tableContainer"></div>
@@ -136,283 +135,250 @@
                 <div><strong>Nilai Tertinggi:</strong> <span id="stat_tinggi">0</span> <span id="stat_nama_tinggi" style="font-style:italic;">(-)</span></div>
                 <div><strong>Nilai Terendah:</strong> <span id="stat_rendah">0</span> <span id="stat_nama_rendah" style="font-style:italic;">(-)</span></div>
             </div>
-            <div class="signature-box">
-                <div id="sig_role_display" style="margin-bottom:5px;">Guru Bidang Studi</div>
-                <div class="sig-image-container" id="sig_dropzone">
-                    <span class="no-print" id="sig_placeholder" style="font-size:10px; color:#999; display:block; padding-top:35px; cursor:pointer;">Drag & Drop TTD</span>
-                    <input type="file" id="sig_file" style="opacity:0; position:absolute; top:0; left:0; width:100%; height:100%; cursor:pointer;" accept="image/*">
-                    <img id="sig_img" style="display:none; width: 100%; height: 100%; object-fit: contain; pointer-events: none; position:absolute; top:0; left:0;">
-                </div>
-                <div id="sig_name_display" style="font-weight: bold; text-decoration: underline;">Nama Guru, S.Pd</div>
+            
+            <div class="signature-area">
+                <div class="date">Bekasi, ......................... 202...</div>
+                <div class="role" id="lbl_jabatan">Guru Kelas</div>
+                <div class="name" id="lbl_nama_guru">( .................................................... )</div>
+                <div class="nip">NIP/NUPTK: ..............................</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS STYLE POPUP MODAL UMUM -->
+    <div class="ios-overlay" id="iosOverlay">
+        <div class="ios-modal">
+            <h3 class="ios-title" id="iosTitle">Konfirmasi</h3>
+            <p class="ios-msg" id="iosMsg">Pesan</p>
+            <div class="ios-actions">
+                <button class="ios-btn" id="iosBtnNo">Batal</button>
+                <button class="ios-btn bold" id="iosBtnYes">Ya</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS STYLE POPUP KONFIGURASI SOAL -->
+    <div class="ios-overlay" id="iosConfigOverlay">
+        <div class="ios-modal">
+            <h3 class="ios-title">Data Baru Ditemukan</h3>
+            <p class="ios-msg">Tentukan jumlah soal untuk form baru ini.</p>
+            <div class="ios-inputs">
+                <div>PG <input type="number" id="jml_pg" value="20" min="0"></div>
+                <div>PGK <input type="number" id="jml_pgk" value="0" min="0"></div>
+                <div>ISIAN <input type="number" id="jml_isian" value="0" min="0"></div>
+                <div>ESAI <input type="number" id="jml_esai" value="5" min="0"></div>
+            </div>
+            <div class="ios-actions">
+                <button class="ios-btn" onclick="document.getElementById('iosConfigOverlay').classList.remove('active')">Batal</button>
+                <button class="ios-btn bold" onclick="terapkanKonfigurasi()">Buat Tabel</button>
             </div>
         </div>
     </div>
 
     <script>
         const GAS_URL = 'https://script.google.com/macros/s/AKfycby4w7PBty7uJpJh-2jOZZePkjyx5y36VsEniHchw4f44ogYQdfiIe14TKQKUfU7o36hJA/exec';
-        let dataSiswa = [];
-        let savedDbData = [];
+        let allSiswaData = [], dataSiswa = [], savedDbData = [];
         let savedKunci = { pg: [], pgk: [], max_pgk: [] };
+        let isSelecting = false, startR = null, startC = null, endR = null, endC = null;
+        let configPG = 0, configPGK = 0, configIsian = 0, configEsai = 0;
 
-        // Variabel untuk Blok/Seleksi ala Spreadsheet
-        let isSelecting = false;
-        let startR = null, startC = null;
-        let endR = null, endC = null;
-
-        function updateSignatureText() {
-            document.getElementById('sig_role_display').innerText = document.getElementById('jabatan_guru').value;
-            document.getElementById('sig_name_display').innerText = document.getElementById('nama_guru').value;
+        function showCustomPopup(title, message, confirmText, onConfirm) {
+            document.getElementById('iosTitle').innerText = title;
+            document.getElementById('iosMsg').innerText = message;
+            document.getElementById('iosBtnYes').innerText = confirmText || "Ya";
+            let overlay = document.getElementById('iosOverlay');
+            overlay.classList.add('active');
+            document.getElementById('iosBtnYes').onclick = () => { overlay.classList.remove('active'); if (onConfirm) onConfirm(); };
+            document.getElementById('iosBtnNo').onclick = () => overlay.classList.remove('active');
         }
 
-        function applyColors() {
-            document.documentElement.style.setProperty('--header-bg', document.getElementById('color_header_bg').value);
-            document.documentElement.style.setProperty('--header-color', document.getElementById('color_header_text').value);
-            document.documentElement.style.setProperty('--body-color', document.getElementById('color_body_text').value);
-            document.documentElement.style.setProperty('--col-bg', document.getElementById('color_col_bg').value);
-        }
+        window.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('statusMsg').innerText = "Memuat data siswa dan riwayat dropdown...";
+            try {
+                let resSiswa = await fetch(GAS_URL + "?action=get_siswa");
+                let jsonSiswa = await resSiswa.json();
+                if (jsonSiswa.status === 'success') {
+                    allSiswaData = jsonSiswa.data;
+                    let uniqueClasses = [...new Set(allSiswaData.map(s => s.kelas.toUpperCase()))].sort();
+                    let selKelas = document.getElementById('kelas');
+                    uniqueClasses.forEach(kls => selKelas.appendChild(new Option(kls, kls)));
+                }
 
-        // ==========================================
-        // FITUR SELEKSI (BLOK), COPY, DAN PASTE
-        // ==========================================
+                let resOpt = await fetch(GAS_URL + "?action=get_rekap_options");
+                let jsonOpt = await resOpt.json();
+                if (jsonOpt.status === 'success') {
+                    document.getElementById('list_mapel').innerHTML = jsonOpt.mapel.map(x => `<option value="${x}">`).join('');
+                    document.getElementById('list_tahun').innerHTML = jsonOpt.tahun.map(x => `<option value="${x}">`).join('');
+                    document.getElementById('list_judul').innerHTML = jsonOpt.judul.map(x => `<option value="${x}">`).join('');
+                }
+                document.getElementById('statusMsg').innerText = "";
+            } catch (error) { document.getElementById('statusMsg').innerText = "Gagal memuat otomatis."; }
+        });
+
+        // COPY PASTE SYSTEM
         document.addEventListener('mousedown', function(e) {
             if (e.target.classList.contains('cell-input')) {
-                isSelecting = true;
-                startR = parseInt(e.target.dataset.r);
-                startC = parseInt(e.target.dataset.c);
-                endR = startR;
-                endC = startC;
-                updateSelection();
-            } else {
-                clearSelection();
-            }
+                isSelecting = true; startR = parseInt(e.target.dataset.r); startC = parseInt(e.target.dataset.c);
+                endR = startR; endC = startC; updateSelection();
+            } else clearSelection();
         });
-
-        document.addEventListener('mouseover', function(e) {
-            if (isSelecting && e.target.classList.contains('cell-input')) {
-                endR = parseInt(e.target.dataset.r);
-                endC = parseInt(e.target.dataset.c);
-                updateSelection();
-            }
-        });
-
-        document.addEventListener('mouseup', function() {
-            isSelecting = false;
-        });
-
+        document.addEventListener('mouseover', function(e) { if (isSelecting && e.target.classList.contains('cell-input')) { endR = parseInt(e.target.dataset.r); endC = parseInt(e.target.dataset.c); updateSelection(); } });
+        document.addEventListener('mouseup', () => isSelecting = false);
+        
         function updateSelection() {
             document.querySelectorAll('.cell-input').forEach(el => el.classList.remove('selected-cell'));
-            let minR = Math.min(startR, endR), maxR = Math.max(startR, endR);
-            let minC = Math.min(startC, endC), maxC = Math.max(startC, endC);
-
-            for (let r = minR; r <= maxR; r++) {
-                for (let c = minC; c <= maxC; c++) {
-                    let el = document.querySelector(`.cell-input[data-r="${r}"][data-c="${c}"]`);
-                    if (el) el.classList.add('selected-cell');
-                }
-            }
+            let minR = Math.min(startR, endR), maxR = Math.max(startR, endR), minC = Math.min(startC, endC), maxC = Math.max(startC, endC);
+            for (let r = minR; r <= maxR; r++) for (let c = minC; c <= maxC; c++) { let el = document.querySelector(`.cell-input[data-r="${r}"][data-c="${c}"]`); if (el) el.classList.add('selected-cell'); }
         }
+        function clearSelection() { document.querySelectorAll('.cell-input').forEach(el => el.classList.remove('selected-cell')); startR = null; startC = null; }
 
-        function clearSelection() {
-            document.querySelectorAll('.cell-input').forEach(el => el.classList.remove('selected-cell'));
-            startR = null; startC = null; endR = null; endC = null;
-        }
-
-        // COPY (CTRL+C)
         document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                if (startR === null) return; 
-                let minR = Math.min(startR, endR), maxR = Math.max(startR, endR);
-                let minC = Math.min(startC, endC), maxC = Math.max(startC, endC);
-
-                let copyString = "";
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && startR !== null) {
+                let copyString = "", minR = Math.min(startR, endR), maxR = Math.max(startR, endR), minC = Math.min(startC, endC), maxC = Math.max(startC, endC);
                 for (let r = minR; r <= maxR; r++) {
                     let rowVals = [];
-                    for (let c = minC; c <= maxC; c++) {
-                        let el = document.querySelector(`.cell-input[data-r="${r}"][data-c="${c}"]`);
-                        rowVals.push(el ? el.value : "");
-                    }
+                    for (let c = minC; c <= maxC; c++) { let el = document.querySelector(`.cell-input[data-r="${r}"][data-c="${c}"]`); rowVals.push(el ? el.value : ""); }
                     copyString += rowVals.join('\t') + '\n';
                 }
                 navigator.clipboard.writeText(copyString);
-                
-                // Efek visual copy sebentar
-                document.querySelectorAll('.selected-cell').forEach(el => {
-                    let oldBg = el.style.backgroundColor;
-                    el.style.backgroundColor = '#d4edda';
-                    setTimeout(() => el.style.backgroundColor = oldBg, 200);
-                });
-            }
-            
-            // Navigasi Keyboard (Arrow Keys)
-            let active = document.activeElement;
-            if (active && active.classList.contains('cell-input')) {
-                let r = parseInt(active.dataset.r);
-                let c = parseInt(active.dataset.c);
-                let targetEl = null;
-
-                if (e.key === 'ArrowDown') targetEl = document.querySelector(`.cell-input[data-r="${r+1}"][data-c="${c}"]`);
-                else if (e.key === 'ArrowUp') targetEl = document.querySelector(`.cell-input[data-r="${r-1}"][data-c="${c}"]`);
-                else if (e.key === 'ArrowRight' && active.selectionStart === active.value.length) targetEl = document.querySelector(`.cell-input[data-r="${r}"][data-c="${c+1}"]`);
-                else if (e.key === 'ArrowLeft' && active.selectionEnd === 0) targetEl = document.querySelector(`.cell-input[data-r="${r}"][data-c="${c-1}"]`);
-
-                if (targetEl) {
-                    e.preventDefault();
-                    targetEl.focus();
-                }
             }
         });
 
-        // PASTE (CTRL+V)
         document.addEventListener('paste', function(e) {
-            let active = document.activeElement;
-            let targetCell = null;
-
-            if (active && active.classList.contains('cell-input')) {
-                targetCell = active;
-            } else if (startR !== null) {
-                let minR = Math.min(startR, endR);
-                let minC = Math.min(startC, endC);
-                targetCell = document.querySelector(`.cell-input[data-r="${minR}"][data-c="${minC}"]`);
-            }
-
+            let active = document.activeElement, targetCell = null;
+            if (active && active.classList.contains('cell-input')) targetCell = active;
+            else if (startR !== null) targetCell = document.querySelector(`.cell-input[data-r="${Math.min(startR, endR)}"][data-c="${Math.min(startC, endC)}"]`);
             if (!targetCell) return;
-
-            let pasteData = (e.clipboardData || window.clipboardData).getData('text');
-            if (!pasteData) return;
-
+            let pasteData = (e.clipboardData || window.clipboardData).getData('text'); if (!pasteData) return;
             e.preventDefault();
-            let rows = pasteData.trim().split(/\r\n|\n|\r/);
-            let sR = parseInt(targetCell.dataset.r);
-            let sC = parseInt(targetCell.dataset.c);
 
+            if(targetCell.readOnly) {
+                let rIdx = targetCell.dataset.r, nm = document.querySelector(`#row_siswa_${rIdx} .col-nama`).innerText.replace(' 🔒','').replace(' ✏️','');
+                showCustomPopup("Buka Gembok Otomatis?", `Paste data mulai dari "${nm}"?`, "Buka & Paste", () => jalankanPaste(pasteData, targetCell, true));
+            } else jalankanPaste(pasteData, targetCell, false);
+        });
+
+        function jalankanPaste(pasteData, targetCell, forceUnlock) {
+            let rows = pasteData.trim().split(/\r\n|\n|\r/), sR = parseInt(targetCell.dataset.r), sC = parseInt(targetCell.dataset.c), targetRowsToUnlock = new Set();
             for (let i = 0; i < rows.length; i++) {
-                let cols = rows[i].split('\t');
+                let cols = rows[i].split('\t'); targetRowsToUnlock.add(sR + i);
                 for (let j = 0; j < cols.length; j++) {
                     let el = document.querySelector(`.cell-input[data-r="${sR + i}"][data-c="${sC + j}"]`);
-                    if (el) {
-                        el.value = cols[j].trim();
-                        el.dispatchEvent(new Event('input')); 
+                    if (el) { 
+                        if(forceUnlock) el.readOnly = false; 
+                        if(!el.readOnly) { el.value = cols[j].trim(); el.dispatchEvent(new Event('input')); }
                     }
                 }
             }
-        });
+            if(forceUnlock) {
+                targetRowsToUnlock.forEach(rIdx => {
+                    let tr = document.getElementById(`row_siswa_${rIdx}`);
+                    if(tr) { tr.setAttribute('data-dirty', 'true'); tr.style.backgroundColor = "#fffae6"; let colNama = tr.querySelector('.col-nama'); colNama.innerHTML = colNama.innerText.replace(' 🔒', ' ✏️'); }
+                });
+            }
+            hitungSemua();
+        }
 
-        // ==========================================
-        // DATA SINKRONISASI DAN GENERATE TABEL
-        // ==========================================
         async function fetchSiswaAndGenerate() {
+            if(!document.getElementById('mapel').value || !document.getElementById('tahun').value || !document.getElementById('jenis_ujian').value) {
+                alert("Harap isi Mapel, Tahun, dan Judul Ujian terlebih dahulu!"); return;
+            }
+
             document.getElementById('lbl_sekolah').innerText = document.getElementById('sekolah').value;
             document.getElementById('lbl_mapel').innerText = document.getElementById('mapel').value;
             document.getElementById('lbl_kelas').innerText = document.getElementById('kelas').value;
             document.getElementById('lbl_tahun').innerText = document.getElementById('tahun').value;
             document.getElementById('lbl_judul').innerText = document.getElementById('jenis_ujian').value;
-            updateSignatureText(); applyColors();
+            
+            // Set Tanda Tangan Guru
+            document.getElementById('lbl_jabatan').innerText = document.getElementById('input_jabatan').value || "Guru Kelas";
+            let namaGuru = document.getElementById('input_nama_guru').value;
+            document.getElementById('lbl_nama_guru').innerText = namaGuru ? namaGuru : "( .................................................... )";
 
-            document.getElementById('statusMsg').innerText = "Mengambil data siswa & sinkronisasi database...";
+            let kls = document.getElementById('kelas').value.toLowerCase();
+            dataSiswa = allSiswaData.filter(s => s.kelas.toLowerCase() === kls);
+            if(dataSiswa.length === 0) dataSiswa = [{nama: "Data Dummy (Belum tarik dari sheet)"}];
+
+            document.getElementById('statusMsg').innerText = "Mengecek ketersediaan data di database...";
             
             try {
-                let resSiswa = await fetch(GAS_URL + "?action=get_siswa");
-                let jsonSiswa = await resSiswa.json();
-                let kls = document.getElementById('kelas').value.toLowerCase();
-                
-                if (jsonSiswa.status === 'success') {
-                    dataSiswa = jsonSiswa.data.filter(s => s.kelas.toLowerCase() === kls);
-                }
-                if(dataSiswa.length === 0) dataSiswa = [{nama: "Contoh Siswa 1"}, {nama: "Contoh Siswa 2"}];
-
-                let mapel = document.getElementById('mapel').value;
-                let kelasOri = document.getElementById('kelas').value;
-                let tahun = document.getElementById('tahun').value;
-                let judul = document.getElementById('jenis_ujian').value;
-                
-                let resDb = await fetch(`${GAS_URL}?action=get_rekap_sumatif&mapel=${encodeURIComponent(mapel)}&kelas=${encodeURIComponent(kelasOri)}&tahun=${encodeURIComponent(tahun)}&judul=${encodeURIComponent(judul)}`);
+                let resDb = await fetch(`${GAS_URL}?action=get_rekap_sumatif&mapel=${encodeURIComponent(document.getElementById('mapel').value)}&kelas=${encodeURIComponent(document.getElementById('kelas').value)}&tahun=${encodeURIComponent(document.getElementById('tahun').value)}&judul=${encodeURIComponent(document.getElementById('jenis_ujian').value)}`);
                 let jsonDb = await resDb.json();
                 
                 if(jsonDb.status === 'success') {
                     savedDbData = jsonDb.data;
-                    if (Array.isArray(jsonDb.kunci)) {
-                        savedKunci = { pg: jsonDb.kunci, pgk: [], max_pgk: [] };
-                    } else if (typeof jsonDb.kunci === 'object' && jsonDb.kunci !== null) {
-                        savedKunci = { pg: jsonDb.kunci.pg || [], pgk: jsonDb.kunci.pgk || [], max_pgk: jsonDb.kunci.max_pgk || [] };
+                    if (Array.isArray(jsonDb.kunci)) savedKunci = { pg: jsonDb.kunci, pgk: [], max_pgk: [] };
+                    else if (typeof jsonDb.kunci === 'object' && jsonDb.kunci !== null) savedKunci = { pg: jsonDb.kunci.pg || [], pgk: jsonDb.kunci.pgk || [], max_pgk: jsonDb.kunci.max_pgk || [] };
+
+                    if (savedDbData.length > 0) {
+                        let sampleAns = savedDbData[0].jawaban || {};
+                        configPG = (savedKunci.pg && savedKunci.pg.length > 0) ? savedKunci.pg.length : (sampleAns.pg ? sampleAns.pg.length : 0);
+                        configPGK = (savedKunci.pgk && savedKunci.pgk.length > 0) ? savedKunci.pgk.length : (sampleAns.pgk ? sampleAns.pgk.length : 0);
+                        configIsian = sampleAns.isian ? sampleAns.isian.length : 0;
+                        configEsai = sampleAns.esai ? sampleAns.esai.length : 0;
+                        
+                        document.getElementById('statusMsg').innerText = "Data ditemukan! Tabel dibuat otomatis.";
+                        document.getElementById('printArea').style.display = 'block';
+                        generateTable();
+                    } else {
+                        document.getElementById('statusMsg').innerText = "Data baru. Menunggu konfigurasi...";
+                        document.getElementById('iosConfigOverlay').classList.add('active');
                     }
                 }
-
-                generateTable();
-                document.getElementById('statusMsg').innerText = "Data berhasil dimuat.";
                 setTimeout(() => document.getElementById('statusMsg').innerText = "", 3000);
             } catch (error) {
-                document.getElementById('statusMsg').innerText = "Gagal memuat dari Database. Menampilkan Mode Offline.";
-                generateTable();
+                document.getElementById('statusMsg').innerText = "Gagal terhubung. Membuka Mode Offline.";
+                document.getElementById('iosConfigOverlay').classList.add('active');
             }
         }
 
+        function terapkanKonfigurasi() {
+            configPG = parseInt(document.getElementById('jml_pg').value) || 0;
+            configPGK = parseInt(document.getElementById('jml_pgk').value) || 0;
+            configIsian = parseInt(document.getElementById('jml_isian').value) || 0;
+            configEsai = parseInt(document.getElementById('jml_esai').value) || 0;
+            
+            document.getElementById('iosConfigOverlay').classList.remove('active');
+            document.getElementById('printArea').style.display = 'block';
+            generateTable();
+        }
+
         function generateTable() {
-            clearSelection(); // reset blok jika tabel diregenerate
-            let jmlPG = parseInt(document.getElementById('jml_pg').value) || 0;
-            let jmlPGK = parseInt(document.getElementById('jml_pgk').value) || 0;
-            let jmlIsian = parseInt(document.getElementById('jml_isian').value) || 0;
-            let jmlEsai = parseInt(document.getElementById('jml_esai').value) || 0;
-            
+            clearSelection(); 
             let html = `<table class="data-table" id="tabelNilai"><thead><tr id="row_head_1"><th rowspan="2" class="col-nama">NAMA</th>`;
-            
-            if (jmlPG > 0) html += `<th colspan="${jmlPG}">PILIHAN GANDA</th>`;
-            if (jmlPGK > 0) html += `<th colspan="${jmlPGK}">PILIHAN GANDA KOMPLEKS (PGK)</th>`;
-            if (jmlIsian > 0) html += `<th colspan="${jmlIsian}">ISIAN</th>`;
-            if (jmlEsai > 0) html += `<th colspan="${jmlEsai}">ESAI</th>`;
-            html += `<th rowspan="2">JUMLAH<br>SKOR</th></tr><tr id="row_head_2">`;
+            if (configPG > 0) html += `<th colspan="${configPG}">PILIHAN GANDA</th>`;
+            if (configPGK > 0) html += `<th colspan="${configPGK}">PGK</th>`;
+            if (configIsian > 0) html += `<th colspan="${configIsian}">ISIAN</th>`;
+            if (configEsai > 0) html += `<th colspan="${configEsai}">ESAI</th>`;
+            html += `<th rowspan="2">SKOR</th></tr><tr id="row_head_2">`; 
 
             let colNum = 1;
-            for(let i=1; i<=jmlPG; i++) html += `<th>${colNum++}</th>`;
-            for(let i=1; i<=jmlPGK; i++) html += `<th>${colNum++}</th>`;
-            for(let i=1; i<=jmlIsian; i++) html += `<th>${colNum++}</th>`;
-            for(let i=1; i<=jmlEsai; i++) html += `<th>${colNum++}</th>`;
+            for(let i=1; i<=configPG; i++) html += `<th>${colNum++}</th>`;
+            for(let i=1; i<=configPGK; i++) html += `<th>${colNum++}</th>`;
+            for(let i=1; i<=configIsian; i++) html += `<th>${colNum++}</th>`;
+            for(let i=1; i<=configEsai; i++) html += `<th>${colNum++}</th>`;
             html += `</tr>`;
 
-            // Baris Kunci Jawaban (Dihitung sebagai Index Baris -1 dalam sistem koordinat data-r)
-            html += `<tr class="kunci-row"><td class="col-nama">KUNCI JAWABAN (BENAR)</td>`;
+            html += `<tr class="kunci-row" data-dirty="true"><td class="col-nama">KUNCI JAWABAN</td>`;
             let totalCol = 0;
-            for(let i=1; i<=jmlPG; i++) {
-                let valKunci = savedKunci.pg[i-1] || "";
-                html += `<td><input type="text" class="answer-input cell-input" data-r="-1" data-c="${totalCol++}" id="kunci_pg_${i}" maxlength="1" value="${valKunci}" oninput="hitungSemua()"></td>`;
-            }
-            for(let i=1; i<=jmlPGK; i++) {
-                let valKunci = savedKunci.pgk[i-1] || "";
-                let valMax = savedKunci.max_pgk[i-1] || "";
-                html += `<td>
-                            <div class="pgk-settings">
-                                <input type="text" class="cell-input" data-r="-1" data-c="${totalCol++}" id="kunci_pgk_${i}" placeholder="Kunci" value="${valKunci}" oninput="hitungSemua()" style="background:transparent; border:none; outline:none; text-align:center; font-weight:bold;">
-                                <input type="number" id="max_pgk_${i}" placeholder="Max" value="${valMax}" oninput="hitungSemua()" title="Skor Maksimal">
-                            </div>
-                         </td>`;
-            }
-            for(let i=1; i<=jmlIsian; i++) { html += `<td>-</td>`; totalCol++; }
-            for(let i=1; i<=jmlEsai; i++) { html += `<td>-</td>`; totalCol++; }
+            for(let i=1; i<=configPG; i++) html += `<td><input type="text" class="answer-input cell-input" data-r="-1" data-c="${totalCol++}" id="kunci_pg_${i}" maxlength="1" value="${savedKunci.pg[i-1] || ""}" oninput="hitungSemua()"></td>`;
+            for(let i=1; i<=configPGK; i++) html += `<td><div class="pgk-settings"><input type="text" class="cell-input" data-r="-1" data-c="${totalCol++}" id="kunci_pgk_${i}" value="${savedKunci.pgk[i-1] || ""}" oninput="hitungSemua()" style="background:transparent; border:none; text-align:center; font-weight:bold;"><input type="number" id="max_pgk_${i}" value="${savedKunci.max_pgk[i-1] || ""}" oninput="hitungSemua()"></div></td>`;
+            for(let i=1; i<=configIsian; i++) { html += `<td>-</td>`; totalCol++; }
+            for(let i=1; i<=configEsai; i++) { html += `<td>-</td>`; totalCol++; }
             html += `<td>-</td></tr></thead><tbody>`;
 
-            // Baris Data Siswa (Index Baris mulai dari 0 sampai N)
             dataSiswa.forEach((siswa, index) => {
                 let dbRecord = savedDbData.find(d => d.nama === siswa.nama);
                 let ans = dbRecord ? dbRecord.jawaban : {pg:[], pgk:[], isian:[], esai:[]};
                 let cIndex = 0;
 
-                html += `<tr><td class="col-nama">${siswa.nama}</td>`;
+                html += `<tr id="row_siswa_${index}" data-dirty="false">
+                            <td class="col-nama" style="cursor:pointer; color:#0056b3; font-weight:bold; text-decoration:underline;" onclick="konfirmasiEdit(${index}, '${siswa.nama}')">${siswa.nama} 🔒</td>`;
                 
-                for(let i=1; i<=jmlPG; i++) {
-                    let v = ans.pg && ans.pg[i-1] ? ans.pg[i-1] : "";
-                    html += `<td><input type="text" class="answer-input cell-input" data-r="${index}" data-c="${cIndex++}" id="pg_${index}_${i}" maxlength="1" value="${v}" oninput="hitungNilai(${index})"></td>`;
-                }
-                for(let i=1; i<=jmlPGK; i++) {
-                    let v = ans.pgk && ans.pgk[i-1] ? ans.pgk[i-1] : "";
-                    html += `<td><input type="text" class="answer-input cell-input" data-r="${index}" data-c="${cIndex++}" id="pgk_${index}_${i}" value="${v}" oninput="hitungNilai(${index})"></td>`;
-                }
-                for(let i=1; i<=jmlIsian; i++) {
-                    let v = ans.isian && ans.isian[i-1] ? ans.isian[i-1] : "";
-                    html += `<td><input type="number" class="score-input cell-input" data-r="${index}" data-c="${cIndex++}" id="isian_${index}_${i}" value="${v}" oninput="hitungNilai(${index})"></td>`;
-                }
-                for(let i=1; i<=jmlEsai; i++) {
-                    let v = ans.esai && ans.esai[i-1] ? ans.esai[i-1] : "";
-                    html += `<td><input type="number" class="score-input cell-input" data-r="${index}" data-c="${cIndex++}" id="esai_${index}_${i}" value="${v}" oninput="hitungNilai(${index})"></td>`;
-                }
+                for(let i=1; i<=configPG; i++) html += `<td><input type="text" class="answer-input cell-input" data-r="${index}" data-c="${cIndex++}" id="pg_${index}_${i}" maxlength="1" value="${ans.pg && ans.pg[i-1] ? ans.pg[i-1] : ""}" oninput="hitungNilai(${index})" readonly onclick="konfirmasiEdit(${index}, '${siswa.nama}')"></td>`;
+                for(let i=1; i<=configPGK; i++) html += `<td><input type="text" class="answer-input cell-input" data-r="${index}" data-c="${cIndex++}" id="pgk_${index}_${i}" value="${ans.pgk && ans.pgk[i-1] ? ans.pgk[i-1] : ""}" oninput="hitungNilai(${index})" readonly onclick="konfirmasiEdit(${index}, '${siswa.nama}')"></td>`;
+                for(let i=1; i<=configIsian; i++) html += `<td><input type="number" class="score-input cell-input" data-r="${index}" data-c="${cIndex++}" id="isian_${index}_${i}" value="${ans.isian && ans.isian[i-1] ? ans.isian[i-1] : ""}" oninput="hitungNilai(${index})" readonly onclick="konfirmasiEdit(${index}, '${siswa.nama}')"></td>`;
+                for(let i=1; i<=configEsai; i++) html += `<td><input type="number" class="score-input cell-input" data-r="${index}" data-c="${cIndex++}" id="esai_${index}_${i}" value="${ans.esai && ans.esai[i-1] ? ans.esai[i-1] : ""}" oninput="hitungNilai(${index})" readonly onclick="konfirmasiEdit(${index}, '${siswa.nama}')"></td>`;
                 
                 let totalS = dbRecord ? dbRecord.skor : 0;
                 html += `<td id="skor_${index}" style="font-weight:bold; font-size:14px;">${totalS}</td></tr>`;
@@ -420,162 +386,118 @@
 
             html += `</tbody></table>`;
             document.getElementById('tableContainer').innerHTML = html;
-
+            
             setTimeout(() => {
-                const trHeight = document.getElementById('row_head_1').offsetHeight;
-                const trHeight2 = document.getElementById('row_head_2').offsetHeight;
-                let keysRowTop = trHeight + (trHeight2 > 0 ? trHeight2 : 22);
-                document.querySelector('table.data-table thead tr.kunci-row td').style.top = keysRowTop + "px";
+                const trHeight = document.getElementById('row_head_1').offsetHeight, trHeight2 = document.getElementById('row_head_2').offsetHeight;
+                document.querySelector('table.data-table thead tr.kunci-row td').style.top = (trHeight + (trHeight2 > 0 ? trHeight2 : 22)) + "px";
             }, 100);
 
-            hitungSemua(); 
+            dataSiswa.forEach((_, idx) => prosesHitung(idx, false)); 
         }
 
+        function konfirmasiEdit(idx, nama) {
+            let row = document.getElementById(`row_siswa_${idx}`);
+            let inputs = row.querySelectorAll('.cell-input');
+            if (!inputs[0].readOnly) return; 
+            showCustomPopup("Edit Nilai?", `Buka gembok untuk mulai mengisi/mengedit nilai:\n${nama}?`, "Buka Gembok", () => {
+                inputs.forEach(inp => inp.readOnly = false);
+                row.style.backgroundColor = "#fffae6"; 
+                row.querySelector('.col-nama').innerHTML = `${nama} ✏️`;
+                row.setAttribute('data-dirty', 'true');
+                inputs[0].focus();
+            });
+        }
+
+        function markDirty(idx) { document.getElementById(`row_siswa_${idx}`).setAttribute('data-dirty', 'true'); }
         function hitungSemua() { dataSiswa.forEach((_, index) => hitungNilai(index)); }
+        function hitungNilai(idx) { prosesHitung(idx, true); }
 
-        function hitungNilai(idx) {
-            let jmlPG = parseInt(document.getElementById('jml_pg').value) || 0;
-            let jmlPGK = parseInt(document.getElementById('jml_pgk').value) || 0;
-            let jmlIsian = parseInt(document.getElementById('jml_isian').value) || 0;
-            let jmlEsai = parseInt(document.getElementById('jml_esai').value) || 0;
-
+        function prosesHitung(idx, isDirtyAction) {
+            if(isDirtyAction) markDirty(idx);
             let totalSkor = 0;
-
-            for(let i=1; i<=jmlPG; i++) {
-                let cellEl = document.getElementById(`pg_${idx}_${i}`);
-                let ans = cellEl.value.toUpperCase();
-                let key = document.getElementById(`kunci_pg_${i}`).value.toUpperCase();
-                cellEl.value = ans;
-                
-                cellEl.parentElement.classList.remove('bg-green', 'bg-red');
-                if (ans !== "") {
-                    if (ans === key && key !== "") {
-                        totalSkor += 1;
-                        cellEl.parentElement.classList.add('bg-green');
-                    } else if (key !== "") {
-                        cellEl.parentElement.classList.add('bg-red');
-                    }
-                }
+            for(let i=1; i<=configPG; i++) {
+                let cellEl = document.getElementById(`pg_${idx}_${i}`), ans = cellEl.value.toUpperCase(), key = document.getElementById(`kunci_pg_${i}`).value.toUpperCase();
+                cellEl.value = ans; cellEl.parentElement.classList.remove('bg-benar', 'bg-salah');
+                if (ans !== "") { if (ans === key && key !== "") { totalSkor += 1; cellEl.parentElement.classList.add('bg-benar'); } else if (key !== "") { cellEl.parentElement.classList.add('bg-salah'); } }
             }
-
-            for(let i=1; i<=jmlPGK; i++) {
-                let cellEl = document.getElementById(`pgk_${idx}_${i}`);
-                let ans = cellEl.value.toUpperCase().replace(/\s/g, ''); 
-                let key = document.getElementById(`kunci_pgk_${i}`).value.toUpperCase().replace(/\s/g, '');
+            for(let i=1; i<=configPGK; i++) {
+                let cellEl = document.getElementById(`pgk_${idx}_${i}`), ans = cellEl.value.toUpperCase().replace(/\s/g, ''), key = document.getElementById(`kunci_pgk_${i}`).value.toUpperCase().replace(/\s/g, '');
                 let maxSkor = parseInt(document.getElementById(`max_pgk_${i}`).value) || 0;
-                cellEl.value = ans;
-                
-                cellEl.parentElement.classList.remove('bg-green', 'bg-red');
-                if (ans !== "") {
-                    let sortedAns = ans.split('').sort().join('');
-                    let sortedKey = key.split('').sort().join('');
-                    
-                    if (sortedAns === sortedKey && key !== "") {
-                        totalSkor += maxSkor;
-                        cellEl.parentElement.classList.add('bg-green');
-                    } else if (key !== "") {
-                        cellEl.parentElement.classList.add('bg-red');
-                    }
+                cellEl.value = ans; cellEl.parentElement.classList.remove('bg-benar', 'bg-salah');
+                if (ans !== "") { let sortedAns = ans.split('').sort().join(''), sortedKey = key.split('').sort().join('');
+                    if (sortedAns === sortedKey && key !== "") { totalSkor += maxSkor; cellEl.parentElement.classList.add('bg-benar'); } else if (key !== "") { cellEl.parentElement.classList.add('bg-salah'); }
                 }
             }
+            for(let i=1; i<=configIsian; i++) totalSkor += (parseInt(document.getElementById(`isian_${idx}_${i}`).value) || 0);
+            for(let i=1; i<=configEsai; i++) totalSkor += (parseInt(document.getElementById(`esai_${idx}_${i}`).value) || 0);
 
-            let addScore = (prefix, count) => {
-                for(let i=1; i<=count; i++) {
-                    totalSkor += (parseInt(document.getElementById(`${prefix}_${idx}_${i}`).value) || 0);
-                }
-            };
-            addScore('isian', jmlIsian);
-            addScore('esai', jmlEsai);
-
-            document.getElementById(`skor_${idx}`).innerText = totalSkor;
-            hitungStatistik();
+            document.getElementById(`skor_${idx}`).innerText = totalSkor; hitungStatistik();
         }
 
         function hitungStatistik() {
-            let totalSemua = 0, tertinggi = -1, terendah = 9999, siswaValid = 0;
-            let namaTertinggi = [], namaTerendah = [];
-
+            let totalSemua = 0, tertinggi = -1, terendah = 9999, siswaValid = 0, namaTertinggi = [], namaTerendah = [];
             dataSiswa.forEach((siswa, index) => {
                 let cell = document.getElementById(`skor_${index}`);
                 if (cell) {
-                    let skor = parseInt(cell.innerText) || 0;
-                    let isHasData = false;
-                    document.querySelectorAll(`tr:nth-child(${index+1}) input.cell-input`).forEach(inp => {
-                        if(inp.value.trim() !== "") isHasData = true;
-                    });
-
+                    let skor = parseInt(cell.innerText) || 0, isHasData = false;
+                    document.querySelectorAll(`#row_siswa_${index} input.cell-input`).forEach(inp => { if(inp.value.trim() !== "") isHasData = true; });
                     if (isHasData) {
                         totalSemua += skor; siswaValid++;
-                        if (skor > tertinggi) { tertinggi = skor; namaTertinggi = [siswa.nama]; }
-                        else if (skor === tertinggi) { namaTertinggi.push(siswa.nama); }
-                        if (skor < terendah) { terendah = skor; namaTerendah = [siswa.nama]; }
-                        else if (skor === terendah) { namaTerendah.push(siswa.nama); }
+                        if (skor > tertinggi) { tertinggi = skor; namaTertinggi = [siswa.nama]; } else if (skor === tertinggi) { namaTertinggi.push(siswa.nama); }
+                        if (skor < terendah) { terendah = skor; namaTerendah = [siswa.nama]; } else if (skor === terendah) { namaTerendah.push(siswa.nama); }
+                    }
+                }
+            });
+            if (siswaValid === 0) { document.getElementById('stat_rata').innerText = "0"; document.getElementById('stat_tinggi').innerText = "0"; document.getElementById('stat_rendah').innerText = "0"; document.getElementById('stat_nama_tinggi').innerText = "(-)"; document.getElementById('stat_nama_rendah').innerText = "(-)"; return; }
+            document.getElementById('stat_rata').innerText = (totalSemua / siswaValid).toFixed(2);
+            document.getElementById('stat_tinggi').innerText = tertinggi; document.getElementById('stat_rendah').innerText = terendah;
+            document.getElementById('stat_nama_tinggi').innerText = `(${namaTertinggi.join(', ')})`; document.getElementById('stat_nama_rendah').innerText = `(${namaTerendah.join(', ')})`;
+        }
+
+        async function simpanKeSpreadsheet() {
+            let payload = {
+                action: "simpan_rekap_sumatif_baru",
+                info: { sekolah: document.getElementById('sekolah').value, mapel: document.getElementById('mapel').value, kelas: document.getElementById('kelas').value, tahun: document.getElementById('tahun').value, judul: document.getElementById('jenis_ujian').value },
+                kunci: { pg: [], pgk: [], max_pgk: [] }, data: []
+            };
+
+            for(let i=1; i<=configPG; i++) payload.kunci.pg.push(document.getElementById(`kunci_pg_${i}`).value.toUpperCase());
+            for(let i=1; i<=configPGK; i++) { payload.kunci.pgk.push(document.getElementById(`kunci_pgk_${i}`).value.toUpperCase()); payload.kunci.max_pgk.push(document.getElementById(`max_pgk_${i}`).value); }
+
+            let adaDataDisimpan = false;
+            dataSiswa.forEach((siswa, index) => {
+                let rowEl = document.getElementById(`row_siswa_${index}`);
+                if (rowEl && rowEl.getAttribute('data-dirty') === 'true') {
+                    let localPG = [], localPGK = [], localIsian = [], localEsai = [], hasData = false; 
+                    for(let i=1; i<=configPG; i++) { let val = document.getElementById(`pg_${index}_${i}`).value.toUpperCase(); localPG.push(val); if(val !== "") hasData = true; }
+                    for(let i=1; i<=configPGK; i++) { let val = document.getElementById(`pgk_${index}_${i}`).value.toUpperCase(); localPGK.push(val); if(val !== "") hasData = true; }
+                    for(let i=1; i<=configIsian; i++) { let val = document.getElementById(`isian_${index}_${i}`).value; localIsian.push(val); if(val !== "") hasData = true; }
+                    for(let i=1; i<=configEsai; i++) { let val = document.getElementById(`esai_${index}_${i}`).value; localEsai.push(val); if(val !== "") hasData = true; }
+                    
+                    if (hasData) {
+                        payload.data.push({ nama: siswa.nama, pg: localPG, pgk: localPGK, isian: localIsian, esai: localEsai, skor: (parseInt(document.getElementById(`skor_${index}`).innerText) || 0) });
+                        adaDataDisimpan = true;
                     }
                 }
             });
 
-            if (siswaValid === 0) {
-                document.getElementById('stat_rata').innerText = "0"; document.getElementById('stat_tinggi').innerText = "0";
-                document.getElementById('stat_rendah').innerText = "0"; document.getElementById('stat_nama_tinggi').innerText = "(-)";
-                document.getElementById('stat_nama_rendah').innerText = "(-)"; return;
-            }
-
-            document.getElementById('stat_rata').innerText = (totalSemua / siswaValid).toFixed(2);
-            document.getElementById('stat_tinggi').innerText = tertinggi;
-            document.getElementById('stat_rendah').innerText = terendah;
-            document.getElementById('stat_nama_tinggi').innerText = `(${namaTertinggi.join(', ')})`;
-            document.getElementById('stat_nama_rendah').innerText = `(${namaTerendah.join(', ')})`;
-        }
-
-        async function simpanKeSpreadsheet() {
-            document.getElementById('statusMsg').innerText = "Merekam semua jawaban. Mohon tunggu...";
-            let jmlPG = parseInt(document.getElementById('jml_pg').value) || 0;
-            let jmlPGK = parseInt(document.getElementById('jml_pgk').value) || 0;
-            let jmlIsian = parseInt(document.getElementById('jml_isian').value) || 0;
-            let jmlEsai = parseInt(document.getElementById('jml_esai').value) || 0;
-
-            let payload = {
-                action: "simpan_rekap_sumatif_baru",
-                info: {
-                    sekolah: document.getElementById('sekolah').value, mapel: document.getElementById('mapel').value,
-                    kelas: document.getElementById('kelas').value, tahun: document.getElementById('tahun').value,
-                    judul: document.getElementById('jenis_ujian').value
-                },
-                kunci: { pg: [], pgk: [], max_pgk: [] },
-                data: []
-            };
-
-            for(let i=1; i<=jmlPG; i++) payload.kunci.pg.push(document.getElementById(`kunci_pg_${i}`).value.toUpperCase());
-            for(let i=1; i<=jmlPGK; i++) {
-                payload.kunci.pgk.push(document.getElementById(`kunci_pgk_${i}`).value.toUpperCase());
-                payload.kunci.max_pgk.push(document.getElementById(`max_pgk_${i}`).value);
-            }
-
-            dataSiswa.forEach((siswa, index) => {
-                let ansPG = [], ansPGK = [], ansIsian = [], ansEsai = [];
-                for(let i=1; i<=jmlPG; i++) ansPG.push(document.getElementById(`pg_${index}_${i}`).value.toUpperCase());
-                for(let i=1; i<=jmlPGK; i++) ansPGK.push(document.getElementById(`pgk_${index}_${i}`).value.toUpperCase());
-                for(let i=1; i<=jmlIsian; i++) ansIsian.push(document.getElementById(`isian_${index}_${i}`).value);
-                for(let i=1; i<=jmlEsai; i++) ansEsai.push(document.getElementById(`esai_${index}_${i}`).value);
-                
-                let skorActual = parseInt(document.getElementById(`skor_${index}`).innerText) || 0;
-
-                payload.data.push({
-                    nama: siswa.nama, pg: ansPG, pgk: ansPGK, isian: ansIsian, esai: ansEsai, skor: skorActual
-                });
-            });
+            if (!adaDataDisimpan) { showCustomPopup("Batal Menyimpan", "Tidak ada data baru yang diedit.", "Tutup"); return; }
+            document.getElementById('statusMsg').innerText = "Menyimpan ke Database...";
 
             try {
                 let response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
                 let result = await response.json();
-                if (result.status === 'success') {
-                    alert('Semua data berhasil disimpan ke Database!');
+                if (result.status === 'success') { 
+                    showCustomPopup("Berhasil Disimpan", "Data Anda berhasil di-sinkronisasi ke Server.", "Oke Siap");
                     document.getElementById('statusMsg').innerText = "";
+                    document.querySelectorAll('tr[data-dirty="true"]').forEach(tr => {
+                        tr.setAttribute('data-dirty', 'false'); tr.style.backgroundColor = ""; 
+                        let nama = tr.querySelector('.col-nama').innerText.replace(' ✏️', '');
+                        tr.querySelector('.col-nama').innerHTML = `${nama} 🔒`;
+                        tr.querySelectorAll('.cell-input').forEach(inp => inp.readOnly = true);
+                    });
                 }
-            } catch (err) {
-                alert("Data berhasil dikirim. (Pastikan Script Google sudah di-Deploy)");
-                document.getElementById('statusMsg').innerText = "";
-            }
+            } catch (err) { showCustomPopup("Gagal Koneksi", "Pastikan internet stabil.", "Tutup"); document.getElementById('statusMsg').innerText = ""; }
         }
     </script>
 </body>
