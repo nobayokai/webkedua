@@ -608,9 +608,11 @@ window.jalankanWidgetKiri = function() {
   });
 
   window.bukaChartKelas = function(kelas) {
-      window.currentKelasAbsen = kelas; 
-      document.getElementById('chart-kelas-title').textContent = kelas;
-      document.getElementById('chart-modal').classList.add('active');
+  window.currentKelasAbsen = kelas;
+  document.getElementById('chart-kelas-title').textContent = kelas;
+  document.getElementById('chart-modal').classList.add('active');
+
+  loadChartJs(function() {
 
       var absenKelas = window.globalDataAbsensi.filter(function(a) { return a.kelas === kelas; });
       var monthsNumber = ['07', '08', '09', '10', '11', '12', '01', '02', '03', '04', '05', '06'];
@@ -677,6 +679,7 @@ window.jalankanWidgetKiri = function() {
       });
 
       renderDetailAbsenHarian(kelas, currentAbsensiDate);
+    });
   };
 
   function namaDariAbsen(a) {
@@ -964,6 +967,14 @@ window.jalankanWidgetKiri = function() {
   function startClockLoop(){ setInterval(function(){ var now = new Date(); elTime.textContent = formatClock(now); elDate.textContent = formatDate(now); elGreeting.textContent = greeting(now); }, 1000); }
   function startInitUI(){ var now = new Date(); elTime.textContent=formatClock(now); elDate.textContent=formatDate(now); elGreeting.textContent=greeting(now); currentNavDate=now; renderCalendar(currentNavDate); }
   function startGeolocation(){ elChipLokasi.textContent='Lokasi: Jakarta (default)'; }
+  function loadChartJs(callback) {
+  if (window.Chart) return callback();
+
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+  script.onload = callback;
+  document.head.appendChild(script);
+}
 
   startInitUI(); fetchAgendaDatabase(); fetchRekapAbsensi(); startClockLoop(); startGeolocation();
 };
