@@ -88,27 +88,46 @@
         <div class="book">
             <div class="page left-page" id="kiri-statis" style="position: relative; padding-top: 25px;">
                 <script>
-                    fetch('animasi-kiri.html')
-                        .then(response => response.text())
-                        .then(data => {
-                            // Masukkan isi kalender
-                            document.getElementById('kiri-statis').innerHTML = data;
-                            
-                            // Tambahkan tombol Close (X) ke dalam popup kalender
-                            const btnClose = document.createElement('button');
-                            btnClose.className = 'btn-close-mobile';
-                            btnClose.innerHTML = '✕';
-                            btnClose.onclick = toggleMobileWidget;
-                            
-                            // Letakkan tombol silang ini di paling atas widget
-                            document.getElementById('kiri-statis').prepend(btnClose);
+    let widgetKiriSudahDimuat = false;
 
-                            // Jalankan ulang script bawaan widgetnya
-                            const script = document.createElement('script');
-                            script.innerHTML = document.querySelector('#kiri-statis script').innerHTML;
-                            document.body.appendChild(script);
-                        });
-                </script>
+    function loadWidgetKiri() {
+        if (widgetKiriSudahDimuat) return;
+        widgetKiriSudahDimuat = true;
+
+        fetch('animasi-kiri.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('kiri-statis').innerHTML = data;
+
+                const btnClose = document.createElement('button');
+                btnClose.className = 'btn-close-mobile';
+                btnClose.innerHTML = '✕';
+                btnClose.onclick = toggleMobileWidget;
+                document.getElementById('kiri-statis').prepend(btnClose);
+
+                const script = document.createElement('script');
+                script.innerHTML = document.querySelector('#kiri-statis script').innerHTML;
+                document.body.appendChild(script);
+            });
+    }
+
+    // Desktop: langsung load
+    if (window.innerWidth > 768) {
+        loadWidgetKiri();
+    }
+
+    // HP: load saat tombol widget diklik
+    function toggleMobileWidget() {
+        if (window.innerWidth <= 768 && !widgetKiriSudahDimuat) {
+            loadWidgetKiri();
+        }
+        document.body.classList.toggle('widget-terbuka');
+        const leftPage = document.getElementById('kiri-statis');
+        const overlay = document.getElementById('mobile-overlay');
+        leftPage.classList.toggle('show-popup');
+        overlay.classList.toggle('active');
+    }
+</script>
             </div>
             
             <div class="page right-page">
