@@ -133,7 +133,7 @@ async function loadPage(namaFile, elemenTab) {
     const areaKonten = document.getElementById('area-konten');
     try {
         areaKonten.innerHTML = '<p id="status-loading">Memuat halaman...</p>';
-        const urlBebasCache = namaFile + '?v=' + new Date().getTime();
+        const urlBebasCache = namaFile;
         const response = await fetch(urlBebasCache);
         if (!response.ok) throw new Error('Halaman tidak ditemukan');
         const htmlContent = await response.text();
