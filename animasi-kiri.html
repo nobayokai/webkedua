@@ -441,21 +441,52 @@ window.jalankanWidgetKiri = function() {
     });
   };
 
-  window.fetchAgendaDatabase = async function() {
-    isAgendaLoading = true; renderCalendar(currentNavDate); 
-    try {
-        var res = await fetch(API_URL_UTAMA + "?action=get_agenda"); var json = await res.json();
-        if(json.status === 'success') {
-            globalAgenda = json.data.map(function(item) {
-                var tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
-                if (tgl.length > 10 && tgl.includes('-')) tgl = tgl.substring(0, 10);
-                if (tgl.includes('/')) { var p = tgl.split('/'); if (p.length === 3) tgl = p[2] + '-' + pad2(p[1]) + '-' + pad2(p[0]); }
-                item.tanggalBersih = tgl; return item;
-            });
+      window.fetchAgendaDatabase = async function() {
+      const CACHE_KEY = 'lms_cache_agenda_v1';
+      const CACHE_TTL = 5 * 60 * 1000;
+    
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Date.now() - parsed.time < CACHE_TTL) {
+          globalAgenda = parsed.data;
+          isAgendaLoading = false;
+          renderCalendar(currentNavDate);
+          return;
         }
-    } catch(e) {} finally { isAgendaLoading = false; renderCalendar(currentNavDate); }
-  };
-
+      }
+    
+      isAgendaLoading = true;
+      renderCalendar(currentNavDate);
+    
+      try {
+        const res = await fetch(API_URL_UTAMA + "?action=get_agenda");
+        const json = await res.json();
+    
+        if (json.status === 'success') {
+          globalAgenda = json.data.map(function(item) {
+            var tgl = item.tanggal ? String(item.tanggal).replace(/['"]/g, '').trim() : "";
+            if (tgl.length > 10 && tgl.includes('-')) tgl = tgl.substring(0, 10);
+            if (tgl.includes('/')) {
+              var p = tgl.split('/');
+              if (p.length === 3) tgl = p[2] + '-' + pad2(p[1]) + '-' + pad2(p[0]);
+            }
+            item.tanggalBersih = tgl;
+            return item;
+          });
+    
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            time: Date.now(),
+            data: globalAgenda
+          }));
+        }
+      } catch(e) {
+        console.warn(e);
+      } finally {
+        isAgendaLoading = false;
+        renderCalendar(currentNavDate);
+      }
+    };
 
   // ==========================================
   // SISTEM ABSENSI (HARI INI)
@@ -526,23 +557,43 @@ window.jalankanWidgetKiri = function() {
   };
 
   window.fetchRekapAbsensi = async function() {
-      var container = document.getElementById('absensi-list-container');
-      try {
-          var URL_ABSEN = API_URL_UTAMA + "?action=get_rekap_absensi";
-          var URL_SISWA = API_URL_UTAMA + "?action=get_siswa";
+  const CACHE_KEY = 'lms_cache_absensi_siswa_v1';
+  const CACHE_TTL = 5 * 60 * 1000;
 
-          var responses = await Promise.all([fetch(URL_ABSEN), fetch(URL_SISWA)]);
-          var jsonAbsen = await responses[0].json();
-          var jsonSiswa = await responses[1].json();
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    if (Date.now() - parsed.time < CACHE_TTL) {
+      window.globalDataAbsensi = parsed.absen;
+      window.globalDataSemuaSiswa = parsed.siswa;
+      renderRekapAbsensi(currentAbsensiDate);
+      return;
+    }
+  }
 
-          window.globalDataAbsensi = jsonAbsen.data || [];
-          window.globalDataSemuaSiswa = jsonSiswa.data || []; 
+  try {
+    const URL_ABSEN = API_URL_UTAMA + "?action=get_rekap_absensi";
+    const URL_SISWA = API_URL_UTAMA + "?action=get_siswa";
 
-          renderRekapAbsensi(currentAbsensiDate);
-      } catch (e) {
-          container.innerHTML = '<div style="text-align:center; color:red; font-size:10px; margin-top:15px;">Gagal memuat rekap absensi.</div>';
-      }
-  };
+    const responses = await Promise.all([fetch(URL_ABSEN), fetch(URL_SISWA)]);
+    const jsonAbsen = await responses[0].json();
+    const jsonSiswa = await responses[1].json();
+
+    window.globalDataAbsensi = jsonAbsen.data || [];
+    window.globalDataSemuaSiswa = jsonSiswa.data || [];
+
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      time: Date.now(),
+      absen: window.globalDataAbsensi,
+      siswa: window.globalDataSemuaSiswa
+    }));
+
+    renderRekapAbsensi(currentAbsensiDate);
+  } catch(e) {
+    document.getElementById('absensi-list-container').innerHTML =
+      '<div style="text-align:center; color:red; font-size:10px; margin-top:15px;">Gagal memuat rekap absensi.</div>';
+  }
+};
 
   document.getElementById('btn-prev-absensi').addEventListener('click', function(e) {
       e.stopPropagation();
