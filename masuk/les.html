@@ -53,48 +53,70 @@
         .action-cell { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; justify-content: center; border: none; }
 
         /* Table Styling */
-        .table-responsive { overflow-x: auto; margin-top: 20px; position: relative;}
+        /* MODIFIKASI: Menambahkan overflow, tinggi maksimal (65vh), agar kontainer bisa di-scroll */
+        .table-responsive { 
+            overflow: auto; 
+            max-height: 65vh; 
+            margin-top: 20px; 
+            position: relative;
+        }
+        
         table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
         th, td { border: 1px solid #dee2e6; padding: 8px 6px; text-align: center; vertical-align: middle; }
-        th { background-color: #e9ecef; font-weight: 600; }
+        
+        /* MODIFIKASI HEADER STICKY */
+        th { 
+            background-color: #e9ecef; 
+            font-weight: 600; 
+            position: sticky; /* Kunci header saat scroll */
+            z-index: 2; /* Supaya header di atas baris data */
+            box-shadow: inset 0 0 0 1px #dee2e6; /* Mengakali garis border yang hilang saat freeze */
+        }
+        
+        /* Baris 1 menempel di paling atas */
+        thead tr:nth-child(1) th { 
+            top: 0; 
+            z-index: 3;
+        }
+        
+        /* Baris 2 menempel sedikit di bawah baris 1 (sesuai tinggi baris atas) */
+        thead tr:nth-child(2) th { 
+            top: 35px; 
+            z-index: 3;
+        }
+
+/* Pastikan container tabel memiliki pengaturan overflow yang benar */
+.table-container {
+    overflow-y: auto;
+    max-height: 80vh; /* Sesuaikan dengan kebutuhan */
+}
+
+/* Targetkan semua header di dalam thead */
+thead th {
+    position: sticky;
+    top: 0;
+    background-color: #eef2f5; /* WAJIB: Ganti dengan kode warna abu-abu header Anda */
+    z-index: 10; /* Pastikan selalu berada di atas konten baris bawahnya */
+    
+    /* Opsional: Menjaga garis batas (border) tidak menghilang saat di-scroll */
+    box-shadow: inset 0 -1px 0 #dee2e6, inset -1px 0 0 #dee2e6;
+}
+
+/* KHUSUS HEADER BERTINGKAT PADA TABEL HONOR LES INI */
+/* Karena Anda menggunakan rowspan/colspan (ada baris "Penerimaan Kotor" dan di bawahnya "Per Siswa"), 
+   baris header kedua perlu offset 'top' agar tidak tertumpuk dengan baris pertama di posisi 0 */
+thead tr:nth-child(2) th {
+    top: 40px; /* Sesuaikan angka ini dengan tinggi (height) aktual dari baris header pertama */
+    z-index: 9;
+}
+        
         .text-left { text-align: left; }
         .editable { width: 100%; box-sizing: border-box; background: #fffde7; border: 1px dashed #bcaaa4; padding: 4px; text-align: center; border-radius: 3px; font-size: 0.9em; }
         .editable:focus { border-color: #ff9800; outline: none; }
         .ket-input { width: 100%; box-sizing: border-box; background: #f1f8e9; border: 1px solid #c5e1a5; padding: 4px; border-radius: 3px; font-size: 0.8em; margin-top: 4px; }
         .ket-input::placeholder { color: #999; font-style: italic; }
         .override-field { background: #e3f2fd; border-color: #90caf9; font-weight: bold;}
-        .grouped-row td { border-bottom: 2px solid #aaa; }
-        /* 1. Tambahkan batas tinggi dan scroll vertikal pada kontainer tabel *
-        .table-responsive { 
-            overflow-x: auto; 
-            overflow-y: auto; /* Memungkinkan scroll ke bawah */
-            max-height: 70vh; /* Membatasi tinggi tabel (70% dari tinggi layar) */
-            margin-top: 20px; 
-            position: relative;
-        }
-        
-        /* 2. Modifikasi tag th untuk menjadi sticky */
-        th { 
-            border: 1px solid #dee2e6; 
-            padding: 8px 6px; 
-            text-align: center; 
-            vertical-align: middle; 
-            background-color: #e9ecef; /* Wajib solid agar teks di bawahnya tidak tembus */
-            font-weight: 600; 
-            position: sticky; 
-            z-index: 2; /* Memastikan header berada di atas baris data */
-            /* Tambahan outline agar garis border tidak hilang saat di-scroll */
-            outline: 1px solid #dee2e6; 
-        }
-        
-        /* 3. Atur jarak freeze untuk baris pertama dan kedua pada thead */
-        thead tr:first-child th {
-            top: 0; /* Baris pertama menempel di paling atas */
-        }
-        
-        thead tr:nth-child(2) th {
-            top: 36px; /* Baris kedua menempel di bawah baris pertama. Sesuaikan angka ini jika desain terpotong/overlap */
-        }
+        .grouped-row td { border-bottom: 2px solid #aaa; } 
 
         #loadingOverlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -112,7 +134,11 @@
             /* PRINT MODE: TABEL LAPORAN */
             body.printing-table .no-print { display: none !important; }
             body.printing-table .container { box-shadow: none; border-radius: 0; max-width: 100%; padding: 0; }
-            body.printing-table .table-responsive { overflow: visible; zoom: 0.82; }
+            
+            /* Hapus scroll dan limit tinggi saat di print */
+            body.printing-table .table-responsive { overflow: visible !important; max-height: none !important; zoom: 0.82; }
+            body.printing-table th { position: static !important; box-shadow: none !important; }
+            
             body.printing-table table { font-size: 8pt; border-color: #000; width: 100%; }
             body.printing-table th, body.printing-table td { border: 1px solid #000 !important; padding: 3px 2px; }
             body.printing-table th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 7.5pt; }
