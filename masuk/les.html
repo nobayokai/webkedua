@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Manajemen Honor Les - Terhubung Google Sheets</title>
     <style>
-        /* Modern Web Styling */
         :root {
             --primary: #004494;
             --primary-hover: #003377;
             --success: #28a745;
             --success-hover: #218838;
             --info: #17a2b8;
-            --info-hover: #138496;
             --warning: #ff9800;
             --purple: #6f42c1;
             --purple-hover: #5a32a3;
+            --danger: #e91e63;
             --bg-color: #f8f9fa;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: #333; }
@@ -27,7 +26,6 @@
         .status-success { background: var(--success) !important; }
         .status-error { background: #dc3545 !important; }
 
-        /* Form Section */
         .form-panel { background: #fdfdfd; padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 20px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .form-group { display: flex; flex-direction: column; }
@@ -43,8 +41,16 @@
         .btn-print:hover { background: var(--success-hover); }
         .btn-print-kw { background: var(--purple); }
         .btn-print-kw:hover { background: var(--purple-hover); }
+        .btn-save-sheets { background: #4caf50; min-width: 220px; flex: 1; position: relative; }
+        .btn-save-sheets.dirty {
+            background: var(--danger) !important;
+            animation: pulseGlow 1.2s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(233, 30, 99, 0); }
+        }
 
-        /* Action Buttons in Table */
         .btn-edit, .btn-delete { padding: 4px 8px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
         .btn-edit { background: #ffc107; color: #333; }
         .btn-edit:hover { background: #e0a800; }
@@ -52,8 +58,6 @@
         .btn-delete:hover { background: #c82333; }
         .action-cell { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; justify-content: center; border: none; }
 
-        /* Table Styling */
-        /* MODIFIKASI: Menambahkan overflow, tinggi maksimal (65vh), agar kontainer bisa di-scroll */
         .table-responsive { 
             overflow: auto; 
             max-height: 65vh; 
@@ -64,52 +68,16 @@
         table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
         th, td { border: 1px solid #dee2e6; padding: 8px 6px; text-align: center; vertical-align: middle; }
         
-        /* MODIFIKASI HEADER STICKY */
         th { 
             background-color: #e9ecef; 
             font-weight: 600; 
-            position: sticky; /* Kunci header saat scroll */
-            z-index: 2; /* Supaya header di atas baris data */
-            box-shadow: inset 0 0 0 1px #dee2e6; /* Mengakali garis border yang hilang saat freeze */
+            position: sticky;
+            z-index: 2;
+            box-shadow: inset 0 0 0 1px #dee2e6;
         }
-        
-        /* Baris 1 menempel di paling atas */
-        thead tr:nth-child(1) th { 
-            top: 0; 
-            z-index: 3;
-        }
-        
-        /* Baris 2 menempel sedikit di bawah baris 1 (sesuai tinggi baris atas) */
-        thead tr:nth-child(2) th { 
-            top: 35px; 
-            z-index: 3;
-        }
+        thead tr:nth-child(1) th { top: 0; z-index: 3; }
+        thead tr:nth-child(2) th { top: 35px; z-index: 3; }
 
-/* Pastikan container tabel memiliki pengaturan overflow yang benar */
-.table-container {
-    overflow-y: auto;
-    max-height: 80vh; /* Sesuaikan dengan kebutuhan */
-}
-
-/* Targetkan semua header di dalam thead */
-thead th {
-    position: sticky;
-    top: 0;
-    background-color: #eef2f5; /* WAJIB: Ganti dengan kode warna abu-abu header Anda */
-    z-index: 10; /* Pastikan selalu berada di atas konten baris bawahnya */
-    
-    /* Opsional: Menjaga garis batas (border) tidak menghilang saat di-scroll */
-    box-shadow: inset 0 -1px 0 #dee2e6, inset -1px 0 0 #dee2e6;
-}
-
-/* KHUSUS HEADER BERTINGKAT PADA TABEL HONOR LES INI */
-/* Karena Anda menggunakan rowspan/colspan (ada baris "Penerimaan Kotor" dan di bawahnya "Per Siswa"), 
-   baris header kedua perlu offset 'top' agar tidak tertumpuk dengan baris pertama di posisi 0 */
-thead tr:nth-child(2) th {
-    top: 40px; /* Sesuaikan angka ini dengan tinggi (height) aktual dari baris header pertama */
-    z-index: 9;
-}
-        
         .text-left { text-align: left; }
         .editable { width: 100%; box-sizing: border-box; background: #fffde7; border: 1px dashed #bcaaa4; padding: 4px; text-align: center; border-radius: 3px; font-size: 0.9em; }
         .editable:focus { border-color: #ff9800; outline: none; }
@@ -124,18 +92,14 @@ thead tr:nth-child(2) th {
             font-size: 1.5em; font-weight: bold; color: var(--primary); z-index: 10; border-radius: 5px;
         }
 
-        /* KHUSUS CSS PRINT */
         #kwitansiContainer { display: none; }
         
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
             body { background: white; padding: 0; margin: 0; }
             
-            /* PRINT MODE: TABEL LAPORAN */
             body.printing-table .no-print { display: none !important; }
             body.printing-table .container { box-shadow: none; border-radius: 0; max-width: 100%; padding: 0; }
-            
-            /* Hapus scroll dan limit tinggi saat di print */
             body.printing-table .table-responsive { overflow: visible !important; max-height: none !important; zoom: 0.82; }
             body.printing-table th { position: static !important; box-shadow: none !important; }
             
@@ -150,13 +114,12 @@ thead tr:nth-child(2) th {
             body.printing-table input.ket-input { display: none; }
             body.printing-table span.print-ket { display: block !important; font-size: 6.5pt; color: #444; margin-top: 2px; font-style: italic; line-height: 1.1; word-wrap: break-word; max-width: 80px;}
             
-            /* PRINT MODE: KWITANSI MASAL */
-            body.printing-kwitansi .container { display: none !important; } /* Sembunyikan semua UI & Tabel */
+            body.printing-kwitansi .container { display: none !important; }
             body.printing-kwitansi #kwitansiContainer { display: block !important; }
             
             .kwitansi-page { page-break-after: always; display: flex; flex-direction: column; height: 277mm; }
             .kwitansi-card {
-                height: 125mm; /* Pas setengah A4 dengan margin */
+                height: 125mm;
                 margin-bottom: 15mm;
                 border: 2px solid #004494;
                 border-radius: 12px;
@@ -169,7 +132,7 @@ thead tr:nth-child(2) th {
                 box-shadow: inset 0 0 0 4px #e3f2fd;
             }
             .kw-card-yayasan {
-                border-color: #b71c1c; /* Merah untuk Yayasan */
+                border-color: #b71c1c;
                 box-shadow: inset 0 0 0 4px #ffebee;
             }
             .kw-card-yayasan .kw-logo { color: #b71c1c; }
@@ -187,7 +150,6 @@ thead tr:nth-child(2) th {
             .kw-bold { font-weight: bold; color: #000; }
             .kw-highlight-text { background: #f1f3f5; font-style: italic; font-weight: bold; padding: 2px 10px; border-radius: 4px; display: inline-block; border-bottom: none; }
             
-            /* Keterangan Tambahan (Rincian Siswa) */
             .kw-detail-box { font-size: 0.85em; background: #f8f9fa; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; margin-top: 5px; color: #555; line-height: 1.4;}
             .kw-detail-item { display: inline-block; margin-right: 15px; }
             .kw-detail-val { font-weight: bold; color: #004494; }
@@ -262,22 +224,20 @@ thead tr:nth-child(2) th {
                 </div>
                 
                 <div class="action-buttons">
-                    <button class="btn-add" id="btnSimpan" onclick="simpanData()">+ Simpan Data (Otomatis ke Sheets)</button>
+                    <button class="btn-add" id="btnSimpan" onclick="simpanData()">+ Simpan Baris ke Tabel</button>
+                    <button class="btn-save-sheets" id="btnSaveSheets" onclick="simpanKeSheets()">✓ Semua Tersimpan di Sheets</button>
                     <button class="btn-print" onclick="cetakTabel()">🖨️ Cetak Tabel Laporan</button>
                     <button class="btn-print-kw" onclick="cetakKwitansi()">🎫 Cetak Kwitansi (Termasuk Yayasan)</button>
-                    <!-- TOMBOL BARU LANJUT BULAN BERIKUTNYA -->
                     <button class="btn-add" style="background: var(--info);" onclick="salinKeBulanBerikutnya()">⏭️ Lanjut ke Bulan Berikutnya</button>
                 </div>
             </div>
         </div>
 
-        <!-- Print Header untuk Mode Tabel -->
         <div class="header-print no-print-kwitansi">
             <h3>DATA HONOR LES SDIT HIDAYATUT TAUFIQ</h3>
             <p>Bulan: <strong id="printBulan">JUNI</strong> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; TAHUN AJARAN: <strong id="printTahun">2025-2026</strong></p>
         </div>
 
-        <!-- Data Table -->
         <div class="table-responsive no-print-kwitansi">
             <div id="loadingOverlay">🔄 Sinkronisasi Data Google Sheets...</div>
             <table id="tabelHonor">
@@ -305,32 +265,28 @@ thead tr:nth-child(2) th {
                         <th width="8%" class="no-print">Net Kelas Ini</th>
                     </tr>
                 </thead>
-                <tbody id="tbodyData">
-                    <!-- Dynamic Rows -->
-                </tbody>
-                <tfoot>
-                    <!-- Subtotals -->
-                </tfoot>
+                <tbody id="tbodyData"></tbody>
+                <tfoot></tfoot>
             </table>
         </div>
     </div>
 
-    <!-- Container Khusus Kwitansi Saat Diprint -->
     <div id="kwitansiContainer"></div>
 
     <script>
-        // URL GOOGLE APPS SCRIPT HARDCODED
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbyYnTaFvOnlTdZIxfRxjorGT_2_-QVxBvr5gPq_CDgn5_YWZQrUcStAIgtFLjXCMm3D/exec';
         
         let dataLes = []; 
-        let globalGroupedData = {}; // Menyimpan data grup untuk dipakai di Kwitansi
+        let globalGroupedData = {};
         let incrementId = 1;
         let editModeId = null;
         let syncTimeout = null;
+        let isDirty = false;
+        let isSaving = false;
         
-        let totalYayasanGlobal = 0; // Untuk mencatat total potongan yayasan
-        let currentTahun = ''; // TAMBAHAN: Mengunci Tahun saat ini agar sinkronisasi tidak tertukar
-        let currentBulan = ''; // TAMBAHAN: Mengunci Bulan saat ini agar sinkronisasi tidak tertukar
+        let totalYayasanGlobal = 0;
+        let currentTahun = '';
+        let currentBulan = '';
 
         window.onload = function() {
             if(localStorage.getItem('honorLes_LastTahun')) {
@@ -351,31 +307,71 @@ thead tr:nth-child(2) th {
             else if(type === 'error') badge.classList.add('status-error');
         }
 
-        async function gantiPeriode() {
-            if (syncTimeout) clearTimeout(syncTimeout); // TAMBAHAN: Mencegah save bocor ke bulan lain saat dropdown diubah
+        // ====== Penanda ada perubahan belum disimpan ======
+        function setDirtyState(dirty) {
+            isDirty = dirty;
+            const btn = document.getElementById('btnSaveSheets');
+            if(dirty) {
+                btn.classList.add('dirty');
+                btn.innerHTML = '💾 Simpan Perubahan • Ada Perubahan Belum Disimpan';
+                setStatus('sync', '⚠️ Ada perubahan belum disimpan');
+            } else {
+                btn.classList.remove('dirty');
+                btn.innerHTML = '✓ Semua Tersimpan di Sheets';
+            }
+        }
 
-            const tahun = document.getElementById('tahunAjaran').value.trim();
-            const bulan = document.getElementById('bulan').value;
-            
-            localStorage.setItem('honorLes_LastTahun', tahun);
-            localStorage.setItem('honorLes_LastBulan', bulan);
-            document.getElementById('printBulan').innerText = bulan.toUpperCase();
-            document.getElementById('printTahun').innerText = tahun;
+        // Karate: semua net per kelas = 0, total grup nanti dipaksa 1.5jt saat render
+        function normalizeKarateNet() {
+            dataLes.forEach(d => {
+                if(String(d.jenisLes || '').toLowerCase().includes('karate')) {
+                    d.netTotal = 0;
+                }
+            });
+        }
+
+        async function gantiPeriode() {
+            if (syncTimeout) clearTimeout(syncTimeout);
+
+            const tahunBaru = document.getElementById('tahunAjaran').value.trim();
+            const bulanBaru = document.getElementById('bulan').value;
+
+            // Cegah pindah bulan kalau ada perubahan belum disimpan
+            if (isDirty && (tahunBaru !== currentTahun || bulanBaru !== currentBulan)) {
+                const lanjut = confirm(
+                    '⚠️ PERHATIAN!\n\nAda perubahan di tabel yang BELUM DISIMPAN ke Google Sheets.\n\n' +
+                    'Jika Anda pindah bulan sekarang, perubahan tersebut akan HILANG.\n\n' +
+                    'Klik OK untuk tetap pindah (perubahan hilang), atau Cancel untuk kembali dan simpan dulu.'
+                );
+                if (!lanjut) {
+                    document.getElementById('tahunAjaran').value = currentTahun || '2025-2026';
+                    document.getElementById('bulan').value = currentBulan || 'JUNI';
+                    return;
+                }
+                isDirty = false;
+            }
 
             document.getElementById('loadingOverlay').style.display = 'flex';
             setStatus('sync', '🔄 Memuat Data...');
 
             try {
-                const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
+                const response = await fetch(`${GAS_URL}?tahun=${encodeURIComponent(tahunBaru)}&bulan=${encodeURIComponent(bulanBaru)}`);
                 const result = await response.json();
                 
                 dataLes = result || [];
                 incrementId = dataLes.length > 0 ? Math.max(...dataLes.map(d => parseInt(d.id) || 0)) + 1 : 1;
                 
-                // TAMBAHAN: Kunci bulan dan tahun untuk dataLes yang sedang aktif dimuat
-                currentTahun = tahun;
-                currentBulan = bulan;
+                normalizeKarateNet();
 
+                currentTahun = tahunBaru;
+                currentBulan = bulanBaru;
+
+                localStorage.setItem('honorLes_LastTahun', currentTahun);
+                localStorage.setItem('honorLes_LastBulan', currentBulan);
+                document.getElementById('printBulan').innerText = currentBulan.toUpperCase();
+                document.getElementById('printTahun').innerText = currentTahun;
+
+                setDirtyState(false);
                 setStatus('success', '🟢 Sinkronisasi Selesai');
                 renderTabel();
             } catch (error) {
@@ -386,8 +382,23 @@ thead tr:nth-child(2) th {
             }
         }
 
+        // Simpan eksplisit (dipanggil dari tombol)
+        async function simpanKeSheets() {
+            if (!isDirty) {
+                setStatus('success', 'ℹ️ Tidak ada perubahan baru');
+                return;
+            }
+            if (isSaving) return;
+            isSaving = true;
+            try {
+                await syncToDatabase();
+                setDirtyState(false);
+            } finally {
+                isSaving = false;
+            }
+        }
+
         async function syncToDatabase() {
-            // TAMBAHAN: Gunakan currentTahun & currentBulan yang terkunci, bukan membaca langsung dari dropdown yang mungkin sedang diubah user
             const tahun = currentTahun || document.getElementById('tahunAjaran').value.trim();
             const bulan = currentBulan || document.getElementById('bulan').value;
             
@@ -419,9 +430,14 @@ thead tr:nth-child(2) th {
             }
         }
 
-        // FUNGSI BARU: Lanjut ke Bulan Berikutnya
         function salinKeBulanBerikutnya() {
-            if (syncTimeout) clearTimeout(syncTimeout); // Hentikan autosync sementara
+            if (syncTimeout) clearTimeout(syncTimeout);
+
+            if (isDirty) {
+                const lanjut = confirm('Ada perubahan belum disimpan di bulan ini. Tetap lanjutkan menyalin ke bulan berikutnya? (Perubahan akan hilang)');
+                if (!lanjut) return;
+                isDirty = false;
+            }
 
             const blnSelect = document.getElementById('bulan');
             const currIndex = blnSelect.selectedIndex;
@@ -433,25 +449,23 @@ thead tr:nth-child(2) th {
 
             if(!confirm('Salin data ke bulan berikutnya?\n\nData "Belum Bayar" bulan ini akan otomatis pindah menjadi "Pending" di bulan depan.')) return;
 
-            // 1. Pindah bulan di dropdown
             blnSelect.selectedIndex = currIndex + 1;
             const nextBulan = blnSelect.value;
             const tahun = document.getElementById('tahunAjaran').value.trim();
 
-            // 2. Siapkan data baru: Guru, Kelas, Jml Murid tetap. Belum bayar -> Pending
             let newData = dataLes.map(d => {
                 let carryPending = parseInt(d.belumBayar) || 0;
                 let carryKetPending = d.ketBelumBayar || "";
 
-                let totalBayar = parseInt(d.jumlahSiswa) + carryPending; // Karena belum bayar di-reset 0
+                let totalBayar = parseInt(d.jumlahSiswa) + carryPending;
                 let grossTotal = totalBayar * parseInt(d.hargaLes);
                 let netTotal = totalBayar * parseInt(d.netPerSiswa);
 
                 return {
                     ...d,
-                    pendingan: carryPending,      // Data belum bayar masuk ke pending
-                    ketPending: carryKetPending,  // Keterangan ikut pindah
-                    belumBayar: 0,                // Reset jadi 0 di bulan baru
+                    pendingan: carryPending,
+                    ketPending: carryKetPending,
+                    belumBayar: 0,
                     ketBelumBayar: "",
                     totalBayar: totalBayar,
                     grossTotal: grossTotal,
@@ -459,41 +473,20 @@ thead tr:nth-child(2) th {
                 };
             });
 
-            // 3. Perbaiki khusus nominal net karate jika ada (Syarat: Karate net = 1.500.000)
-            let karateDone = false;
-            newData.forEach(d => {
-                if(String(d.jenisLes).toLowerCase().includes('karate')) {
-                    if(!karateDone) {
-                        d.netTotal = 1500000;
-                        karateDone = true;
-                    } else {
-                        d.netTotal = 0;
-                    }
-                }
-            });
-
-            // 4. Timpa data lama dengan data baru di sistem frontend
             dataLes = newData;
+            normalizeKarateNet();
+
             currentBulan = nextBulan;
             currentTahun = tahun;
             
-            // 5. Update UI
             localStorage.setItem('honorLes_LastBulan', currentBulan);
             document.getElementById('printBulan').innerText = currentBulan.toUpperCase();
             renderTabel();
+            setDirtyState(true);
             
-            // 6. Langsung tembak save ke Google Sheets untuk bulan depan
-            syncToDatabase(); 
+            syncToDatabase().then(() => setDirtyState(false));
             
-            alert(`Berhasil disalin! Sekarang Anda sedang mengedit data bulan ${currentBulan}`);
-        }
-
-        function triggerAutoSync() {
-            if(syncTimeout) clearTimeout(syncTimeout);
-            setStatus('sync', '⏳ Menunggu diketik...');
-            syncTimeout = setTimeout(() => {
-                syncToDatabase();
-            }, 1500); 
+            alert(`Berhasil disalin! Sekarang Anda sedang mengedit data bulan ${currentBulan}.`);
         }
 
         function simpanData() {
@@ -518,11 +511,6 @@ thead tr:nth-child(2) th {
                     let totalBayar = jumlahSiswa + parseInt(d.pendingan) - parseInt(d.belumBayar);
                     let grossTotal = totalBayar * hargaLes;
                     let netTotal = totalBayar * netPerSiswa;
-                    
-                    if(jenisLes.toLowerCase().includes('karate')) {
-                        let firstKarateId = Math.min(...dataLes.filter(x => x.namaGuru === namaGuru && x.jenisLes === jenisLes).map(x => x.id));
-                        netTotal = (d.id === firstKarateId) ? 1500000 : 0;
-                    }
 
                     dataLes[index] = {
                         ...d, kelas: kelas, namaGuru: namaGuru, jenisLes: jenisLes,
@@ -533,17 +521,12 @@ thead tr:nth-child(2) th {
                 }
                 editModeId = null;
                 const btnSimpan = document.getElementById('btnSimpan');
-                btnSimpan.innerHTML = '+ Simpan Data (Otomatis ke Sheets)';
+                btnSimpan.innerHTML = '+ Simpan Baris ke Tabel';
                 btnSimpan.style.backgroundColor = 'var(--primary)';
             } else {
                 let totalBayar = jumlahSiswa;
                 let grossTotal = totalBayar * hargaLes;
                 let netTotal = totalBayar * netPerSiswa;
-                
-                if(jenisLes.toLowerCase().includes('karate')) {
-                    let isExist = dataLes.some(d => d.namaGuru === namaGuru && d.jenisLes === jenisLes);
-                    netTotal = isExist ? 0 : 1500000; 
-                }
 
                 dataLes.push({
                     id: incrementId++,
@@ -555,38 +538,40 @@ thead tr:nth-child(2) th {
                 });
             }
 
+            normalizeKarateNet();
+
             document.getElementById('kelas').value = '';
             document.getElementById('jumlahSiswa').value = '0';
             document.getElementById('namaGuru').focus();
 
             renderTabel();
-            syncToDatabase(); 
+            setDirtyState(true);
         }
 
         function updateCellData(id, field, value) {
             let index = dataLes.findIndex(d => d.id == id); 
-            if(index !== -1) {
-                if(field === 'ketPending' || field === 'ketBelumBayar') {
-                    dataLes[index][field] = value;
-                    triggerAutoSync(); 
-                } else {
-                    dataLes[index][field] = parseInt(value) || 0;
-                    let row = dataLes[index];
+            if(index === -1) return;
 
-                    if(['jumlahSiswa', 'pendingan', 'belumBayar'].includes(field)) {
-                        row.totalBayar = parseInt(row.jumlahSiswa) + parseInt(row.pendingan) - parseInt(row.belumBayar);
-                        row.grossTotal = row.totalBayar * parseInt(row.hargaLes);
-                        
-                        if(!row.jenisLes.toLowerCase().includes('karate')) {
-                            row.netTotal = row.totalBayar * parseInt(row.netPerSiswa);
-                        }
-                    }
-                    if(field === 'netTotal') row.netTotal = parseInt(value) || 0;
+            if(field === 'ketPending' || field === 'ketBelumBayar') {
+                dataLes[index][field] = value;
+            } else {
+                dataLes[index][field] = parseInt(value) || 0;
+                let row = dataLes[index];
+
+                if(['jumlahSiswa', 'pendingan', 'belumBayar'].includes(field)) {
+                    row.totalBayar = parseInt(row.jumlahSiswa) + parseInt(row.pendingan) - parseInt(row.belumBayar);
+                    row.grossTotal = row.totalBayar * parseInt(row.hargaLes);
                     
-                    renderTabel();
-                    triggerAutoSync();
+                    if(!row.jenisLes.toLowerCase().includes('karate')) {
+                        row.netTotal = row.totalBayar * parseInt(row.netPerSiswa);
+                    }
                 }
+                if(field === 'netTotal') row.netTotal = parseInt(value) || 0;
             }
+
+            normalizeKarateNet();
+            renderTabel();
+            setDirtyState(true);
         }
 
         function formatRp(angka) {
@@ -605,17 +590,18 @@ thead tr:nth-child(2) th {
 
                 editModeId = item.id; 
                 const btnSimpan = document.getElementById('btnSimpan');
-                btnSimpan.innerHTML = '✓ Update & Sync Data';
+                btnSimpan.innerHTML = '✓ Update Baris';
                 btnSimpan.style.backgroundColor = '#ff9800';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
         function hapusData(id) {
-            if(confirm('Yakin ingin menghapus data kelas ini dari Google Sheets?')) {
+            if(confirm('Yakin ingin menghapus data kelas ini? (Data akan hilang setelah Anda klik "Simpan Perubahan ke Sheets")')) {
                 dataLes = dataLes.filter(d => d.id != id);
+                normalizeKarateNet();
                 renderTabel();
-                syncToDatabase();
+                setDirtyState(true);
             }
         }
 
@@ -650,7 +636,6 @@ thead tr:nth-child(2) th {
                 groupedData[key].groupGross += parseInt(d.grossTotal) || 0;
                 groupedData[key].groupNet += parseInt(d.netTotal) || 0;
                 
-                // Kalkulasi untuk Rincian di Kwitansi
                 groupedData[key].totalJmlSiswa += parseInt(d.jumlahSiswa) || 0;
                 groupedData[key].totalPending += parseInt(d.pendingan) || 0;
                 groupedData[key].totalBelumBayar += parseInt(d.belumBayar) || 0;
@@ -660,13 +645,21 @@ thead tr:nth-child(2) th {
                 if(d.ketBelumBayar && d.ketBelumBayar.trim() !== '') groupedData[key].rincianBelumBayar.push(`Kls ${d.kelas}: ${d.ketBelumBayar}`);
             });
 
-            globalGroupedData = groupedData; // Simpan untuk dipakai Kwitansi
+            // Paksa total karate per grup = 1.500.000
+            for(let key in groupedData) {
+                if(String(groupedData[key].jenisLes).toLowerCase().includes('karate')) {
+                    groupedData[key].groupNet = 1500000;
+                }
+            }
+
+            globalGroupedData = groupedData;
 
             let no = 1;
             for(let key in groupedData) {
                 let group = groupedData[key];
                 let rowspan = group.items.length;
                 let groupPotongan = group.groupGross - group.groupNet;
+                let isKarate = String(group.jenisLes).toLowerCase().includes('karate');
                 
                 sumKotor += group.groupGross;
                 sumBersihGuru += group.groupNet;
@@ -704,14 +697,16 @@ thead tr:nth-child(2) th {
                         <td>${formatRp(d.hargaLes)}</td>
                         <td>${formatRp(d.grossTotal)}</td>
                         
-                        <td class="no-print">${String(d.jenisLes).toLowerCase().includes('karate') ? '-' : formatRp(d.netPerSiswa)}</td>
+                        <td class="no-print">${isKarate ? '-' : formatRp(d.netPerSiswa)}</td>
                         <td class="no-print">
-                            <input class="editable override-field" type="number" value="${d.netTotal}" onchange="updateCellData('${d.id}', 'netTotal', this.value)" step="10000">
+                            ${isKarate 
+                                ? `-`
+                                : `<input class="editable override-field" type="number" value="${d.netTotal}" onchange="updateCellData('${d.id}', 'netTotal', this.value)" step="10000">`
+                            }
                         </td>
                     `;
 
                     if(index === 0) {
-                        // Tambahkan Kolom Potongan Yayasan Per Guru
                         tr.innerHTML += `<td rowspan="${rowspan}" style="color:#d32f2f; font-weight:bold;">${formatRp(groupPotongan)}</td>`;
                         tr.innerHTML += `<td rowspan="${rowspan}" style="font-weight:bold; font-size:1.05em; background-color:#f8f9fa;">${formatRp(group.groupNet)}</td>`;
                         tr.innerHTML += `<td rowspan="${rowspan}"></td>`;
@@ -730,7 +725,7 @@ thead tr:nth-child(2) th {
                 no++;
             }
             
-            totalYayasanGlobal = sumYayasan; // Simpan ke variabel global untuk kwitansi
+            totalYayasanGlobal = sumYayasan;
 
             tfoot.innerHTML = `
                 <tr style="background-color: #f1f3f5; font-weight: 600;">
@@ -764,7 +759,6 @@ thead tr:nth-child(2) th {
             `;
         }
 
-        /* LOGIKA TERBILANG RUPIAH */
         function terbilang(angka) {
             let bilangan = ['','Satu','Dua','Tiga','Empat','Lima','Enam','Tujuh','Delapan','Sembilan','Sepuluh','Sebelas'];
             angka = Math.floor(angka);
@@ -780,7 +774,6 @@ thead tr:nth-child(2) th {
             return 'Nominal Terlalu Besar';
         }
 
-        /* LOGIKA PRINT */
         function cetakTabel() {
             document.body.classList.add('printing-table');
             window.print();
@@ -797,7 +790,6 @@ thead tr:nth-child(2) th {
                 return;
             }
 
-            // Generate Tanggal Hari Ini Sesuai dengan Zona Waktu (Bekasi)
             const d = new Date();
             const bulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
             const tglStr = `${d.getDate()} ${bulanArr[d.getMonth()]} ${d.getFullYear()}`;
@@ -806,7 +798,6 @@ thead tr:nth-child(2) th {
             let currentPage = document.createElement('div');
             currentPage.className = 'kwitansi-page';
             
-            // FUNGSI HELPER UNTUK RENDER CARD
             const renderCard = (group, isYayasan = false) => {
                 let nama = isYayasan ? "Penny Sulistiati" : group.namaGuru;
                 let nominal = isYayasan ? totalYayasanGlobal : group.groupNet;
@@ -817,7 +808,6 @@ thead tr:nth-child(2) th {
                 let tahunText = document.getElementById('tahunAjaran').value;
                 let addClass = isYayasan ? "kw-card-yayasan" : "";
 
-                // Susun HTML Rincian Siswa jika bukan yayasan
                 let htmlRincian = "";
                 if(!isYayasan) {
                     htmlRincian = `<div class="kw-detail-box">`;
@@ -882,22 +872,18 @@ thead tr:nth-child(2) th {
                 }
             };
 
-            // RENDER KWITANSI YAYASAN (Paling Atas)
             if(totalYayasanGlobal > 0) {
-                renderCard({}, true); // Lempar object kosong dan flag true
+                renderCard({}, true);
             }
 
-            // RENDER KWITANSI GURU / EKSKUL
             groups.forEach((group) => {
                 renderCard(group, false);
             });
 
-            // Append sisa page jika angkanya ganjil (1 card di page terakhir)
             if(cardCount % 2 !== 0) {
                 container.appendChild(currentPage);
             }
 
-            // Jalankan Print
             document.body.classList.add('printing-kwitansi');
             window.print();
             document.body.classList.remove('printing-kwitansi');
