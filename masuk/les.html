@@ -63,7 +63,38 @@
         .ket-input { width: 100%; box-sizing: border-box; background: #f1f8e9; border: 1px solid #c5e1a5; padding: 4px; border-radius: 3px; font-size: 0.8em; margin-top: 4px; }
         .ket-input::placeholder { color: #999; font-style: italic; }
         .override-field { background: #e3f2fd; border-color: #90caf9; font-weight: bold;}
-        .grouped-row td { border-bottom: 2px solid #aaa; } 
+        .grouped-row td { border-bottom: 2px solid #aaa; }
+        /* 1. Tambahkan batas tinggi dan scroll vertikal pada kontainer tabel *
+        .table-responsive { 
+            overflow-x: auto; 
+            overflow-y: auto; /* Memungkinkan scroll ke bawah */
+            max-height: 70vh; /* Membatasi tinggi tabel (70% dari tinggi layar) */
+            margin-top: 20px; 
+            position: relative;
+        }
+        
+        /* 2. Modifikasi tag th untuk menjadi sticky */
+        th { 
+            border: 1px solid #dee2e6; 
+            padding: 8px 6px; 
+            text-align: center; 
+            vertical-align: middle; 
+            background-color: #e9ecef; /* Wajib solid agar teks di bawahnya tidak tembus */
+            font-weight: 600; 
+            position: sticky; 
+            z-index: 2; /* Memastikan header berada di atas baris data */
+            /* Tambahan outline agar garis border tidak hilang saat di-scroll */
+            outline: 1px solid #dee2e6; 
+        }
+        
+        /* 3. Atur jarak freeze untuk baris pertama dan kedua pada thead */
+        thead tr:first-child th {
+            top: 0; /* Baris pertama menempel di paling atas */
+        }
+        
+        thead tr:nth-child(2) th {
+            top: 36px; /* Baris kedua menempel di bawah baris pertama. Sesuaikan angka ini jika desain terpotong/overlap */
+        }
 
         #loadingOverlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
