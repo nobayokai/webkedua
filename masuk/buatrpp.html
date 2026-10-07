@@ -261,27 +261,28 @@
                     <td colspan="2"><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.cp)}</span></td>
                 </tr>
                 <tr>
+                    <tr>
                     <td style="font-weight:bold;">Profil Pelajar Pancasila</td>
                     <td colspan="2"><span class="ai-text editable-text" contenteditable="true">${bersihkanTeks(data.profil_pancasila)}</span></td>
                 </tr>
-                <tr>
-                    <td style="font-weight:bold;">8 Profil Lulusan</td>
-                    <td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Keimanan dan Ketakwaan terhadap Tuhan YME</strong><br>${bersihkanTeks(data.profil_keimanan)}</span></td>
-                </tr>    
-                    <tr><td></td><td colspan="2"><strong>Kewargaan</strong><br>${bersihkanTeks(data.profil_kewargaan)}
-                </tr>    
-                    <tr><td></td><td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Penalaran Kritis</strong><br>${bersihkanTeks(data.profil_penalaran)}</span></td>
-                </tr>    
-                    <tr><td></td><td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Kreativitas</strong><br>${bersihkanTeks(data.profil_kreativitas)}</span></td>
-                </tr>    
-                    <tr><td></td><td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Kolaborasi</strong><br>${bersihkanTeks(data.profil_kolaborasi)}</span></td>
-                </tr>    
-                    <tr><td></td><td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Kemandirian</strong><br>${bersihkanTeks(data.profil_kemandirian)}</span></td>
-                </tr>    
-                    <tr><td></td><td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Kesehatan</strong><br>${bersihkanTeks(data.profil_kesehatan)}</span></td>
-                </tr>    
-                    <tr><td></td><td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>Komunikasi</strong><br>${bersihkanTeks(data.profil_komunikasi)}</span></td>
-                </tr>
+                
+                ${[
+                    { key: data.profil_keimanan, judul: "Keimanan dan Ketakwaan terhadap Tuhan YME" },
+                    { key: data.profil_kewargaan, judul: "Kewargaan" },
+                    { key: data.profil_penalaran, judul: "Penalaran Kritis" },
+                    { key: data.profil_kreativitas, judul: "Kreativitas" },
+                    { key: data.profil_kolaborasi, judul: "Kolaborasi" },
+                    { key: data.profil_kemandirian, judul: "Kemandirian" },
+                    { key: data.profil_kesehatan, judul: "Kesehatan" },
+                    { key: data.profil_komunikasi, judul: "Komunikasi" }
+                ]
+                .filter(p => p.key && p.key.trim() !== "" && p.key.trim() !== "-")
+                .map((p, index) => `
+                    <tr>
+                        <td style="font-weight:bold;">${index === 0 ? 'Profil Lulusan yang Relevan' : ''}</td>
+                        <td colspan="2"><span class="ai-text editable-text" contenteditable="true"><strong>${p.judul}</strong><br>${bersihkanTeks(p.key)}</span></td>
+                    </tr>
+                `).join('')}
 
                 <tr><td colspan="3" class="section-header">KOMPETENSI AWAL</td></tr>
                 <tr>
