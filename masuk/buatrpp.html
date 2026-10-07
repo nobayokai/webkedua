@@ -28,6 +28,8 @@
         .form-group { display: flex; flex-direction: column; }
         label { font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #334155; }
         input, select { padding: 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 1rem; transition: border-color 0.2s; font-family: inherit; }
+        textarea { padding: 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 1rem; transition: border-color 0.2s; font-family: inherit; resize: vertical; }
+        textarea:focus { outline: none; border-color: var(--primary); }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         
         button { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.4); }
@@ -120,6 +122,11 @@
             <div class="form-group"><label>Kepala Sekolah</label><input type="text" id="kepsek" value="ROSANDI, S.Pd.I"></div>
             <div class="form-group"><label>Tempat (Kota)</label><input type="text" id="tempat" value="Bekasi"></div>
             <div class="form-group"><label>Tanggal Modul</label><input type="text" id="tanggal" value="Juli 2026"></div>
+        <!-- Tambahan Kolom Konteks Pembelajaran -->
+        <div class="form-group" style="grid-column: 1 / -1; margin-top: 15px; margin-bottom: 10px;">
+            <label style="color: var(--accent);">Konteks/Situasi Pembelajaran (Opsional)</label>
+            <textarea id="konteks" rows="3" placeholder="Contoh: Pembelajaran dilakukan secara jarak jauh (PJJ) via Zoom/WhatsApp karena kabut asap, atau kegiatan belajar 100% di luar ruangan..."></textarea>
+        </div>
         </div>
         <button class="btn-generate" onclick="generateRPPM()">Generate Modul Ajar dengan AI 🚀</button>
     </div>
@@ -153,8 +160,7 @@
     const gasUrl = "https://script.google.com/macros/s/AKfycbzNNR8ao5lJ_ze_vVemKNtDogBFFciXmtFxjVjnbf3tzebWc6TVwiteClqa00wWwDqtnw/exec";
 
     // Auto Save Logic
-    const inputIds = ['nama', 'nip', 'sekolah', 'mapel', 'fase', 'semester', 'tahun', 'materi', 'waktu', 'siswa', 'jenis_guru', 'kepsek', 'tempat', 'tanggal'];
-    
+    const inputIds = ['nama', 'nip', 'sekolah', 'mapel', 'fase', 'semester', 'tahun', 'materi', 'waktu', 'siswa', 'jenis_guru', 'kepsek', 'tempat', 'tanggal', 'konteks'];
     function saveInputData() {
         const formData = {};
         inputIds.forEach(id => formData[id] = document.getElementById(id).value);
@@ -528,6 +534,7 @@
             editables.forEach(el => el.setAttribute('contenteditable', 'true'));
         }, 1000);
     }
+    
 </script>
 
 </body>
