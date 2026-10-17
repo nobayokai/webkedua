@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-100">
+<html lang="id" class="h-full bg-white">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,31 +22,41 @@
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
+    /* CSS UNTUK TAMPILAN DI LAYAR (PREVIEW) */
     .a4-page {
-      width: 210mm; min-height: 297mm;
-      /* JARAK ATAS DIUBAH JADI 5mm, KIRI 20mm, BAWAH 20mm, KANAN 20mm */
-      padding: 5mm 20mm 20mm 20mm; 
+      width: 210mm; 
+      min-height: 297mm;
+      padding: 15mm 20mm 20mm 20mm; 
       background: white;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Shadow lebih halus */
       margin-bottom: 20px;
       font-family: 'Times New Roman', Times, serif;
-      /* UKURAN FONT UTAMA DIUBAH JADI 12pt */
       font-size: 12pt; 
       line-height: 1.3; color: #000;
       position: relative;
+      border: 1px solid #e2e8f0; /* Border tipis agar kertas terlihat jelas di background putih */
     }
 
+    /* CSS SAAT DICETAK / PRINT */
     @media print {
-      @page { size: A4; margin: 0; }
+      /* Menghapus size: A4 agar mengikuti ukuran kertas apa pun di dialog print. */
+      @page { 
+        margin: 15mm 20mm 20mm 20mm; 
+      }
+      
       body { background: white !important; margin: 0 !important; padding: 0 !important; }
       body > *:not(#printable-area) { display: none !important; }
-      #printable-area { display: block !important; }
+      #printable-area { display: block !important; background: white !important; }
+      
       #printable-area .a4-page {
-        box-shadow: none !important; margin: 0 !important;
-        /* JARAK ATAS SAAT CETAK 5mm */
-        padding: 5mm 15mm 15mm 18mm !important;
+        box-shadow: none !important; 
+        margin: 0 !important;
+        padding: 0 !important; 
+        border: none !important;
         page-break-after: always;
-        width: 210mm !important; min-height: 297mm !important;
+        width: 100% !important; 
+        /* Memaksa halaman memenuhi tinggi kertas agar tidak ada sisa abu-abu */
+        min-height: 100vh !important; 
       }
       #printable-area .a4-page:last-child { page-break-after: auto; }
     }
@@ -82,17 +92,17 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 no-print">
 
     <!-- TABS -->
-    <div class="flex space-x-2 border-b border-slate-200 mb-6 bg-white p-2 rounded-2xl shadow-sm border border-slate-200/80 overflow-x-auto">
+    <div class="flex space-x-2 border-b border-slate-200 mb-6 bg-slate-50 p-2 rounded-2xl shadow-sm border border-slate-200/80 overflow-x-auto">
       <button id="tab-btn-tppk" onclick="switchTab('tppk')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-brand-600 text-white shadow-md whitespace-nowrap">
         <i class="fa-solid fa-shield-halved"></i> 1. SK TPPKSP
       </button>
-      <button id="tab-btn-pembimbing" onclick="switchTab('pembimbing')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+      <button id="tab-btn-pembimbing" onclick="switchTab('pembimbing')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
         <i class="fa-solid fa-trophy"></i> 2. SK Pembimbing Lomba
       </button>
-      <button id="tab-btn-bencana" onclick="switchTab('bencana')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+      <button id="tab-btn-bencana" onclick="switchTab('bencana')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
         <i class="fa-solid fa-triangle-exclamation"></i> 3. SK Aman Bencana
       </button>
-      <button id="tab-btn-riwayat" onclick="switchTab('riwayat')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+      <button id="tab-btn-riwayat" onclick="switchTab('riwayat')" class="tab-btn flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
         <i class="fa-solid fa-database"></i> 4. Riwayat Database
       </button>
     </div>
