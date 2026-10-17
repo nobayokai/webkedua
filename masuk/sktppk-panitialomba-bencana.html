@@ -24,12 +24,15 @@
 
     .a4-page {
       width: 210mm; min-height: 297mm;
-      padding: 15mm 20mm 20mm 20mm;
+      /* JARAK ATAS DIUBAH JADI 5mm, KIRI 20mm, BAWAH 20mm, KANAN 20mm */
+      padding: 5mm 20mm 20mm 20mm; 
       background: white;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
       margin-bottom: 20px;
       font-family: 'Times New Roman', Times, serif;
-      font-size: 11pt; line-height: 1.25; color: #000;
+      /* UKURAN FONT UTAMA DIUBAH JADI 12pt */
+      font-size: 12pt; 
+      line-height: 1.3; color: #000;
       position: relative;
     }
 
@@ -40,7 +43,8 @@
       #printable-area { display: block !important; }
       #printable-area .a4-page {
         box-shadow: none !important; margin: 0 !important;
-        padding: 12mm 15mm 15mm 18mm !important;
+        /* JARAK ATAS SAAT CETAK 5mm */
+        padding: 5mm 15mm 15mm 18mm !important;
         page-break-after: always;
         width: 210mm !important; min-height: 297mm !important;
       }
@@ -342,7 +346,6 @@
     // FUNGSI FORMAT TANGGAL (Mengubah ISO Date menjadi string rapi)
     function formatDateString(dateStr) {
       if (!dateStr) return '';
-      // Cek jika formatnya ISO (mengandung T dan Z)
       if (typeof dateStr === 'string' && dateStr.includes('T') && dateStr.includes('Z')) {
         const d = new Date(dateStr);
         if (!isNaN(d.getTime())) {
@@ -422,7 +425,7 @@
       const tanggal = document.getElementById('tppk-tanggal').value;
       const kepsek = document.getElementById('global-kepsek').value;
 
-      const kopHtml = globalKop ? `<img src="${globalKop}" class="max-h-28 mx-auto object-contain">` : `<div class="border-2 border-dashed p-3 text-center text-xs text-slate-400">[ Area Kop Surat ]</div>`;
+      const kopHtml = globalKop ? `<img src="${globalKop}" class="max-h-28 mx-auto object-contain">` : `<div class="border-2 border-dashed p-3 text-center text-slate-400">[ Area Kop Surat ]</div>`;
       const ttdHtml = globalTtd ? `<img src="${globalTtd}" class="max-h-20 object-contain my-1">` : `<div class="h-16"></div>`;
 
       let timTableHtml = '';
@@ -438,7 +441,7 @@
       document.getElementById('preview-tppk-canvas').innerHTML = `
         <div class="a4-page">
           <div class="mb-3">${kopHtml}</div>
-          <div class="text-center font-bold uppercase mb-4 text-[11pt] leading-snug">
+          <div class="text-center font-bold uppercase mb-4 leading-snug">
             <p>KEPUTUSAN KEPALA ${sekolah.toUpperCase()}</p>
             <p>Nomor : ${nomor}</p>
             <p class="mt-2">TENTANG</p>
@@ -556,7 +559,7 @@
       const tempat = document.getElementById('pem-tempat').value;
       const kepsek = document.getElementById('global-kepsek').value;
 
-      const kopHtml = globalKop ? `<img src="${globalKop}" class="max-h-28 mx-auto object-contain">` : `<div class="border-2 border-dashed p-3 text-center text-xs text-slate-400">[ Area Kop Surat ]</div>`;
+      const kopHtml = globalKop ? `<img src="${globalKop}" class="max-h-28 mx-auto object-contain">` : `<div class="border-2 border-dashed p-3 text-center text-slate-400">[ Area Kop Surat ]</div>`;
       const ttdHtml = globalTtd ? `<img src="${globalTtd}" class="max-h-20 object-contain my-1">` : `<div class="h-16"></div>`;
 
       let tableRows = '';
@@ -573,7 +576,7 @@
       document.getElementById('preview-pembimbing-canvas').innerHTML = `
         <div class="a4-page">
           <div class="mb-3">${kopHtml}</div>
-          <div class="text-center font-bold uppercase mb-4 text-[11pt]">
+          <div class="text-center font-bold uppercase mb-4">
             <p>SURAT KEPUTUSAN</p>
             <p>KEPALA ${sekolah}</p>
             <p>NOMOR : ${nomor}</p>
@@ -613,7 +616,7 @@
             </table>
           </div>
           <div class="text-center font-bold my-4 uppercase">PEMBIMBING KEGIATAN LOMBA<br>${kegiatan}</div>
-          <table class="w-full border-collapse border border-black my-4 text-xs">
+          <table class="w-full border-collapse border border-black my-4">
             <thead><tr class="bg-slate-100">
               <th class="border border-black p-2 w-8">NO.</th>
               <th class="border border-black p-2">NAMA</th>
@@ -664,7 +667,7 @@
       const tanggal = document.getElementById('bencana-tanggal').value;
       const kepsek = document.getElementById('global-kepsek').value;
 
-      const kopHtml = globalKop ? `<img src="${globalKop}" class="max-h-28 mx-auto object-contain">` : `<div class="border-2 border-dashed p-3 text-center text-xs text-slate-400">[ Area Kop Surat ]</div>`;
+      const kopHtml = globalKop ? `<img src="${globalKop}" class="max-h-28 mx-auto object-contain">` : `<div class="border-2 border-dashed p-3 text-center text-slate-400">[ Area Kop Surat ]</div>`;
       const ttdHtml = globalTtd ? `<img src="${globalTtd}" class="max-h-20 object-contain my-1">` : `<div class="h-16"></div>`;
 
       let tableRows = '';
@@ -680,13 +683,13 @@
       document.getElementById('preview-bencana-canvas').innerHTML = `
         <div class="a4-page">
           <div class="mb-3">${kopHtml}</div>
-          <div class="text-center font-bold uppercase mb-4 text-[11pt]">
+          <div class="text-center font-bold uppercase mb-4">
             <p>KEPUTUSAN KEPALA ${sekolah.toUpperCase()}</p>
             <p>Nomor : ${nomor}</p>
             <p class="mt-2">TENTANG</p>
             <p>PEMBENTUKAN TIM SEKOLAH AMAN BENCANA ${sekolah.toUpperCase()}</p>
           </div>
-          <div class="text-center font-bold uppercase mb-4 text-[11pt]">
+          <div class="text-center font-bold uppercase mb-4">
             KEPALA ${sekolah.toUpperCase()}
           </div>
           <table class="w-full text-justify mb-3">
@@ -722,7 +725,7 @@
         </div>
 
         <div class="a4-page">
-          <div class="mb-4 text-xs">
+          <div class="mb-4">
             <table class="w-full">
               <tr><td class="w-64">LAMPIRAN KEPUTUSAN KEPALA SEKOLAH</td><td class="w-3">:</td><td>PEMBENTUKAN TIM SEKOLAH AMAN BENCANA</td></tr>
               <tr><td>TENTANG</td><td>:</td><td>DI ${sekolah.toUpperCase()}</td></tr>
@@ -732,7 +735,7 @@
             </table>
           </div>
           <div class="text-center font-bold my-4 uppercase">SUSUNAN PENGURUS TIM SEKOLAH AMAN BENCANA<br>${sekolah.toUpperCase()}<br>TAHUN AJARAN ${tahun}</div>
-          <table class="w-full border-collapse border border-black my-4 text-xs">
+          <table class="w-full border-collapse border border-black my-4">
             <thead><tr class="bg-slate-100">
               <th class="border border-black p-2 w-10">No</th>
               <th class="border border-black p-2">Nama</th>
@@ -863,7 +866,6 @@
             if (item.jenisSk === 'PEMBIMBING') badge = 'bg-amber-100 text-amber-700';
             if (item.jenisSk === 'BENCANA') badge = 'bg-red-100 text-red-700';
 
-            // FORMAT TANGGAL DI SINI
             const tglRapi = formatDateString(item.tanggalPenetapan);
 
             tr.innerHTML = `
@@ -896,7 +898,7 @@
       if (item.jenisSk === 'TPPK') {
         document.getElementById('tppk-nomor').value = item.nomorSurat || '';
         document.getElementById('tppk-tempat').value = item.tempatPenetapan || '';
-        document.getElementById('tppk-tanggal').value = formatDateString(item.tanggalPenetapan); // FORMAT TANGGAL
+        document.getElementById('tppk-tanggal').value = formatDateString(item.tanggalPenetapan);
         timTPPK = Array.isArray(item.tim) ? item.tim : [];
         renderTimTPPKInputs(); updatePreviewTPPK();
         copyPreviewToPrintable('preview-tppk-canvas');
