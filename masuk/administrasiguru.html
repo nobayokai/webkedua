@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Semester Guru</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--ink:#16324F;--paper:#F3F7F4;--teal:#12806F;--amber:#F4A62A;--rose:#D1495B;--line:#D5DFD9}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 Nunito,sans-serif}
+h1,h2,h3{font-family:'Baloo 2',sans-serif;margin:0;line-height:1.15}
+main{max-width:1050px;margin:auto;padding:20px}
+.hero{background:var(--ink);color:#fff;border-radius:22px;padding:28px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.hero h1{font-size:2.4rem;font-weight:800}.hero p{margin:6px 0 0;opacity:.85}
+.clock{background:var(--amber);color:var(--ink);border-radius:18px;padding:12px 18px;text-align:center;font-weight:800}
+.clock b{display:block;font:800 2rem 'Baloo 2'}
+.widgets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:16px 0}
+.w{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px}
+.w b{font:800 2.2rem 'Baloo 2';display:block}.w:nth-child(3n+1){border-color:var(--teal)}.w:nth-child(3n+2){border-color:var(--amber)}.w:nth-child(3n){border-color:var(--rose)}.w h3{font-size:1.2rem;margin-bottom:6px}.w .row{gap:22px}.w .row span{font-size:.9rem}.w .row b{font-size:1.9rem}.ta{background:#fff;border:2px solid var(--line);border-left:8px solid var(--amber);border-radius:14px;padding:10px 16px;margin-top:16px;font-weight:700}.ta b{font:800 1.4rem 'Baloo 2'}
+.act{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+button,.btn{font:800 1rem Nunito;border:0;border-radius:14px;padding:12px 18px;cursor:pointer;background:var(--teal);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.big{padding:20px;text-align:left;font-size:1.1rem;border-radius:18px}.big small{display:block;font-weight:600;opacity:.85}
+.amb{background:var(--amber);color:var(--ink)}.ink{background:var(--ink)}.ghost{background:#fff;color:var(--ink);border:2px solid var(--line)}.red{background:var(--rose)}.sm{padding:6px 12px;font-size:.85rem;border-radius:10px}
+.card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+.card h2{font-size:1.4rem;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+label{font-weight:700;font-size:.9rem;display:block}
+input,select{width:100%;padding:9px 10px;border:2px solid var(--line);border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;font-size:.92rem}th{background:#E4EFE9}
+.sc{overflow-x:auto}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tag{padding:2px 10px;border-radius:99px;font-weight:800;font-size:.8rem;color:#fff;background:var(--teal)}.tag.Libur{background:var(--rose)}.tag.Ujian{background:var(--amber);color:var(--ink)}
+.item{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.sig{max-height:60px;border:1px dashed var(--line);margin-top:6px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:99px;display:none;z-index:9}
+dialog{border:0;border-radius:18px;padding:22px;width:min(460px,92vw)}dialog::backdrop{background:#16324f99}
+#pa{display:none}
+@media(max-width:640px){.hero{grid-template-columns:1fr}.hero h1{font-size:1.8rem}}
+@media print{@page{margin:14mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body>*:not(#pa){display:none!important}body{background:#fff}#pa{display:block;color:var(--ink);font:11pt/1.4 Nunito,sans-serif;text-align:left}
+#pa table{width:100%}#pa th,#pa td{border:1px solid #9DB5AA;font-size:10pt;padding:4px 7px;text-align:left}
+#pa .bn{background:linear-gradient(90deg,var(--teal),var(--ink));color:#fff;border-radius:10px;padding:10px 16px;margin-bottom:10px}#pa .bn h2{font-size:20pt}#pa .bn p{margin:0;font-weight:800}
+#pa h3{font-size:13pt;border-left:6px solid var(--amber);padding-left:8px;margin:14px 0 6px;color:var(--teal)}
+.t1 th{background:var(--teal);color:#fff}.t2 th{background:var(--amber);color:var(--ink)}.t3 th{background:var(--ink);color:#fff}
+.t1 tr:nth-child(even) td,.t2 tr:nth-child(even) td,.t3 tr:nth-child(even) td{background:#EEF6F2}.t3 tr.e td{background:#FFF1D6}.t3 tr.x td{background:#FDE3E7}
+.t3 th:nth-child(-n+2),.t3 td:nth-child(-n+2){white-space:nowrap;width:1%}.pg+.pg{page-break-before:always}.ttd{display:flex;justify-content:space-between;margin-top:22px;page-break-inside:avoid}.ttd div{width:auto;max-width:48%;text-align:left}.ttd img{max-height:70px;display:block;margin:4px 0}}
+
+textarea{width:100%;padding:9px 10px;border:2px solid var(--line);border-radius:10px;font:inherit;color:var(--ink)}
+input[type=checkbox],input[type=radio]{width:auto}
+.rpp{background:#fff;color:#000}.rpp .mt{text-align:center;font-weight:800;font-size:1.2rem;margin:10px 0 16px}
+.rpp table{border:1px solid #000;margin-bottom:14px}.rpp th,.rpp td{border:1px solid #000;padding:6px 8px;font-size:10.5pt}.rpp th{background:#e5e7eb}
+.rpp .sh{background:#dbeafe;font-weight:800;text-transform:uppercase}.rpp .lb{width:28%;font-weight:700}.rpp .ai{white-space:pre-wrap;display:block}
+.rpp .ed{outline:none;display:inline-block;min-width:20px}.rpp .ed:hover{background:#fef9c3}
+.rpp .sb{display:flex;justify-content:space-around;margin-top:30px;page-break-inside:avoid}.rpp .sb>div{text-align:center;min-width:40%}.rpp .sg{height:70px;display:flex;align-items:center;justify-content:center}.rpp .sg img{max-height:70px}
+.kid{max-width:760px;margin:auto}.kid .kh{background:linear-gradient(135deg,#F4A62A,#D1495B 60%,#12806F);color:#fff;border-radius:22px;padding:22px;text-align:center;margin-bottom:14px}
+.kid .kh h2{font-size:1.9rem}.kc1{background:#fff;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 0 var(--line)}.kc1 h3{font-size:1.4rem;margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:12px}.op{cursor:pointer;position:relative}.op input{position:absolute;opacity:0}
+.op div{border:3px solid var(--line);border-radius:16px;padding:10px 4px;text-align:center;background:#fff;transition:.15s}.op span{font-size:2rem;display:block}.op small{font-weight:800}
+.op:hover div{transform:translateY(-3px)}.op:has(input:checked) div{border-color:var(--teal);background:#E4F5EF;transform:scale(1.05)}.op:has(input:focus-visible) div{outline:3px solid var(--amber)}
+.kid .big{width:100%;text-align:center}
+.pbk+.pbk{break-before:page}.nk h2{background:#f4b084;text-align:center;border:1px solid #666;padding:4px;font-size:15pt;color:#000}.nk p{text-align:center;margin:4px 0 10px}
+.nt th{background:#f4b084}.n0{background:#b4c6e7}.n1{background:#f8cbad}.n2{background:#ffe699}.n3{background:#c6e0b4}
+@media print{#pa .rpp{color:#000}#pa .rpp th,#pa .rpp td{border:1px solid #000}#pa .rpp th{background:#e5e7eb}#pa .rpp .sh{background:#dbeafe}#pa .rpp table{margin-bottom:12px}
+#pa .nt th,#pa .nt td{border:1px solid #666;text-align:center;padding:3px;font-size:9pt}#pa .nt th{background:#f4b084;color:#000}#pa .nt .n0{background:#b4c6e7}#pa .nt .n1{background:#f8cbad}#pa .nt .n2{background:#ffe699}#pa .nt .n3{background:#c6e0b4}
+#pa .nk h2{background:#f4b084;color:#000;font-size:15pt;text-align:center;border:1px solid #666}.np{display:none}}
+
+#lb{position:fixed;top:0;left:0;right:0;z-index:60;display:none}#lb.on{display:block}
+#lb i{display:block;height:6px;background:linear-gradient(90deg,#12806F,#F4A62A,#D1495B,#5B6CE0,#12806F);background-size:200% 100%;animation:ld 1s linear infinite}
+#lb span{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:6px 18px;border-radius:99px;font-weight:800;font-size:.85rem;box-shadow:0 6px 18px #16324f55;white-space:nowrap}
+@keyframes ld{to{background-position:-200% 0}}
+.ldc{text-align:center;padding:40px 10px;font-weight:800;color:var(--ink)}.ldb{height:10px;max-width:360px;margin:0 auto 12px;background:#e4efe9;border-radius:9px;overflow:hidden}
+.ldb i{display:block;width:40%;height:100%;border-radius:9px;background:linear-gradient(90deg,#12806F,#F4A62A,#D1495B);animation:ldm 1.1s ease-in-out infinite}@keyframes ldm{0%{margin-left:-40%}100%{margin-left:100%}}
+.vh{background:linear-gradient(120deg,#0f1b2d,#16324F 55%,#2B4FA3);color:#fff;border-radius:22px;padding:24px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:16px;position:relative;overflow:hidden}
+.vh:after{content:'';position:absolute;right:-50px;top:-50px;width:210px;height:210px;border-radius:50%;background:#ffffff12;pointer-events:none}.vh>*{position:relative;z-index:1}
+.av{width:78px;height:78px;border-radius:20px;background:#ffffff22;border:2px solid #ffffff44;display:grid;place-items:center;font:800 1.9rem 'Baloo 2'}
+.vh h1{font-size:1.7rem}.vh p{margin:2px 0;opacity:.85}.chip{font:800 .8rem Nunito;background:#fff;color:#2B4FA3;border-radius:99px;padding:2px 12px;vertical-align:middle}
+.kps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px}.kp{background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 0 var(--line),0 8px 20px #16324f0d}
+.kt{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:.78rem;color:#5b6b7a}.kt i{font-style:normal;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem}
+.kv{margin:10px 0 8px;color:#5b6b7a}.kv b{font:800 2.1rem 'Baloo 2';color:var(--ink)}.pb2{height:7px;background:#eef2ef;border-radius:9px;overflow:hidden}.pb2 u{display:block;height:100%;border-radius:9px}
+.vr{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:#fff;border-radius:18px;padding:12px 16px;margin-bottom:10px;border-left:8px solid var(--c);box-shadow:0 2px 0 var(--line)}
+.dt{width:60px;height:60px;border-radius:16px;background:var(--c);color:#fff;display:grid;place-content:center;text-align:center;line-height:1.05}.dt b{font:800 1.5rem 'Baloo 2'}.dt small{font-weight:800;text-transform:uppercase;font-size:.7rem}
+.vm{flex:1;min-width:220px}.vm p{margin:3px 0}.va{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:2px solid var(--c);background:#fff;color:var(--c);padding:6px 12px;font-size:.82rem;border-radius:99px;box-shadow:none}.pill[data-d="1"]{background:var(--c);color:#fff}.pill:hover{transform:translateY(-2px);background:var(--c);color:#fff}
+
+.tap{margin-top:8px!important}.tap b{background:#fff;color:#2B4FA3;border-radius:99px;padding:2px 12px;font-weight:800}
+.vh .clock{margin-left:auto;background:linear-gradient(135deg,#F4A62A,#FF7A59);box-shadow:0 8px 20px #0004}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:18px}
+.ab{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:20px;padding:18px;text-align:left;box-shadow:0 10px 22px color-mix(in srgb,var(--g1) 35%,transparent);display:flex;flex-direction:column;gap:2px;font-size:1.05rem}
+.ab span{font-size:2rem;line-height:1.2}.ab small{font-weight:600;opacity:.9}.ab:hover{transform:translateY(-3px)}
+.sec{font-size:1.4rem;margin:6px 0 12px}
+</style>
+<style id="pgst"></style>
+</head>
+<body>
+<main>
+<section id="home">
+  <div class="vh"><div class="av">📚</div><div style="flex:1;min-width:220px"><h1>Program Semester</h1><p>Susun kalender efektif, materi, dan cetak program semester atau tahunan.</p><p class="tap" id="ta"></p></div>
+  <div class="clock"><span id="hari"></span><b id="jam"></b></div></div>
+  <div class="kps" id="wd"></div>
+  <div class="acts">
+    <button class="ab" style="--g1:#12806F;--g2:#22C1A1" onclick="baru()"><span>➕</span><b>Buat program baru</b><small>Isi identitas, hitung kalender otomatis</small></button>
+    <button class="ab" style="--g1:#E08A00;--g2:#F7C948" onclick="openCetak('sem')"><span>🖨️</span><b>Cetak program semester</b><small>Pilih kelas, mapel, tahun, semester</small></button>
+    <button class="ab" style="--g1:#4A5CD6;--g2:#8E7CF0" onclick="openCetak('thn')"><span>🗓️</span><b>Cetak program tahunan</b><small>Gabungan ganjil dan genap</small></button>
+    <button class="ab" style="--g1:#D1495B;--g2:#FF8A9B" onclick="openSet()"><span>⚙️</span><b>Pengaturan</b><small>Tahun ajaran, agenda, siswa, tanda tangan</small></button>
+  </div>
+  <h2 class="sec">🗂️ Program tersimpan</h2><div id="list"></div>
+</section>
+
+<section id="view" hidden></section>
+<section id="tool" hidden></section>
+<section id="edit" hidden>
+  <div class="row" style="margin-bottom:12px"><button class="ghost" onclick="home()">Kembali</button><h2 id="et"></h2></div>
+  <div class="card"><h2>1. Identitas</h2><div class="grid" id="idn"></div></div>
+  <div class="card"><h2>2. Kalender dan materi per pertemuan</h2><p>Kalender dihitung dari agenda sekolah yang diunggah di Pengaturan. Sabtu dan Minggu otomatis libur.</p><p>Kolom "Pert. ke" bisa diedit: ketik tanda - agar tanggal itu tidak dihitung sebagai pertemuan. Nomor berikutnya otomatis menyesuaikan.</p><div class="sc" id="cal"></div></div>
+  <div class="row"><button onclick="simpan()">Simpan program</button><button class="ghost" onclick="home()">Batal</button></div>
+</section>
+</main>
+
+<dialog id="dp"><h2 style="margin-bottom:12px">Print Semua</h2><div id="dpb" class="grid" style="grid-template-columns:1fr"></div>
+  <div class="row" style="margin-top:14px"><button onclick="doPA()">Cetak</button><button class="ghost" onclick="$('#dp').close()">Tutup</button></div></dialog>
+<dialog id="dc"><h2 id="dct" style="margin-bottom:12px"></h2><div id="dcb" class="grid" style="grid-template-columns:1fr"></div>
+  <div class="row" style="margin-top:14px"><button onclick="cetak()">Cetak</button><button class="ghost" onclick="$('#dc').close()">Tutup</button></div></dialog>
+<dialog id="dset" style="width:min(640px,94vw)"><h2 style="margin-bottom:12px">Pengaturan</h2><div id="dsb" class="grid"></div>
+  <div class="row" style="margin-top:14px"><button onclick="saveSet()">Simpan pengaturan</button><button class="ghost" onclick="$('#dset').close()">Tutup</button></div></dialog>
+<div id="lb"><i></i><span id="lbt"></span></div><div id="toast"></div><div id="pa"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const HR=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],BL=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const pad=n=>String(n).padStart(2,'0'),iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const tg=t=>{const d=new Date(t+'T00:00');return `${d.getDate()} ${BL[d.getMonth()]} ${d.getFullYear()}`};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600)};
+const API_URL='https://script.google.com/macros/s/AKfycbwz-1_lp1UmpcmfY17680140zWcNKjoA-sQy_Kle8B9FSg1rK30Rt6r1IvF_UMM2ji6Uw/exec'; // Isi URL Web App Apps Script (berakhiran /exec). Kosong = data disimpan di peramban saja.
+let progs=[],cur=null,mode='sem';
+const rng=(t,s)=>{const y=+t.split('/')[s=='Gasal'?0:1]||new Date().getFullYear();return s=='Gasal'?[`${y}-07-01`,`${y}-12-31`]:[`${y}-01-01`,`${y}-06-30`]};
+let S=JSON.parse(localStorage.S||'null');
+if(!S){const d=new Date(),y=d.getFullYear(),g=d.getMonth()>=6,t=g?`${y}/${y+1}`:`${y-1}/${y}`,sm=g?'Gasal':'Genap',r=rng(t,sm);S={tahun:t,semester:sm,mulai:r[0],selesai:r[1],agenda:[],ttdGuru:'',ttdKepsek:''}}
+let T=null;
+function sync(p){if(p.tahun==S.tahun&&S.agenda.length)p.agenda=S.agenda;if(S.ttdGuru)p.ttdGuru=S.ttdGuru;if(S.ttdKepsek)p.ttdKepsek=S.ttdKepsek;return p}
+
+/* penyimpanan: Apps Script bila URL diisi, jika tidak localStorage */
+const api=(a,d)=>wrap(a=='list'?'Memuat program...':'Menyimpan...',()=>api0(a,d));
+async function api0(a,d){
+  const u=API_URL;
+  if(!u){let l=JSON.parse(localStorage.progs||'[]');
+    if(a=='save'){const i=l.findIndex(x=>x.id==d.id);i<0?l.push(d):l[i]=d}
+    if(a=='del')l=l.filter(x=>x.id!=d.id);
+    localStorage.progs=JSON.stringify(l);return l}
+  const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({a,d})});
+  return (await r.json()).data}
+async function load(){$('#list').innerHTML=ld('Memuat program dari Google Sheet...');await loadSiswa();await loadAgenda();try{progs=await api('list')}catch(e){toast('Gagal memuat data dari Google Sheet.');progs=[]}draw()}
+
+/* perhitungan kalender */
+function calc(p){const out=[],ag={},ags=agFor(p.tahun);(ags.length?ags:p.agenda||[]).forEach(a=>(ag[a.tgl]=ag[a.tgl]||[]).push(a));
+  if(!p.mulai||!p.selesai)return out;
+  for(let d=new Date(p.mulai+'T00:00');d<=new Date(p.selesai+'T00:00');d.setDate(d.getDate()+1)){
+    if(d.getDay()!=p.hari)continue;
+    const t=iso(d),a=ag[t]||[],k=a.map(x=>x.ket||'').join(' ').toLowerCase();
+    out.push({t,s:/libur/.test(k)?'Libur':/ujian/.test(k)?'Ujian':'KBM',n:a.map(x=>x.nama).join('; ')})}
+  let n=0;out.forEach(r=>{if(r.s=='KBM'){if((p.materi?.[r.t]?.no||'')=='-'){r.no='-';r.ex=1}else r.no=++n}});return out}
+
+/* beranda */
+function draw(){
+  const L=progs.filter(p=>p.tahun==S.tahun),M={};
+  L.forEach(p=>{const k=M[p.kelas]=M[p.kelas]||{e:0,x:0},c=calc(p);k.e+=c.filter(r=>r.s=='KBM'&&!r.ex).length;k.x+=c.filter(r=>r.s!='KBM'||r.ex).length});
+  const KP=(ic,l,v,sub,p,c)=>`<div class="kp"><div class="kt"><span>${l}</span><i style="background:${c}22;color:${c}">${ic}</i></div><div class="kv"><b>${v}</b> ${sub}</div><div class="pb2"><u style="width:${p}%;background:${c}"></u></div></div>`;
+  $('#ta').innerHTML=`📅 Tahun ajaran aktif <b>${esc(S.tahun)}</b> &nbsp; Semester <b>${S.semester}</b>`;
+  $('#wd').innerHTML=KP('🗂️','PROGRAM TERSIMPAN',L.length,'program',100,'#5B6CE0')+Object.keys(M).sort().map((k,i)=>{const m=M[k],t=m.e+m.x;return KP('🎓','KELAS '+esc(k).toUpperCase(),m.e,`pertemuan efektif, ${m.x} hari tanpa KBM`,t?Math.round(m.e/t*100):0,PAL[(i+1)%5])}).join('');
+  $('#list').innerHTML=L.length?L.map((p,i)=>{const c=PAL[i%5];return `<div class="vr" style="--c:${c}"><div class="dt"><small>KELAS</small><b>${esc(p.kelas)}</b><small>${esc(p.semester)}</small></div>
+   <div class="vm"><b>${esc(p.mapel)}</b> <span class="tag" style="background:${c}">${esc(p.tahun)}</span><p>🏫 ${esc(p.sekolah)} &nbsp; 🗓️ Hari ${HR[p.hari]}</p></div>
+   <div class="va"><button class="pill" style="--c:#5B6CE0" data-d="1" onclick="view('${p.id}')">👁️ View</button><button class="pill" style="--c:#12806F" onclick="edit('${p.id}')">✏️ Edit</button><button class="pill" style="--c:#D1495B" onclick="hapus('${p.id}')">🗑️ Hapus</button></div></div>`}).join(''):`<div class="card"><p>Belum ada program untuk tahun ajaran ${esc(S.tahun)}. Klik "Buat program baru".</p></div>`}
+setInterval(()=>{const d=new Date();$('#hari').textContent=`${HR[d.getDay()]}, ${d.getDate()} ${BL[d.getMonth()]}`;$('#jam').textContent=d.toLocaleTimeString('id-ID')},1000);
+
+function home(){show('home');draw()}
+async function hapus(id){if(confirm('Hapus program ini?')){progs=await api('del',{id});draw();toast('Program dihapus')}}
+function baru(){const l=progs[progs.length-1]||{};
+  cur=sync({id:'p'+Date.now(),sekolah:l.sekolah||'',mapel:l.mapel||'',kelas:l.kelas||'',semester:S.semester,tahun:S.tahun,hari:2,guru:l.guru||'',nipGuru:l.nipGuru||'',kepsek:l.kepsek||'',nipKepsek:l.nipKepsek||'',
+    tanggal:iso(new Date()),mulai:S.mulai,selesai:S.selesai,agenda:[],materi:{},ttdGuru:'',ttdKepsek:''});open_('Program baru')}
+function edit(id){cur=sync(JSON.parse(JSON.stringify(progs.find(p=>p.id==id))));open_('Edit program')}
+function open_(t){$('#et').textContent=t;$('#home').hidden=true;$('#edit').hidden=false;form();dCal();scrollTo(0,0)}
+
+/* 1. identitas */
+const F=[['sekolah','Nama satuan pendidikan'],['mapel','Mata pelajaran'],['kelas','Kelas'],['semester','Semester',['Gasal','Genap']],['tahun','Tahun pelajaran (contoh 2026/2027)'],['hari','Hari pembelajaran',[1,2,3,4,5]],
+  ['guru','Guru mata pelajaran'],['nipGuru','NIP guru'],['kepsek','Kepala sekolah'],['nipKepsek','NIP kepala sekolah'],['tanggal','Tanggal pembuatan','date'],['mulai','Awal semester','date'],['selesai','Akhir semester','date']];
+function form(){$('#idn').innerHTML=F.map(([k,l,o])=>`<div><label>${l}</label>`+(Array.isArray(o)?`<select data-k="${k}">${o.map(v=>`<option value="${v}" ${v==cur[k]?'selected':''}>${k=='hari'?HR[v]:v}</option>`).join('')}</select>`:`<input data-k="${k}" type="${o||'text'}" value="${esc(cur[k])}">`)+'</div>').join('');
+  document.querySelectorAll('#idn [data-k]').forEach(e=>e.onchange=()=>{const k=e.dataset.k;cur[k]=k=='hari'?+e.value:e.value;
+    if(k=='semester'||k=='tahun'){const r=rng(cur.tahun,cur.semester);cur.mulai=r[0];cur.selesai=r[1];sync(cur);form()}
+    dCal()})}
+
+const KET=['Libur nasional','Kegiatan sekolah (tetap KBM)','Ujian sekolah'];
+function pd(v){if(v instanceof Date)return iso(new Date(v.getTime()+12*36e5));v=String(v||'').trim();let m;
+  if(m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  if(m=v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/))return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  if(m=v.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/)){const i=BL.findIndex(b=>b.toLowerCase().startsWith(m[2].toLowerCase().slice(0,3)));if(i>=0)return `${m[3]}-${pad(i+1)}-${pad(m[1])}`}return ''}
+function tmpl(){const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['Tanggal','Nama Kegiatan','Keterangan'],['2026-08-17','Hari Kemerdekaan RI',KET[0]],['2026-08-18','Lomba Kemerdekaan',KET[1]],['2026-09-15','Ujian Tengah Semester',KET[2]]]),'Agenda');XLSX.writeFile(w,'contoh-agenda-sekolah.xlsx')}
+function importXl(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{
+  const w=XLSX.read(ev.target.result,{type:'array',cellDates:true}),rows=XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1,raw:true}),out=[];
+  rows.forEach(r=>{const t=pd(r[0]);if(t&&r[1])out.push({tgl:t,nama:String(r[1]),ket:String(r[2]||'')})});
+  T.agenda=out;T.agDirty=1;dSet();toast(out.length+' agenda dimuat')};r.readAsArrayBuffer(f);e.target.value=''}
+function openSet(){T=JSON.parse(JSON.stringify(S));
+  $('#dsb').innerHTML=`<div><label>Tahun ajaran aktif</label><input id="sT" value="${esc(T.tahun)}" placeholder="2026/2027"></div>
+  <div><label>Semester aktif</label><select id="sS"><option>Gasal</option><option>Genap</option></select></div>
+  <div><label>Awal semester</label><input id="sM" type="date" value="${T.mulai}"></div><div><label>Akhir semester</label><input id="sE" type="date" value="${T.selesai}"></div>
+  <div style="grid-column:1/-1"><label>Agenda sekolah (Excel: Tanggal, Nama Kegiatan, Keterangan)</label><div class="row"><input type="file" id="xl" accept=".xlsx,.xls,.csv" style="max-width:300px"><button class="ghost sm" onclick="tmpl()">Unduh contoh Excel</button></div><div id="sag"></div></div>
+  <div style="grid-column:1/-1"><label>Data siswa (Excel: NIS, Nama Siswa, Kelas, Tahun Ajaran)</label><div class="row"><input type="file" id="xs" accept=".xlsx,.xls,.csv" style="max-width:300px"><button class="ghost sm" onclick="tmplS()">Unduh contoh Excel</button></div><div id="ssw"></div></div>
+  <div><label>Tanda tangan kepala sekolah</label><input type="file" accept="image/*" onchange="img(this.files[0],'ttdKepsek')"><div id="sk"></div></div>
+  <div><label>Tanda tangan guru</label><input type="file" accept="image/*" onchange="img(this.files[0],'ttdGuru')"><div id="sg"></div></div>`;
+  $('#sS').value=T.semester;
+  $('#sT').onchange=$('#sS').onchange=()=>{T.tahun=$('#sT').value.trim();T.semester=$('#sS').value;const r=rng(T.tahun,T.semester);T.mulai=r[0];T.selesai=r[1];$('#sM').value=r[0];$('#sE').value=r[1];if(!T.agDirty)T.agenda=agFor(T.tahun);dSet()};
+  $('#sM').onchange=e=>T.mulai=e.target.value;$('#sE').onchange=e=>T.selesai=e.target.value;$('#xl').onchange=importXl;$('#xs').onchange=importSw;dSet();$('#dset').showModal()}
+function tmplS(){const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['NIS','Nama Siswa','Kelas','Tahun Ajaran'],['1001','Contoh Siswa Satu','4A',S.tahun],['1002','Contoh Siswa Dua','4A',S.tahun]]),'Siswa');XLSX.writeFile(w,'contoh-data-siswa.xlsx')}
+function importSw(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const w=XLSX.read(ev.target.result,{type:'array'}),out=[];
+  XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1,raw:false}).forEach(r=>{if(r[1]&&r[2]&&String(r[0]).trim().toLowerCase()!='nis')out.push({nis:String(r[0]??'').trim(),nama:String(r[1]).trim(),kelas:String(r[2]).trim(),tahun:String(r[3]||T.tahun).trim()})});
+  T.swNew=out;dSet();toast(out.length+' siswa dimuat')};r.readAsArrayBuffer(f);e.target.value=''}
+async function swSave(rows){if(API_URL)SW=await xcall({a:'sset',rows});else{const ty=new Set(rows.map(r=>norm(r.tahun)));SW=[...SW.filter(s=>!ty.has(norm(s.tahun))),...rows];localStorage.siswa=JSON.stringify(SW)}}
+const agFor=t=>AG.filter(a=>norm(a.tahun)==norm(t)).map(a=>({tgl:a.tgl,nama:a.nama,ket:a.ket}));
+async function loadAgenda(){await wrap('Memuat agenda sekolah...',async()=>{try{AG=API_URL?await xcall({a:'aget'}):JSON.parse(localStorage.agendaDb||'[]')}catch(e){AG=[]}});const a=agFor(S.tahun);if(a.length){S.agenda=a;localStorage.S=JSON.stringify(S)}}
+async function agSave(tahun,rows){const nr=rows.map(r=>({tahun,tgl:r.tgl,nama:r.nama,ket:r.ket}));if(API_URL)AG=await xcall({a:'aset',tahun,rows:nr});else{AG=[...AG.filter(a=>norm(a.tahun)!=norm(tahun)),...nr];localStorage.agendaDb=JSON.stringify(AG)}}
+async function loadSiswa(){await wrap('Memuat data siswa...',async()=>{try{SW=API_URL?await xcall({a:'sget'}):JSON.parse(localStorage.siswa||'[]')}catch(e){SW=[]}})}
+function dSet(){$('#ssw').innerHTML=T.swNew?`<p>${T.swNew.length} siswa siap disimpan. Klik Simpan pengaturan.</p>`:`<p>${SW.length} siswa tersimpan, ${SW.filter(s=>norm(s.tahun)==norm(T.tahun)).length} untuk tahun ajaran ${esc(T.tahun)}.</p>`;$('#sag').innerHTML=T.agenda.length?`<p>${T.agenda.length} agenda dimuat. Tersimpan di Google Sheet. Unggah ulang untuk mengganti.</p><div class="sc" style="max-height:150px;overflow:auto"><table>${T.agenda.map(a=>`<tr><td style="white-space:nowrap">${tg(a.tgl)}</td><td>${esc(a.nama)}</td><td>${esc(a.ket)}</td></tr>`).join('')}</table></div>`:'<p>Belum ada agenda.</p>';
+  $('#sg').innerHTML=T.ttdGuru?`<img class="sig" src="${T.ttdGuru}">`:'';$('#sk').innerHTML=T.ttdKepsek?`<img class="sig" src="${T.ttdKepsek}">`:''}
+const saveSet=()=>wrap('Menyimpan pengaturan...',saveSet0);
+async function saveSet0(){if(!/^\d{4}\/\d{4}$/.test(T.tahun))return toast('Format tahun ajaran: 2026/2027');
+  const sn=T.swNew,ad=T.agDirty;delete T.swNew;delete T.agDirty;S=T;localStorage.S=JSON.stringify(S);$('#dset').close();if(sn&&sn.length)try{await swSave(sn)}catch(e){toast('Data siswa gagal disimpan: '+e.message)}
+  if(ad||(S.agenda.length&&!agFor(S.tahun).length))try{await agSave(S.tahun,S.agenda)}catch(e){toast('Agenda gagal disimpan: '+e.message)}
+  try{for(const p of progs){const b=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]);sync(p);if(b!=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]))progs=await api('save',p)}}catch(e){toast('Pengaturan tersimpan, tetapi sebagian program gagal diperbarui.');draw();return}
+  draw();toast('Pengaturan tersimpan')}
+function warn(){return cur.agenda?.length?'':'<p style="color:var(--rose);font-weight:800">Agenda sekolah untuk tahun ajaran ini belum diunggah di Pengaturan.</p>'}
+
+/* 3. kalender dan materi */
+function dCal(){const c=calc(cur);cur.materi=cur.materi||{};
+  $('#cal').innerHTML=warn()+(c.length?`<table><tr><th>Tanggal</th><th>Status</th><th>Pert. ke</th><th>Bab</th><th>Materi pokok / keterangan</th></tr>${c.map(r=>{const m=cur.materi[r.t]||{};return `<tr><td>${tg(r.t)}</td><td><span class="tag ${r.s}">${r.s=='KBM'?'Efektif':r.s}</span></td>`+
+   (r.s=='KBM'?`<td><input style="width:64px" value="${r.no}" title="Ketik - agar tidak dihitung" onchange="mt('${r.t}','no',this.value.trim()=='-'?'-':'');dCal()"></td><td><input value="${esc(m.bab)}" onchange="mt('${r.t}','bab',this.value)" placeholder="Bab 1"></td><td><input value="${esc(m.materi)}" onchange="mt('${r.t}','materi',this.value)">${r.n?'<small>'+esc(r.n)+'</small>':''}</td>`:`<td>-</td><td>-</td><td>${esc(r.n)||r.s}</td>`)+'</tr>'}).join('')}</table>`:'<p>Atur hari pembelajaran dan rentang semester untuk melihat kalender.</p>')}
+function mt(t,k,v){(cur.materi[t]=cur.materi[t]||{})[k]=v}
+
+/* tanda tangan */
+function img(f,k){if(!f)return;const i=new Image();i.onload=()=>{const s=Math.min(1,260/i.width),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);T[k]=c.toDataURL('image/jpeg',.7);dSet()};i.src=URL.createObjectURL(f)}
+
+async function simpan(){if(!cur.sekolah||!cur.mapel||!cur.kelas)return toast('Isi sekolah, mata pelajaran, dan kelas.');
+  sync(cur);try{progs=await api('save',cur);toast('Program tersimpan');home()}catch(e){toast('Gagal menyimpan. Periksa koneksi internet.')}}
+
+/* cetak */
+const uniq=k=>[...new Set(progs.map(p=>p[k]))];
+function openCetak(m){if(!progs.length)return toast('Belum ada program tersimpan.');mode=m;$('#dct').textContent=m=='sem'?'Cetak program semester':'Cetak program tahunan';
+  const S=(id,l,a)=>`<div><label>${l}</label><select id="${id}">${a.map(v=>`<option>${esc(v)}</option>`).join('')}</select></div>`;
+  $('#dcb').innerHTML=S('ck','Kelas',uniq('kelas'))+S('cm','Mata pelajaran',uniq('mapel'))+S('ct','Tahun pelajaran',uniq('tahun'))+(m=='sem'?S('cs','Program',['Gasal','Genap']):'');if(uniq('tahun').includes(S.tahun))$('#ct').value=S.tahun;$('#dc').showModal()}
+function cetak(){const f=s=>progs.find(p=>p.kelas==$('#ck').value&&p.mapel==$('#cm').value&&p.tahun==$('#ct').value&&p.semester==s);
+  const ss=mode=='sem'?[f($('#cs').value)]:[f('Gasal'),f('Genap')],a=ss.filter(Boolean);
+  if(!a.length)return toast('Program untuk pilihan ini belum dibuat.');
+  const p=a[0],nip=n=>n?`<br>NIP. ${esc(n)}`:'',gs=a.find(x=>x.ttdGuru),ks=a.find(x=>x.ttdKepsek),sp='<br><br><br><br>',
+  ttd=`<div class="ttd"><div>Mengetahui,<br>Kepala Sekolah${ks?`<img src="${ks.ttdKepsek}">`:sp}<b><u>${esc(p.kepsek)}</u></b>${nip(p.nipKepsek)}</div>
+   <div>Dibuat pada ${tg(p.tanggal)}<br>Guru Mata Pelajaran${gs?`<img src="${gs.ttdGuru}">`:sp}<b><u>${esc(p.guru)}</u></b>${nip(p.nipGuru)}</div></div>`;
+  const idn=`<table style="border:0;width:auto">${[['Satuan Pendidikan',p.sekolah],['Mata Pelajaran',p.mapel],['Kelas',p.kelas+(mode=='sem'?' / '+p.semester:'')],['Tahun Pelajaran',p.tahun]].map(r=>`<tr><td style="border:0">${r[0]}</td><td style="border:0">: ${esc(r[1])}</td></tr>`).join('')}</table>`;
+  $('#pa').innerHTML=`<div class="bn"><h2>${mode=='sem'?'PROGRAM SEMESTER '+p.semester.toUpperCase():'PROGRAM TAHUNAN'}</h2><p>TAHUN PELAJARAN ${esc(p.tahun)}</p></div>${idn}`+a.map(x=>semHTML(x,mode=='sem')).join('')+ttd;
+  $('#pgst').textContent='';$('#dc').close();setTimeout(()=>print(),200)}
+function semHTML(p,detail){const c=calc(p),mo={},bab={};
+  c.forEach(r=>{const k=r.t.slice(0,7),m=mo[k]=mo[k]||{h:0,e:0,x:[]},ok=r.s=='KBM'&&!r.ex;m.h++;ok?m.e++:m.x.push(`${tg(r.t)}: ${r.n||(r.ex?'Tidak ada pertemuan':r.s)}`);
+    if(ok){const b=(p.materi?.[r.t]?.bab||'').trim();if(b&&b!='-')bab[b]=(bab[b]||0)+1}});
+  const E=c.filter(r=>r.s=='KBM'&&!r.ex).length;
+  let h=`<h3>Semester ${p.semester}: Kalender dan Minggu Efektif</h3><table class="t1"><tr><th>Bulan</th><th>Hari ${HR[p.hari]}</th><th>Pertemuan efektif</th><th>Kegiatan tanpa KBM</th></tr>`+
+   Object.entries(mo).map(([k,m])=>`<tr><td>${BL[+k.slice(5)-1]} ${k.slice(0,4)}</td><td>${m.h}</td><td>${m.e}</td><td>${m.x.map(esc).join('<br>')||'-'}</td></tr>`).join('')+`<tr><th>Jumlah</th><th>${c.length}</th><th>${E}</th><th></th></tr></table>`;
+  if(Object.keys(bab).length)h+=`<h3>Rincian Bab</h3><table class="t2"><tr><th>Bab</th><th>Jumlah pertemuan</th></tr>${Object.entries(bab).map(([b,n])=>`<tr><td>${esc(b)}</td><td>${n}</td></tr>`).join('')}</table>`;
+  if(detail)h+=`<h3>Program Semester</h3><table class="t3"><tr><th>Tanggal</th><th>Pert.</th><th>Bab</th><th>Materi pokok / keterangan</th></tr>${c.map(r=>{const m=p.materi?.[r.t]||{};
+    return r.s!='KBM'?`<tr class="x"><td>${tg(r.t)}</td><td>-</td><td>-</td><td>${esc(r.n)||r.s}</td></tr>`
+     :`<tr${r.ex?' class="e"':''}><td>${tg(r.t)}</td><td>${r.no}</td><td>${esc(m.bab)||'-'}</td><td>${esc(m.materi)||esc(r.n)}</td></tr>`}).join('')}</table>`;
+  return `<div class="pg">${h}</div>`}
+
+
+/* ===== VIEW: RPP, PENILAIAN, JURNAL, REFLEKSI, PRINT SEMUA ===== */
+const RPP_AI_URL='https://script.google.com/macros/s/AKfycbzNNR8ao5lJ_ze_vVemKNtDogBFFciXmtFxjVjnbf3tzebWc6TVwiteClqa00wWwDqtnw/exec'; // pembuat modul ajar AI
+let X={RPP:{},Formatif:{},Sumatif:{},Jurnal:{},Refleksi:{}},VP=null,BABS=[],SW=[],G={},bz=0,vq='',vb='',AG=[];
+const norm=t=>String(t).replace(/\D/g,''),PAL=['#12806F','#D98200','#D1495B','#5B6CE0','#8E5BD1'];
+const ld=m=>`<div class="ldc"><div class="ldb"><i></i></div>${m}</div>`;
+async function wrap(m,f){bz++;$('#lbt').textContent=m||'Memproses...';$('#lb').classList.add('on');try{return await f()}finally{if(!--bz)$('#lb').classList.remove('on')}}
+const K=(...a)=>VP.id+'|'+a.join('|');
+const show=n=>{['home','edit','view','tool'].forEach(x=>$('#'+x).hidden=x!=n);scrollTo(0,0)};
+const lsx=t=>JSON.parse(localStorage['x_'+t]||'{}');
+async function xcall(o){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(o)}),j=await r.json();if(j.error)throw new Error(j.error);return j.data}
+async function xload(){await Promise.all(Object.keys(X).map(async t=>{X[t]={};try{if(API_URL)(await xcall({a:'xget',t,pid:VP.id})).forEach(r=>X[t][r.key]=r.data);else{const l=lsx(t);for(const k in l)if(k.startsWith(VP.id+'|'))X[t][k]=l[k]}}catch(e){toast('Gagal memuat data '+t)}}))}
+const xput=(t,k,d)=>wrap('Menyimpan data...',()=>xput0(t,k,d));
+async function xput0(t,key,data){try{if(API_URL)await xcall({a:'xput',t,key,pid:VP.id,data});else{const l=lsx(t);l[key]=data;localStorage['x_'+t]=JSON.stringify(l)}X[t][key]=data;return 1}catch(e){toast('Gagal menyimpan: '+e.message);return 0}}
+const xdel=(t,k)=>wrap('Menghapus data...',()=>xdel0(t,k));
+async function xdel0(t,key){try{if(API_URL)await xcall({a:'xdel',t,key,pid:VP.id});else{const l=lsx(t);delete l[key];localStorage['x_'+t]=JSON.stringify(l)}delete X[t][key]}catch(e){toast('Gagal menghapus')}}
+const rows=()=>calc(VP).filter(r=>r.s=='KBM'&&!r.ex).map(r=>({...(VP.materi?.[r.t]||{}),...r}));
+
+async function view(id){VP=progs.find(p=>p.id==id);show('view');$('#view').innerHTML=ld('Memuat data pertemuan...');await wrap('Memuat data pertemuan...',xload);dView()}
+function dView(){const R=rows();BABS=[...new Set(R.map(r=>(r.bab||'').trim()).filter(Boolean))];
+  const n=R.length,cnt=k=>R.filter(r=>X[k][K(r.t)]).length,jr=R.map(r=>X.Jurnal[K(r.t)]).filter(Boolean),th=jr.reduce((a,j)=>a+j.hadir,0),ta=jr.reduce((a,j)=>a+j.hadir+j.sakit+j.izin+j.alpa,0),kh=ta?Math.round(th/ta*100):0,pc=v=>n?Math.round(v/n*100):0,
+  ini=(VP.guru||'G').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(),
+  KP=(ic,l,v,sub,p,c)=>`<div class="kp"><div class="kt"><span>${l}</span><i style="background:${c}22;color:${c}">${ic}</i></div><div class="kv"><b>${v}</b> ${sub}</div><div class="pb2"><u style="width:${p}%;background:${c}"></u></div></div>`,
+  sm=b=>X.Sumatif[K(b)],P=(d,t,f,c)=>`<button class="pill" style="--c:${c}" data-d="${d?1:0}" onclick="${f}">${t}${d?' ✓':''}</button>`;
+  $('#view').innerHTML=`<div class="row" style="margin-bottom:12px"><button class="ghost" onclick="home()">← Kembali</button></div>
+  <div class="vh"><div class="av">${esc(ini)}</div><div style="flex:1;min-width:220px"><h1>${esc(VP.guru||'Guru')} <span class="chip">${esc(VP.mapel)}</span></h1><p>NIP. ${esc(VP.nipGuru||'-')}</p><p>🏫 ${esc(VP.sekolah)} &nbsp; 📅 ${esc(VP.tahun)}-${VP.semester} &nbsp; 🎓 Kelas ${esc(VP.kelas)}</p></div><button class="amb" onclick="openPA()">🖨️ Print Semua</button></div>
+  <div class="kps">${KP('📅','PERTEMUAN',n,'Pertemuan efektif',100,'#5B6CE0')}${KP('📘','RPP TERSUSUN',cnt('RPP'),'dari '+n,pc(cnt('RPP')),'#12806F')}${KP('📝','PENILAIAN FORMATIF',cnt('Formatif'),'dari '+n,pc(cnt('Formatif')),'#D98200')}${KP('📒','JURNAL, HADIR '+kh+'%',cnt('Jurnal'),'dari '+n,pc(cnt('Jurnal')),'#D1495B')}</div>
+  <div class="card"><h2>🏆 Penilaian Sumatif</h2><div class="va">${BABS.map((b,i)=>P(sm(b),(sm(b)?'Lihat / Edit':'Isi')+' Sumatif: '+esc(b),`openNilai('S',${i})`,'#8E5BD1')).join('')}${['STS','SAS'].map(b=>P(sm(b),(sm(b)?'Lihat / Edit':'Isi')+' Nilai '+b,`openNilai('S','${b}')`,'#5B6CE0')).join('')}</div></div>
+  <div class="card"><div class="row"><input id="vq" placeholder="🔍 Cari materi atau bab..." value="${esc(vq)}" oninput="vq=this.value;vList()" style="flex:1;min-width:200px"><select id="vb" onchange="vb=this.value;vList()" style="max-width:280px"><option value="">Semua bab</option>${BABS.map(b=>`<option value="${esc(b)}" ${b==vb?'selected':''}>${esc(b)}</option>`).join('')}</select></div></div><div id="vl"></div>`;vList()}
+function vList(){const q=vq.toLowerCase(),P=(d,t,f,c)=>`<button class="pill" style="--c:${c}" data-d="${d?1:0}" onclick="${f}">${t}${d?' ✓':''}</button>`;
+  const L=rows().filter(r=>(!vb||(r.bab||'').trim()==vb)&&(!q||((r.materi||'')+' '+(r.bab||'')).toLowerCase().includes(q)));
+  $('#vl').innerHTML=L.map(r=>{const t=r.t,d=new Date(t+'T00:00'),c=PAL[Math.max(0,BABS.indexOf((r.bab||'').trim()))%5],h=k=>X[k][K(t)],nr=Object.keys(X.Refleksi).filter(k=>k.startsWith(K(t,''))).length;
+    return `<div class="vr" style="--c:${c}"><div class="dt"><small>${HR[d.getDay()].slice(0,3)}</small><b>${d.getDate()}</b><small>${BL[d.getMonth()].slice(0,3)}</small></div><div class="vm"><b>Pertemuan ${r.no}</b> <span class="tag" style="background:${c}">${esc(r.bab||'-')}</span><p>${esc(r.materi||'')}</p></div><div class="va">`+
+    P(h('RPP'),h('RPP')?'📘 Lihat / Edit RPP':'📘 Buat RPP',`openRpp('${t}')`,'#12806F')+P(h('Formatif'),h('Formatif')?'📝 Lihat / Edit Penilaian Formatif':'📝 Isi Penilaian Formatif',`openNilai('F','${t}')`,'#D98200')+
+    P(h('Jurnal'),h('Jurnal')?'📒 Lihat / Edit Jurnal':'📒 Isi Jurnal',`openJurnal('${t}')`,'#5B6CE0')+P(0,'🌈 Isi Refleksi KBM',`openRef('${t}','isi')`,'#D1495B')+(nr?P(1,`🌈 Lihat & Print Refleksi (${nr})`,`openRef('${t}','hasil')`,'#D1495B'):'')+'</div></div>'}).join('')||'<p>Tidak ada pertemuan yang cocok.</p>'}
+function tool(t,h){show('tool');$('#tool').innerHTML=`<div class="row" style="margin-bottom:12px"><button class="ghost" onclick="back()">Kembali</button><h2>${t}</h2></div>`+h}
+const back=()=>{show('view');dView()};
+function printHTML(h,pp='A4',or='portrait'){$('#pgst').textContent=`@page{size:${pp=='F4'?'215mm 330mm':'210mm 297mm'} ${or};margin:12mm}`;$('#pa').innerHTML=h;setTimeout(()=>print(),200)}
+
+/* siswa */
+async function allSiswa(){const a=SW.filter(x=>norm(x.tahun)==norm(VP.tahun));return a.length?a:SW}
+const guessK=(ks,old)=>old||localStorage['ks_'+VP.id]||ks.find(k=>k.toLowerCase().includes(String(VP.kelas).toLowerCase()))||ks[0]||'';
+const kOpts=(ks,s)=>ks.map(k=>`<option ${k==s?'selected':''}>${esc(k)}</option>`).join('');
+
+/* penilaian formatif (F) dan sumatif (S) */
+async function openNilai(kind,ref){const F=kind=='F',nb=F?ref:(ref=='STS'||ref=='SAS'?ref:BABS[ref]),key=K(nb),t=F?'Formatif':'Sumatif',old=X[t][key]||{};
+  const ttl=F?'Penilaian Formatif: '+tg(ref):'Penilaian Sumatif: '+esc(nb);tool(ttl,'<p>Memuat siswa...</p>');
+  const sw=await allSiswa(),ks=[...new Set(sw.map(s=>s.kelas))].sort();G={t,key,sw,nilai:{...(old.nilai||{})},names:[],kel:guessK(ks,old.kelas)};
+  tool(ttl,`<div class="card"><label>Kelas siswa</label><select id="gk" onchange="G.kel=this.value;gTable()">${kOpts(ks,G.kel)}</select><div id="gb" class="sc"></div><div class="row" style="margin-top:12px"><button onclick="saveNilai()">Simpan</button></div></div>`);gTable()}
+function gRead(){document.querySelectorAll('.gi').forEach(e=>{const n=G.names[+e.dataset.n];if(e.value==='')delete G.nilai[n];else G.nilai[n]=Math.min(100,+e.value.replace(/\D/g,'')||0)})}
+function gTable(){gRead();let n=G.sw.filter(s=>s.kelas==G.kel).map(s=>s.nama).sort((a,b)=>a.localeCompare(b));if(!n.length)n=Object.keys(G.nilai);G.names=n;
+  $('#gb').innerHTML=(n.length?`<table><tr><th>No</th><th>Nama siswa</th><th>Nilai (0-100)</th></tr>${n.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x)}</td><td><input class="gi" data-n="${i}" inputmode="numeric" maxlength="3" style="width:80px" value="${G.nilai[x]??''}"></td></tr>`).join('')}</table>`:
+   '<p>Daftar siswa kelas ini tidak ditemukan. Unggah data siswa di Pengaturan, atau ketik nama siswa (satu per baris):</p><textarea id="gm" rows="4"></textarea><button class="sm" onclick="gApply()">Terapkan</button>')}
+function gApply(){$('#gm').value.split('\n').map(x=>x.trim()).filter(Boolean).forEach(n=>G.nilai[n]=G.nilai[n]??'');gTable()}
+async function saveNilai(){gRead();const nilai={};Object.entries(G.nilai).forEach(([k,v])=>{if(v!=='')nilai[k]=v});if(await xput(G.t,G.key,{kelas:G.kel,nilai})){localStorage['ks_'+VP.id]=G.kel;toast('Nilai tersimpan');back()}}
+
+/* jurnal */
+const MODEL=['Problem Based Learning (PBL)','Project Based Learning (PjBL)','Discovery / Inquiry Learning','Direct Instruction (Tatap Muka)','Cooperative Learning','Diskusi & Praktikum Lab','Lainnya'];
+function openJurnal(t){const r=rows().find(x=>x.t==t),o=X.Jurnal[K(t)]||{},v=(k,d)=>esc(o[k]??d);
+  tool('Jurnal: '+tg(t),`<div class="card"><div class="grid"><div><label>Tanggal mengajar</label><input id="j_tgl" type="date" value="${o.tgl||t}"></div><div><label>Jam ke- / alokasi</label><input id="j_jam" value="${v('jam','')}" placeholder="1 - 2 (2 JP)"></div>
+  <div><label>Mata pelajaran</label><input id="j_mapel" value="${v('mapel',VP.mapel)}"></div><div><label>Kelas / rombel</label><input id="j_kelas" value="${v('kelas',VP.kelas)}"></div>
+  <div><label>Model pembelajaran</label><select id="j_model">${MODEL.map(m=>`<option ${m==o.model?'selected':''}>${m}</option>`).join('')}</select></div></div>
+  <label style="margin-top:12px">Materi pembelajaran / TP / CP</label><textarea id="j_materi" rows="2">${v('materi',(r.bab?r.bab+': ':'')+(r.materi||''))}</textarea>
+  <div class="grid" style="margin-top:12px">${[['hadir','Hadir (H)'],['sakit','Sakit (S)'],['izin','Izin (I)'],['alpa','Alpa (A)']].map(([k,l])=>`<div><label>${l}</label><input id="j_${k}" type="number" min="0" value="${o[k]||0}" oninput="jHit()"></div>`).join('')}</div><p id="j_sum"></p>
+  <label>Refleksi guru / catatan khusus</label><textarea id="j_cat" rows="2">${v('catatan','')}</textarea><div class="row" style="margin-top:12px"><button onclick="saveJurnal('${t}')">Simpan jurnal</button></div></div>`);jHit()}
+function jHit(){const n=['hadir','sakit','izin','alpa'].map(k=>+$('#j_'+k).value||0),s=n.reduce((a,b)=>a+b,0);$('#j_sum').innerHTML=`Total siswa: <b>${s}</b> | Kehadiran: <b>${s?Math.round(n[0]/s*100):0}%</b>`}
+async function saveJurnal(t){const g=k=>$('#j_'+k).value,d={tgl:g('tgl'),jam:g('jam'),mapel:g('mapel'),kelas:g('kelas'),model:g('model'),materi:g('materi'),catatan:g('cat')};['hadir','sakit','izin','alpa'].forEach(k=>d[k]=+g(k)||0);
+  if(!d.jam||!d.kelas)return toast('Isi jam ke dan kelas.');if(await xput('Jurnal',K(t),d)){toast('Jurnal tersimpan');back()}}
+
+/* refleksi KBM */
+const QS=[['Aku Hari Ini','#F4A62A',[['r1','Bagaimana perasaanmu hari ini?',[['🤩','Sangat Senang'],['😊','Senang'],['😐','Biasa Saja'],['😞','Sedih']]],
+ ['r2','Apakah kamu ikut belajar dengan rajin tadi?',[['🙋','Rajin Sekali'],['✋','Rajin'],['🤔','Kadang-Kadang'],['😴','Tidak Ikut']]],
+ ['r3','Apa yang kamu lakukan kalau ada pelajaran yang susah?',[['🙋‍♂️','Tanya Guru'],['📚','Baca Buku'],['💡','Coba Dulu'],['🤷','Diam Saja']]]]],
+['Aku Paham','#12806F',[['p1','Apakah kamu paham pelajaran hari ini?',[['😵','Belum Paham'],['😕','Sedikit Paham'],['🙂','Cukup Paham'],['😃','Paham'],['🤩','Paham Sekali']]],
+ ['p2','Apakah kamu bisa mengerjakan soalnya sendiri?',[['🚫','Belum Bisa'],['😬','Sedikit Bisa'],['🙂','Cukup Bisa'],['💪','Bisa'],['🏆','Bisa Sekali']]],
+ ['p3','Apakah kamu siap kalau nanti ada ulangan?',[['😰','Belum Siap'],['😟','Sedikit Siap'],['😌','Cukup Siap'],['😎','Siap'],['🚀','Siap Sekali']]]]],
+['Aku Nilai Bu/Pak Guru','#D1495B',[['g1','Apakah Bu/Pak Guru menjelaskan dengan jelas?',[['🌀','Tidak Jelas'],['😖','Kurang Jelas'],['😐','Cukup Jelas'],['👌','Jelas'],['🌟','Jelas Sekali']]],
+ ['g2','Apakah belajarnya seru dan menyenangkan?',[['😴','Bosan'],['😪','Kurang Seru'],['🙂','Cukup Seru'],['🎉','Seru'],['🔥','Seru Sekali']]],
+ ['g3','Apakah Bu/Pak Guru mau membantu kalau kamu susah?',[['🚪','Tidak Bantu'],['😕','Jarang Bantu'],['🤝','Kadang Bantu'],['💙','Suka Bantu'],['🦸','Selalu Bantu']]]]]];
+const QL=QS.flatMap(s=>s[2]);
+async function openRef(t,mode){const R=rows().find(x=>x.t==t),T0='Refleksi KBM: '+tg(t);
+  if(mode=='hasil'){G={t};tool(T0,`<div class="row" style="margin-bottom:10px"><button class="ghost" onclick="openRef('${t}','isi')">Isi Refleksi</button><button class="amb" onclick="prRef('${t}')">Print Refleksi</button></div><div class="card">${refDoc(t,1)}</div>`);return}
+  tool(T0,'<p>Memuat siswa...</p>');const sw=await allSiswa(),ks=[...new Set(sw.map(s=>s.kelas))].sort();G={t,sw};
+  tool(T0,`<div class="row" style="margin-bottom:10px"><button class="ghost" onclick="openRef('${t}','hasil')">Lihat hasil</button></div><div class="kid"><div class="kh"><h2>🌟 Aku Belajar Hari Ini 🌟</h2><p>Yuk, ceritakan pengalaman belajarmu!</p></div>
+  <div class="kc1"><h3>✏️ Tentang Aku</h3><div class="grid"><div><label>Kelasku</label><select id="rk" onchange="rNames()">${kOpts(ks,guessK(ks))}</select></div><div><label>Namaku</label><input id="rn" list="rl" placeholder="Tulis atau pilih namamu"><datalist id="rl"></datalist></div></div><p>Pertemuan ke-${R.no}, ${tg(t)}</p></div>`+
+  QS.map(([h,c,qs])=>`<div class="kc1" style="border-top:8px solid ${c}"><h3 style="color:${c}">${h}</h3>${qs.map((q,n)=>`<div><p><b>${n+1}. ${q[1]}</b></p><div class="opts">${q[2].map((o,i)=>`<label class="op"><input type="radio" name="${q[0]}" value="${i}"><div><span>${o[0]}</span><small>${o[1]}</small></div></label>`).join('')}</div></div>`).join('')}</div>`).join('')+
+  `<button class="big" onclick="saveRef('${t}')">Kirim jawabanku! 🚀</button></div>`);rNames()}
+function rNames(){const k=$('#rk');$('#rl').innerHTML=G.sw.filter(s=>s.kelas==(k&&k.value)).map(s=>`<option value="${esc(s.nama)}">`).join('')}
+async function saveRef(t){const nama=$('#rn').value.trim();if(!nama)return toast('Tulis namamu dulu ya.');const a={};
+  for(const q of QL){const c=document.querySelector(`input[name=${q[0]}]:checked`);if(!c)return toast('Jawab semua pertanyaan ya.');a[q[0]]=+c.value}
+  if(await xput('Refleksi',K(t,nama),{nama,kelas:$('#rk').value,t,a})){toast('Terima kasih! Jawabanmu tersimpan.');openRef(t,'isi')}}
+function refDoc(t,ed){const rs=Object.entries(X.Refleksi).filter(([k])=>k.startsWith(K(t,''))).sort((a,b)=>a[1].nama.localeCompare(b[1].nama)),r=rows().find(x=>x.t==t);if(ed)G.rs=rs;
+  return `<h3>Rekap Refleksi KBM</h3><p>${esc(VP.mapel)}, kelas ${esc(VP.kelas)}. Pertemuan ke-${r.no}, ${tg(t)}. Jumlah responden: <b>${rs.length}</b></p>
+  <table class="t3"><tr><th>No</th><th>Pertanyaan</th><th>Jawaban siswa</th><th>Rata-rata (1-5)</th></tr>${QL.map((q,i)=>{const c=q[2].map(()=>0);rs.forEach(([,v])=>c[v.a[q[0]]]++);
+   const sc=q[0][0]!='r'&&rs.length?(rs.reduce((a,[,v])=>a+v.a[q[0]]+1,0)/rs.length).toFixed(1):'-';return `<tr><td>${i+1}</td><td>${q[1]}</td><td>${q[2].map((o,j)=>`${o[0]} ${o[1]}: <b>${c[j]}</b>`).join('<br>')}</td><td>${sc}</td></tr>`}).join('')}</table>
+  <h3>Jawaban per siswa</h3><div class="sc"><table class="t1"><tr><th>No</th><th>Nama</th>${QL.map((q,i)=>`<th>${i+1}</th>`).join('')}${ed?'<th></th>':''}</tr>${rs.map(([k,v],n)=>`<tr><td>${n+1}</td><td>${esc(v.nama)}</td>${QL.map(q=>`<td>${q[2][v.a[q[0]]][0]}</td>`).join('')}${ed?`<td><button class="sm red" onclick="delRef(${n})">Hapus</button></td>`:''}</tr>`).join('')}</table></div>`}
+const prRef=t=>printHTML(`<div class="rf">${refDoc(t,0)}</div>`);
+async function delRef(n){if(!confirm('Hapus jawaban siswa ini?'))return;await xdel('Refleksi',G.rs[n][0]);openRef(G.t,'hasil')}
+
+/* RPP / modul ajar */
+const faseOf=k=>{const n=({I:1,II:2,III:3,IV:4,V:5,VI:6})[String(k).toUpperCase().trim()]||parseInt(k)||0;return n<=2?'A':n<=4?'B':'C'};
+const RF=['nama','nip','sekolah','mapel','fase','semester','tahun','materi','waktu','siswa','jenis_guru','kepsek','tempat','tanggal'];
+function openRpp(t){const o=X.RPP[K(t)];o?rppShow(t,o.html):rppForm(t)}
+function rppForm(t){const r=rows().find(x=>x.t==t),d=new Date(t+'T00:00'),L=k=>localStorage['rp_'+k]||'';G={t};
+  const V={nama:VP.guru,nip:VP.nipGuru||'-',sekolah:VP.sekolah,mapel:VP.mapel,fase:faseOf(VP.kelas)+' / '+VP.kelas,semester:VP.semester=='Gasal'?'1':'2',tahun:VP.tahun.replace('/',' - '),materi:r.materi||r.bab||'',
+   waktu:L('waktu')||'2 JP = 2 x 35 menit',siswa:L('siswa')||'... Siswa',jenis_guru:L('jg')||'Guru Bidang Studi',kepsek:VP.kepsek,tempat:L('tempat'),tanggal:BL[d.getMonth()]+' '+d.getFullYear()};
+  const LB={nama:'Nama penyusun',nip:'NIP',sekolah:'Nama sekolah',mapel:'Mata pelajaran',fase:'Fase / kelas',semester:'Semester',tahun:'Tahun ajaran',materi:'Materi pokok',waktu:'Alokasi waktu',siswa:'Jumlah siswa',jenis_guru:'Jenis guru',kepsek:'Kepala sekolah',tempat:'Tempat (kota)',tanggal:'Tanggal modul'};
+  tool('Buat RPP: '+tg(t),`<div class="card"><p>Isian terisi otomatis dari program tersimpan. Ubah jika perlu.</p><div class="grid">${RF.map(k=>`<div><label>${LB[k]}</label><input id="rp_${k}" value="${esc(V[k])}"></div>`).join('')}</div>
+  <label style="margin-top:12px">Konteks / situasi pembelajaran (opsional)</label><textarea id="rp_konteks" rows="2"></textarea><div class="row" style="margin-top:12px"><button onclick="rppGen()">Generate Modul Ajar dengan AI</button></div><p id="rp_st"></p></div>`)}
+const rppGen=()=>wrap('AI sedang menyusun modul ajar...',rppGen0);
+async function rppGen0(){const id={};[...RF,'konteks'].forEach(k=>id[k]=$('#rp_'+k).value);localStorage.rp_waktu=id.waktu;localStorage.rp_siswa=id.siswa;localStorage.rp_jg=id.jenis_guru;localStorage.rp_tempat=id.tempat;
+  $('#rp_st').textContent='AI sedang menyusun modul ajar, mohon tunggu...';
+  try{const r=await fetch(RPP_AI_URL,{method:'POST',body:JSON.stringify({identitas:id}),headers:{'Content-Type':'text/plain;charset=utf-8'}}),ai=await r.json();if(ai.error)throw new Error(ai.error);rppShow(G.t,rppHTML({...id,...ai}))}catch(e){$('#rp_st').textContent='Gagal: '+e.message}}
+function rppShow(t,h){tool('RPP: '+tg(t),`<div class="row" style="margin-bottom:10px"><button onclick="rppSave('${t}')">Simpan RPP</button><button class="amb" onclick="rppPrint()">Print</button><button class="ghost" onclick="rppForm('${t}')">Buat ulang dengan AI</button></div><p style="font-size:.85rem">Klik teks untuk mengedit langsung, lalu klik Simpan RPP.</p><div class="card rpp" id="rd">${h}</div>`)}
+async function rppSave(t){if(await xput('RPP',K(t),{html:$('#rd').innerHTML}))toast('RPP tersimpan')}
+const rppPrint=()=>printHTML(`<div class="rpp">${$('#rd').innerHTML.replace(/ contenteditable="true"/g,'')}</div>`,'F4','portrait');
+function rppHTML(d){const c=v=>{if(!v)return '-';if(typeof v=='object')v=Object.values(v).join('\n\n');return String(v).replace(/\\n/g,'\n')},
+  E=(v,a)=>`<span class="ed ${a?'ai':''}" contenteditable="true">${c(v)}</span>`,R=(l,v,a)=>`<tr><td class="lb">${l}</td><td>${E(v,a)}</td></tr>`,H=t=>`<tr><td colspan="2" class="sh">${t}</td></tr>`,
+  [fs,kl]=String(d.fase||'').split('/').map(x=>x.trim()),
+  PL=[['profil_keimanan','Keimanan dan Ketakwaan terhadap Tuhan YME'],['profil_kewargaan','Kewargaan'],['profil_penalaran','Penalaran Kritis'],['profil_kreativitas','Kreativitas'],['profil_kolaborasi','Kolaborasi'],['profil_kemandirian','Kemandirian'],['profil_kesehatan','Kesehatan'],['profil_komunikasi','Komunikasi']].filter(([k])=>d[k]&&String(d[k]).trim()&&String(d[k]).trim()!='-'),
+  T5=(a,ed)=>`<table style="text-align:center"><tr><th>Kriteria</th><th>Sangat baik (4)</th><th>Baik (3)</th><th>Cukup (2)</th><th>Perlu dikembangkan (1)</th></tr>${a.map(r=>`<tr>${r.map((x,i)=>`<td style="${i?'':'text-align:left;font-weight:700'}">${ed?`<span class="ed" contenteditable="true">${x}</span>`:x}</td>`).join('')}</tr>`).join('')}</table>`,
+  SG=(im)=>`<div class="sg">${im?`<img src="${im}">`:''}</div>`;
+  return `<div class="mt">MODUL PEMBELAJARAN<br>KELAS ${E(kl||d.fase)} FASE ${E(fs||d.fase)}</div><table>${H('A. Informasi Umum')}<tr><td colspan="2" style="background:#f8fafc;font-weight:700;text-align:center">IDENTITAS SEKOLAH</td></tr>`+
+  R('Nama Penyusun',d.nama)+R('Nama Sekolah',d.sekolah)+R('Alokasi Waktu',d.waktu)+R('Mapel',d.mapel)+R('Jumlah Siswa',d.siswa)+R('Fase / Kelas',d.fase)+R('Semester',d.semester)+R('Materi Pokok',d.materi)+R('Capaian Pembelajaran',d.cp,1)+R('Profil Pelajar Pancasila',d.profil_pancasila,1)+
+  PL.map(([k,j],i)=>R(i?'':'Profil Lulusan yang Relevan',`<strong>${j}</strong><br>${c(d[k])}`,1)).join('')+
+  H('Kompetensi Awal')+R('Sarana Prasarana',d.sarpras,1)+R('Target Peserta Didik',d.target_siswa,1)+R('Diferensiasi',d.diferensiasi,1)+R('Model Pembelajaran',d.model_pembelajaran,1)+
+  H('Kegiatan Inti')+R('Cakupan Elemen',d.cakupan_elemen,1)+R('Kata Kunci',d.kata_kunci,1)+
+  H('Pemahaman Materi')+R('Materi yang dapat diamati',d.pemahaman_materi,1)+R('Tujuan Pembelajaran',d.tujuan_pembelajaran,1)+R('Pertanyaan Pemantik',d.pemantik,1)+R('Ketersediaan Materi',d.ketersediaan_materi,1)+R('Assesmen',d.jenis_asesmen,1)+R('Unit Kegiatan',d.unit_kegiatan,1)+R('Persiapan Pembelajaran',d.persiapan_pembelajaran,1)+
+  H('Alur Tujuan Pembelajaran')+R('PENDAHULUAN',d.p1_pendahuluan,1)+R('KEGIATAN INTI',d.p1_inti,1)+R('PENUTUP',d.p1_penutup,1)+H('Asesmen')+`</table>
+  <p><b>Asesmen Sikap</b><br>Penilaian sikap ini dilakukan melalui pengamatan (observasi) Guru selama kegiatan pembelajaran. Bentuk pedoman penilaian yang dapat digunakan oleh Guru adalah sebagai berikut.</p>`+
+  T5([['Sopan santun','Peserta didik berlaku sopan, baik selama proses pembelajaran maupun di luar kelas.','Peserta didik berlaku sopan hanya selama proses pembelajaran.','Peserta didik hanya berlaku sopan hanya kepada Guru atau peserta didik yang lain.','Peserta didik belum menampakkan perilaku sopan.'],
+   ['Percaya diri','Peserta didik berani berpendapat, bertanya, atau menjawab pertanyaan, serta mengambil keputusan.','Peserta didik berani berpendapat, bertanya, atau menjawab pertanyaan.','Peserta didik hanya berani menjawab hanya saat Guru bertanya.','Peserta didik kesulitan dalam berpendapat, bertanya, maupun menjawab pertanyaan.'],
+   ['Toleransi','Dapat menghargai pendapat peserta didik lain dan menerima kesepakatan meskipun berbeda pendapat.','Dapat menghargai pendapat peserta didik lain dan kurang bisa menerima kesepakatan.','Dapat menghargai pendapat peserta didik lain dan tidak bisa menerima kesepakatan.','Tidak dapat menghargai pendapat peserta didik lain dan tidak bisa menerima kesepakatan.']])+
+  `<p><b>Asesmen Pengetahuan</b><br>Penilaian pengetahuan dilaksanakan melalui tes setelah kegiatan pembelajaran berlangsung.</p>`+T5([['Pilihan ganda','','','',''],['Uraian/esai','','','',''],['Tes Lisan','','','','']],1)+
+  `<p><b>Asesmen Hasil Belajar</b><br>Penilaian ini dilakukan melalui pengamatan (observasi) Guru selama kegiatan pembelajaran berlangsung.</p>`+T5([['-','','','',''],['-','','','','']],1)+
+  `<div class="sb"><div>Mengetahui,<br>Kepala Sekolah${SG(VP.ttdKepsek)}<b>( ${E(d.kepsek)} )</b></div><div>${E([d.tempat,d.tanggal].filter(Boolean).join(', '))}<br>${E(d.jenis_guru)}${SG(VP.ttdGuru)}<b>( ${E(d.nama)} )</b></div></div>`}
+
+/* print semua */
+function nilaiHTML(ds){const R=rows().filter(r=>ds.includes(r.t)),bm=r=>(r.bab||'').trim()||'-',babs=[...new Set(R.map(bm))],G2=babs.map(b=>R.filter(r=>bm(r)==b)),cl=i=>'n'+(i%4);if(!R.length)return '';
+  const N=new Set();[...Object.values(X.Formatif),...Object.values(X.Sumatif)].forEach(d=>Object.keys(d.nilai||{}).forEach(n=>N.add(n)));
+  const names=[...N].sort((a,b)=>a.localeCompare(b)),av=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):'',nf=(r,n)=>X.Formatif[K(r.t)]?.nilai?.[n],ns=(b,n)=>X.Sumatif[K(b)]?.nilai?.[n];
+  const body=names.map((n,i)=>{const lm=babs.map(b=>ns(b,n)),all=[...G2.flat().map(r=>nf(r,n)),...lm].filter(v=>v!==undefined),ra=av(all),sts=ns('STS',n),sas=ns('SAS',n),ak=av([ra,sts,sas].filter(v=>v>0));
+    return `<tr><td>${i+1}</td><td style="text-align:left;white-space:nowrap">${esc(n)}</td>${G2.flatMap((g,gi)=>g.map(r=>`<td class="${cl(gi)}">${nf(r,n)??''}</td>`)).join('')}${lm.map((v,gi)=>`<td class="${cl(gi)}">${v??''}</td>`).join('')}<td>${ra}</td><td>${sts??''}</td><td>${sas??''}</td><td><b>${ak}</b></td></tr>`}).join('');
+  return `<div class="nk"><h2>DAFTAR NILAI</h2><p>${esc(VP.sekolah)} | ${esc(VP.mapel)} | Kelas ${esc(VP.kelas)} | Semester ${VP.semester} | Tahun Ajaran ${esc(VP.tahun)}</p></div>
+  <table class="nt"><tr><th rowspan="3">No</th><th rowspan="3">Nama Siswa</th><th colspan="${R.length}">Penilaian Formatif</th><th colspan="${babs.length}">Sumatif</th><th rowspan="3">Rata-<br>Rata</th><th rowspan="3">STS</th><th rowspan="3">SAS</th><th rowspan="3">Nilai<br>Akhir</th></tr>
+  <tr>${G2.map((g,i)=>`<th colspan="${g.length}" class="${cl(i)}">L. Materi ${i+1}</th>`).join('')}${babs.map((b,i)=>`<th rowspan="2" class="${cl(i)}">LM ${i+1}</th>`).join('')}</tr>
+  <tr>${G2.flatMap((g,i)=>g.map((r,j)=>`<th class="${cl(i)}">TP${j+1}</th>`)).join('')}</tr>${body}</table>
+  <p style="font-size:9pt">${babs.map((b,i)=>`L. Materi ${i+1} / LM ${i+1}: ${esc(b)}`).join('<br>')}</p>`}
+function jurnalHTML(ds){const L=ds.map(t=>[t,X.Jurnal[K(t)]]).filter(x=>x[1]);if(!L.length)return '';
+  return `<div class="nk"><h2>JURNAL MENGAJAR</h2><p>${esc(VP.sekolah)} | ${esc(VP.mapel)} | Kelas ${esc(VP.kelas)} | Semester ${VP.semester} | Tahun Ajaran ${esc(VP.tahun)}</p></div>
+  <table class="t3"><tr><th>No</th><th>Tanggal</th><th>Jam ke</th><th>Kelas</th><th>Materi</th><th>Model</th><th>H</th><th>S</th><th>I</th><th>A</th><th>Hadir</th><th>Catatan</th></tr>${L.map(([t,j],i)=>{const s=j.hadir+j.sakit+j.izin+j.alpa;
+   return `<tr><td>${i+1}</td><td style="white-space:nowrap">${tg(j.tgl||t)}</td><td>${esc(j.jam)}</td><td>${esc(j.kelas)}</td><td>${esc(j.materi)}</td><td>${esc(j.model)}</td><td>${j.hadir}</td><td>${j.sakit}</td><td>${j.izin}</td><td>${j.alpa}</td><td>${s?Math.round(j.hadir/s*100):0}%</td><td>${esc(j.catatan)}</td></tr>`}).join('')}</table>`}
+function openPA(){$('#dpb').innerHTML=`<div><label><input type="checkbox" id="pj1" checked> Semua RPP</label><label><input type="checkbox" id="pj2" checked> Semua penilaian (formatif TP dan sumatif LM)</label><label><input type="checkbox" id="pj3" checked> Semua jurnal</label></div>
+  <div><label>Pilih tanggal pertemuan <a href="#" onclick="document.querySelectorAll('.pd').forEach(x=>x.checked=!x.checked);return false">(balik pilihan)</a></label><div style="max-height:180px;overflow:auto;border:2px solid var(--line);border-radius:10px;padding:8px">${rows().map(r=>`<label><input type="checkbox" class="pd" value="${r.t}" checked> Pert. ${r.no}, ${tg(r.t)}</label>`).join('')}</div></div>
+  <div class="grid"><div><label>Kertas</label><select id="ppk"><option>A4</option><option>F4</option></select></div><div><label>Orientasi</label><select id="por"><option value="portrait">Potrait</option><option value="landscape">Landscape</option></select></div></div>`;$('#dp').showModal()}
+function doPA(){const ds=[...document.querySelectorAll('.pd:checked')].map(x=>x.value);let h='';
+  if(!ds.length)return toast('Pilih minimal satu tanggal.');
+  if($('#pj1').checked)h+=ds.filter(t=>X.RPP[K(t)]).map(t=>`<div class="rpp pbk">${X.RPP[K(t)].html.replace(/ contenteditable="true"/g,'')}</div>`).join('');
+  if($('#pj2').checked)h+=`<div class="pbk">${nilaiHTML(ds)}</div>`;if($('#pj3').checked)h+=`<div class="pbk">${jurnalHTML(ds)}</div>`;
+  if(!h.replace(/<[^>]*>/g,'').trim())return toast('Belum ada data untuk dicetak pada pilihan ini.');$('#dp').close();printHTML(h,$('#ppk').value,$('#por').value)}
+
+load();
+</script>
+</body>
+</html>
