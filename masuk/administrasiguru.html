@@ -89,6 +89,10 @@ input[type=checkbox],input[type=radio]{width:auto}
 .ab{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:20px;padding:18px;text-align:left;box-shadow:0 10px 22px color-mix(in srgb,var(--g1) 35%,transparent);display:flex;flex-direction:column;gap:2px;font-size:1.05rem}
 .ab span{font-size:2rem;line-height:1.2}.ab small{font-weight:600;opacity:.9}.ab:hover{transform:translateY(-3px)}
 .sec{font-size:1.4rem;margin:6px 0 12px}
+
+.ttd{display:flex;justify-content:space-between;gap:16px;margin-top:24px;page-break-inside:avoid}.ttd>div{max-width:48%;text-align:left}.ttd img{max-height:70px;display:block;margin:4px 0}
+#lg{position:fixed;inset:0;z-index:80;background:linear-gradient(135deg,#0f1b2d,#16324F 50%,#2B4FA3);display:grid;place-items:center;padding:16px}#lg[hidden]{display:none}
+.lgc{background:#fff;border-radius:24px;padding:28px;width:min(400px,100%);border-top:10px solid var(--amber);box-shadow:0 20px 50px #0006;display:grid;gap:12px}.lgc h1{font-size:1.9rem}.lgc .av{background:linear-gradient(135deg,#12806F,#5B6CE0);color:#fff;border:0;margin:auto}
 </style>
 <style id="pgst"></style>
 </head>
@@ -96,7 +100,7 @@ input[type=checkbox],input[type=radio]{width:auto}
 <main>
 <section id="home">
   <div class="vh"><div class="av">📚</div><div style="flex:1;min-width:220px"><h1>Program Semester</h1><p>Susun kalender efektif, materi, dan cetak program semester atau tahunan.</p><p class="tap" id="ta"></p></div>
-  <div class="clock"><span id="hari"></span><b id="jam"></b></div></div>
+  <button class="ghost sm" id="lo" hidden onclick="logout()">🚪 Keluar</button><div class="clock"><span id="hari"></span><b id="jam"></b></div></div>
   <div class="kps" id="wd"></div>
   <div class="acts">
     <button class="ab" style="--g1:#12806F;--g2:#22C1A1" onclick="baru()"><span>➕</span><b>Buat program baru</b><small>Isi identitas, hitung kalender otomatis</small></button>
@@ -123,6 +127,9 @@ input[type=checkbox],input[type=radio]{width:auto}
   <div class="row" style="margin-top:14px"><button onclick="cetak()">Cetak</button><button class="ghost" onclick="$('#dc').close()">Tutup</button></div></dialog>
 <dialog id="dset" style="width:min(640px,94vw)"><h2 style="margin-bottom:12px">Pengaturan</h2><div id="dsb" class="grid"></div>
   <div class="row" style="margin-top:14px"><button onclick="saveSet()">Simpan pengaturan</button><button class="ghost" onclick="$('#dset').close()">Tutup</button></div></dialog>
+<div id="lg" hidden><div class="lgc"><div class="av">📚</div><h1 style="text-align:center">Program Semester</h1><p id="lm" style="text-align:center;margin:0">Masuk untuk melanjutkan</p>
+  <div><label>Username</label><input id="lu" autocomplete="username"></div><div><label>Password</label><input id="lp" type="password" autocomplete="current-password" onkeydown="if(event.key=='Enter')doLogin()"></div>
+  <label><input type="checkbox" id="lr"> Ingat saya di perangkat ini</label><button onclick="doLogin()">Masuk</button></div></div>
 <div id="lb"><i></i><span id="lbt"></span></div><div id="toast"></div><div id="pa"></div>
 
 <script>
@@ -202,12 +209,15 @@ function importXl(e){const f=e.target.files[0];if(!f)return;const r=new FileRead
 function openSet(){T=JSON.parse(JSON.stringify(S));
   $('#dsb').innerHTML=`<div><label>Tahun ajaran aktif</label><input id="sT" value="${esc(T.tahun)}" placeholder="2026/2027"></div>
   <div><label>Semester aktif</label><select id="sS"><option>Gasal</option><option>Genap</option></select></div>
+  <div><label>Peran guru (berlaku untuk semua hasil cetak)</label><select id="sP"><option>Guru Bidang Studi</option><option>Guru Kelas</option></select></div>
   <div><label>Awal semester</label><input id="sM" type="date" value="${T.mulai}"></div><div><label>Akhir semester</label><input id="sE" type="date" value="${T.selesai}"></div>
   <div style="grid-column:1/-1"><label>Agenda sekolah (Excel: Tanggal, Nama Kegiatan, Keterangan)</label><div class="row"><input type="file" id="xl" accept=".xlsx,.xls,.csv" style="max-width:300px"><button class="ghost sm" onclick="tmpl()">Unduh contoh Excel</button></div><div id="sag"></div></div>
   <div style="grid-column:1/-1"><label>Data siswa (Excel: NIS, Nama Siswa, Kelas, Tahun Ajaran)</label><div class="row"><input type="file" id="xs" accept=".xlsx,.xls,.csv" style="max-width:300px"><button class="ghost sm" onclick="tmplS()">Unduh contoh Excel</button></div><div id="ssw"></div></div>
+  <div style="grid-column:1/-1"><h3>🔐 Akun login</h3><p style="margin:2px 0">Username dan password disimpan di Google Sheet (sheet Akun). Kosongkan password jika tidak ingin mengubah.</p></div>
+  <div><label>Username</label><input id="au" autocomplete="off" value="${esc(AUTH?AUTH.u:'')}"></div><div><label>Password baru</label><input id="ap" type="password" autocomplete="new-password"></div>
   <div><label>Tanda tangan kepala sekolah</label><input type="file" accept="image/*" onchange="img(this.files[0],'ttdKepsek')"><div id="sk"></div></div>
   <div><label>Tanda tangan guru</label><input type="file" accept="image/*" onchange="img(this.files[0],'ttdGuru')"><div id="sg"></div></div>`;
-  $('#sS').value=T.semester;
+  $('#sS').value=T.semester;$('#sP').value=T.peran||'Guru Bidang Studi';$('#sP').onchange=e=>T.peran=e.target.value;
   $('#sT').onchange=$('#sS').onchange=()=>{T.tahun=$('#sT').value.trim();T.semester=$('#sS').value;const r=rng(T.tahun,T.semester);T.mulai=r[0];T.selesai=r[1];$('#sM').value=r[0];$('#sE').value=r[1];if(!T.agDirty)T.agenda=agFor(T.tahun);dSet()};
   $('#sM').onchange=e=>T.mulai=e.target.value;$('#sE').onchange=e=>T.selesai=e.target.value;$('#xl').onchange=importXl;$('#xs').onchange=importSw;dSet();$('#dset').showModal()}
 function tmplS(){const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['NIS','Nama Siswa','Kelas','Tahun Ajaran'],['1001','Contoh Siswa Satu','4A',S.tahun],['1002','Contoh Siswa Dua','4A',S.tahun]]),'Siswa');XLSX.writeFile(w,'contoh-data-siswa.xlsx')}
@@ -222,8 +232,9 @@ async function loadSiswa(){await wrap('Memuat data siswa...',async()=>{try{SW=AP
 function dSet(){$('#ssw').innerHTML=T.swNew?`<p>${T.swNew.length} siswa siap disimpan. Klik Simpan pengaturan.</p>`:`<p>${SW.length} siswa tersimpan, ${SW.filter(s=>norm(s.tahun)==norm(T.tahun)).length} untuk tahun ajaran ${esc(T.tahun)}.</p>`;$('#sag').innerHTML=T.agenda.length?`<p>${T.agenda.length} agenda dimuat. Tersimpan di Google Sheet. Unggah ulang untuk mengganti.</p><div class="sc" style="max-height:150px;overflow:auto"><table>${T.agenda.map(a=>`<tr><td style="white-space:nowrap">${tg(a.tgl)}</td><td>${esc(a.nama)}</td><td>${esc(a.ket)}</td></tr>`).join('')}</table></div>`:'<p>Belum ada agenda.</p>';
   $('#sg').innerHTML=T.ttdGuru?`<img class="sig" src="${T.ttdGuru}">`:'';$('#sk').innerHTML=T.ttdKepsek?`<img class="sig" src="${T.ttdKepsek}">`:''}
 const saveSet=()=>wrap('Menyimpan pengaturan...',saveSet0);
-async function saveSet0(){if(!/^\d{4}\/\d{4}$/.test(T.tahun))return toast('Format tahun ajaran: 2026/2027');
+async function saveSet0(){const au=$('#au').value.trim(),pw=$('#ap').value;if(pw&&(!au||pw.length<4))return toast('Isi username dan password minimal 4 karakter.');if(!/^\d{4}\/\d{4}$/.test(T.tahun))return toast('Format tahun ajaran: 2026/2027');
   const sn=T.swNew,ad=T.agDirty;delete T.swNew;delete T.agDirty;S=T;localStorage.S=JSON.stringify(S);$('#dset').close();if(sn&&sn.length)try{await swSave(sn)}catch(e){toast('Data siswa gagal disimpan: '+e.message)}
+  if(au&&pw)try{const h=await sha(au+':'+pw);await lcall({a:'lset',u:au,h,auth:AUTH});AUTH={u:au,h};(localStorage.auth?localStorage:sessionStorage).auth=JSON.stringify(AUTH);$('#lo').hidden=false}catch(e){toast('Akun gagal disimpan: '+e.message)}
   if(ad||(S.agenda.length&&!agFor(S.tahun).length))try{await agSave(S.tahun,S.agenda)}catch(e){toast('Agenda gagal disimpan: '+e.message)}
   try{for(const p of progs){const b=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]);sync(p);if(b!=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]))progs=await api('save',p)}}catch(e){toast('Pengaturan tersimpan, tetapi sebagian program gagal diperbarui.');draw();return}
   draw();toast('Pengaturan tersimpan')}
@@ -249,24 +260,21 @@ function openCetak(m){if(!progs.length)return toast('Belum ada program tersimpan
 function cetak(){const f=s=>progs.find(p=>p.kelas==$('#ck').value&&p.mapel==$('#cm').value&&p.tahun==$('#ct').value&&p.semester==s);
   const ss=mode=='sem'?[f($('#cs').value)]:[f('Gasal'),f('Genap')],a=ss.filter(Boolean);
   if(!a.length)return toast('Program untuk pilihan ini belum dibuat.');
-  const p=a[0],nip=n=>n?`<br>NIP. ${esc(n)}`:'',gs=a.find(x=>x.ttdGuru),ks=a.find(x=>x.ttdKepsek),sp='<br><br><br><br>',
-  ttd=`<div class="ttd"><div>Mengetahui,<br>Kepala Sekolah${ks?`<img src="${ks.ttdKepsek}">`:sp}<b><u>${esc(p.kepsek)}</u></b>${nip(p.nipKepsek)}</div>
-   <div>Dibuat pada ${tg(p.tanggal)}<br>Guru Mata Pelajaran${gs?`<img src="${gs.ttdGuru}">`:sp}<b><u>${esc(p.guru)}</u></b>${nip(p.nipGuru)}</div></div>`;
+  const p=a[0],gs=a.find(x=>x.ttdGuru),ks=a.find(x=>x.ttdKepsek),tt=ttd(p,p.tanggal,gs?gs.ttdGuru:'',ks?ks.ttdKepsek:'');
   const idn=`<table style="border:0;width:auto">${[['Satuan Pendidikan',p.sekolah],['Mata Pelajaran',p.mapel],['Kelas',p.kelas+(mode=='sem'?' / '+p.semester:'')],['Tahun Pelajaran',p.tahun]].map(r=>`<tr><td style="border:0">${r[0]}</td><td style="border:0">: ${esc(r[1])}</td></tr>`).join('')}</table>`;
-  $('#pa').innerHTML=`<div class="bn"><h2>${mode=='sem'?'PROGRAM SEMESTER '+p.semester.toUpperCase():'PROGRAM TAHUNAN'}</h2><p>TAHUN PELAJARAN ${esc(p.tahun)}</p></div>${idn}`+a.map(x=>semHTML(x,mode=='sem')).join('')+ttd;
+  $('#pa').innerHTML=`<div class="bn"><h2>${mode=='sem'?'PROGRAM SEMESTER '+p.semester.toUpperCase():'PROGRAM TAHUNAN'}</h2><p>TAHUN PELAJARAN ${esc(p.tahun)}</p></div>${idn}`+semHTML(a,mode=='sem',mode=='sem'?'Semester '+p.semester+': Kalender dan Minggu Efektif':'Kalender dan Minggu Efektif Tahun Pelajaran '+p.tahun)+tt;
   $('#pgst').textContent='';$('#dc').close();setTimeout(()=>print(),200)}
-function semHTML(p,detail){const c=calc(p),mo={},bab={};
+function semHTML(ps,detail,judul){const c=ps.flatMap(p=>calc(p).map(r=>({...r,p}))).sort((a,b)=>a.t<b.t?-1:a.t>b.t?1:0),mo={},bab={},mm=r=>r.p.materi?.[r.t]||{};
   c.forEach(r=>{const k=r.t.slice(0,7),m=mo[k]=mo[k]||{h:0,e:0,x:[]},ok=r.s=='KBM'&&!r.ex;m.h++;ok?m.e++:m.x.push(`${tg(r.t)}: ${r.n||(r.ex?'Tidak ada pertemuan':r.s)}`);
-    if(ok){const b=(p.materi?.[r.t]?.bab||'').trim();if(b&&b!='-')bab[b]=(bab[b]||0)+1}});
-  const E=c.filter(r=>r.s=='KBM'&&!r.ex).length;
-  let h=`<h3>Semester ${p.semester}: Kalender dan Minggu Efektif</h3><table class="t1"><tr><th>Bulan</th><th>Hari ${HR[p.hari]}</th><th>Pertemuan efektif</th><th>Kegiatan tanpa KBM</th></tr>`+
+    if(ok){const b=(mm(r).bab||'').trim();if(b&&b!='-')bab[b]=(bab[b]||0)+1}});
+  const E=c.filter(r=>r.s=='KBM'&&!r.ex).length,TB=Object.values(bab).reduce((a,b)=>a+b,0);
+  let h=`<h3>${judul}</h3><table class="t1"><tr><th>Bulan</th><th>Hari ${HR[ps[0].hari]}</th><th>Pertemuan efektif</th><th>Kegiatan tanpa KBM</th></tr>`+
    Object.entries(mo).map(([k,m])=>`<tr><td>${BL[+k.slice(5)-1]} ${k.slice(0,4)}</td><td>${m.h}</td><td>${m.e}</td><td>${m.x.map(esc).join('<br>')||'-'}</td></tr>`).join('')+`<tr><th>Jumlah</th><th>${c.length}</th><th>${E}</th><th></th></tr></table>`;
-  if(Object.keys(bab).length)h+=`<h3>Rincian Bab</h3><table class="t2"><tr><th>Bab</th><th>Jumlah pertemuan</th></tr>${Object.entries(bab).map(([b,n])=>`<tr><td>${esc(b)}</td><td>${n}</td></tr>`).join('')}</table>`;
-  if(detail)h+=`<h3>Program Semester</h3><table class="t3"><tr><th>Tanggal</th><th>Pert.</th><th>Bab</th><th>Materi pokok / keterangan</th></tr>${c.map(r=>{const m=p.materi?.[r.t]||{};
+  if(TB)h+=`<h3>Rincian Bab</h3><table class="t2"><tr><th>Bab</th><th>Jumlah pertemuan</th></tr>${Object.entries(bab).map(([b,n])=>`<tr><td>${esc(b)}</td><td>${n}</td></tr>`).join('')}<tr><th>Total</th><th>${TB}</th></tr></table>`;
+  if(detail)h+=`<h3>Program Semester</h3><table class="t3"><tr><th>Tanggal</th><th>Pert.</th><th>Bab</th><th>Materi pokok / keterangan</th></tr>${c.map(r=>{const m=mm(r);
     return r.s!='KBM'?`<tr class="x"><td>${tg(r.t)}</td><td>-</td><td>-</td><td>${esc(r.n)||r.s}</td></tr>`
      :`<tr${r.ex?' class="e"':''}><td>${tg(r.t)}</td><td>${r.no}</td><td>${esc(m.bab)||'-'}</td><td>${esc(m.materi)||esc(r.n)}</td></tr>`}).join('')}</table>`;
   return `<div class="pg">${h}</div>`}
-
 
 /* ===== VIEW: RPP, PENILAIAN, JURNAL, REFLEKSI, PRINT SEMUA ===== */
 const RPP_AI_URL='https://script.google.com/macros/s/AKfycbzNNR8ao5lJ_ze_vVemKNtDogBFFciXmtFxjVjnbf3tzebWc6TVwiteClqa00wWwDqtnw/exec'; // pembuat modul ajar AI
@@ -308,7 +316,12 @@ function printHTML(h,pp='A4',or='portrait'){$('#pgst').textContent=`@page{size:$
 
 /* siswa */
 async function allSiswa(){const a=SW.filter(x=>norm(x.tahun)==norm(VP.tahun));return a.length?a:SW}
-const guessK=(ks,old)=>old||localStorage['ks_'+VP.id]||ks.find(k=>k.toLowerCase().includes(String(VP.kelas).toLowerCase()))||ks[0]||'';
+const nk=x=>{const m=String(x).toUpperCase().replace(/\s|KELAS/g,'').match(/^(\d+|VI|IV|V|III|II|I)(.*)$/);return m?(({I:1,II:2,III:3,IV:4,V:5,VI:6})[m[1]]||m[1])+m[2]:String(x).toUpperCase().trim()};
+const swT=()=>{const x=SW.filter(s=>norm(s.tahun)==norm(VP.tahun));return x.length?x:SW};
+function siswaKelas(){const a=swT(),k=nk(VP.kelas);let r=a.filter(s=>nk(s.kelas)==k);if(!r.length)r=a.filter(s=>nk(s.kelas).startsWith(k));const ks=localStorage['ks_'+VP.id];if(!r.length&&ks)r=a.filter(s=>s.kelas==ks);return r}
+const guessK=(ks,old)=>old||localStorage['ks_'+VP.id]||ks.find(k=>nk(k)==nk(VP.kelas))||ks.find(k=>nk(k).startsWith(nk(VP.kelas)))||ks[0]||'';
+const peran=()=>S.peran||'Guru Bidang Studi',nipL=n=>n?`<br>NIP. ${esc(n)}`:'';
+function ttd(p,tgl,gs,ks){gs=gs??p.ttdGuru;ks=ks??p.ttdKepsek;const sp='<br><br><br><br>';return `<div class="ttd"><div>Mengetahui,<br>Kepala Sekolah${ks?`<img src="${ks}">`:sp}<b><u>${esc(p.kepsek)}</u></b>${nipL(p.nipKepsek)}</div><div>Dibuat pada ${tg(tgl)}<br>${peran()}${gs?`<img src="${gs}">`:sp}<b><u>${esc(p.guru)}</u></b>${nipL(p.nipGuru)}</div></div>`}
 const kOpts=(ks,s)=>ks.map(k=>`<option ${k==s?'selected':''}>${esc(k)}</option>`).join('');
 
 /* penilaian formatif (F) dan sumatif (S) */
@@ -363,16 +376,16 @@ function refDoc(t,ed){const rs=Object.entries(X.Refleksi).filter(([k])=>k.starts
   <table class="t3"><tr><th>No</th><th>Pertanyaan</th><th>Jawaban siswa</th><th>Rata-rata (1-5)</th></tr>${QL.map((q,i)=>{const c=q[2].map(()=>0);rs.forEach(([,v])=>c[v.a[q[0]]]++);
    const sc=q[0][0]!='r'&&rs.length?(rs.reduce((a,[,v])=>a+v.a[q[0]]+1,0)/rs.length).toFixed(1):'-';return `<tr><td>${i+1}</td><td>${q[1]}</td><td>${q[2].map((o,j)=>`${o[0]} ${o[1]}: <b>${c[j]}</b>`).join('<br>')}</td><td>${sc}</td></tr>`}).join('')}</table>
   <h3>Jawaban per siswa</h3><div class="sc"><table class="t1"><tr><th>No</th><th>Nama</th>${QL.map((q,i)=>`<th>${i+1}</th>`).join('')}${ed?'<th></th>':''}</tr>${rs.map(([k,v],n)=>`<tr><td>${n+1}</td><td>${esc(v.nama)}</td>${QL.map(q=>`<td>${q[2][v.a[q[0]]][0]}</td>`).join('')}${ed?`<td><button class="sm red" onclick="delRef(${n})">Hapus</button></td>`:''}</tr>`).join('')}</table></div>`}
-const prRef=t=>printHTML(`<div class="rf">${refDoc(t,0)}</div>`);
+const prRef=t=>printHTML(`<div class="rf">${refDoc(t,0)}${ttd(VP,iso(new Date()))}</div>`);
 async function delRef(n){if(!confirm('Hapus jawaban siswa ini?'))return;await xdel('Refleksi',G.rs[n][0]);openRef(G.t,'hasil')}
 
 /* RPP / modul ajar */
-const faseOf=k=>{const n=({I:1,II:2,III:3,IV:4,V:5,VI:6})[String(k).toUpperCase().trim()]||parseInt(k)||0;return n<=2?'A':n<=4?'B':'C'};
+const faseOf=k=>{const m=String(k).toUpperCase().trim().match(/^(\d+|VI|IV|V|III|II|I)/),n=m?({I:1,II:2,III:3,IV:4,V:5,VI:6})[m[1]]||parseInt(m[1]):0;return n<=2?'A':n<=4?'B':'C'};
 const RF=['nama','nip','sekolah','mapel','fase','semester','tahun','materi','waktu','siswa','jenis_guru','kepsek','tempat','tanggal'];
 function openRpp(t){const o=X.RPP[K(t)];o?rppShow(t,o.html):rppForm(t)}
 function rppForm(t){const r=rows().find(x=>x.t==t),d=new Date(t+'T00:00'),L=k=>localStorage['rp_'+k]||'';G={t};
   const V={nama:VP.guru,nip:VP.nipGuru||'-',sekolah:VP.sekolah,mapel:VP.mapel,fase:faseOf(VP.kelas)+' / '+VP.kelas,semester:VP.semester=='Gasal'?'1':'2',tahun:VP.tahun.replace('/',' - '),materi:r.materi||r.bab||'',
-   waktu:L('waktu')||'2 JP = 2 x 35 menit',siswa:L('siswa')||'... Siswa',jenis_guru:L('jg')||'Guru Bidang Studi',kepsek:VP.kepsek,tempat:L('tempat'),tanggal:BL[d.getMonth()]+' '+d.getFullYear()};
+   waktu:L('waktu')||'2 JP = 2 x 35 menit',siswa:siswaKelas().length?siswaKelas().length+' Siswa':'... Siswa',jenis_guru:peran(),kepsek:VP.kepsek,tempat:L('tempat'),tanggal:BL[d.getMonth()]+' '+d.getFullYear()};
   const LB={nama:'Nama penyusun',nip:'NIP',sekolah:'Nama sekolah',mapel:'Mata pelajaran',fase:'Fase / kelas',semester:'Semester',tahun:'Tahun ajaran',materi:'Materi pokok',waktu:'Alokasi waktu',siswa:'Jumlah siswa',jenis_guru:'Jenis guru',kepsek:'Kepala sekolah',tempat:'Tempat (kota)',tanggal:'Tanggal modul'};
   tool('Buat RPP: '+tg(t),`<div class="card"><p>Isian terisi otomatis dari program tersimpan. Ubah jika perlu.</p><div class="grid">${RF.map(k=>`<div><label>${LB[k]}</label><input id="rp_${k}" value="${esc(V[k])}"></div>`).join('')}</div>
   <label style="margin-top:12px">Konteks / situasi pembelajaran (opsional)</label><textarea id="rp_konteks" rows="2"></textarea><div class="row" style="margin-top:12px"><button onclick="rppGen()">Generate Modul Ajar dengan AI</button></div><p id="rp_st"></p></div>`)}
@@ -388,7 +401,7 @@ function rppHTML(d){const c=v=>{if(!v)return '-';if(typeof v=='object')v=Object.
   [fs,kl]=String(d.fase||'').split('/').map(x=>x.trim()),
   PL=[['profil_keimanan','Keimanan dan Ketakwaan terhadap Tuhan YME'],['profil_kewargaan','Kewargaan'],['profil_penalaran','Penalaran Kritis'],['profil_kreativitas','Kreativitas'],['profil_kolaborasi','Kolaborasi'],['profil_kemandirian','Kemandirian'],['profil_kesehatan','Kesehatan'],['profil_komunikasi','Komunikasi']].filter(([k])=>d[k]&&String(d[k]).trim()&&String(d[k]).trim()!='-'),
   T5=(a,ed)=>`<table style="text-align:center"><tr><th>Kriteria</th><th>Sangat baik (4)</th><th>Baik (3)</th><th>Cukup (2)</th><th>Perlu dikembangkan (1)</th></tr>${a.map(r=>`<tr>${r.map((x,i)=>`<td style="${i?'':'text-align:left;font-weight:700'}">${ed?`<span class="ed" contenteditable="true">${x}</span>`:x}</td>`).join('')}</tr>`).join('')}</table>`,
-  SG=(im)=>`<div class="sg">${im?`<img src="${im}">`:''}</div>`;
+  SG=(im)=>`<div class="sg" style="justify-content:flex-start">${im?`<img src="${im}">`:''}</div>`;
   return `<div class="mt">MODUL PEMBELAJARAN<br>KELAS ${E(kl||d.fase)} FASE ${E(fs||d.fase)}</div><table>${H('A. Informasi Umum')}<tr><td colspan="2" style="background:#f8fafc;font-weight:700;text-align:center">IDENTITAS SEKOLAH</td></tr>`+
   R('Nama Penyusun',d.nama)+R('Nama Sekolah',d.sekolah)+R('Alokasi Waktu',d.waktu)+R('Mapel',d.mapel)+R('Jumlah Siswa',d.siswa)+R('Fase / Kelas',d.fase)+R('Semester',d.semester)+R('Materi Pokok',d.materi)+R('Capaian Pembelajaran',d.cp,1)+R('Profil Pelajar Pancasila',d.profil_pancasila,1)+
   PL.map(([k,j],i)=>R(i?'':'Profil Lulusan yang Relevan',`<strong>${j}</strong><br>${c(d[k])}`,1)).join('')+
@@ -402,7 +415,7 @@ function rppHTML(d){const c=v=>{if(!v)return '-';if(typeof v=='object')v=Object.
    ['Toleransi','Dapat menghargai pendapat peserta didik lain dan menerima kesepakatan meskipun berbeda pendapat.','Dapat menghargai pendapat peserta didik lain dan kurang bisa menerima kesepakatan.','Dapat menghargai pendapat peserta didik lain dan tidak bisa menerima kesepakatan.','Tidak dapat menghargai pendapat peserta didik lain dan tidak bisa menerima kesepakatan.']])+
   `<p><b>Asesmen Pengetahuan</b><br>Penilaian pengetahuan dilaksanakan melalui tes setelah kegiatan pembelajaran berlangsung.</p>`+T5([['Pilihan ganda','','','',''],['Uraian/esai','','','',''],['Tes Lisan','','','','']],1)+
   `<p><b>Asesmen Hasil Belajar</b><br>Penilaian ini dilakukan melalui pengamatan (observasi) Guru selama kegiatan pembelajaran berlangsung.</p>`+T5([['-','','','',''],['-','','','','']],1)+
-  `<div class="sb"><div>Mengetahui,<br>Kepala Sekolah${SG(VP.ttdKepsek)}<b>( ${E(d.kepsek)} )</b></div><div>${E([d.tempat,d.tanggal].filter(Boolean).join(', '))}<br>${E(d.jenis_guru)}${SG(VP.ttdGuru)}<b>( ${E(d.nama)} )</b></div></div>`}
+  `<div class="ttd"><div>Mengetahui,<br>Kepala Sekolah${SG(VP.ttdKepsek)}<b><u>${E(d.kepsek)}</u></b>${nipL(VP.nipKepsek)}</div><div>${E([d.tempat,d.tanggal].filter(Boolean).join(', '))}<br>${E(d.jenis_guru)}${SG(VP.ttdGuru)}<b><u>${E(d.nama)}</u></b>${d.nip&&d.nip!='-'?nipL(d.nip):''}</div></div>`}
 
 /* print semua */
 function nilaiHTML(ds){const R=rows().filter(r=>ds.includes(r.t)),bm=r=>(r.bab||'').trim()||'-',babs=[...new Set(R.map(bm))],G2=babs.map(b=>R.filter(r=>bm(r)==b)),cl=i=>'n'+(i%4);if(!R.length)return '';
@@ -414,11 +427,11 @@ function nilaiHTML(ds){const R=rows().filter(r=>ds.includes(r.t)),bm=r=>(r.bab||
   <table class="nt"><tr><th rowspan="3">No</th><th rowspan="3">Nama Siswa</th><th colspan="${R.length}">Penilaian Formatif</th><th colspan="${babs.length}">Sumatif</th><th rowspan="3">Rata-<br>Rata</th><th rowspan="3">STS</th><th rowspan="3">SAS</th><th rowspan="3">Nilai<br>Akhir</th></tr>
   <tr>${G2.map((g,i)=>`<th colspan="${g.length}" class="${cl(i)}">L. Materi ${i+1}</th>`).join('')}${babs.map((b,i)=>`<th rowspan="2" class="${cl(i)}">LM ${i+1}</th>`).join('')}</tr>
   <tr>${G2.flatMap((g,i)=>g.map((r,j)=>`<th class="${cl(i)}">TP${j+1}</th>`)).join('')}</tr>${body}</table>
-  <p style="font-size:9pt">${babs.map((b,i)=>`L. Materi ${i+1} / LM ${i+1}: ${esc(b)}`).join('<br>')}</p>`}
+  <p style="font-size:9pt">${babs.map((b,i)=>`L. Materi ${i+1} / LM ${i+1}: ${esc(b)}`).join('<br>')}</p>${ttd(VP,iso(new Date()))}`}
 function jurnalHTML(ds){const L=ds.map(t=>[t,X.Jurnal[K(t)]]).filter(x=>x[1]);if(!L.length)return '';
   return `<div class="nk"><h2>JURNAL MENGAJAR</h2><p>${esc(VP.sekolah)} | ${esc(VP.mapel)} | Kelas ${esc(VP.kelas)} | Semester ${VP.semester} | Tahun Ajaran ${esc(VP.tahun)}</p></div>
   <table class="t3"><tr><th>No</th><th>Tanggal</th><th>Jam ke</th><th>Kelas</th><th>Materi</th><th>Model</th><th>H</th><th>S</th><th>I</th><th>A</th><th>Hadir</th><th>Catatan</th></tr>${L.map(([t,j],i)=>{const s=j.hadir+j.sakit+j.izin+j.alpa;
-   return `<tr><td>${i+1}</td><td style="white-space:nowrap">${tg(j.tgl||t)}</td><td>${esc(j.jam)}</td><td>${esc(j.kelas)}</td><td>${esc(j.materi)}</td><td>${esc(j.model)}</td><td>${j.hadir}</td><td>${j.sakit}</td><td>${j.izin}</td><td>${j.alpa}</td><td>${s?Math.round(j.hadir/s*100):0}%</td><td>${esc(j.catatan)}</td></tr>`}).join('')}</table>`}
+   return `<tr><td>${i+1}</td><td style="white-space:nowrap">${tg(j.tgl||t)}</td><td>${esc(j.jam)}</td><td>${esc(j.kelas)}</td><td>${esc(j.materi)}</td><td>${esc(j.model)}</td><td>${j.hadir}</td><td>${j.sakit}</td><td>${j.izin}</td><td>${j.alpa}</td><td>${s?Math.round(j.hadir/s*100):0}%</td><td>${esc(j.catatan)}</td></tr>`}).join('')}</table>${ttd(VP,iso(new Date()))}`}
 function openPA(){$('#dpb').innerHTML=`<div><label><input type="checkbox" id="pj1" checked> Semua RPP</label><label><input type="checkbox" id="pj2" checked> Semua penilaian (formatif TP dan sumatif LM)</label><label><input type="checkbox" id="pj3" checked> Semua jurnal</label></div>
   <div><label>Pilih tanggal pertemuan <a href="#" onclick="document.querySelectorAll('.pd').forEach(x=>x.checked=!x.checked);return false">(balik pilihan)</a></label><div style="max-height:180px;overflow:auto;border:2px solid var(--line);border-radius:10px;padding:8px">${rows().map(r=>`<label><input type="checkbox" class="pd" value="${r.t}" checked> Pert. ${r.no}, ${tg(r.t)}</label>`).join('')}</div></div>
   <div class="grid"><div><label>Kertas</label><select id="ppk"><option>A4</option><option>F4</option></select></div><div><label>Orientasi</label><select id="por"><option value="portrait">Potrait</option><option value="landscape">Landscape</option></select></div></div>`;$('#dp').showModal()}
@@ -428,7 +441,23 @@ function doPA(){const ds=[...document.querySelectorAll('.pd:checked')].map(x=>x.
   if($('#pj2').checked)h+=`<div class="pbk">${nilaiHTML(ds)}</div>`;if($('#pj3').checked)h+=`<div class="pbk">${jurnalHTML(ds)}</div>`;
   if(!h.replace(/<[^>]*>/g,'').trim())return toast('Belum ada data untuk dicetak pada pilihan ini.');$('#dp').close();printHTML(h,$('#ppk').value,$('#por').value)}
 
-load();
+/* ===== LOGIN ===== */
+let AUTH=JSON.parse(sessionStorage.auth||localStorage.auth||'null');
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('psg:'+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function lloc(o){const l=JSON.parse(localStorage.akun||'[]');if(o.a=='lstat')return{has:l.length>0};if(o.a=='login')return{ok:l.some(x=>x.u==o.u&&x.h==o.h)};
+  if(l.length&&!l.some(x=>x.u==(o.auth||{}).u&&x.h==(o.auth||{}).h))throw new Error('Tidak berwenang. Masuk dulu.');const i=l.findIndex(x=>x.u==o.u);i<0?l.push({u:o.u,h:o.h}):l[i].h=o.h;localStorage.akun=JSON.stringify(l);return{ok:1}}
+const lcall=o=>wrap('Memeriksa akun...',async()=>API_URL?await xcall(o):lloc(o));
+function showLogin(m){$('main').hidden=true;$('#lg').hidden=false;$('#lm').textContent=m||'Masuk untuk melanjutkan'}
+function enter(){$('#lg').hidden=true;$('main').hidden=false;$('#lo').hidden=!AUTH;load()}
+async function doLogin(){const u=$('#lu').value.trim(),p=$('#lp').value;if(!u||!p)return $('#lm').textContent='Isi username dan password.';
+  try{const h=await sha(u+':'+p),r=await lcall({a:'login',u,h});if(!r.ok)return $('#lm').textContent='Username atau password salah.';
+    AUTH={u,h};(($('#lr').checked)?localStorage:sessionStorage).auth=JSON.stringify(AUTH);enter()}catch(e){$('#lm').textContent='Gagal terhubung: '+e.message}}
+function logout(){sessionStorage.removeItem('auth');localStorage.removeItem('auth');location.reload()}
+async function boot(){$('main').hidden=true;let st;try{st=await lcall({a:'lstat'})}catch(e){return showLogin('Tidak dapat terhubung ke server. Muat ulang halaman.')}
+  if(!st.has){AUTH=null;return enter()}
+  if(AUTH)try{if((await lcall({a:'login',u:AUTH.u,h:AUTH.h})).ok)return enter()}catch(e){}
+  AUTH=null;showLogin()}
+boot();
 </script>
 </body>
 </html>
