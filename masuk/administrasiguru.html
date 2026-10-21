@@ -220,7 +220,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <small>CETAK</small><a onclick="openCetak('sem')">🖨️ Program Semester</a><a onclick="openCetak('thn')">🗓️ Program Tahunan</a>
 <small>AKUN</small><a id="lo" hidden onclick="logout()">🚪 Keluar</a></nav>
 <div class="promo"><b>Tahun ajaran aktif</b><span id="pt"></span><button class="soft" onclick="openSet()">Atur sekarang</button></div></aside>
-<div class="mw"><header class="tb"><button id="hb" class="ghost sm" onclick="document.body.classList.toggle('so')">☰</button><span>🔍</span><input id="q" placeholder="Cari program, kelas, mapel..." oninput="qs=this.value.toLowerCase();home()"><kbd>Ctrl K</kbd>
+<div class="mw"><header class="tb"><button id="hb" class="ghost sm" onclick="document.body.classList.toggle('so')">☰</button><span>🔍</span><input id="q" type="search" autocomplete="off" placeholder="Cari program, kelas, mapel..." oninput="qs=this.value.toLowerCase();home()">
 <span class="tbc"><span id="hari"></span> <b id="jam"></b></span><div class="avt" id="av2">G</div></header>
 <main>
 <section id="home">
