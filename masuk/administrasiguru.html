@@ -1010,7 +1010,7 @@ async function txLoad(ps){
   catch(e){ids.forEach(i=>delete TX[i]);toast('Status RPP/jurnal gagal dimuat')}}
 async function drawToday(){
   const el=$('#today');if(!el)return;const g=jdGuru();
-  if(!g){el.innerHTML=`<div class="card" style="margin-bottom:22px"><h2>📚 Pembelajaran Hari ini</h2><p style="margin:0 0 12px">${JD?'Pilih guru yang diaktifkan agar jadwal mengajar hari ini muncul di sini.':'Unggah backup jadwal pelajaran dan pilih guru aktif agar shortcut pembelajaran hari ini muncul di sini.'}</p><button class="soft" onclick="openJadwal()">ATUR JADWAL PELAJARAN</button></div>`;return}
+  if(!g){el.innerHTML=`<div class="card" style="margin-bottom:22px"><h2>Pembelajaran Hari ini</h2><p style="margin:0 0 12px">${JD?'Pilih guru yang diaktifkan agar jadwal mengajar hari ini muncul di sini.':'Unggah backup jadwal pelajaran dan pilih guru aktif agar shortcut pembelajaran hari ini muncul di sini.'}</p><button class="soft" onclick="openJadwal()">ATUR JADWAL PELAJARAN</button></div>`;return}
   const now=new Date(),dow=now.getDay(),t=iso(now),h=JHARI[dow-1],bl=[];(h?jdBlocks(h):[]).forEach(b=>{const f=bl.find(x=>x.kelas==b.kelas&&x.kode==b.kode),w=b.mulai+' - '+b.selesai;if(f){f.waktu.push(w);f.jp+=b.jp}else bl.push({...b,waktu:[w]})});
   const items=bl.map(b=>({b,t,dow,p:jdProg(b,t)}));TDI=items;
   const mp=[...new Set(bl.length?bl.map(b=>b.mapel):jdMapelList())];
