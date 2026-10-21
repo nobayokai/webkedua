@@ -188,12 +188,21 @@ input,select,textarea{border:1px solid #d9dee3;border-radius:8px}input:focus,sel
 #qr{margin:16px 0}
 @media(max-width:1000px){.r1,.ch{grid-template-columns:1fr}.chl{border-right:0;border-bottom:1px solid #e6e6ef}}
 @media(max-width:900px){#sb{position:fixed;left:0;transform:translateX(-105%);transition:.2s;box-shadow:0 0 40px #0004}body.so #sb{transform:none}#hb{display:inline-block}.mw{padding:0 12px 20px}.tbc{display:none}.wi{width:120px}}
+
+/* ===== JADWAL PELAJARAN ===== */
+.jt th,.jt td{text-align:center;vertical-align:middle;padding:8px 6px;min-width:96px}
+.jt th:first-child,.jt td:first-child{position:sticky;left:0;background:#fff;z-index:1;white-space:nowrap;font-weight:700;min-width:118px;text-align:left}
+.jt th{background:var(--prs);color:var(--hd)}.jt th:first-child{background:var(--prs)}
+.jt tr.jr td{background:#fafafc;color:var(--mt);font-size:.8rem;font-weight:600}.jt tr.jr td:first-child{background:#fafafc}
+.jb{display:inline-flex;flex-direction:column;align-items:center;min-width:46px;margin:2px;padding:3px 8px;border-radius:10px;background:var(--c,#696cff);color:#fff;font-weight:800;line-height:1.15}
+.jb small{font-size:.62rem;font-weight:700;opacity:.9;letter-spacing:.05em}
+.jsql{background:#16324F;color:#e8f0ee;border-radius:10px;padding:12px;overflow:auto;font-size:.8rem;white-space:pre}
 </style>
 <style id="pgst"></style>
 </head>
 <body>
 <div class="app"><aside id="sb"><div class="lg2"><svg width="34" height="34" viewBox="0 0 34 34"><rect width="34" height="34" rx="9" fill="#696cff"/><path d="M10 23l7-13 7 13M13 19h8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Admin Guru</span></div><nav>
-<a id="nvh" class="on" onclick="home()">🏠 Dashboard</a><a onclick="baru()">➕ Program Baru</a><a onclick="openSet()">⚙️ Pengaturan</a>
+<a id="nvh" class="on" onclick="home()">🏠 Dashboard</a><a id="nvj" onclick="openJadwal()">📅 Jadwal Pelajaran</a><a onclick="baru()">➕ Program Baru</a><a onclick="openSet()">⚙️ Pengaturan</a>
 <small>CETAK</small><a onclick="openCetak('sem')">🖨️ Program Semester</a><a onclick="openCetak('thn')">🗓️ Program Tahunan</a>
 <small>AKUN</small><a id="lo" hidden onclick="logout()">🚪 Keluar</a></nav>
 <div class="promo"><b>Tahun ajaran aktif</b><span id="pt"></span><button class="soft" onclick="openSet()">Atur sekarang</button></div></aside>
@@ -202,12 +211,14 @@ input,select,textarea{border:1px solid #d9dee3;border-radius:8px}input:focus,sel
 <main>
 <section id="home">
 <div class="r1"><div class="card wc"><div><h2 id="wt"></h2><p id="ta"></p><button class="soft" onclick="baru()">BUAT PROGRAM BARU</button></div><svg class="wi" viewBox="0 0 220 170"><rect x="30" y="118" width="170" height="8" rx="4" fill="#d9daff"/><circle cx="110" cy="52" r="24" fill="#f5cba7"/><path d="M84 50c0-26 52-26 52 0-12-10-40-10-52 0z" fill="#3b3f5c"/><path d="M78 118c0-40 12-52 32-52s32 12 32 52z" fill="#696cff"/><rect x="62" y="96" width="62" height="22" rx="3" fill="#c5c9d3"/><circle cx="93" cy="107" r="3" fill="#fff"/><rect x="166" y="92" width="22" height="26" rx="3" fill="#a1acb8"/><path d="M177 92c-12-14-14-26-6-34 4 14 8 22 6 34zM177 92c10-12 14-22 12-30-8 8-12 18-12 30z" fill="#03c3ec"/></svg></div><div id="wd"></div></div>
+<div id="today"></div>
 <div class="card ch"><div class="chl"><h3>Pertemuan per Bulan</h3><div class="lgd"><span><i style="background:#696cff"></i>Efektif</span><span><i style="background:#03c3ec"></i>Tanpa KBM</span></div><div id="bars"></div></div><div class="chr" id="gauge"></div></div>
 <h2 class="sec">🗂️ Program tersimpan</h2><div id="list"></div>
 </section>
 
 <section id="view" hidden></section>
 <section id="tool" hidden></section>
+<section id="jadwal" hidden></section>
 <section id="edit" hidden>
   <div class="row" style="margin-bottom:12px"><button class="ghost" onclick="home()">Kembali</button><h2 id="et"></h2></div>
   <div class="card"><h2>1. Identitas</h2><div class="grid" id="idn"></div></div>
@@ -335,7 +346,7 @@ async function api0(a, d) {
     throw err;
   }
 }
-async function load(){$('#list').innerHTML=ld('Memuat program...');await loadSiswa();await loadAgenda();try{progs=await api('list')}catch(e){toast('Gagal memuat data.');progs=[]}draw()}
+async function load(){$('#list').innerHTML=ld('Memuat program...');await loadSiswa();await loadAgenda();await loadJadwal();try{progs=await api('list')}catch(e){toast('Gagal memuat data.');progs=[]}draw()}
 
 /* perhitungan kalender */
 function calc(p){const out=[],ag={},ags=agFor(p.tahun);(ags.length?ags:p.agenda||[]).forEach(a=>(ag[a.tgl]=ag[a.tgl]||[]).push(a));
@@ -351,10 +362,10 @@ let qs='';
 function draw(){
   const L=progs.filter(p=>p.tahun==S.tahun),mo={},cls=new Set();let E=0,N=0;
   L.forEach(p=>{cls.add(p.kelas);calc(p).forEach(r=>{const m=mo[r.t.slice(0,7)]=mo[r.t.slice(0,7)]||[0,0];r.s=='KBM'&&!r.ex?(m[0]++,E++):(m[1]++,N++)})});
-  const T=E+N,pc=T?Math.round(E/T*100):0,nm=((L[0]||progs[0]||{}).guru||'').split(' ')[0]||'Bapak/Ibu';
+  const T=E+N,pc=T?Math.round(E/T*100):0,nm=((jdGuru()||{}).nama||(L[0]||progs[0]||{}).guru||'').split(' ')[0]||'Bapak/Ibu';
   $('#wt').textContent=`Selamat datang, ${nm}! 🎉`;
   $('#ta').innerHTML=`Tahun ajaran <b>${esc(S.tahun)}</b> semester <b>${S.semester}</b>.<br>Anda punya <b>${L.length}</b> program dengan <b>${E}</b> pertemuan efektif.`;
-  $('#pt').textContent=S.tahun+' · '+S.semester;$('#av2').textContent=((AUTH&&AUTH.u)||'G')[0].toUpperCase();
+  $('#pt').textContent=S.tahun+' · '+S.semester;$('#av2').textContent=((AUTH&&AUTH.u)||'G')[0].toUpperCase();drawToday();
   const C=(ic,bg,fg,l,v,sb,up)=>`<div class="card sc2"><div class="ic" style="background:${bg};color:${fg}">${ic}</div><span>${l}</span><b>${v}</b><small class="${up?'':'dn'}">${sb}</small></div>`;
   $('#wd').innerHTML=C('🗂️','#e7e7ff','#696cff','Program',L.length,'tersimpan',1)+C('✅','#e8fadf','#71dd37','Efektif',E,pc+'% dari hari',1)+C('🏖️','#ffe0db','#ff3e1d','Tanpa KBM',N,'libur / ujian / kegiatan',0)+C('🎓','#d7f5fc','#03c3ec','Kelas',cls.size,esc([...cls].join(', '))||'-',1);
   const ks=Object.keys(mo).sort(),top=Math.ceil(Math.max(4,...ks.map(k=>Math.max(...mo[k])))/4)*4;
@@ -387,18 +398,28 @@ setInterval(()=>{const d=new Date();$('#hari').textContent=`${HR[d.getDay()]}, $
 
 function home(){show('home');draw()}
 async function hapus(id){if(confirm('Hapus program ini?')){progs=await api('del',{id});draw();toast('Program dihapus')}}
-function baru(){const l=progs[progs.length-1]||{};
-  cur=sync({id:'p'+Date.now(),sekolah:l.sekolah||'',mapel:l.mapel||'',kelas:l.kelas||'',semester:S.semester,tahun:S.tahun,hari:2,guru:l.guru||'',nipGuru:l.nipGuru||'',kepsek:l.kepsek||'',nipKepsek:l.nipKepsek||'',
-    tanggal:iso(new Date()),mulai:S.mulai,selesai:S.selesai,agenda:[],materi:{},ttdGuru:'',ttdKepsek:''});open_('Program baru')}
+function baru(pre){const l=progs[progs.length-1]||{},jg=jdGuru(),ml=jg?jdMapelList():[],
+  mp=jg?(ml.find(x=>jdMk(x)==jdMk(l.mapel))||(ml.length==1?ml[0]:'')):(l.mapel||'');
+  cur=sync({id:'p'+Date.now(),sekolah:l.sekolah||'',mapel:mp,kelas:l.kelas||'',semester:S.semester,tahun:S.tahun,hari:2,guru:jg?jg.nama:(l.guru||''),nipGuru:l.nipGuru||'',kepsek:l.kepsek||'',nipKepsek:l.nipKepsek||'',
+    tanggal:iso(new Date()),mulai:S.mulai,selesai:S.selesai,agenda:[],materi:{},ttdGuru:'',ttdKepsek:''});
+  if(pre)Object.assign(cur,pre);open_('Program baru')}
 function edit(id){cur=sync(JSON.parse(JSON.stringify(progs.find(p=>p.id==id))));open_('Edit program')}
-function open_(t){$('#et').textContent=t;$('#home').hidden=true;$('#edit').hidden=false;form();dCal();scrollTo(0,0)}
+function open_(t){$('#et').textContent=t;show('edit');form();dCal();scrollTo(0,0)}
 
 /* 1. identitas */
 const F=[['sekolah','Nama satuan pendidikan'],['mapel','Mata pelajaran'],['kelas','Kelas'],['semester','Semester',['Gasal','Genap']],['tahun','Tahun pelajaran (contoh 2026/2027)'],['hari','Hari pembelajaran',[1,2,3,4,5]],
   ['guru','Guru mata pelajaran'],['nipGuru','NIP guru'],['kepsek','Kepala sekolah'],['nipKepsek','NIP kepala sekolah'],['tanggal','Tanggal pembuatan','date'],['mulai','Awal semester','date'],['selesai','Akhir semester','date']];
-function form(){$('#idn').innerHTML=F.map(([k,l,o])=>`<div><label>${l}</label>`+(Array.isArray(o)?`<select data-k="${k}">${o.map(v=>`<option value="${v}" ${v==cur[k]?'selected':''}>${k=='hari'?HR[v]:v}</option>`).join('')}</select>`:`<input data-k="${k}" type="${o||'text'}" value="${esc(cur[k])}">`)+'</div>').join('');
+function form(){
+  const jg=jdGuru();if(jg&&!cur.guru)cur.guru=jg.nama;
+  const ml=jg?jdMapelList():[];
+  $('#idn').innerHTML=F.map(([k,l,o])=>{
+    if(jg&&k=='mapel')o=jdOpts(ml,cur.mapel,1);
+    if(jg&&k=='guru')o=jdOpts([jg.nama],cur.guru);
+    const lb=v=>k=='hari'?HR[v]:(k=='mapel'&&v===''?'— Pilih mata pelajaran —':(jg&&k=='mapel'&&!ml.includes(v)?v+' (tidak ada di jadwal)':v));
+    return `<div><label>${l}${jg&&(k=='mapel'||k=='guru')?' <small style="color:var(--pr)">(dari jadwal aktif)</small>':''}</label>`+(Array.isArray(o)?`<select data-k="${k}">${o.map(v=>`<option value="${esc(v)}" ${v==cur[k]?'selected':''}>${esc(lb(v))}</option>`).join('')}</select>`:`<input data-k="${k}" type="${o||'text'}" value="${esc(cur[k])}">`)+'</div>'}).join('');
   document.querySelectorAll('#idn [data-k]').forEach(e=>e.onchange=()=>{const k=e.dataset.k;cur[k]=k=='hari'?+e.value:e.value;
     if(k=='semester'||k=='tahun'){const r=rng(cur.tahun,cur.semester);cur.mulai=r[0];cur.selesai=r[1];sync(cur);form()}
+    if(jdGuru()&&(k=='mapel'||k=='kelas')){const hs=jdDaysFor(cur.kelas,cur.mapel);if(hs.length&&!hs.includes(+cur.hari)){cur.hari=hs[0];form();toast('Hari disesuaikan dengan jadwal: '+HR[hs[0]])}}
     dCal()})}
 
 const KET=['Libur nasional','Kegiatan sekolah (tetap KBM)','Ujian sekolah'];
@@ -441,8 +462,8 @@ async function saveSet0(){if(!/^\d{4}\/\d{4}$/.test(T.tahun))return toast('Forma
   const sn=T.swNew,ad=T.agDirty;delete T.swNew;delete T.agDirty;S=T;localStorage.S=JSON.stringify(S);$('#dset').close();if(sn&&sn.length)try{await swSave(sn)}catch(e){toast('Data siswa gagal disimpan: '+e.message)}
   
   if(ad||(S.agenda.length&&!agFor(S.tahun).length))try{await agSave(S.tahun,S.agenda)}catch(e){toast('Agenda gagal disimpan: '+e.message)}
-  try{for(const p of progs){const b=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]);sync(p);if(b!=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]))progs=await api('save',p)}}catch(e){toast('Pengaturan tersimpan, tetapi sebagian program gagal diperbarui.');draw();return}
-  draw();toast('Pengaturan tersimpan')}
+  try{for(const p of progs){const b=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]);sync(p);if(b!=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]))progs=await api('save',p)}}catch(e){toast('Pengaturan tersimpan, tetapi sebagian program gagal diperbarui.');await loadJadwal();draw();return}
+  await loadJadwal();draw();toast('Pengaturan tersimpan')}
 function warn(){return cur.agenda?.length?'':'<p style="color:var(--rose);font-weight:800">Agenda sekolah untuk tahun ajaran ini belum diunggah di Pengaturan.</p>'}
 
 /* 3. kalender dan materi */
@@ -502,7 +523,7 @@ const norm=t=>String(t).replace(/\D/g,''),PAL=['#12806F','#D98200','#D1495B','#5
 const ld=m=>`<div class="ldc"><div class="ldb"><i></i></div>${m}</div>`;
 async function wrap(m,f){bz++;$('#lbt').textContent=m||'Memproses...';$('#lb').classList.add('on');try{return await f()}finally{if(!--bz)$('#lb').classList.remove('on')}}
 const K=(...a)=>VP.id+'|'+a.join('|');
-const show=n=>{['home','edit','view','tool'].forEach(x=>$('#'+x).hidden=x!=n);$('#nvh').classList.toggle('on',n=='home');document.body.classList.remove('so');scrollTo(0,0)};
+const show=n=>{['home','edit','view','tool','jadwal'].forEach(x=>$('#'+x).hidden=x!=n);$('#nvh').classList.toggle('on',n=='home');$('#nvj').classList.toggle('on',n=='jadwal');document.body.classList.remove('so');scrollTo(0,0)};
 const lsx=t=>JSON.parse(localStorage['x_'+t]||'{}');
 async function xcall(o) {
   const { a, t, pid, key, data, rows, tahun } = o;
@@ -620,7 +641,7 @@ async function xdel0(t,key){
 }
 const rows=()=>calc(VP).filter(r=>r.s=='KBM'&&!r.ex).map(r=>({...(VP.materi?.[r.t]||{}),...r}));
 
-async function view(id){VP=progs.find(p=>p.id==id);show('view');$('#view').innerHTML=ld('Memuat data pertemuan...');await wrap('Memuat data pertemuan...',xload);dView()}
+async function view(id){VP=progs.find(p=>p.id==id);RET=null;show('view');$('#view').innerHTML=ld('Memuat data pertemuan...');await wrap('Memuat data pertemuan...',xload);dView()}
 function dView(){const R=rows();BABS=[...new Set(R.map(r=>(r.bab||'').trim()).filter(Boolean))];
   const n=R.length,cnt=k=>R.filter(r=>X[k][K(r.t)]).length,jr=R.map(r=>X.Jurnal[K(r.t)]).filter(Boolean),th=jr.reduce((a,j)=>a+j.hadir,0),ta=jr.reduce((a,j)=>a+j.hadir+j.sakit+j.izin+j.alpa,0),kh=ta?Math.round(th/ta*100):0,pc=v=>n?Math.round(v/n*100):0,
   ini=(VP.guru||'G').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(),
@@ -691,7 +712,7 @@ function vList(){
 
 
 function tool(t,h){show('tool');$('#tool').innerHTML=`<div class="row" style="margin-bottom:12px"><button class="ghost" onclick="back()">Kembali</button><h2>${t}</h2></div>`+h}
-const back=()=>{show('view');dView()};
+const back=()=>{if(RET=='home'){RET=null;if(VP&&VP.uuid)TX[VP.uuid]=JSON.parse(JSON.stringify(X));home()}else{show('view');dView()}};
 function printHTML(h,pp='A4',or='portrait'){$('#pgst').textContent=`@page{size:${pp=='F4'?'215mm 330mm':'210mm 297mm'} ${or};margin:12mm}`;$('#pa').innerHTML=h;setTimeout(()=>print(),200)}
 
 /* siswa */
@@ -855,6 +876,177 @@ async function kirimSiswa(){const nama=($('#sn').value||'').trim();if(!nama)retu
   $('#sis').innerHTML=`<div class="kid"><div class="kh"><h2>🎉 Terima kasih, ${esc(nama)}!</h2><p>Jawabanmu sudah terkirim ke gurumu.</p></div><button class="big" onclick="siswaForm()">Isi untuk teman lain</button></div>`;scrollTo(0,0)}
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key=='k'&&$('#q')){e.preventDefault();$('#q').focus()}});
 $('#sb').addEventListener('click',e=>{if(e.target.closest('a'))document.body.classList.remove('so')});
+
+/* ===== JADWAL PELAJARAN ===== */
+let JD=null,JDERR='',TX={},RET=null,TDI=[],TXT=0;
+const JHARI=['SENIN','SELASA','RABU','KAMIS','JUMAT'];
+const JSQL=`create table if not exists public.jadwal_pelajaran(
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  tahun_ajaran text not null,
+  data jsonb not null,
+  guru_id text,
+  guru_nama text,
+  updated_at timestamptz default now(),
+  unique(user_id,tahun_ajaran)
+);
+alter table public.jadwal_pelajaran enable row level security;
+create policy "jadwal_select" on public.jadwal_pelajaran for select using (auth.uid()=user_id);
+create policy "jadwal_insert" on public.jadwal_pelajaran for insert with check (auth.uid()=user_id);
+create policy "jadwal_update" on public.jadwal_pelajaran for update using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy "jadwal_delete" on public.jadwal_pelajaran for delete using (auth.uid()=user_id);`;
+const jdMk=s=>String(s||'').replace(/\s+/g,' ').trim().toUpperCase();
+const jdPv=v=>{const m=String(v||'').match(/^(\d+)(.+)$/);return m?{g:m[1],kode:m[2].trim()}:null};
+const jdCol=k=>PAL[[...String(k)].reduce((a,c)=>a+c.charCodeAt(0),0)%PAL.length];
+const jdSplit=j=>String(j).split(/\s*-\s*/);
+
+/* model jadwal dari JSON backup */
+function jdModel(){
+  if(!JD||!JD.data)return null;if(JD._m)return JD._m;
+  const d=JD.data,gr=[];
+  if(Array.isArray(d.dbGuru))d.dbGuru.forEach((x,i)=>x&&x.nama&&gr.push({id:String(i),nama:x.nama}));
+  else Object.entries(d.dbGuru||{}).forEach(([k,x])=>x&&x.nama&&gr.push({id:String(k),nama:x.nama}));
+  gr.sort((a,b)=>(+a.id||0)-(+b.id||0));
+  const mp={};(d.mapelArray||[]).forEach(m=>mp[m.kode]=String(m.nama||'').replace(/\s+/g,' ').trim());
+  return JD._m={guru:gr,gmap:Object.fromEntries(gr.map(g=>[g.id,g])),mapel:mp,kelas:d.kelasArray||[],waktu:d.waktuArray||[],memori:d.memoriJadwal||{}}}
+function jdGuru(){const M=jdModel();return M&&JD.guru_id?(M.gmap[String(JD.guru_id)]||null):null}
+
+/* blok mengajar guru aktif pada satu hari (jam berurutan, kelas & mapel sama digabung) */
+function jdBlocks(h){
+  const M=jdModel(),g=jdGuru(),out=[],open={};if(!M||!g)return out;
+  M.waktu.forEach(w=>{
+    if(w.tipe!='pelajaran'){for(const k in open)delete open[k];return}
+    const [s,e]=jdSplit(w.jam),row=(M.memori[h]||{})[w.jam]||{},seen=new Set();
+    M.kelas.forEach(k=>{const p=jdPv(row[k]);if(!p||p.g!=g.id)return;seen.add(k);const b=open[k];
+      if(b&&b.kode==p.kode){b.selesai=e;b.jp++}
+      else{const nb={kelas:k,kode:p.kode,mapel:M.mapel[p.kode]||p.kode,mulai:s,selesai:e,jp:1};out.push(nb);open[k]=nb}});
+    for(const k in open)if(!seen.has(k))delete open[k]});
+  return out.sort((a,b)=>a.mulai.localeCompare(b.mulai)||a.kelas.localeCompare(b.kelas))}
+function jdMapelList(){const M=jdModel(),s=new Set();if(M&&jdGuru())JHARI.forEach(h=>jdBlocks(h).forEach(b=>{if(M.mapel[b.kode])s.add(b.mapel)}));return[...s].sort((a,b)=>a.localeCompare(b))}
+const jdDaysFor=(kelas,mapel)=>JHARI.map((h,i)=>jdBlocks(h).some(b=>nk(b.kelas)==nk(kelas)&&jdMk(b.mapel)==jdMk(mapel))?i+1:0).filter(Boolean);
+function jdOpts(list,curv,ph){const a=ph?['',...list]:[...list];if(curv&&!a.includes(curv))a.push(curv);return a}
+
+/* database */
+async function loadJadwal(){
+  JD=null;JDERR='';TX={};
+  try{const{data:{user}}=await sb.auth.getUser();if(!user)return;
+    const{data,error}=await sb.from('jadwal_pelajaran').select('*').eq('user_id',user.id).eq('tahun_ajaran',S.tahun).maybeSingle();
+    if(error)throw error;
+    if(data&&typeof data.data=='string')data.data=JSON.parse(data.data);
+    JD=data||null}
+  catch(e){JDERR=e.message||String(e);console.error(e)}}
+async function jdUpload(e){
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  let d;try{d=JSON.parse(await f.text())}catch(x){return toast('File bukan JSON yang valid.')}
+  if(!d||typeof d!='object'||!d.dbGuru||!d.mapelArray||!d.kelasArray||!d.waktuArray||!d.memoriJadwal)return toast('Format backup tidak dikenali (butuh dbGuru, mapelArray, kelasArray, waktuArray, memoriJadwal).');
+  if(JD&&!confirm('Jadwal tahun ajaran '+S.tahun+' sudah ada. Ganti dengan file ini?'))return;
+  const oldNama=JD&&JD.guru_nama;
+  try{await wrap('Menyimpan jadwal...',async()=>{
+    const{data:{user}}=await sb.auth.getUser();if(!user)throw new Error('Sesi login habis, silakan refresh.');
+    const tmp={data:d};const bak=JD;JD=tmp;const M=jdModel();JD=bak;
+    const g=oldNama?M.guru.find(x=>x.nama==oldNama):null;
+    const row={user_id:user.id,tahun_ajaran:S.tahun,data:d,guru_id:g?g.id:null,guru_nama:g?g.nama:null,updated_at:new Date().toISOString()};
+    const{data:sv,error}=await sb.from('jadwal_pelajaran').upsert(row,{onConflict:'user_id,tahun_ajaran'}).select().single();
+    if(error)throw error;JD=sv;JDERR=''});
+    toast(JD&&JD.guru_id?'Jadwal diperbarui':'Jadwal tersimpan, sekarang pilih guru yang diaktifkan')}
+  catch(x){toast('Gagal menyimpan jadwal: '+x.message)}
+  dJadwal();draw()}
+async function jdAktif(id){
+  const M=jdModel();if(!JD||!M)return;const g=M.gmap[id]||null;
+  try{await wrap('Mengaktifkan guru...',async()=>{
+    const{error}=await sb.from('jadwal_pelajaran').update({guru_id:g?g.id:null,guru_nama:g?g.nama:null,updated_at:new Date().toISOString()}).eq('id',JD.id);
+    if(error)throw error;JD.guru_id=g?g.id:null;JD.guru_nama=g?g.nama:null});
+    toast(g?'Guru aktif: '+g.nama:'Guru aktif dihapus')}
+  catch(x){toast('Gagal: '+x.message)}
+  dJadwal();draw()}
+async function jdHapus(){
+  if(!JD||!confirm('Hapus jadwal pelajaran tahun ajaran '+S.tahun+'?'))return;
+  try{await wrap('Menghapus jadwal...',async()=>{const{error}=await sb.from('jadwal_pelajaran').delete().eq('id',JD.id);if(error)throw error;JD=null});toast('Jadwal dihapus')}
+  catch(x){toast('Gagal menghapus: '+x.message)}
+  dJadwal();draw()}
+
+/* menu Jadwal Pelajaran */
+function openJadwal(){show('jadwal');dJadwal()}
+function dJadwal(){
+  const M=jdModel(),g=jdGuru();
+  let h='<h2 class="sec">📅 Jadwal Pelajaran</h2>';
+  if(JDERR)h+=`<div class="card" style="border-left:6px solid var(--rose)"><h3>⚠️ Tabel jadwal belum siap di database</h3><p>${esc(JDERR)}</p><p>Jalankan SQL berikut sekali di <b>Supabase → SQL Editor</b>, lalu muat ulang halaman:</p><pre class="jsql">${esc(JSQL)}</pre></div>`;
+  h+=`<div class="card"><h2>1. Unggah backup jadwal pelajaran (.json)</h2><p>Disimpan di database untuk tahun ajaran aktif <b>${esc(S.tahun)}</b>.</p>
+    <div class="row"><input type="file" id="jf" accept=".json,application/json" style="max-width:340px" onchange="jdUpload(event)">${JD?'<button class="red sm" onclick="jdHapus()">🗑️ Hapus jadwal</button>':''}</div>
+    <p style="margin:10px 0 0">${M?`✅ Jadwal tersimpan: <b>${M.guru.length}</b> guru, <b>${M.kelas.length}</b> kelas${JD.updated_at?' · diperbarui '+new Date(JD.updated_at).toLocaleString('id-ID'):''}.`:'Belum ada jadwal untuk tahun ajaran ini.'}</p></div>`;
+  if(M)h+=`<div class="card"><h2>2. Pilih guru yang diaktifkan</h2>
+    <select id="jg" onchange="jdAktif(this.value)" style="max-width:460px"><option value="">— Pilih nama guru —</option>${M.guru.map(x=>`<option value="${esc(x.id)}" ${String(JD.guru_id)==x.id?'selected':''}>${esc(x.nama)}</option>`).join('')}</select>
+    <p style="margin:10px 0 0">${g?`Guru aktif: <b>${esc(g.nama)}</b><br>Mata pelajaran: <b>${esc(jdMapelList().join(', ')||'-')}</b>`:'Belum ada guru aktif. Pilih satu nama untuk menampilkan jadwal, shortcut di beranda, dan pilihan mapel pada program.'}</p></div>`;
+  if(g)h+=jdTable();
+  $('#jadwal').innerHTML=h}
+function jdTable(){
+  const M=jdModel(),g=jdGuru(),D=JHARI;
+  const mine=(h,jam)=>{const r=(M.memori[h]||{})[jam]||{};return M.kelas.map(k=>{const p=jdPv(r[k]);return p&&p.g==g.id?{k,kode:p.kode}:null}).filter(Boolean)};
+  const rows=M.waktu.map(w=>{
+    if(w.tipe=='istirahat')return `<tr class="jr"><td>${esc(w.jam)}</td><td colspan="5">☕ ${esc(w.label||'Istirahat')}</td></tr>`;
+    if(w.tipe=='kegiatan'){const hs=String(w.targetHari||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+      return `<tr class="jr"><td>${esc(w.jam)}</td>${D.map(h=>`<td>${!hs.length||hs.includes(h)?esc(w.label):''}</td>`).join('')}</tr>`}
+    return `<tr><td>${esc(w.jam)}</td>${D.map(h=>`<td>${mine(h,w.jam).map(x=>`<span class="jb" style="--c:${jdCol(x.kode)}" title="${esc(M.mapel[x.kode]||x.kode)}">${esc(x.k)}<small>${esc(x.kode)}</small></span>`).join('')}</td>`).join('')}</tr>`}).join('');
+  let tot=0;const unk=new Set();
+  const sum=D.map((h,i)=>{const b=jdBlocks(h);b.forEach(x=>{tot+=x.jp;if(!M.mapel[x.kode])unk.add(`${x.kode} (${HR[i+1]}, kelas ${x.kelas}, ${x.mulai})`)});
+    return `<tr><td><b>${HR[i+1]}</b></td><td>${b.length?b.map(x=>`<div style="margin:3px 0"><span class="tag" style="background:${jdCol(x.kode)}">${esc(x.kelas)}</span> <b>${esc(x.mapel)}</b> · ${x.mulai} - ${x.selesai} <small>(${x.jp} JP)</small></div>`).join(''):'<span style="color:var(--mt)">Tidak mengajar</span>'}</td></tr>`}).join('');
+  return `<div class="card"><h2>3. Jadwal pelajaran — ${esc(g.nama)}</h2><div class="sc"><table class="jt"><tr><th>Hari / Waktu</th>${D.map((h,i)=>`<th>${HR[i+1]}</th>`).join('')}</tr>${rows}</table></div>
+    <p style="margin:10px 0 0;color:var(--mt);font-size:.85rem">Kotak berwarna = kelas yang diajar, huruf kecil = kode mapel. Total <b>${tot} JP</b> per minggu.</p>
+    ${unk.size?`<p style="color:var(--rose);font-weight:700">⚠️ Kode mapel tidak ada di daftar mapel pada file jadwal: ${esc([...unk].join('; '))}. Perbaiki di aplikasi jadwal lalu unggah ulang.</p>`:''}</div>
+    <div class="card"><h2>Ringkasan mengajar per hari</h2><div class="sc"><table><tr><th style="width:110px">Hari</th><th>Kelas, mata pelajaran, dan waktu</th></tr>${sum}</table></div></div>`}
+
+/* beranda: pembelajaran hari ini */
+function jdProg(b,t){
+  const c=progs.filter(p=>p.tahun==S.tahun&&nk(p.kelas)==nk(b.kelas)&&jdMk(p.mapel)==jdMk(b.mapel));
+  if(!c.length)return null;
+  c.sort((x,y)=>(y.semester==S.semester)-(x.semester==S.semester));
+  for(const p of c){const r=calc(p).find(x=>x.t==t);if(r)return{prog:p,row:r}}
+  return{prog:c[0],row:null}}
+async function txLoad(ps){
+  const ids=[...new Set(ps.map(p=>p.uuid).filter(Boolean))];if(!ids.length)return;
+  ids.forEach(i=>TX[i]={RPP:{},Formatif:{},Sumatif:{},Jurnal:{},Refleksi:{}});
+  try{const{data,error}=await sb.from('konten_pembelajaran').select('program_id,jenis,kunci').in('program_id',ids);if(error)throw error;
+    data.forEach(r=>{if(TX[r.program_id]&&TX[r.program_id][r.jenis])TX[r.program_id][r.jenis][r.kunci]=1})}
+  catch(e){ids.forEach(i=>delete TX[i]);toast('Status RPP/jurnal gagal dimuat')}}
+async function drawToday(){
+  const el=$('#today');if(!el)return;const g=jdGuru();
+  if(!g){el.innerHTML=`<div class="card" style="margin-bottom:22px"><h2>📚 Pembelajaran Hari ini</h2><p style="margin:0 0 12px">${JD?'Pilih guru yang diaktifkan agar jadwal mengajar hari ini muncul di sini.':'Unggah backup jadwal pelajaran dan pilih guru aktif agar shortcut pembelajaran hari ini muncul di sini.'}</p><button class="soft" onclick="openJadwal()">ATUR JADWAL PELAJARAN</button></div>`;return}
+  const now=new Date(),dow=now.getDay(),t=iso(now),h=JHARI[dow-1],bl=[];(h?jdBlocks(h):[]).forEach(b=>{const f=bl.find(x=>x.kelas==b.kelas&&x.kode==b.kode),w=b.mulai+' - '+b.selesai;if(f){f.waktu.push(w);f.jp+=b.jp}else bl.push({...b,waktu:[w]})});
+  const items=bl.map(b=>({b,t,dow,p:jdProg(b,t)}));TDI=items;
+  const mp=[...new Set(bl.length?bl.map(b=>b.mapel):jdMapelList())];
+  const head=`<div class="card" style="border-left:6px solid var(--pr);margin-bottom:14px"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h2 style="margin:0 0 4px">📚 Pembelajaran Hari ini</h2><b style="color:var(--pr);text-transform:uppercase">${esc(mp.join(' · '))||'-'}</b></div><div style="text-align:right"><b>${HR[dow]}, ${tg(t)}</b><br><small>${esc(g.nama)}</small></div></div></div>`;
+  const need=items.filter(i=>i.p&&i.p.row&&!TX[i.p.prog.uuid]).map(i=>i.p.prog);
+  const tk=++TXT;
+  if(need.length){el.innerHTML=`<div style="margin-bottom:22px">${head}${ld('Memuat shortcut pembelajaran...')}</div>`;await txLoad(need);if(tk!=TXT)return}
+  const body=!h?'<div class="card"><p style="margin:0">🎉 Hari ini akhir pekan, tidak ada jadwal mengajar.</p></div>':!items.length?'<div class="card"><p style="margin:0">Tidak ada jadwal mengajar untuk guru ini hari ini.</p></div>':items.map((it,i)=>tdItem(it,i)).join('');
+  el.innerHTML=`<div style="margin-bottom:22px">${head}${body}</div>`}
+function tdItem(it,i){
+  const b=it.b,P=it.p,c=jdCol(b.kode),pl=(d,tx,f,col)=>`<button class="pill" style="--c:${col}" data-d="${d?1:0}" onclick="${f}">${tx}</button>`;
+  let mid,act='';
+  if(!P){mid=`<p>⚠️ Program <b>${esc(b.mapel)}</b> kelas ${esc(b.kelas)} belum dibuat untuk tahun ajaran ${esc(S.tahun)}.</p>`;act=pl(1,'➕ Buat Program',`tdBuat(${i})`,'#12806F')}
+  else if(!P.row){const p=P.prog;
+    mid=p.hari!=it.dow?`<p>⚠️ Program sudah ada, tetapi harinya <b>${HR[p.hari]||'-'}</b> sedangkan jadwal mengajar hari <b>${HR[it.dow]}</b>.</p>`:'<p>ℹ️ Hari ini di luar rentang semester pada program ini.</p>';
+    act=pl(0,'✏️ Edit Program',`edit('${p.id}')`,'#12806F')+pl(1,'👁️ View',`view('${p.id}')`,'#5B6CE0')}
+  else if(P.row.s!='KBM'){mid=`<p><span class="tag ${P.row.s}">${P.row.s}</span> ${esc(P.row.n||'Tidak ada KBM hari ini')}</p>`;act=pl(1,'👁️ View Program',`view('${P.prog.id}')`,'#5B6CE0')}
+  else if(P.row.ex){mid='<p>Tanggal ini ditandai tidak dihitung sebagai pertemuan.</p>';act=pl(1,'👁️ View Program',`view('${P.prog.id}')`,'#5B6CE0')}
+  else{const p=P.prog,m=p.materi?.[it.t]||{},X0=TX[p.uuid]||{},has=(j,k)=>!!(X0[j]&&X0[j][k]),k0=`${p.id}|${it.t}`,
+      nr=Object.keys(X0.Refleksi||{}).filter(k=>k.startsWith(k0+'|')).length;
+    mid=`<p><b>Pertemuan ${P.row.no}</b>${m.bab?' · '+esc(m.bab):''}</p><p>${esc(m.materi||'(materi pokok belum diisi di program)')}</p>`;
+    act=pl(has('RPP',k0),has('RPP',k0)?'Edit RPP':'Buat RPP',`tgo(${i},'rpp')`,'#12806F')
+      +pl(has('Formatif',k0),has('Formatif',k0)?'Edit Penilaian Formatif':'Isi Penilaian Formatif',`tgo(${i},'fmt')`,'#D98200')
+      +pl(has('Jurnal',k0),has('Jurnal',k0)?'Edit Jurnal':'Isi Jurnal',`tgo(${i},'jur')`,'#5B6CE0')
+      +pl(0,'Link Refleksi',`tgo(${i},'link')`,'#D1495B')
+      +pl(nr,`Hasil Refleksi (${nr})`,`tgo(${i},'hasil')`,'#D1495B')}
+  return `<div class="vr" style="--c:${c}"><div class="kbox"><b>${esc(b.kelas)}</b><small>Kelas</small></div>
+    <div class="vm"><b>⏰ ${esc(b.waktu.join(' & '))}</b> <span class="tag" style="background:${c}">${b.jp} JP</span><p style="color:var(--mt);font-weight:600">${esc(b.mapel)}</p>${mid}</div><div class="va">${act}</div></div>`}
+function tdBuat(i){const it=TDI[i];if(it)baru({mapel:it.b.mapel,kelas:it.b.kelas,hari:it.dow})}
+async function tgo(i,w){
+  const it=TDI[i];if(!it||!it.p||!it.p.row)return;const t=it.t;
+  VP=it.p.prog;RET='home';show('tool');$('#tool').innerHTML=ld('Memuat data pertemuan...');
+  await wrap('Memuat data pertemuan...',xload);
+  BABS=[...new Set(rows().map(r=>(r.bab||'').trim()).filter(Boolean))];
+  ({rpp:()=>openRpp(t),fmt:()=>openNilai('F',t),jur:()=>openJurnal(t),link:()=>openRef(t,'link'),hasil:()=>openRef(t,'hasil')})[w]()}
+
 
 /* ===== LOGIN DENGAN SUPABASE ===== */
 let AUTH = null;
