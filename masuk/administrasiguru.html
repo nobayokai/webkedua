@@ -9,6 +9,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
 :root{--ink:#16324F;--paper:#F3F7F4;--teal:#12806F;--amber:#F4A62A;--rose:#D1495B;--line:#D5DFD9}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 Nunito,sans-serif}
@@ -197,12 +199,24 @@ input,select,textarea{border:1px solid #d9dee3;border-radius:8px}input:focus,sel
 .jb{display:inline-flex;flex-direction:column;align-items:center;min-width:46px;margin:2px;padding:3px 8px;border-radius:10px;background:var(--c,#696cff);color:#fff;font-weight:800;line-height:1.15}
 .jb small{font-size:.62rem;font-weight:700;opacity:.9;letter-spacing:.05em}
 .jsql{background:#16324F;color:#e8f0ee;border-radius:10px;padding:12px;overflow:auto;font-size:.8rem;white-space:pre}
+
+/* ===== CP / ATP / KKTP ===== */
+button:disabled{opacity:.45;cursor:not-allowed}
+#dkbox{overflow:auto;background:#e9e9f0;padding:12px;border-radius:10px;text-align:center;max-height:80vh}
+#dkst{position:relative;margin:auto;background:#fff;box-shadow:0 2px 12px #0003}
+#dkc{display:block}#dko{position:absolute;inset:0}
+.dks{position:absolute;cursor:move;touch-action:none;outline:1px dashed #a1acb8}
+.dks.on{outline:2px solid var(--pr)}
+.dks img{display:block;width:100%;pointer-events:none;user-select:none}
+.dkh{position:absolute;right:-10px;bottom:-10px;width:20px;height:20px;border-radius:50%;background:var(--pr);border:2px solid #fff;cursor:nwse-resize;display:none;touch-action:none}
+.dks.on .dkh{display:block}
 </style>
 <style id="pgst"></style>
 </head>
 <body>
 <div class="app"><aside id="sb"><div class="lg2"><svg width="34" height="34" viewBox="0 0 34 34"><rect width="34" height="34" rx="9" fill="#696cff"/><path d="M10 23l7-13 7 13M13 19h8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Admin Guru</span></div><nav>
 <a id="nvh" class="on" onclick="home()">🏠 Dashboard</a><a id="nvj" onclick="openJadwal()">📅 Jadwal Pelajaran</a><a onclick="baru()">➕ Program Baru</a><a onclick="openSet()">⚙️ Pengaturan</a>
+<small>KURIKULUM</small><a id="nvcp" onclick="openDok('CP')">📘 CP</a><a id="nvatp" onclick="openDok('ATP')">🧭 ATP</a><a id="nvkktp" onclick="openDok('KKTP')">✅ KKTP</a>
 <small>CETAK</small><a onclick="openCetak('sem')">🖨️ Program Semester</a><a onclick="openCetak('thn')">🗓️ Program Tahunan</a>
 <small>AKUN</small><a id="lo" hidden onclick="logout()">🚪 Keluar</a></nav>
 <div class="promo"><b>Tahun ajaran aktif</b><span id="pt"></span><button class="soft" onclick="openSet()">Atur sekarang</button></div></aside>
@@ -219,6 +233,7 @@ input,select,textarea{border:1px solid #d9dee3;border-radius:8px}input:focus,sel
 <section id="view" hidden></section>
 <section id="tool" hidden></section>
 <section id="jadwal" hidden></section>
+<section id="dok" hidden></section>
 <section id="edit" hidden>
   <div class="row" style="margin-bottom:12px"><button class="ghost" onclick="home()">Kembali</button><h2 id="et"></h2></div>
   <div class="card"><h2>1. Identitas</h2><div class="grid" id="idn"></div></div>
@@ -523,7 +538,7 @@ const norm=t=>String(t).replace(/\D/g,''),PAL=['#12806F','#D98200','#D1495B','#5
 const ld=m=>`<div class="ldc"><div class="ldb"><i></i></div>${m}</div>`;
 async function wrap(m,f){bz++;$('#lbt').textContent=m||'Memproses...';$('#lb').classList.add('on');try{return await f()}finally{if(!--bz)$('#lb').classList.remove('on')}}
 const K=(...a)=>VP.id+'|'+a.join('|');
-const show=n=>{['home','edit','view','tool','jadwal'].forEach(x=>$('#'+x).hidden=x!=n);$('#nvh').classList.toggle('on',n=='home');$('#nvj').classList.toggle('on',n=='jadwal');document.body.classList.remove('so');scrollTo(0,0)};
+const show=n=>{['home','edit','view','tool','jadwal','dok'].forEach(x=>$('#'+x).hidden=x!=n);['CP','ATP','KKTP'].forEach(j=>$('#nv'+j.toLowerCase()).classList.toggle('on',n=='dok'&&DK.jenis==j));$('#nvh').classList.toggle('on',n=='home');$('#nvj').classList.toggle('on',n=='jadwal');document.body.classList.remove('so');scrollTo(0,0)};
 const lsx=t=>JSON.parse(localStorage['x_'+t]||'{}');
 async function xcall(o) {
   const { a, t, pid, key, data, rows, tahun } = o;
@@ -1010,7 +1025,7 @@ async function txLoad(ps){
   catch(e){ids.forEach(i=>delete TX[i]);toast('Status RPP/jurnal gagal dimuat')}}
 async function drawToday(){
   const el=$('#today');if(!el)return;const g=jdGuru();
-  if(!g){el.innerHTML=`<div class="card" style="margin-bottom:22px"><h2>Pembelajaran Hari ini</h2><p style="margin:0 0 12px">${JD?'Pilih guru yang diaktifkan agar jadwal mengajar hari ini muncul di sini.':'Unggah backup jadwal pelajaran dan pilih guru aktif agar shortcut pembelajaran hari ini muncul di sini.'}</p><button class="soft" onclick="openJadwal()">ATUR JADWAL PELAJARAN</button></div>`;return}
+  if(!g){el.innerHTML=`<div class="card" style="margin-bottom:22px"><h2>📚 Pembelajaran Hari ini</h2><p style="margin:0 0 12px">${JD?'Pilih guru yang diaktifkan agar jadwal mengajar hari ini muncul di sini.':'Unggah backup jadwal pelajaran dan pilih guru aktif agar shortcut pembelajaran hari ini muncul di sini.'}</p><button class="soft" onclick="openJadwal()">ATUR JADWAL PELAJARAN</button></div>`;return}
   const now=new Date(),dow=now.getDay(),t=iso(now),h=JHARI[dow-1],bl=[];(h?jdBlocks(h):[]).forEach(b=>{const f=bl.find(x=>x.kelas==b.kelas&&x.kode==b.kode),w=b.mulai+' - '+b.selesai;if(f){f.waktu.push(w);f.jp+=b.jp}else bl.push({...b,waktu:[w]})});
   const items=bl.map(b=>({b,t,dow,p:jdProg(b,t)}));TDI=items;
   const mp=[...new Set(bl.length?bl.map(b=>b.mapel):jdMapelList())];
@@ -1046,6 +1061,175 @@ async function tgo(i,w){
   await wrap('Memuat data pertemuan...',xload);
   BABS=[...new Set(rows().map(r=>(r.bab||'').trim()).filter(Boolean))];
   ({rpp:()=>openRpp(t),fmt:()=>openNilai('F',t),jur:()=>openJurnal(t),link:()=>openRef(t,'link'),hasil:()=>openRef(t,'hasil')})[w]()}
+
+
+/* ===== CP / ATP / KKTP (PDF + tanda tangan) ===== */
+const DKB='dokumen-kurikulum';
+const DKN={CP:'Capaian Pembelajaran (CP)',ATP:'Alur Tujuan Pembelajaran (ATP)',KKTP:'Kriteria Ketercapaian Tujuan Pembelajaran (KKTP)'};
+const DKSQL=`create table if not exists public.dokumen_kurikulum(
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  tahun_ajaran text not null,
+  jenis text not null check (jenis in ('CP','ATP','KKTP')),
+  judul text not null,
+  path text not null,
+  halaman int,
+  ukuran bigint,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table public.dokumen_kurikulum enable row level security;
+create policy "dok_select" on public.dokumen_kurikulum for select using (auth.uid()=user_id);
+create policy "dok_insert" on public.dokumen_kurikulum for insert with check (auth.uid()=user_id);
+create policy "dok_update" on public.dokumen_kurikulum for update using (auth.uid()=user_id) with check (auth.uid()=user_id);
+create policy "dok_delete" on public.dokumen_kurikulum for delete using (auth.uid()=user_id);
+
+insert into storage.buckets(id,name,public) values('dokumen-kurikulum','dokumen-kurikulum',false) on conflict (id) do nothing;
+create policy "dokobj_select" on storage.objects for select to authenticated using (bucket_id='dokumen-kurikulum' and (storage.foldername(name))[1]=auth.uid()::text);
+create policy "dokobj_insert" on storage.objects for insert to authenticated with check (bucket_id='dokumen-kurikulum' and (storage.foldername(name))[1]=auth.uid()::text);
+create policy "dokobj_update" on storage.objects for update to authenticated using (bucket_id='dokumen-kurikulum' and (storage.foldername(name))[1]=auth.uid()::text);
+create policy "dokobj_delete" on storage.objects for delete to authenticated using (bucket_id='dokumen-kurikulum' and (storage.foldername(name))[1]=auth.uid()::text);`;
+let DK={jenis:'CP',list:[],err:'',cur:null,bytes:null,pdf:null,n:0,pg:1,mode:'view',pl:[],sel:null,sig:{},tok:0,task:null};
+if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const dkUid=async()=>{const{data:{user}}=await sb.auth.getUser();if(!user)throw new Error('Sesi login habis, silakan refresh.');return user.id};
+const dkUuid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c=='x'?r:(r&3|8)).toString(16)});
+const dkKb=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+
+async function dkLoad(){
+  DK.err='';DK.list=[];
+  try{const uid=await dkUid();
+    const{data,error}=await sb.from('dokumen_kurikulum').select('*').eq('user_id',uid).eq('tahun_ajaran',S.tahun).eq('jenis',DK.jenis).order('created_at');
+    if(error)throw error;DK.list=data||[]}
+  catch(e){DK.err=e.message||String(e)}}
+async function openDok(j){
+  if(DK.jenis!=j||!DK.cur){dkClose()}
+  DK.jenis=j;DK.cur=null;show('dok');$('#dok').innerHTML=ld('Memuat dokumen '+j+'...');
+  await wrap('Memuat dokumen...',dkLoad);dDok()}
+function dkClose(){if(DK.pdf){try{DK.pdf.destroy()}catch(e){}}DK.pdf=null;DK.bytes=null;DK.cur=null;DK.mode='view';DK.pl=[];DK.sel=null;DK.n=0;DK.pg=1}
+function dDok(){
+  const j=DK.jenis,c=DK.cur;
+  let h=`<h2 class="sec">${j=='CP'?'📘':j=='ATP'?'🧭':'✅'} ${esc(DKN[j])}</h2>`;
+  if(!window.pdfjsLib||!window.PDFLib)h+='<div class="card" style="border-left:6px solid var(--rose)"><p style="margin:0">⚠️ Pustaka PDF gagal dimuat (cek koneksi internet), lalu muat ulang halaman.</p></div>';
+  if(DK.err)h+=`<div class="card" style="border-left:6px solid var(--rose)"><h3>⚠️ Penyimpanan dokumen belum siap di database</h3><p>${esc(DK.err)}</p><p>Jalankan SQL berikut sekali di <b>Supabase → SQL Editor</b>, lalu muat ulang halaman:</p><pre class="jsql">${esc(DKSQL)}</pre></div>`;
+  h+=`<div class="card"><h2>1. Unggah file ${esc(j)} (PDF)</h2><p>Disimpan di database untuk tahun ajaran aktif <b>${esc(S.tahun)}</b>. Maksimal 20 MB.</p>
+    <div class="grid"><div><label>Judul / keterangan</label><input id="dkj" placeholder="contoh: ${esc(j)} Informatika Fase C"></div><div><label>File PDF</label><input id="dkf" type="file" accept="application/pdf,.pdf"></div></div>
+    <div class="row" style="margin-top:12px"><button onclick="dkUpload()">⬆️ Unggah PDF</button></div></div>
+  <div class="card"><h2>2. Dokumen tersimpan</h2>${DK.list.length?DK.list.map(d=>`<div class="item"><div><b>${esc(d.judul)}</b>${c&&c.id==d.id?' <span class="tag">dibuka</span>':''}<br><small>${d.halaman||'?'} halaman · ${dkKb(d.ukuran||0)} · diperbarui ${new Date(d.updated_at||d.created_at).toLocaleString('id-ID')}</small></div>
+      <div class="va"><button class="pill" style="--c:#5B6CE0" data-d="1" onclick="dkOpen('${d.id}')">👁️ Preview</button><button class="pill" style="--c:#12806F" onclick="dkOpen('${d.id}',1)">⬇️ Unduh</button><button class="pill" style="--c:#D1495B" onclick="dkHapus('${d.id}')">🗑️ Hapus</button></div></div>`).join(''):`<p style="margin:0">Belum ada ${esc(j)} untuk tahun ajaran ini.</p>`}</div>`;
+  if(c)h+=`<div class="card" id="dkv"><h2>Preview — ${esc(c.judul)}</h2><div id="dkt"></div><div id="dkbox"><div id="dkst"><canvas id="dkc"></canvas><div id="dko" onpointerdown="dkDown(event)"></div></div></div></div>`;
+  $('#dok').innerHTML=h;
+  if(c&&DK.pdf){dkTools();dkPaint()}}
+
+/* unggah, buka, hapus */
+async function dkUpload(){
+  const f=$('#dkf').files[0];if(!f)return toast('Pilih file PDF dulu.');
+  if(f.type!='application/pdf'&&!/\.pdf$/i.test(f.name))return toast('File harus berformat PDF.');
+  if(f.size>20*1048576)return toast('Ukuran file maksimal 20 MB.');
+  if(!window.pdfjsLib)return toast('Pustaka PDF belum termuat.');
+  const judul=$('#dkj').value.trim()||f.name.replace(/\.pdf$/i,'');
+  let nd=null;
+  try{await wrap('Mengonversi dan menyimpan PDF...',async()=>{
+    const bytes=new Uint8Array(await f.arrayBuffer());
+    const pdf=await pdfjsLib.getDocument({data:bytes.slice()}).promise,n=pdf.numPages;pdf.destroy();
+    const uid=await dkUid(),id=dkUuid(),path=`${uid}/${id}.pdf`;
+    const up=await sb.storage.from(DKB).upload(path,new Blob([bytes],{type:'application/pdf'}),{upsert:true,contentType:'application/pdf',cacheControl:'0'});
+    if(up.error)throw up.error;
+    const{data,error}=await sb.from('dokumen_kurikulum').insert({id,user_id:uid,tahun_ajaran:S.tahun,jenis:DK.jenis,judul,path,halaman:n,ukuran:bytes.length}).select().single();
+    if(error){await sb.storage.from(DKB).remove([path]);throw error}
+    nd=data});
+    toast('PDF tersimpan')}
+  catch(e){return toast('Gagal mengunggah: '+(e.message||e))}
+  await wrap('Memuat dokumen...',dkLoad);DK.err?dDok():dkOpen(nd.id)}
+async function dkFetch(path){
+  const{data,error}=await sb.storage.from(DKB).createSignedUrl(path,120);if(error)throw error;
+  const u=data.signedUrl,r=await fetch(u+(u.includes('?')?'&':'?')+'v='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('Unduhan gagal ('+r.status+')');return new Uint8Array(await r.arrayBuffer())}
+async function dkLoadPdf(){if(DK.pdf){try{DK.pdf.destroy()}catch(e){}}DK.pdf=await pdfjsLib.getDocument({data:DK.bytes.slice()}).promise;DK.n=DK.pdf.numPages}
+async function dkOpen(id,dl){
+  const d=DK.list.find(x=>x.id==id);if(!d)return;
+  try{await wrap('Membuka PDF...',async()=>{DK.bytes=await dkFetch(d.path);await dkLoadPdf()});
+    DK.cur=d;DK.mode='view';DK.pl=[];DK.sel=null;DK.pg=1;dDok();
+    if(dl)dkDl();else $('#dkv').scrollIntoView({behavior:'smooth'})}
+  catch(e){toast('Gagal membuka PDF: '+(e.message||e))}}
+function dkDl(){if(!DK.bytes||!DK.cur)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([DK.bytes],{type:'application/pdf'}));a.download=(DK.cur.judul||DK.jenis)+'.pdf';document.body.appendChild(a);a.click();a.remove()}
+async function dkHapus(id){
+  const d=DK.list.find(x=>x.id==id);if(!d||!confirm('Hapus "'+d.judul+'" dari database?'))return;
+  try{await wrap('Menghapus...',async()=>{await sb.storage.from(DKB).remove([d.path]);const{error}=await sb.from('dokumen_kurikulum').delete().eq('id',id);if(error)throw error});
+    if(DK.cur&&DK.cur.id==id)dkClose();await dkLoad();dDok();toast('Dokumen dihapus')}
+  catch(e){toast('Gagal menghapus: '+(e.message||e))}}
+
+/* viewer */
+async function dkPaint(){
+  const tk=++DK.tok,pdf=DK.pdf;if(!pdf)return;
+  if(DK.task){try{DK.task.cancel()}catch(e){}try{await DK.task.promise}catch(e){}DK.task=null}
+  const page=await pdf.getPage(DK.pg);if(tk!=DK.tok)return;
+  const box=$('#dkbox'),cv=$('#dkc');if(!box||!cv)return;
+  const w0=page.getViewport({scale:1}).width,cw=Math.max(260,box.clientWidth-24),sc=Math.min(2,cw/w0),vp=page.getViewport({scale:sc}),dpr=window.devicePixelRatio||1;
+  cv.width=Math.floor(vp.width*dpr);cv.height=Math.floor(vp.height*dpr);cv.style.width=vp.width+'px';cv.style.height=vp.height+'px';$('#dkst').style.width=vp.width+'px';
+  DK.task=page.render({canvasContext:cv.getContext('2d'),viewport:page.getViewport({scale:sc*dpr})});
+  try{await DK.task.promise}catch(e){return}
+  DK.task=null;if(tk==DK.tok)dkOverlay()}
+function dkGo(d,abs){DK.pg=Math.min(DK.n,Math.max(1,(abs?abs:DK.pg+d)||1));DK.sel=null;dkTools();dkPaint()}
+function dkTools(){
+  const el=$('#dkt');if(!el)return;const sign=DK.mode=='sign',sel=DK.pl.find(p=>p.id==DK.sel),pgs=new Set(DK.pl.map(p=>p.page)).size;
+  el.innerHTML=`<div class="row" style="margin-bottom:10px"><button class="ghost sm" onclick="dkGo(-1)" ${DK.pg<=1?'disabled':''}>◀</button>
+    <span>Hal. <input type="number" min="1" max="${DK.n}" value="${DK.pg}" style="width:74px;display:inline-block" onchange="dkGo(0,+this.value)"> / ${DK.n}</span>
+    <button class="ghost sm" onclick="dkGo(1)" ${DK.pg>=DK.n?'disabled':''}>▶</button><span style="flex:1"></span>
+    ${sign?'':'<button class="amb sm" onclick="dkSign()">✍️ Bubuhkan Tanda Tangan</button><button class="ghost sm" onclick="dkDl()">⬇️ Unduh PDF</button>'}</div>
+  ${sign?`<div class="row" style="margin-bottom:10px;padding:10px;background:#f3f3ff;border-radius:10px"><button class="sm" onclick="dkAdd('guru')">➕ TTD Guru</button><button class="sm" onclick="dkAdd('kepsek')">➕ TTD Kepala Sekolah</button>
+    ${sel?`<label style="display:flex;gap:8px;align-items:center;margin:0">Ukuran <input type="range" min="3" max="60" value="${Math.round(sel.w*100)}" id="dkz" oninput="dkSz(this.value)" style="width:150px"></label><button class="red sm" onclick="dkDel()">🗑️ Hapus TTD ini</button>`:'<small style="color:var(--tx)">Tambahkan tanda tangan, lalu geser untuk memindah dan tarik titik di pojok untuk mengubah ukuran. Pindah halaman untuk menambah di halaman lain.</small>'}</div>
+    <div class="row" style="margin-bottom:10px"><button onclick="dkSave()">💾 Simpan PDF</button><button class="ghost" onclick="dkCancel()">Batal</button><small>${DK.pl.length} tanda tangan di ${pgs} halaman. Simpan akan mengganti file lama di database.</small></div>`:''}`}
+function dkOverlay(){
+  const o=$('#dko');if(!o)return;
+  o.innerHTML=DK.mode!='sign'?'':DK.pl.filter(p=>p.page==DK.pg).map(p=>`<div class="dks${p.id==DK.sel?' on':''}" data-id="${p.id}" style="left:${p.x*100}%;top:${p.y*100}%;width:${p.w*100}%"><img src="${DK.sig[p.who].url}" draggable="false"><i class="dkh" data-h="1"></i></div>`).join('')}
+
+/* tanda tangan */
+const dkSig=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');c.width=i.naturalWidth;c.height=i.naturalHeight;const x=c.getContext('2d');x.drawImage(i,0,0);
+  const d=x.getImageData(0,0,c.width,c.height),a=d.data;for(let k=0;k<a.length;k+=4){const m=Math.min(a[k],a[k+1],a[k+2]);a[k+3]=m>=235?0:m<=190?255:Math.round(255*(235-m)/45)}
+  x.putImageData(d,0,0);ok({url:c.toDataURL('image/png'),ratio:c.height/c.width})};i.onerror=()=>no(new Error('Gambar tanda tangan tidak terbaca'));i.src=src});
+async function dkSign(){
+  if(!S.ttdGuru&&!S.ttdKepsek)return toast('Unggah tanda tangan guru / kepala sekolah di menu Pengaturan dulu.');
+  try{DK.sig={};if(S.ttdGuru)DK.sig.guru=await dkSig(S.ttdGuru);if(S.ttdKepsek)DK.sig.kepsek=await dkSig(S.ttdKepsek)}catch(e){return toast(e.message)}
+  DK.mode='sign';DK.pl=[];DK.sel=null;dkTools();dkOverlay()}
+function dkCancel(){if(DK.pl.length&&!confirm('Batalkan semua tanda tangan yang belum disimpan?'))return;DK.mode='view';DK.pl=[];DK.sel=null;dkTools();dkOverlay()}
+function dkAdd(who){
+  if(!DK.sig[who])return toast('Tanda tangan '+(who=='guru'?'guru':'kepala sekolah')+' belum diunggah di Pengaturan.');
+  const st=$('#dkst'),w=.2,hf=w*st.offsetWidth*DK.sig[who].ratio/st.offsetHeight,p={id:'t'+Date.now(),page:DK.pg,who,w,x:.5-w/2,y:Math.max(0,Math.min(.65,1-hf))};
+  DK.pl.push(p);DK.sel=p.id;dkTools();dkOverlay()}
+function dkDel(){DK.pl=DK.pl.filter(p=>p.id!=DK.sel);DK.sel=null;dkTools();dkOverlay()}
+function dkClamp(p){const st=$('#dkst'),W=st.offsetWidth,H=st.offsetHeight,hf=p.w*W*DK.sig[p.who].ratio/H;p.x=Math.min(1-p.w,Math.max(0,p.x));p.y=Math.min(1-hf,Math.max(0,p.y))}
+function dkApply(p){const b=document.querySelector(`.dks[data-id="${p.id}"]`);if(b){b.style.left=p.x*100+'%';b.style.top=p.y*100+'%';b.style.width=p.w*100+'%'}}
+function dkSz(v){const p=DK.pl.find(x=>x.id==DK.sel);if(!p)return;p.w=v/100;dkClamp(p);dkApply(p)}
+function dkDown(e){
+  const b=e.target.closest('.dks');if(!b)return;const p=DK.pl.find(x=>x.id==b.dataset.id);if(!p)return;
+  e.preventDefault();const was=DK.sel;DK.sel=p.id;document.querySelectorAll('.dks').forEach(x=>x.classList.toggle('on',x===b));if(was!=p.id)dkTools();
+  const st=$('#dkst').getBoundingClientRect(),rs=!!e.target.dataset.h,s0={x:e.clientX,y:e.clientY,px:p.x,py:p.y,pw:p.w};
+  b.setPointerCapture(e.pointerId);
+  const mv=ev=>{const dx=(ev.clientX-s0.x)/st.width,dy=(ev.clientY-s0.y)/st.height;
+    if(rs)p.w=Math.min(.9,Math.max(.03,s0.pw+dx));else{p.x=s0.px+dx;p.y=s0.py+dy}
+    dkClamp(p);dkApply(p);const z=$('#dkz');if(z)z.value=Math.round(p.w*100)},
+  up=()=>{b.removeEventListener('pointermove',mv);b.removeEventListener('pointerup',up);b.removeEventListener('pointercancel',up)};
+  b.addEventListener('pointermove',mv);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up)}
+
+/* simpan: tempel tanda tangan ke PDF asli lalu timpa file lama di database */
+async function dkSave(){
+  if(!DK.pl.length)return toast('Belum ada tanda tangan yang ditempatkan.');
+  if(!window.PDFLib)return toast('Pustaka pdf-lib belum termuat.');
+  const d=DK.cur;
+  try{await wrap('Menyimpan PDF bertanda tangan...',async()=>{
+    const doc=await PDFLib.PDFDocument.load(DK.bytes,{ignoreEncryption:true}),emb={},pages=doc.getPages();
+    for(const who of new Set(DK.pl.map(p=>p.who)))emb[who]=await doc.embedPng(DK.sig[who].url);
+    DK.pl.forEach(p=>{const pg=pages[p.page-1],{width:W,height:H}=pg.getSize(),w=p.w*W,h=w*DK.sig[p.who].ratio;
+      pg.drawImage(emb[p.who],{x:p.x*W,y:H-p.y*H-h,width:w,height:h})});
+    const out=await doc.save(),up=await sb.storage.from(DKB).upload(d.path,new Blob([out],{type:'application/pdf'}),{upsert:true,contentType:'application/pdf',cacheControl:'0'});
+    if(up.error)throw up.error;
+    const now=new Date().toISOString(),{error}=await sb.from('dokumen_kurikulum').update({halaman:pages.length,ukuran:out.length,updated_at:now}).eq('id',d.id);
+    if(error)throw error;
+    Object.assign(d,{halaman:pages.length,ukuran:out.length,updated_at:now});
+    DK.bytes=new Uint8Array(out);await dkLoadPdf()});
+    DK.mode='view';DK.pl=[];DK.sel=null;dDok();toast('PDF bertanda tangan tersimpan, file lama diganti')}
+  catch(e){toast('Gagal menyimpan: '+(e.message||e))}}
+window.addEventListener('resize',()=>{clearTimeout(DK.rt);DK.rt=setTimeout(()=>{const s=$('#dok');if(s&&!s.hidden&&DK.pdf&&DK.cur)dkPaint()},300)});
 
 
 /* ===== LOGIN DENGAN SUPABASE ===== */
