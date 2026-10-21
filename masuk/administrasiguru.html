@@ -805,9 +805,9 @@ function rppForm(t){const r=rows().find(x=>x.t==t),d=new Date(t+'T00:00'),L=k=>l
   const LB={nama:'Nama penyusun',nip:'NIP',sekolah:'Nama sekolah',mapel:'Mata pelajaran',fase:'Fase / kelas',semester:'Semester',tahun:'Tahun ajaran',materi:'Materi pokok',waktu:'Alokasi waktu',siswa:'Jumlah siswa',jenis_guru:'Jenis guru',kepsek:'Kepala sekolah',tempat:'Tempat (kota)',tanggal:'Tanggal modul'};
   tool('Buat RPP: '+tg(t),`<div class="card"><p>Isian terisi otomatis dari program tersimpan. Ubah jika perlu.</p><div class="grid">${RF.map(k=>`<div><label>${LB[k]}</label><input id="rp_${k}" value="${esc(V[k])}"></div>`).join('')}</div>
   <label style="margin-top:12px">Konteks / situasi pembelajaran (opsional)</label><textarea id="rp_konteks" rows="2"></textarea><div class="row" style="margin-top:12px"><button onclick="rppGen()">Generate Modul Ajar dengan AI</button></div><p id="rp_st"></p></div>`)}
-const rppGen=()=>wrap('AI sedang menyusun modul ajar...',rppGen0);
+const rppGen=()=>wrap('Pa Anto sedang menyusun modul ajar...',rppGen0);
 async function rppGen0(){const id={};[...RF,'konteks'].forEach(k=>id[k]=$('#rp_'+k).value);localStorage.rp_waktu=id.waktu;localStorage.rp_siswa=id.siswa;localStorage.rp_jg=id.jenis_guru;localStorage.rp_tempat=id.tempat;
-  $('#rp_st').textContent='AI sedang menyusun modul ajar, mohon tunggu...';
+  $('#rp_st').textContent='Pa Anto sedang menyusun modul ajar, mohon tunggu...';
   try{const r=await fetch(RPP_AI_URL,{method:'POST',body:JSON.stringify({identitas:id}),headers:{'Content-Type':'text/plain;charset=utf-8'}}),ai=await r.json();if(ai.error)throw new Error(ai.error);rppShow(G.t,rppHTML({...id,...ai}))}catch(e){$('#rp_st').textContent='Gagal: '+e.message}}
 function rppShow(t,h){tool('RPP: '+tg(t),`<div class="row" style="margin-bottom:10px"><button onclick="rppSave('${t}')">Simpan RPP</button><button class="amb" onclick="rppPrint()">Print</button><button class="ghost" onclick="rppForm('${t}')">Buat ulang dengan AI</button></div><p style="font-size:.85rem">Klik teks untuk mengedit langsung, lalu klik Simpan RPP.</p><div class="card rpp" id="rd">${h}</div>`)}
 async function rppSave(t){if(await xput('RPP',K(t),{html:$('#rd').innerHTML}))toast('RPP tersimpan')}
