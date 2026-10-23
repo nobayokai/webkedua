@@ -210,12 +210,49 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .dks img{display:block;width:100%;pointer-events:none;user-select:none}
 .dkh{position:absolute;right:-10px;bottom:-10px;width:20px;height:20px;border-radius:50%;background:var(--pr);border:2px solid #fff;cursor:nwse-resize;display:none;touch-action:none}
 .dks.on .dkh{display:block}
+
+/* ===== DATA SISWA / AGENDA / PRINT ===== */
+.btn.wa,a.wa{background:#25D366;color:#fff!important;padding:3px 10px;font-size:.76rem;border-radius:8px;white-space:nowrap;margin-left:4px}
+.kos{color:#c3cad2}
+.swt th,.swt td{white-space:nowrap}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:12px}
+.mcw{background:#fff;border:1px solid #e6e6ef;border-radius:12px;padding:12px}
+.mct{font-weight:700;color:var(--hd);padding:0 0 6px}
+.mc{border-collapse:collapse;width:100%;table-layout:fixed}
+.mc th,.mc td{border:0;text-align:center;padding:4px 0;font-size:.8rem;background:none}
+.mc th{color:var(--mt);font-weight:600}
+.mc .we{color:#D1495B}
+.mc td.dL,.lgn i.dL,.mev i.dL{background:#D1495B;color:#fff}
+.mc td.dU,.lgn i.dU,.mev i.dU{background:#F4A62A;color:#16324F}
+.mc td.dK,.lgn i.dK,.mev i.dK{background:#12806F;color:#fff}
+.mc td.dL,.mc td.dU,.mc td.dK{border-radius:6px;font-weight:800}
+.mev{list-style:none;margin:8px 0 0;padding:0;font-size:.78rem;line-height:1.35}
+.mev li{display:flex;gap:6px;align-items:flex-start;margin-bottom:2px}
+.mev i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-top:5px;flex:none}
+.lgn{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0;font-size:.85rem}
+.lgn i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+.lgn i.we2{background:#fff;border:2px solid #D1495B}
+.pjt{border-collapse:collapse;width:100%}
+.pjt th,.pjt td{border:1px solid #9DB5AA;padding:5px 6px;text-align:center;vertical-align:middle;font-size:.9rem}
+.pjt th{background:#E4EFE9}.pjt td:first-child{text-align:left;white-space:nowrap;font-weight:700}
+.pjt tr.jr td{background:#fafafc;color:#666;font-size:.8rem;font-weight:600}
+@media print{
+#pa .mc th,#pa .mc td{border:0;text-align:center;padding:2px 0;font-size:8.5pt;background:none}
+#pa .mc td.dL{background:#D1495B}#pa .mc td.dU{background:#F4A62A}#pa .mc td.dK{background:#12806F}
+#pa .mgrid{grid-template-columns:repeat(3,1fr);gap:10px}
+#pa .mcw{break-inside:avoid;border:1px solid #9DB5AA}
+#pa .mev{font-size:8pt}
+#pa .pst th,#pa .pst td{font-size:8pt;padding:3px 4px}
+#pa .pjt th,#pa .pjt td{border:1px solid #9DB5AA;text-align:center;font-size:10pt;padding:5px}
+#pa .pjt th{background:#E4EFE9}#pa .pjt td:first-child{text-align:left}
+#pa .t1 td:last-child{text-align:left}
+}
 </style>
 <style id="pgst"></style>
 </head>
 <body>
 <div class="app"><aside id="sb"><div class="lg2"><svg width="34" height="34" viewBox="0 0 34 34"><rect width="34" height="34" rx="9" fill="#696cff"/><path d="M10 23l7-13 7 13M13 19h8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Admin Guru</span></div><nav>
-<a id="nvh" class="on" onclick="home()">🏠 Dashboard</a><a id="nvj" onclick="openJadwal()">📅 Jadwal Pelajaran</a><a onclick="baru()">➕ Program Baru</a><a onclick="openSet()">⚙️ Pengaturan</a>
+<a id="nvh" class="on" onclick="home()">🏠 Dashboard</a><a id="nvs" onclick="openSiswa()">👩‍🎓 Data Siswa</a><a id="nva" onclick="openAgenda()">🗓️ Agenda</a><a id="nvj" onclick="openJadwal()">📅 Jadwal Pelajaran</a><a onclick="baru()">➕ Program Baru</a><a onclick="openSet()">⚙️ Pengaturan</a>
 <small>KURIKULUM</small><a id="nvcp" onclick="openDok('CP')">📘 CP</a><a id="nvatp" onclick="openDok('ATP')">🧭 ATP</a><a id="nvkktp" onclick="openDok('KKTP')">✅ KKTP</a>
 <small>CETAK</small><a onclick="openCetak('sem')">🖨️ Program Semester</a><a onclick="openCetak('thn')">🗓️ Program Tahunan</a>
 <small>AKUN</small><a id="lo" hidden onclick="logout()">🚪 Keluar</a></nav>
@@ -233,11 +270,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <section id="view" hidden></section>
 <section id="tool" hidden></section>
 <section id="jadwal" hidden></section>
+<section id="msiswa" hidden></section>
+<section id="magenda" hidden></section>
 <section id="dok" hidden></section>
 <section id="edit" hidden>
   <div class="row" style="margin-bottom:12px"><button class="ghost" onclick="home()">Kembali</button><h2 id="et"></h2></div>
   <div class="card"><h2>1. Identitas</h2><div class="grid" id="idn"></div></div>
-  <div class="card"><h2>2. Kalender dan materi per pertemuan</h2><p>Kalender dihitung dari agenda sekolah yang diunggah di Pengaturan. Sabtu dan Minggu otomatis libur.</p><p>Kolom "Pert. ke" bisa diedit: ketik tanda - agar tanggal itu tidak dihitung sebagai pertemuan. Nomor berikutnya otomatis menyesuaikan.</p><div class="sc" id="cal"></div></div>
+  <div class="card"><h2>2. Kalender dan materi per pertemuan</h2><p>Kalender dihitung dari agenda sekolah yang diunggah di menu Agenda. Sabtu dan Minggu otomatis libur.</p><p>Kolom "Pert. ke" bisa diedit: ketik tanda - agar tanggal itu tidak dihitung sebagai pertemuan. Nomor berikutnya otomatis menyesuaikan.</p><div class="sc" id="cal"></div></div>
   <div class="row"><button onclick="simpan()">Simpan program</button><button class="ghost" onclick="home()">Batal</button></div>
 </section>
 </main></div></div><div id="sis" hidden></div>
@@ -443,43 +482,33 @@ function pd(v){if(v instanceof Date)return iso(new Date(v.getTime()+12*36e5));v=
   if(m=v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/))return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
   if(m=v.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/)){const i=BL.findIndex(b=>b.toLowerCase().startsWith(m[2].toLowerCase().slice(0,3)));if(i>=0)return `${m[3]}-${pad(i+1)}-${pad(m[1])}`}return ''}
 function tmpl(){const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['Tanggal','Nama Kegiatan','Keterangan'],['2026-08-17','Hari Kemerdekaan RI',KET[0]],['2026-08-18','Lomba Kemerdekaan',KET[1]],['2026-09-15','Ujian Tengah Semester',KET[2]]]),'Agenda');XLSX.writeFile(w,'contoh-agenda-sekolah.xlsx')}
-function importXl(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{
-  const w=XLSX.read(ev.target.result,{type:'array',cellDates:true}),rows=XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1,raw:true}),out=[];
-  rows.forEach(r=>{const t=pd(r[0]);if(t&&r[1])out.push({tgl:t,nama:String(r[1]),ket:String(r[2]||'')})});
-  T.agenda=out;T.agDirty=1;dSet();toast(out.length+' agenda dimuat')};r.readAsArrayBuffer(f);e.target.value=''}
 function openSet(){T=JSON.parse(JSON.stringify(S));
   $('#dsb').innerHTML=`<div><label>Tahun ajaran aktif</label><input id="sT" value="${esc(T.tahun)}" placeholder="2026/2027"></div>
   <div><label>Semester aktif</label><select id="sS"><option>Gasal</option><option>Genap</option></select></div>
   <div><label>Peran guru (berlaku untuk semua hasil cetak)</label><select id="sP"><option>Guru Bidang Studi</option><option>Guru Kelas</option></select></div>
   <div><label>Awal semester</label><input id="sM" type="date" value="${T.mulai}"></div><div><label>Akhir semester</label><input id="sE" type="date" value="${T.selesai}"></div>
-  <div style="grid-column:1/-1"><label>Agenda sekolah (Excel: Tanggal, Nama Kegiatan, Keterangan)</label><div class="row"><input type="file" id="xl" accept=".xlsx,.xls,.csv" style="max-width:300px"><button class="ghost sm" onclick="tmpl()">Unduh contoh Excel</button></div><div id="sag"></div></div>
-  <div style="grid-column:1/-1"><label>Data siswa (Excel: NIS, Nama Siswa, Kelas, Tahun Ajaran)</label><div class="row"><input type="file" id="xs" accept=".xlsx,.xls,.csv" style="max-width:300px"><button class="ghost sm" onclick="tmplS()">Unduh contoh Excel</button></div><div id="ssw"></div></div>
+  <div style="grid-column:1/-1"><p style="margin:0;color:var(--mt)">Data siswa dan agenda sekolah kini ada di menu <b>Data Siswa</b> dan <b>Agenda</b> pada sidebar.</p></div>
 
   <div><label>Tanda tangan kepala sekolah</label><input type="file" accept="image/*" onchange="img(this.files[0],'ttdKepsek')"><div id="sk"></div></div>
   <div><label>Tanda tangan guru</label><input type="file" accept="image/*" onchange="img(this.files[0],'ttdGuru')"><div id="sg"></div></div>`;
   $('#sS').value=T.semester;$('#sP').value=T.peran||'Guru Bidang Studi';$('#sP').onchange=e=>T.peran=e.target.value;
   $('#sT').onchange=$('#sS').onchange=()=>{T.tahun=$('#sT').value.trim();T.semester=$('#sS').value;const r=rng(T.tahun,T.semester);T.mulai=r[0];T.selesai=r[1];$('#sM').value=r[0];$('#sE').value=r[1];if(!T.agDirty)T.agenda=agFor(T.tahun);dSet()};
-  $('#sM').onchange=e=>T.mulai=e.target.value;$('#sE').onchange=e=>T.selesai=e.target.value;$('#xl').onchange=importXl;$('#xs').onchange=importSw;dSet();$('#dset').showModal()}
-function tmplS(){const w=XLSX.utils.book_new();XLSX.utils.book_append_sheet(w,XLSX.utils.aoa_to_sheet([['NIS','Nama Siswa','Kelas','Tahun Ajaran'],['1001','Contoh Siswa Satu','4A',S.tahun],['1002','Contoh Siswa Dua','4A',S.tahun]]),'Siswa');XLSX.writeFile(w,'contoh-data-siswa.xlsx')}
-function importSw(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const w=XLSX.read(ev.target.result,{type:'array'}),out=[];
-  XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1,raw:false}).forEach(r=>{if(r[1]&&r[2]&&String(r[0]).trim().toLowerCase()!='nis')out.push({nis:String(r[0]??'').trim(),nama:String(r[1]).trim(),kelas:String(r[2]).trim(),tahun:String(r[3]||T.tahun).trim()})});
-  T.swNew=out;dSet();toast(out.length+' siswa dimuat')};r.readAsArrayBuffer(f);e.target.value=''}
-async function swSave(rows){if(API_URL)SW=await xcall({a:'sset',rows});else{const ty=new Set(rows.map(r=>norm(r.tahun)));SW=[...SW.filter(s=>!ty.has(norm(s.tahun))),...rows];localStorage.siswa=JSON.stringify(SW)}}
+  $('#sM').onchange=e=>T.mulai=e.target.value;$('#sE').onchange=e=>T.selesai=e.target.value;dSet();$('#dset').showModal()}
 const agFor=t=>AG.filter(a=>norm(a.tahun)==norm(t)).map(a=>({tgl:a.tgl,nama:a.nama,ket:a.ket}));
-async function swSave(rows){SW=await xcall({a:'sset',rows})}
 async function loadAgenda(){await wrap('Memuat agenda sekolah...',async()=>{try{AG=await xcall({a:'aget'})}catch(e){AG=[]}});const a=agFor(S.tahun);if(a.length){S.agenda=a;localStorage.S=JSON.stringify(S)}}
 async function agSave(tahun,rows){const nr=rows.map(r=>({tahun,tgl:r.tgl,nama:r.nama,ket:r.ket}));AG=await xcall({a:'aset',tahun,rows:nr})}
-async function loadSiswa(){await wrap('Memuat data siswa...',async()=>{try{SW=await xcall({a:'sget'})}catch(e){SW=[]}})}
-function dSet(){$('#ssw').innerHTML=T.swNew?`<p>${T.swNew.length} siswa siap disimpan. Klik Simpan pengaturan.</p>`:`<p>${SW.length} siswa tersimpan, ${SW.filter(s=>norm(s.tahun)==norm(T.tahun)).length} untuk tahun ajaran ${esc(T.tahun)}.</p>`;$('#sag').innerHTML=T.agenda.length?`<p>${T.agenda.length} agenda dimuat. Tersimpan di Google Sheet. Unggah ulang untuk mengganti.</p><div class="sc" style="max-height:150px;overflow:auto"><table>${T.agenda.map(a=>`<tr><td style="white-space:nowrap">${tg(a.tgl)}</td><td>${esc(a.nama)}</td><td>${esc(a.ket)}</td></tr>`).join('')}</table></div>`:'<p>Belum ada agenda.</p>';
+async function loadSiswa(){await wrap('Memuat data siswa...',async()=>{try{SW=await xcall({a:'sget'})}catch(e){SW=[]}
+  try{const r=await sb.from('siswa').select('tempat_lahir').limit(1);SWOK=!r.error}catch(e){SWOK=false}})}
+function dSet(){
   $('#sg').innerHTML=T.ttdGuru?`<img class="sig" src="${T.ttdGuru}">`:'';$('#sk').innerHTML=T.ttdKepsek?`<img class="sig" src="${T.ttdKepsek}">`:''}
 const saveSet=()=>wrap('Menyimpan pengaturan...',saveSet0);
 async function saveSet0(){if(!/^\d{4}\/\d{4}$/.test(T.tahun))return toast('Format tahun ajaran: 2026/2027');
-  const sn=T.swNew,ad=T.agDirty;delete T.swNew;delete T.agDirty;S=T;localStorage.S=JSON.stringify(S);$('#dset').close();if(sn&&sn.length)try{await swSave(sn)}catch(e){toast('Data siswa gagal disimpan: '+e.message)}
+  const ad=T.agDirty;delete T.swNew;delete T.agDirty;S=T;localStorage.S=JSON.stringify(S);$('#dset').close();
   
   if(ad||(S.agenda.length&&!agFor(S.tahun).length))try{await agSave(S.tahun,S.agenda)}catch(e){toast('Agenda gagal disimpan: '+e.message)}
-  try{for(const p of progs){const b=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]);sync(p);if(b!=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]))progs=await api('save',p)}}catch(e){toast('Pengaturan tersimpan, tetapi sebagian program gagal diperbarui.');await loadJadwal();draw();return}
+  try{await syncProgs()}catch(e){toast('Pengaturan tersimpan, tetapi sebagian program gagal diperbarui.');await loadJadwal();draw();return}
   await loadJadwal();draw();toast('Pengaturan tersimpan')}
-function warn(){return cur.agenda?.length?'':'<p style="color:var(--rose);font-weight:800">Agenda sekolah untuk tahun ajaran ini belum diunggah di Pengaturan.</p>'}
+function warn(){return cur.agenda?.length?'':'<p style="color:var(--rose);font-weight:800">Agenda sekolah untuk tahun ajaran ini belum diunggah di menu Agenda.</p>'}
 
 /* 3. kalender dan materi */
 function dCal(){const c=calc(cur);cur.materi=cur.materi||{};
@@ -538,7 +567,7 @@ const norm=t=>String(t).replace(/\D/g,''),PAL=['#12806F','#D98200','#D1495B','#5
 const ld=m=>`<div class="ldc"><div class="ldb"><i></i></div>${m}</div>`;
 async function wrap(m,f){bz++;$('#lbt').textContent=m||'Memproses...';$('#lb').classList.add('on');try{return await f()}finally{if(!--bz)$('#lb').classList.remove('on')}}
 const K=(...a)=>VP.id+'|'+a.join('|');
-const show=n=>{['home','edit','view','tool','jadwal','dok'].forEach(x=>$('#'+x).hidden=x!=n);['CP','ATP','KKTP'].forEach(j=>$('#nv'+j.toLowerCase()).classList.toggle('on',n=='dok'&&DK.jenis==j));$('#nvh').classList.toggle('on',n=='home');$('#nvj').classList.toggle('on',n=='jadwal');document.body.classList.remove('so');scrollTo(0,0)};
+const show=n=>{['home','edit','view','tool','jadwal','dok','msiswa','magenda'].forEach(x=>$('#'+x).hidden=x!=n);['CP','ATP','KKTP'].forEach(j=>$('#nv'+j.toLowerCase()).classList.toggle('on',n=='dok'&&DK.jenis==j));$('#nvh').classList.toggle('on',n=='home');$('#nvj').classList.toggle('on',n=='jadwal');$('#nvs').classList.toggle('on',n=='msiswa');$('#nva').classList.toggle('on',n=='magenda');document.body.classList.remove('so');scrollTo(0,0)};
 const lsx=t=>JSON.parse(localStorage['x_'+t]||'{}');
 async function xcall(o) {
   const { a, t, pid, key, data, rows, tahun } = o;
@@ -585,17 +614,26 @@ async function xcall(o) {
     if (a === 'sget') {
       const { data: res, error } = await sb.from('siswa').select('*');
       if (error) throw error;
-      return res.map(s => ({ nis: s.nis, nama: s.nama, kelas: s.kelas, tahun: s.tahun_ajaran }));
+      return res.map(s => ({ nis: s.nis || '', nama: s.nama || '', kelas: s.kelas || '', tahun: s.tahun_ajaran || '',
+        tempat: s.tempat_lahir || '', tgl: s.tanggal_lahir || '', jalan: s.jalan || '', kel: s.kelurahan || '', kec: s.kecamatan || '', kota: s.kota || '',
+        ayah: s.nama_ayah || '', pkAyah: s.pekerjaan_ayah || '', ibu: s.nama_ibu || '', pkIbu: s.pekerjaan_ibu || '', hp: s.no_telepon || '' }));
     }
     if (a === 'sset') {
+      const extra = rows.some(r => r.tempat || r.tgl || r.jalan || r.kel || r.kec || r.kota || r.ayah || r.pkAyah || r.ibu || r.pkIbu || r.hp);
+      const probe = await sb.from('siswa').select('tempat_lahir').limit(1);
+      const kolomAda = !probe.error;
+      if (!kolomAda && extra) throw new Error('Kolom data siswa tambahan belum ada di database. Jalankan SQL yang tampil di menu Data Siswa, lalu coba lagi.');
       // Hapus dulu data di tahun ajaran yang sama, lalu insert baru
       const th = [...new Set(rows.map(r => r.tahun))];
       for (const y of th) {
         await sb.from('siswa').delete().eq('tahun_ajaran', y);
       }
-      const insertData = rows.map(r => ({
-        nis: r.nis, nama: r.nama, kelas: r.kelas, tahun_ajaran: r.tahun
-      }));
+      const insertData = rows.map(r => {
+        const o = { nis: r.nis, nama: r.nama, kelas: r.kelas, tahun_ajaran: r.tahun };
+        if (kolomAda) Object.assign(o, { tempat_lahir: r.tempat || null, tanggal_lahir: r.tgl || null, jalan: r.jalan || null, kelurahan: r.kel || null, kecamatan: r.kec || null, kota: r.kota || null,
+          nama_ayah: r.ayah || null, pekerjaan_ayah: r.pkAyah || null, nama_ibu: r.ibu || null, pekerjaan_ibu: r.pkIbu || null, no_telepon: r.hp || null });
+        return o;
+      });
       const { error } = await sb.from('siswa').insert(insertData);
       if (error) throw error;
       return await xcall({ a: 'sget' });
@@ -748,7 +786,7 @@ async function openNilai(kind,ref){const F=kind=='F',nb=F?ref:(ref=='STS'||ref==
 function gRead(){document.querySelectorAll('.gi').forEach(e=>{const n=G.names[+e.dataset.n];if(e.value==='')delete G.nilai[n];else G.nilai[n]=Math.min(100,+e.value.replace(/\D/g,'')||0)})}
 function gTable(){gRead();let n=G.sw.filter(s=>s.kelas==G.kel).map(s=>s.nama).sort((a,b)=>a.localeCompare(b));if(!n.length)n=Object.keys(G.nilai);G.names=n;
   $('#gb').innerHTML=(n.length?`<table><tr><th>No</th><th>Nama siswa</th><th>Nilai (0-100)</th></tr>${n.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x)}</td><td><input class="gi" data-n="${i}" inputmode="numeric" maxlength="3" style="width:80px" value="${G.nilai[x]??''}"></td></tr>`).join('')}</table>`:
-   '<p>Daftar siswa kelas ini tidak ditemukan. Unggah data siswa di Pengaturan, atau ketik nama siswa (satu per baris):</p><textarea id="gm" rows="4"></textarea><button class="sm" onclick="gApply()">Terapkan</button>')}
+   '<p>Daftar siswa kelas ini tidak ditemukan. Unggah data siswa di menu Data Siswa, atau ketik nama siswa (satu per baris):</p><textarea id="gm" rows="4"></textarea><button class="sm" onclick="gApply()">Terapkan</button>')}
 function gApply(){$('#gm').value.split('\n').map(x=>x.trim()).filter(Boolean).forEach(n=>G.nilai[n]=G.nilai[n]??'');gTable()}
 async function saveNilai(){gRead();const nilai={};Object.entries(G.nilai).forEach(([k,v])=>{if(v!=='')nilai[k]=v});if(await xput(G.t,G.key,{kelas:G.kel,nilai})){localStorage['ks_'+VP.id]=G.kel;toast('Nilai tersimpan');back()}}
 
@@ -766,32 +804,30 @@ async function saveJurnal(t){const g=k=>$('#j_'+k).value,d={tgl:g('tgl'),jam:g('
   if(!d.jam||!d.kelas)return toast('Isi jam ke dan kelas.');if(await xput('Jurnal',K(t),d)){toast('Jurnal tersimpan');back()}}
 
 /* refleksi KBM */
-const QS=[['Aku Hari Ini','#F4A62A',[['r1','Bagaimana perasaanmu hari ini?',[['🤩','Sangat Senang'],['😊','Senang'],['😐','Biasa Saja'],['😞','Sedih']]],
- ['r2','Apakah kamu ikut belajar dengan rajin tadi?',[['🙋','Rajin Sekali'],['✋','Rajin'],['🤔','Kadang-Kadang'],['😴','Tidak Ikut']]],
- ['r3','Apa yang kamu lakukan kalau ada pelajaran yang susah?',[['🙋‍♂️','Tanya Guru'],['📚','Baca Buku'],['💡','Coba Dulu'],['🤷','Diam Saja']]]]],
+const QS=[['Aku Hari Ini','#F4A62A',[['r1','Bagaimana perasaanmu hari ini?',[['🤩','Sangat Senang'],['😊','Senang'],['😐','Biasa Saja'],['😞','Sedih'],['😭','Sangat Sedih']]],
+ ['r3','Apa yang kamu lakukan kalau ada pelajaran yang susah?',[['🙋‍♂️','Tanya Guru'],['📚','Baca Buku'],['💡','Coba Dulu'],['🤷','Diam Saja'],['👫','Tanya Teman']]]]],
 ['Aku Paham','#12806F',[['p1','Apakah kamu paham pelajaran hari ini?',[['😵','Belum Paham'],['😕','Sedikit Paham'],['🙂','Cukup Paham'],['😃','Paham'],['🤩','Paham Sekali']]],
- ['p2','Apakah kamu bisa mengerjakan soalnya sendiri?',[['🚫','Belum Bisa'],['😬','Sedikit Bisa'],['🙂','Cukup Bisa'],['💪','Bisa'],['🏆','Bisa Sekali']]],
- ['p3','Apakah kamu siap kalau nanti ada ulangan?',[['😰','Belum Siap'],['😟','Sedikit Siap'],['😌','Cukup Siap'],['😎','Siap'],['🚀','Siap Sekali']]]]],
+ ['p2','Apakah kamu bisa mengerjakan soalnya sendiri?',[['🚫','Belum Bisa'],['😬','Sedikit Bisa'],['🙂','Cukup Bisa'],['💪','Bisa'],['🏆','Bisa Sekali']]]]],
 ['Aku Nilai Bu/Pak Guru','#D1495B',[['g1','Apakah Bu/Pak Guru menjelaskan dengan jelas?',[['🌀','Tidak Jelas'],['😖','Kurang Jelas'],['😐','Cukup Jelas'],['👌','Jelas'],['🌟','Jelas Sekali']]],
- ['g2','Apakah belajarnya seru dan menyenangkan?',[['😴','Bosan'],['😪','Kurang Seru'],['🙂','Cukup Seru'],['🎉','Seru'],['🔥','Seru Sekali']]],
- ['g3','Apakah Bu/Pak Guru mau membantu kalau kamu susah?',[['🚪','Tidak Bantu'],['😕','Jarang Bantu'],['🤝','Kadang Bantu'],['💙','Suka Bantu'],['🦸','Selalu Bantu']]]]]];
+ ['g2','Apakah belajarnya seru dan menyenangkan?',[['😴','Bosan'],['😪','Kurang Seru'],['🙂','Cukup Seru'],['🎉','Seru'],['🔥','Seru Sekali']]]]]];
 const QL=QS.flatMap(s=>s[2]);
+const qSkor=(k,i)=>k=='r3'||i==null||i<0?null:(k=='r1'?5-i:i+1);
 async function openRef(t,mode){const R=rows().find(x=>x.t==t),T0='Refleksi KBM: '+tg(t);if(mode=='link')return refLink(t);
   if(mode=='hasil'){G={t};tool(T0,`<div class="row" style="margin-bottom:10px"><button class="ghost" onclick="openRef('${t}','link')">🔗 Link Siswa</button><button class="ghost" onclick="rfRef('${t}')">🔄 Muat ulang</button><button class="amb" onclick="prRef('${t}')">Print Refleksi</button></div><div class="card">${refDoc(t,1)}</div>`);return}
   tool(T0,'<p>Memuat siswa...</p>');const sw=await allSiswa(),ks=[...new Set(sw.map(s=>s.kelas))].sort();G={t,sw};
   tool(T0,`<div class="row" style="margin-bottom:10px"><button class="ghost" onclick="openRef('${t}','hasil')">Lihat hasil</button></div><div class="kid"><div class="kh"><h2>🌟 Aku Belajar Hari Ini 🌟</h2><p>Yuk, ceritakan pengalaman belajarmu!</p></div>
   <div class="kc1"><h3>✏️ Tentang Aku</h3><div class="grid"><div><label>Kelasku</label><select id="rk" onchange="rNames()">${kOpts(ks,guessK(ks))}</select></div><div><label>Namaku</label><input id="rn" list="rl" placeholder="Tulis atau pilih namamu"><datalist id="rl"></datalist></div></div><p>Pertemuan ke-${R.no}, ${tg(t)}</p></div>`+
-  QS.map(([h,c,qs])=>`<div class="kc1" style="border-top:8px solid ${c}"><h3 style="color:${c}">${h}</h3>${qs.map((q,n)=>`<div><p><b>${n+1}. ${q[1]}</b></p><div class="opts">${q[2].map((o,i)=>`<label class="op"><input type="radio" name="${q[0]}" value="${i}"><div><span>${o[0]}</span><small>${o[1]}</small></div></label>`).join('')}</div></div>`).join('')}</div>`).join('')+
+  QS.map(([h,c,qs])=>`<div class="kc1" style="border-top:8px solid ${c}"><h3 style="color:${c}">${h}</h3>${qs.map(q=>`<div><p><b>${QL.indexOf(q)+1}. ${q[1]}</b></p><div class="opts">${q[2].map((o,i)=>`<label class="op"><input type="radio" name="${q[0]}" value="${i}"><div><span>${o[0]}</span><small>${o[1]}</small></div></label>`).join('')}</div></div>`).join('')}</div>`).join('')+
   `<button class="big" onclick="saveRef('${t}')">Kirim jawabanku! 🚀</button></div>`);rNames()}
 function rNames(){const k=$('#rk');$('#rl').innerHTML=G.sw.filter(s=>s.kelas==(k&&k.value)).map(s=>`<option value="${esc(s.nama)}">`).join('')}
 async function saveRef(t){const nama=$('#rn').value.trim();if(!nama)return toast('Tulis namamu dulu ya.');const a={};
   for(const q of QL){const c=document.querySelector(`input[name=${q[0]}]:checked`);if(!c)return toast('Jawab semua pertanyaan ya.');a[q[0]]=+c.value}
   if(await xput('Refleksi',K(t,nama),{nama,kelas:$('#rk').value,t,a})){toast('Terima kasih! Jawabanmu tersimpan.');openRef(t,'isi')}}
 function refDoc(t,ed){const rs=Object.entries(X.Refleksi).filter(([k])=>k.startsWith(K(t,''))).sort((a,b)=>a[1].nama.localeCompare(b[1].nama)),r=rows().find(x=>x.t==t);if(ed)G.rs=rs;
-  return `<h3>Rekap Refleksi KBM</h3><p>${esc(VP.mapel)}, kelas ${esc(VP.kelas)}. Pertemuan ke-${r.no}, ${tg(t)}. Jumlah responden: <b>${rs.length}</b></p>
-  <table class="t3"><tr><th>No</th><th>Pertanyaan</th><th>Jawaban siswa</th><th>Rata-rata (1-5)</th></tr>${QL.map((q,i)=>{const c=q[2].map(()=>0);rs.forEach(([,v])=>c[v.a[q[0]]]++);
-   const sc=q[0][0]!='r'&&rs.length?(rs.reduce((a,[,v])=>a+v.a[q[0]]+1,0)/rs.length).toFixed(1):'-';return `<tr><td>${i+1}</td><td>${q[1]}</td><td>${q[2].map((o,j)=>`${o[0]} ${o[1]}: <b>${c[j]}</b>`).join('<br>')}</td><td>${sc}</td></tr>`}).join('')}</table>
-  <h3>Jawaban per siswa</h3><div class="sc"><table class="t1"><tr><th>No</th><th>Nama</th>${QL.map((q,i)=>`<th>${i+1}</th>`).join('')}${ed?'<th></th>':''}</tr>${rs.map(([k,v],n)=>`<tr><td>${n+1}</td><td>${esc(v.nama)}</td>${QL.map(q=>`<td>${q[2][v.a[q[0]]][0]}</td>`).join('')}${ed?`<td><button class="sm red" onclick="delRef(${n})">Hapus</button></td>`:''}</tr>`).join('')}</table></div>`}
+  return `<h3>Rekap Refleksi KBM</h3><p>${esc(VP.mapel)}, kelas ${esc(VP.kelas)}. Pertemuan ke-${r.no}, ${tg(t)}. Jumlah responden: <b>${rs.length}</b></p><p style="font-size:.85em">Rata-rata skala 1-5 (semakin tinggi semakin positif). Pertanyaan 2 bersifat pilihan sikap sehingga tidak dihitung rata-ratanya.</p>
+  <table class="t3"><tr><th>No</th><th>Pertanyaan</th><th>Jawaban siswa</th><th>Rata-rata (1-5)</th></tr>${QL.map((q,i)=>{const c=q[2].map(()=>0);rs.forEach(([,v])=>{if(c[v.a[q[0]]]!=null)c[v.a[q[0]]]++});
+   const sk=rs.map(([,v])=>qSkor(q[0],v.a[q[0]])).filter(x=>x!=null),sc=sk.length?(sk.reduce((a,b)=>a+b,0)/sk.length).toFixed(1):'-';return `<tr><td>${i+1}</td><td>${q[1]}</td><td>${q[2].map((o,j)=>`${o[0]} ${o[1]}: <b>${c[j]}</b>`).join('<br>')}</td><td>${sc}</td></tr>`}).join('')}</table>
+  <h3>Jawaban per siswa</h3><div class="sc"><table class="t1"><tr><th>No</th><th>Nama</th>${QL.map((q,i)=>`<th>${i+1}</th>`).join('')}${ed?'<th></th>':''}</tr>${rs.map(([k,v],n)=>`<tr><td>${n+1}</td><td>${esc(v.nama)}</td>${QL.map(q=>`<td>${(q[2][v.a[q[0]]]||['-'])[0]}</td>`).join('')}${ed?`<td><button class="sm red" onclick="delRef(${n})">Hapus</button></td>`:''}</tr>`).join('')}</table></div>`}
 const prRef=t=>printHTML(`<div class="rf">${refDoc(t,0)}${ttd(VP,iso(new Date()))}</div>`);
 async function delRef(n){if(!confirm('Hapus jawaban siswa ini?'))return;await xdel('Refleksi',G.rs[n][0]);openRef(G.t,'hasil')}
 
@@ -881,7 +917,7 @@ function siswaForm(){const d=SI,sw=d.siswa||[];
   $('#sis').innerHTML=`<div class="kid"><div class="kh"><h2>🌟 Aku Belajar Hari Ini 🌟</h2><p>Yuk, ceritakan pengalaman belajarmu!</p></div>
   <div class="sinfo"><b>${esc(d.mapel)}</b> · Kelas ${esc(d.kelas)}<br>📅 ${tg(QP.get('t'))}${d.bab?' · '+esc(d.bab):''}${d.materi?'<br>📖 '+esc(d.materi):''}</div>
   <div class="kc1"><h3>✏️ Tentang Aku</h3><label>Namaku</label>${sw.length?`<select id="sn"><option value="">- Pilih namamu -</option>${sw.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`:'<input id="sn" placeholder="Tulis namamu">'}</div>`+
-  QS.map(([h,c,qs])=>`<div class="kc1" style="border-top:8px solid ${c}"><h3 style="color:${c}">${h}</h3>${qs.map((q,n)=>`<div><p><b>${n+1}. ${q[1]}</b></p><div class="opts">${q[2].map((o,i)=>`<label class="op"><input type="radio" name="${q[0]}" value="${i}"><div><span>${o[0]}</span><small>${o[1]}</small></div></label>`).join('')}</div></div>`).join('')}</div>`).join('')+
+  QS.map(([h,c,qs])=>`<div class="kc1" style="border-top:8px solid ${c}"><h3 style="color:${c}">${h}</h3>${qs.map(q=>`<div><p><b>${QL.indexOf(q)+1}. ${q[1]}</b></p><div class="opts">${q[2].map((o,i)=>`<label class="op"><input type="radio" name="${q[0]}" value="${i}"><div><span>${o[0]}</span><small>${o[1]}</small></div></label>`).join('')}</div></div>`).join('')}</div>`).join('')+
   `<button class="big" id="sbtn" onclick="kirimSiswa()">Kirim jawabanku! 🚀</button></div>`;scrollTo(0,0)}
 async function kirimSiswa(){const nama=($('#sn').value||'').trim();if(!nama)return toast('Pilih atau tulis namamu dulu ya.');const a={};
   for(const q of QL){const c=document.querySelector(`input[name=${q[0]}]:checked`);if(!c)return toast('Jawab semua pertanyaan ya.');a[q[0]]=+c.value}
@@ -891,6 +927,160 @@ async function kirimSiswa(){const nama=($('#sn').value||'').trim();if(!nama)retu
   $('#sis').innerHTML=`<div class="kid"><div class="kh"><h2>🎉 Terima kasih, ${esc(nama)}!</h2><p>Jawabanmu sudah terkirim ke gurumu.</p></div><button class="big" onclick="siswaForm()">Isi untuk teman lain</button></div>`;scrollTo(0,0)}
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key=='k'&&$('#q')){e.preventDefault();$('#q').focus()}});
 $('#sb').addEventListener('click',e=>{if(e.target.closest('a'))document.body.classList.remove('so')});
+
+/* ===== SINKRON PROGRAM (agenda, tanda tangan) ===== */
+async function syncProgs(){for(const p of progs){const b=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]);sync(p);if(b!=JSON.stringify([p.agenda,p.ttdGuru,p.ttdKepsek]))progs=await api('save',p)}}
+const sekolahNama=()=>((progs.find(p=>p.tahun==S.tahun)||progs[0]||{}).sekolah||'');
+const xlRead=(ev,opt)=>{const w=XLSX.read(ev.target.result,{type:'array',cellDates:true});return XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1,raw:true,defval:'',...(opt||{})})};
+const xlSave=(aoa,sheet,file,cols)=>{const w=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(aoa);if(cols)ws['!cols']=cols.map(c=>({wch:c}));XLSX.utils.book_append_sheet(w,ws,sheet);XLSX.writeFile(w,file)};
+const thFile=t=>String(t).replace(/[^0-9]+/g,'-');
+
+/* ===== DATA SISWA ===== */
+let SWOK=true,SWV={tahun:'',kelas:'',q:''},SWE=-1;
+const SWSQL=`alter table public.siswa
+  add column if not exists tempat_lahir text,
+  add column if not exists tanggal_lahir date,
+  add column if not exists jalan text,
+  add column if not exists kelurahan text,
+  add column if not exists kecamatan text,
+  add column if not exists kota text,
+  add column if not exists nama_ayah text,
+  add column if not exists pekerjaan_ayah text,
+  add column if not exists nama_ibu text,
+  add column if not exists pekerjaan_ibu text,
+  add column if not exists no_telepon text;`;
+const SWF=[['nis','NIS'],['nama','Nama Siswa'],['kelas','Kelas'],['tahun','Tahun Ajaran'],['tempat','Tempat Lahir'],['tgl','Tanggal Lahir'],['jalan','Jalan'],['kel','Kelurahan'],['kec','Kecamatan'],['kota','Kota'],['ayah','Nama Ayah'],['pkAyah','Pekerjaan Ayah'],['ibu','Nama Ibu'],['pkIbu','Pekerjaan Ibu'],['hp','No. Telepon']];
+const SWA={nis:['nis','nisn','nomorinduk'],nama:['nama','namasiswa'],kelas:['kelas'],tahun:['tahunajaran','tahunpelajaran','tahun'],tempat:['tempatlahir','tempat'],tgl:['tanggallahir','tgllahir','tanggal'],
+  jalan:['jalan','alamat','alamatjalan'],kel:['kelurahan','desa','desakelurahan'],kec:['kecamatan'],kota:['kota','kabupaten','kotakabupaten'],ayah:['namaayah','ayah'],pkAyah:['pekerjaanayah'],
+  ibu:['namaibu','ibu'],pkIbu:['pekerjaanibu'],hp:['notelepon','nomortelepon','telepon','notelp','notelpon','nohp','nomorhp','hp','nowa','whatsapp','nomorwhatsapp']};
+const SWC=['tempat','tgl','jalan','kel','kec','kota','ayah','pkAyah','ibu','pkIbu','hp'];
+const swKos=s=>SWC.filter(k=>!String(s[k]||'').trim()).length;
+const waUrl=h=>{let d=String(h||'').replace(/\D/g,'');if(!d)return '';if(d.startsWith('0'))d='62'+d.slice(1);else if(d.startsWith('8'))d='62'+d;return 'https://wa.me/'+d};
+const kos='<span class="kos">—</span>';
+const swSort=(a,b)=>String(nk(a.kelas)).localeCompare(String(nk(b.kelas)),'id',{numeric:true})||a.nama.localeCompare(b.nama);
+function openSiswa(){show('msiswa');if(!SWV.tahun)SWV.tahun=S.tahun;dSiswa()}
+function swList(){const q=SWV.q.toLowerCase();return SW.map((s,i)=>({...s,i})).filter(s=>norm(s.tahun)==norm(SWV.tahun)&&(!SWV.kelas||s.kelas==SWV.kelas)&&(!q||(s.nama+' '+s.nis).toLowerCase().includes(q))).sort(swSort)}
+function dSiswa(){
+  const yrs=[...new Set([...SW.map(s=>s.tahun),S.tahun])].filter(Boolean).sort().reverse();
+  const inY=SW.filter(s=>norm(s.tahun)==norm(SWV.tahun)),ks=[...new Set(inY.map(s=>s.kelas))].sort((a,b)=>String(nk(a)).localeCompare(String(nk(b)),'id',{numeric:true}));
+  if(SWV.kelas&&!ks.includes(SWV.kelas))SWV.kelas='';
+  const nl=inY.filter(s=>swKos(s)>0).length;
+  $('#msiswa').innerHTML=`<h2 class="sec">👩‍🎓 Data Siswa</h2>
+  ${SWOK?'':`<div class="card" style="border-left:6px solid var(--rose)"><h3>⚠️ Kolom data siswa tambahan belum ada di database</h3><p>Jalankan SQL berikut sekali di <b>Supabase → SQL Editor</b>, lalu muat ulang halaman. Sebelum itu hanya NIS, nama, kelas, dan tahun ajaran yang bisa disimpan.</p><pre class="jsql">${esc(SWSQL)}</pre></div>`}
+  <div class="card"><h2>Unggah &amp; unduh data</h2>
+    <p>Kolom Excel: NIS, Nama Siswa, Kelas, Tahun Ajaran, Tempat Lahir, Tanggal Lahir, Jalan, Kelurahan, Kecamatan, Kota, Nama Ayah, Pekerjaan Ayah, Nama Ibu, Pekerjaan Ibu, No. Telepon. Data yang masih kosong bisa dilengkapi lewat tombol <b>Edit</b>, atau unduh Excel, isi di komputer, lalu unggah kembali.</p>
+    <div class="row"><input type="file" id="xs" accept=".xlsx,.xls,.csv" style="max-width:300px" onchange="swImport(event)"><button class="ghost sm" onclick="swTmpl()">Unduh contoh Excel</button><button class="ghost sm" onclick="swExport()">⬇️ Unduh data (Excel)</button><button class="sm" onclick="swEdit(-1)">➕ Tambah siswa</button><button class="amb sm" onclick="prSiswa()">🖨️ Print</button></div>
+    <p style="margin:10px 0 0">${inY.length?`<b>${inY.length}</b> siswa tahun ajaran ${esc(SWV.tahun)} tersimpan${nl?`, <b style="color:var(--rose)">${nl}</b> belum lengkap datanya`:', semua data lengkap ✅'}.`:'Belum ada data siswa untuk tahun ajaran ini.'} Mengunggah file akan menggantikan data siswa pada tahun ajaran yang sama; kolom yang kosong di file otomatis memakai data lama.</p></div>
+  <div class="card"><div class="row" style="margin-bottom:12px"><div><label>Tahun ajaran</label><select onchange="SWV.tahun=this.value;SWV.kelas='';dSiswa()">${yrs.map(y=>`<option ${y==SWV.tahun?'selected':''}>${esc(y)}</option>`).join('')}</select></div>
+    <div><label>Kelas</label><select onchange="SWV.kelas=this.value;swTable()"><option value="">Semua kelas</option>${ks.map(k=>`<option ${k==SWV.kelas?'selected':''}>${esc(k)}</option>`).join('')}</select></div>
+    <div style="flex:1;min-width:200px"><label>Cari</label><input placeholder="🔍 Nama atau NIS..." value="${esc(SWV.q)}" oninput="SWV.q=this.value;swTable()"></div></div>
+    <div class="sc"><div id="swt"></div></div></div>`;swTable()}
+function swTable(){const L=swList(),el=$('#swt');if(!el)return;
+  el.innerHTML=L.length?`<table class="swt"><tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Kelas</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>Jalan</th><th>Kelurahan</th><th>Kecamatan</th><th>Kota</th><th>Nama Ayah</th><th>Pekerjaan Ayah</th><th>Nama Ibu</th><th>Pekerjaan Ibu</th><th>No. Telepon</th><th>Aksi</th></tr>${L.map((s,n)=>{const v=x=>esc(x)||kos;
+    return `<tr><td>${n+1}</td><td>${v(s.nis)}</td><td><b>${esc(s.nama)}</b>${swKos(s)?` <span class="tag" style="background:var(--rose)" title="${swKos(s)} kolom belum diisi">${swKos(s)} kosong</span>`:''}</td><td>${esc(s.kelas)}</td><td>${v(s.tempat)}</td><td>${s.tgl?tg(s.tgl):kos}</td><td>${v(s.jalan)}</td><td>${v(s.kel)}</td><td>${v(s.kec)}</td><td>${v(s.kota)}</td><td>${v(s.ayah)}</td><td>${v(s.pkAyah)}</td><td>${v(s.ibu)}</td><td>${v(s.pkIbu)}</td>
+      <td>${s.hp?`${esc(s.hp)} <a class="btn wa" target="_blank" rel="noopener" href="${waUrl(s.hp)}">💬 WhatsApp</a>`:kos}</td>
+      <td><button class="sm" onclick="swEdit(${s.i})">✏️ Edit</button> <button class="sm red" onclick="swDel(${s.i})">🗑️</button></td></tr>`}).join('')}</table>`:'<p>Tidak ada siswa yang cocok.</p>'}
+async function swSave(rows,tahun){
+  if(!rows.length){const{error}=await sb.from('siswa').delete().eq('tahun_ajaran',tahun);if(error)throw error;SW=SW.filter(s=>norm(s.tahun)!=norm(tahun));return}
+  SW=await xcall({a:'sset',rows})}
+function swTmpl(){xlSave([SWF.map(f=>f[1]),['1001','Contoh Siswa Satu','4A',S.tahun,'Bekasi','2016-05-17','Jl. Mawar No. 1','Jatiasih','Jatiasih','Bekasi','Budi Santoso','Wiraswasta','Siti Aminah','Ibu Rumah Tangga','081234567890'],['1002','Contoh Siswa Dua','4A',S.tahun,'Jakarta','2016-08-03','Jl. Melati No. 5','Margahayu','Bekasi Timur','Bekasi','','','','','']],'Siswa','contoh-data-siswa.xlsx',[10,24,8,12,14,14,24,14,14,12,20,18,20,18,16])}
+function swExport(){const L=SW.filter(s=>norm(s.tahun)==norm(SWV.tahun)).sort(swSort);if(!L.length)return toast('Belum ada data siswa untuk diunduh.');
+  xlSave([SWF.map(f=>f[1]),...L.map(s=>SWF.map(([k])=>String(s[k]??'')))],'Siswa','data-siswa-'+thFile(SWV.tahun)+'.xlsx',[10,24,8,12,14,14,24,14,14,12,20,18,20,18,16]);toast('Data siswa diunduh')}
+function swImport(e){const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
+  r.onload=async ev=>{try{
+    const rows=xlRead(ev),nh=c=>String(c).toLowerCase().replace(/[^a-z]/g,'');
+    let hi=rows.findIndex(r=>r.some(c=>['nama','namasiswa'].includes(nh(c)))),idx={};
+    if(hi>=0)rows[hi].forEach((c,j)=>{const h=nh(c);for(const k in SWA)if(SWA[k].includes(h)&&idx[k]==null)idx[k]=j});
+    else{idx={nis:0,nama:1,kelas:2,tahun:3};hi=-1}
+    if(idx.nama==null||idx.kelas==null)return toast('Kolom "Nama Siswa" dan "Kelas" tidak ditemukan di baris judul.');
+    const sv=v=>v instanceof Date?'':String(v??'').trim(),out=[];
+    rows.slice(hi+1).forEach(r=>{const o={};for(const [k] of SWF)o[k]=idx[k]==null?'':(k=='tgl'?pd(r[idx[k]]):sv(r[idx[k]]));
+      if(!o.nama||!o.kelas)return;if(!o.tahun)o.tahun=SWV.tahun||S.tahun;if(o.hp&&/^8/.test(o.hp))o.hp='0'+o.hp;out.push(o)});
+    if(!out.length)return toast('Tidak ada baris siswa yang terbaca.');
+    // lengkapi kolom kosong dengan data lama
+    out.forEach(o=>{const old=SW.find(s=>norm(s.tahun)==norm(o.tahun)&&((o.nis&&s.nis==o.nis)||(s.nama.toLowerCase()==o.nama.toLowerCase()&&nk(s.kelas)==nk(o.kelas))));
+      if(old)SWC.concat(['nis']).forEach(k=>{if(!o[k]&&old[k])o[k]=old[k]})});
+    const th=[...new Set(out.map(o=>o.tahun))],ada=SW.filter(s=>th.some(t=>norm(t)==norm(s.tahun))).length;
+    if(ada&&!confirm(out.length+' siswa akan menggantikan '+ada+' siswa yang tersimpan pada tahun ajaran '+th.join(', ')+'. Lanjutkan?'))return;
+    await wrap('Menyimpan data siswa...',()=>swSave(out));SWV.tahun=th[0];SWV.kelas='';dSiswa();toast(out.length+' siswa disimpan');
+  }catch(x){toast('Data siswa gagal disimpan: '+(x.message||x))}};r.readAsArrayBuffer(f)}
+function swEdit(i){SWE=i;const o=i>=0?SW[i]:{tahun:SWV.tahun||S.tahun,kelas:SWV.kelas};let d=$('#dsw');
+  if(!d){d=document.createElement('dialog');d.id='dsw';d.style.width='min(680px,94vw)';document.body.appendChild(d)}
+  const fld=([k,l])=>`<div><label>${l}</label><input id="sf_${k}" type="${k=='tgl'?'date':k=='hp'?'tel':'text'}" ${k=='tahun'?'readonly':''} ${k=='hp'?'placeholder="08xxxxxxxxxx"':''} ${k=='kelas'?'list="swkl"':''} value="${esc(o[k]||'')}"></div>`;
+  d.innerHTML=`<h2 style="margin-bottom:12px">${i>=0?'Edit data siswa':'Tambah siswa'}</h2><datalist id="swkl">${[...new Set(SW.map(s=>s.kelas))].map(k=>`<option value="${esc(k)}">`).join('')}</datalist>
+  <div class="grid" style="max-height:60vh;overflow:auto;padding:2px">${SWF.map(fld).join('')}</div>
+  <div class="row" style="margin-top:14px"><button onclick="swOk()">Simpan</button><button class="ghost" onclick="$('#dsw').close()">Batal</button></div>`;d.showModal()}
+async function swOk(){const i=SWE,o=i>=0?{...SW[i]}:{};SWF.forEach(([k])=>o[k]=($('#sf_'+k).value||'').trim());
+  if(!o.nama||!o.kelas)return toast('Nama dan kelas wajib diisi.');if(o.hp&&/^8/.test(o.hp))o.hp='0'+o.hp;
+  const rows=SW.filter((s,j)=>j!=i&&norm(s.tahun)==norm(o.tahun));rows.push(o);
+  try{await wrap('Menyimpan...',()=>swSave(rows));$('#dsw').close();toast('Data siswa tersimpan');dSiswa()}catch(e){toast('Gagal menyimpan: '+e.message)}}
+async function swDel(i){const s=SW[i];if(!s||!confirm('Hapus '+s.nama+' dari data siswa?'))return;
+  try{await wrap('Menghapus...',()=>swSave(SW.filter((x,j)=>j!=i&&norm(x.tahun)==norm(s.tahun)),s.tahun));dSiswa();toast('Siswa dihapus')}catch(e){toast('Gagal menghapus: '+e.message)}}
+function prSiswa(){const L=swList();if(!L.length)return toast('Tidak ada data siswa untuk dicetak.');const v=x=>esc(x)||'-';
+  printHTML(`<div class="bn"><h2>DATA SISWA</h2><p>TAHUN PELAJARAN ${esc(SWV.tahun)}</p></div><table style="border:0;width:auto">${[['Satuan Pendidikan',sekolahNama()||'-'],['Kelas',SWV.kelas||'Semua kelas'],['Jumlah siswa',L.length]].map(r=>`<tr><td style="border:0">${r[0]}</td><td style="border:0">: ${esc(r[1])}</td></tr>`).join('')}</table>
+  <h3>Daftar Siswa</h3><table class="t1 pst"><tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Kelas</th><th>Tempat, Tanggal Lahir</th><th>Alamat</th><th>Nama Ayah</th><th>Pekerjaan Ayah</th><th>Nama Ibu</th><th>Pekerjaan Ibu</th><th>No. Telepon</th></tr>
+  ${L.map((s,n)=>`<tr><td>${n+1}</td><td>${v(s.nis)}</td><td>${esc(s.nama)}</td><td>${esc(s.kelas)}</td><td>${esc(s.tempat)}${s.tempat&&s.tgl?', ':''}${s.tgl?tg(s.tgl):(s.tempat?'':'-')}</td><td>${esc([s.jalan,s.kel&&'Kel. '+s.kel,s.kec&&'Kec. '+s.kec,s.kota].filter(Boolean).join(', '))||'-'}</td><td>${v(s.ayah)}</td><td>${v(s.pkAyah)}</td><td>${v(s.ibu)}</td><td>${v(s.pkIbu)}</td><td>${v(s.hp)}</td></tr>`).join('')}</table>`,'A4','landscape')}
+
+/* ===== AGENDA SEKOLAH ===== */
+let AGV={tahun:'',sem:''};
+function openAgenda(){show('magenda');if(!AGV.tahun){AGV.tahun=S.tahun;AGV.sem=S.semester}dAgenda()}
+const agTipe=a=>{const k=a.map(x=>x.ket||'').join(' ').toLowerCase();return /libur/.test(k)?'L':/ujian/.test(k)?'U':'K'};
+const agNama={L:'Libur',U:'Ujian',K:'Kegiatan'};
+/* gabungkan tanggal berurutan dengan kegiatan sama menjadi rentang; nama gabungan (& ; ,dan) dipecah per kegiatan */
+function agGroup(items){const m={};
+  items.forEach(a=>{String(a.nama).split(/\s*&\s*|\s*;\s*|\s+dan\s+/i).map(x=>x.trim()).filter(Boolean).forEach(n=>{const k=n+'|'+(a.ket||'');(m[k]=m[k]||{nama:n,ket:a.ket||'',d:new Set()}).d.add(a.tgl)})});
+  const out=[];Object.values(m).forEach(g=>{const ds=[...g.d].sort();let st=ds[0],pv=ds[0];
+    const nx=t=>{const d=new Date(t+'T00:00');d.setDate(d.getDate()+1);return iso(d)};
+    for(let i=1;i<=ds.length;i++){if(ds[i]&&ds[i]==nx(pv)){pv=ds[i];continue}out.push({a:st,b:pv,nama:g.nama,ket:g.ket,tp:agTipe([{ket:g.ket}])});st=ds[i];pv=ds[i]}});
+  return out.sort((x,y)=>x.a<y.a?-1:x.a>y.a?1:(x.b<y.b?1:x.b>y.b?-1:0))}
+const agRg=(a,b)=>{if(a==b)return tg(a);const A=new Date(a+'T00:00'),B=new Date(b+'T00:00');
+  return A.getFullYear()!=B.getFullYear()?tg(a)+' – '+tg(b):A.getMonth()!=B.getMonth()?A.getDate()+' '+BL[A.getMonth()]+' – '+tg(b):A.getDate()+'–'+B.getDate()+' '+BL[A.getMonth()]+' '+A.getFullYear()};
+const agHr=(a,b)=>{const h=t=>HR[new Date(t+'T00:00').getDay()];return a==b?h(a):h(a)+' – '+h(b)};
+function agData(){const [m,s]=rng(AGV.tahun,AGV.sem),all=agFor(AGV.tahun).sort((a,b)=>a.tgl<b.tgl?-1:a.tgl>b.tgl?1:0),map={};
+  all.filter(a=>a.tgl>=m&&a.tgl<=s).forEach(a=>(map[a.tgl]=map[a.tgl]||[]).push(a));return{m,s,all,map,inSem:all.filter(a=>a.tgl>=m&&a.tgl<=s)}}
+function agMonth(y,m,map){const lead=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate(),arr=[];
+  let h=`<table class="mc"><tr>${['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map((d,i)=>`<th${i>4?' class="we"':''}>${d}</th>`).join('')}</tr><tr>`+'<td></td>'.repeat(lead),c=lead;
+  for(let d=1;d<=days;d++){if(c%7==0&&c>0)h+='</tr><tr>';const t=`${y}-${pad(m+1)}-${pad(d)}`,it=map[t],tp=it?agTipe(it):'';
+    if(it)it.forEach(x=>arr.push({tgl:t,nama:x.nama,ket:x.ket}));
+    h+=`<td class="${tp?'d'+tp:''}${c%7>4&&!tp?' we':''}"${it?` title="${esc(it.map(x=>x.nama).join('; '))}"`:''}>${d}</td>`;c++}
+  while(c%7){h+='<td></td>';c++}
+  const ev=agGroup(arr),dd=t=>+t.slice(8);
+  return `<div class="mcw"><div class="mct">${BL[m]} ${y}</div>${h}</tr></table>${ev.length?`<ul class="mev">${ev.map(e=>`<li><i class="d${e.tp}"></i><span><b>${e.a==e.b?dd(e.a):dd(e.a)+'–'+dd(e.b)}</b> ${esc(e.nama)}</span></li>`).join('')}</ul>`:'<p class="mev" style="color:var(--mt)">Tidak ada agenda</p>'}</div>`}
+function agCal(D){const y=+D.m.slice(0,4),m0=+D.m.slice(5,7)-1;return `<div class="mgrid">${[0,1,2,3,4,5].map(i=>agMonth(y,m0+i,D.map)).join('')}</div>`}
+const agLegend='<div class="lgn"><span><i class="dL"></i>Libur</span><span><i class="dU"></i>Ujian</span><span><i class="dK"></i>Kegiatan sekolah</span><span><i class="we2"></i>Sabtu/Minggu</span></div>';
+function agRows(D){return agGroup(D.inSem).map(a=>{const tp=a.tp;return `<tr><td style="white-space:nowrap">${agRg(a.a,a.b)}</td><td style="white-space:nowrap">${agHr(a.a,a.b)}</td><td>${esc(a.nama)}</td><td><span class="tag ${tp=='L'?'Libur':tp=='U'?'Ujian':''}">${esc(a.ket)||agNama[tp]}</span></td></tr>`}).join('')}
+function dAgenda(){const yrs=[...new Set([...AG.map(a=>a.tahun),S.tahun])].filter(Boolean).sort().reverse(),D=agData(),nL=D.inSem.filter(a=>agTipe([a])=='L').length,nU=D.inSem.filter(a=>agTipe([a])=='U').length;
+  $('#magenda').innerHTML=`<h2 class="sec">🗓️ Agenda Sekolah</h2>
+  <div class="card"><h2>Unggah &amp; unduh agenda</h2><p>Kolom Excel: Tanggal, Nama Kegiatan, Keterangan (<i>Libur nasional</i>, <i>Kegiatan sekolah (tetap KBM)</i>, atau <i>Ujian sekolah</i>). Agenda berlaku per tahun ajaran dan dipakai untuk menghitung pertemuan efektif. Unggah file baru akan menggantikan agenda tahun ajaran yang dipilih.</p>
+    <div class="row"><div><label>Tahun ajaran</label><select onchange="AGV.tahun=this.value;dAgenda()">${yrs.map(y=>`<option ${y==AGV.tahun?'selected':''}>${esc(y)}</option>`).join('')}</select></div>
+    <div><label>Semester</label><select onchange="AGV.sem=this.value;dAgenda()"><option ${AGV.sem=='Gasal'?'selected':''}>Gasal</option><option ${AGV.sem=='Genap'?'selected':''}>Genap</option></select></div></div>
+    <div class="row" style="margin-top:12px"><input type="file" id="xl" accept=".xlsx,.xls,.csv" style="max-width:300px" onchange="agImport(event)"><button class="ghost sm" onclick="tmpl()">Unduh contoh Excel</button><button class="ghost sm" onclick="agExport()">⬇️ Unduh agenda (Excel)</button><button class="amb sm" onclick="prAgenda()">🖨️ Print</button></div>
+    <p style="margin:10px 0 0">${D.all.length?`Tersimpan <b>${D.all.length}</b> agenda untuk tahun ajaran ${esc(AGV.tahun)}; <b>${D.inSem.length}</b> di semester ${AGV.sem} (${nL} libur, ${nU} ujian).`:'Belum ada agenda untuk tahun ajaran ini.'}</p></div>
+  <div class="card"><h2>Kalender Semester ${esc(AGV.sem)} · ${esc(AGV.tahun)}</h2>${agLegend}${agCal(D)}</div>
+  <div class="card"><h2>Daftar agenda semester ${esc(AGV.sem)}</h2>${D.inSem.length?`<div class="sc"><table><tr><th>Tanggal</th><th>Hari</th><th>Kegiatan</th><th>Keterangan</th></tr>${agRows(D)}</table></div>`:'<p>Belum ada agenda pada semester ini.</p>'}</div>`}
+async function agImport(e){const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
+  r.onload=async ev=>{try{const out=[];xlRead(ev).forEach(r=>{const t=pd(r[0]);if(t&&r[1])out.push({tgl:t,nama:String(r[1]).trim(),ket:String(r[2]||'').trim()})});
+    if(!out.length)return toast('Tidak ada baris agenda yang terbaca. Cek kolom Tanggal dan Nama Kegiatan.');
+    if(agFor(AGV.tahun).length&&!confirm('Agenda tahun ajaran '+AGV.tahun+' sudah ada. Ganti dengan '+out.length+' agenda dari file ini?'))return;
+    await wrap('Menyimpan agenda...',async()=>{await agSave(AGV.tahun,out);if(norm(AGV.tahun)==norm(S.tahun)){S.agenda=agFor(S.tahun);localStorage.S=JSON.stringify(S)}await syncProgs()});
+    dAgenda();toast(out.length+' agenda disimpan')}catch(x){toast('Agenda gagal disimpan: '+(x.message||x))}};r.readAsArrayBuffer(f)}
+function agExport(){const L=agFor(AGV.tahun).sort((a,b)=>a.tgl<b.tgl?-1:1);if(!L.length)return toast('Belum ada agenda untuk diunduh.');
+  xlSave([['Tanggal','Nama Kegiatan','Keterangan'],...L.map(a=>[a.tgl,a.nama,a.ket||''])],'Agenda','agenda-sekolah-'+thFile(AGV.tahun)+'.xlsx',[14,38,32]);toast('Agenda diunduh')}
+function prAgenda(){const D=agData();if(!D.inSem.length)return toast('Belum ada agenda pada semester ini.');
+  printHTML(`<div class="pbk"><div class="bn"><h2>AGENDA SEKOLAH</h2><p>SEMESTER ${AGV.sem.toUpperCase()} · TAHUN PELAJARAN ${esc(AGV.tahun)}</p></div>${sekolahNama()?`<p><b>${esc(sekolahNama())}</b></p>`:''}${agLegend}${agCal(D)}</div>
+  <div class="pbk"><h3>Daftar Agenda Semester ${esc(AGV.sem)}</h3><table class="t3"><tr><th>Tanggal</th><th>Hari</th><th>Kegiatan</th><th>Keterangan</th></tr>${agRows(D)}</table></div>`,'A4','landscape')}
+
+/* ===== PRINT JADWAL PELAJARAN ===== */
+function prJadwal(){const M=jdModel(),g=jdGuru();if(!M||!g)return toast('Pilih guru yang diaktifkan dulu.');const D=JHARI;
+  const mine=(h,jam)=>{const r=(M.memori[h]||{})[jam]||{};return M.kelas.map(k=>{const p=jdPv(r[k]);return p&&p.g==g.id?{k,kode:p.kode}:null}).filter(Boolean)};
+  const rows=M.waktu.map(w=>{
+    if(w.tipe=='istirahat')return `<tr class="jr"><td>${esc(w.jam)}</td><td colspan="5">☕ ${esc(w.label||'Istirahat')}</td></tr>`;
+    if(w.tipe=='kegiatan'){const hs=String(w.targetHari||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);return `<tr class="jr"><td>${esc(w.jam)}</td>${D.map(h=>`<td>${!hs.length||hs.includes(h)?esc(w.label):''}</td>`).join('')}</tr>`}
+    return `<tr><td>${esc(w.jam)}</td>${D.map(h=>`<td>${mine(h,w.jam).map(x=>`<span class="jb" style="--c:${jdCol(x.kode)}">${esc(x.k)}<small>${esc(x.kode)}</small></span>`).join('')}</td>`).join('')}</tr>`}).join('');
+  let tot=0;const sum=D.map((h,i)=>{const b=jdBlocks(h);b.forEach(x=>tot+=x.jp);return `<tr><td><b>${HR[i+1]}</b></td><td style="text-align:left">${b.length?b.map(x=>`${esc(x.kelas)} · <b>${esc(x.mapel)}</b> · ${x.mulai} - ${x.selesai} (${x.jp} JP)`).join('<br>'):'Tidak mengajar'}</td></tr>`}).join('');
+  printHTML(`<div class="bn"><h2>JADWAL PELAJARAN</h2><p>TAHUN PELAJARAN ${esc(S.tahun)}</p></div><table style="border:0;width:auto">${[['Nama Guru',g.nama],['Mata Pelajaran',jdMapelList().join(', ')||'-'],['Total jam mengajar',tot+' JP per minggu']].map(r=>`<tr><td style="border:0">${r[0]}</td><td style="border:0">: ${esc(r[1])}</td></tr>`).join('')}</table>
+  <h3>Jadwal Mingguan</h3><table class="pjt"><tr><th>Hari / Waktu</th>${D.map((h,i)=>`<th>${HR[i+1]}</th>`).join('')}</tr>${rows}</table>
+  <h3>Ringkasan Mengajar per Hari</h3><table class="t1"><tr><th style="width:110px">Hari</th><th>Kelas, mata pelajaran, dan waktu</th></tr>${sum}</table>`,'A4','landscape')}
 
 /* ===== JADWAL PELAJARAN ===== */
 let JD=null,JDERR='',TX={},RET=null,TDI=[],TXT=0;
@@ -987,7 +1177,7 @@ function dJadwal(){
   let h='<h2 class="sec">📅 Jadwal Pelajaran</h2>';
   if(JDERR)h+=`<div class="card" style="border-left:6px solid var(--rose)"><h3>⚠️ Tabel jadwal belum siap di database</h3><p>${esc(JDERR)}</p><p>Jalankan SQL berikut sekali di <b>Supabase → SQL Editor</b>, lalu muat ulang halaman:</p><pre class="jsql">${esc(JSQL)}</pre></div>`;
   h+=`<div class="card"><h2>1. Unggah backup jadwal pelajaran (.json)</h2><p>Disimpan di database untuk tahun ajaran aktif <b>${esc(S.tahun)}</b>.</p>
-    <div class="row"><input type="file" id="jf" accept=".json,application/json" style="max-width:340px" onchange="jdUpload(event)">${JD?'<button class="red sm" onclick="jdHapus()">🗑️ Hapus jadwal</button>':''}</div>
+    <div class="row"><input type="file" id="jf" accept=".json,application/json" style="max-width:340px" onchange="jdUpload(event)">${JD?'<button class="red sm" onclick="jdHapus()">🗑️ Hapus jadwal</button>':''}${g?'<button class="amb sm" onclick="prJadwal()">🖨️ Print jadwal</button>':''}</div>
     <p style="margin:10px 0 0">${M?`✅ Jadwal tersimpan: <b>${M.guru.length}</b> guru, <b>${M.kelas.length}</b> kelas${JD.updated_at?' · diperbarui '+new Date(JD.updated_at).toLocaleString('id-ID'):''}.`:'Belum ada jadwal untuk tahun ajaran ini.'}</p></div>`;
   if(M)h+=`<div class="card"><h2>2. Pilih guru yang diaktifkan</h2>
     <select id="jg" onchange="jdAktif(this.value)" style="max-width:460px"><option value="">— Pilih nama guru —</option>${M.guru.map(x=>`<option value="${esc(x.id)}" ${String(JD.guru_id)==x.id?'selected':''}>${esc(x.nama)}</option>`).join('')}</select>
