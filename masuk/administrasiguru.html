@@ -172,9 +172,9 @@ button,.btn{background:var(--pr);border-radius:8px;font-family:'Public Sans';fon
 button.soft{background:var(--prs);color:var(--pr);font-size:.8rem;letter-spacing:.04em;padding:9px 16px}.ghost{background:#fff;color:var(--hd);border:1px solid #d9dee3}.amb{background:#ffab00;color:#fff}.red{background:#ff3e1d}
 .card,.kp,.vr,.kc1{border:0;border-radius:12px;box-shadow:var(--sh)}.card{padding:22px}
 input,select,textarea{border:1px solid #d9dee3;border-radius:8px}input:focus,select:focus,textarea:focus{outline:2px solid #696cff55;border-color:var(--pr)}
-.r1{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;margin-bottom:22px}
+.r1{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;margin-bottom:22px}
 .wc{display:flex;justify-content:space-between;align-items:center;gap:10px;overflow:hidden}.wc h2{color:var(--pr);font-size:1.45rem;margin-bottom:12px}.wc p{margin:0 0 18px;line-height:1.7}.wi{width:210px;flex:none}
-#wd{display:grid;grid-template-columns:1fr 1fr;gap:22px}.sc2{padding:18px;display:grid;gap:4px;align-content:start}
+#wd{margin-bottom:22px}.wdg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}.wdt{margin:0 0 12px}.wdt h3{margin:0 0 2px}.wdt small{color:var(--mt)}.sc2{padding:18px;display:grid;gap:4px;align-content:start}
 .ic{width:42px;height:42px;border-radius:8px;display:grid;place-items:center;font-size:1.2rem;margin-bottom:10px}.sc2 span{color:var(--tx)}.sc2 b{font:600 1.55rem 'Public Sans';color:var(--hd)}.sc2 small{font-weight:600;color:#71dd37}.sc2 small.dn{color:#ff3e1d}
 .ch{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);padding:0;margin-bottom:22px;overflow:hidden}.chl{padding:24px;border-right:1px solid #e6e6ef}.chr{padding:24px;text-align:center;display:grid;align-content:center}
 .lgd{display:flex;gap:16px;margin:10px 0 22px;font-size:.9rem}.lgd i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
@@ -184,11 +184,18 @@ input,select,textarea{border:1px solid #d9dee3;border-radius:8px}input:focus,sel
 .bc em{position:absolute;bottom:-26px;font-style:normal;font-size:.8rem;color:var(--mt)}.plot+div{height:30px}
 .chr svg{max-width:230px;margin:auto}.chr p{margin:6px 0 0}
 .sec{font-size:1.25rem;margin:6px 0 14px}
+.pgl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:16px}
+.kc{border:1px solid #e6e6ef;border-radius:12px;padding:14px 16px;background:#fafaff}
+.kch{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}.kch b{font:700 1.05rem 'Public Sans';color:var(--hd)}.kch span{font-size:.78rem;color:var(--pr);background:var(--prs);border-radius:20px;padding:2px 9px;white-space:nowrap}
+.pb{margin-top:9px}.pbl{display:flex;justify-content:space-between;font-size:.82rem;color:var(--tx);gap:6px}.pbl b{color:var(--hd);white-space:nowrap}
+.pbt{height:7px;border-radius:6px;background:#e6e6ef;margin-top:4px;overflow:hidden}.pbt i{display:block;height:100%;border-radius:6px}
+.dn2{position:relative;width:100%;max-width:190px;margin:0 auto 10px}.dn2 svg{max-width:100%}
+.dg{margin-top:14px;display:grid;gap:6px;text-align:left;font-size:.86rem}.dg div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #e6e6ef;padding-bottom:5px}.dg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
 .vh{background:linear-gradient(135deg,#696cff,#8e90ff);box-shadow:var(--sh)}.vh h1,.vh p{color:#fff}.chip{color:var(--pr)}.kp .kv b{color:var(--hd)}
 .lgc{border-top:8px solid var(--pr)}#lg{background:#f5f5f9}
 #sis{min-height:100vh;padding:16px;background:linear-gradient(#e9eaff,#f5f5f9 320px)}.sinfo{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--sh)}.sinfo b{color:var(--hd)}
 #qr{margin:16px 0}
-@media(max-width:1000px){.r1,.ch{grid-template-columns:1fr}.chl{border-right:0;border-bottom:1px solid #e6e6ef}}
+@media(max-width:1000px){.wdg{grid-template-columns:1fr 1fr}.r1,.ch{grid-template-columns:1fr}.chl{border-right:0;border-bottom:1px solid #e6e6ef}}
 @media(max-width:900px){#sb{position:fixed;left:0;transform:translateX(-105%);transition:.2s;box-shadow:0 0 40px #0004}body.so #sb{transform:none}#hb{display:inline-block}.mw{padding:0 12px 20px}.tbc{display:none}.wi{width:120px}}
 
 /* ===== JADWAL PELAJARAN ===== */
@@ -247,6 +254,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 #pa .pjt th{background:#E4EFE9}#pa .pjt td:first-child{text-align:left}
 #pa .t1 td:last-child{text-align:left}
 }
+@media print{
+html,body,.app,.mw,main,#pa{background:#fff!important}
+#pa .t1 tr:nth-child(even) td,#pa .t2 tr:nth-child(even) td,#pa .t3 tr:nth-child(even) td{background:#fff}
+#pa .t3 tr.e td{background:#fff}
+#pa .ttd img,#pa .sg img{background:transparent;mix-blend-mode:multiply}
+}
 </style>
 <style id="pgst"></style>
 </head>
@@ -261,9 +274,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <span class="tbc"><span id="hari"></span> <b id="jam"></b></span><div class="avt" id="av2">G</div></header>
 <main>
 <section id="home">
-<div class="r1"><div class="card wc"><div><h2 id="wt"></h2><p id="ta"></p><button class="soft" onclick="baru()">BUAT PROGRAM BARU</button></div><svg class="wi" viewBox="0 0 220 170"><rect x="30" y="118" width="170" height="8" rx="4" fill="#d9daff"/><circle cx="110" cy="52" r="24" fill="#f5cba7"/><path d="M84 50c0-26 52-26 52 0-12-10-40-10-52 0z" fill="#3b3f5c"/><path d="M78 118c0-40 12-52 32-52s32 12 32 52z" fill="#696cff"/><rect x="62" y="96" width="62" height="22" rx="3" fill="#c5c9d3"/><circle cx="93" cy="107" r="3" fill="#fff"/><rect x="166" y="92" width="22" height="26" rx="3" fill="#a1acb8"/><path d="M177 92c-12-14-14-26-6-34 4 14 8 22 6 34zM177 92c10-12 14-22 12-30-8 8-12 18-12 30z" fill="#03c3ec"/></svg></div><div id="wd"></div></div>
+<div class="r1"><div class="card wc"><div><h2 id="wt"></h2><p id="ta"></p><button class="soft" onclick="baru()">BUAT PROGRAM BARU</button></div><svg class="wi" viewBox="0 0 220 170"><rect x="30" y="118" width="170" height="8" rx="4" fill="#d9daff"/><circle cx="110" cy="52" r="24" fill="#f5cba7"/><path d="M84 50c0-26 52-26 52 0-12-10-40-10-52 0z" fill="#3b3f5c"/><path d="M78 118c0-40 12-52 32-52s32 12 32 52z" fill="#696cff"/><rect x="62" y="96" width="62" height="22" rx="3" fill="#c5c9d3"/><circle cx="93" cy="107" r="3" fill="#fff"/><rect x="166" y="92" width="22" height="26" rx="3" fill="#a1acb8"/><path d="M177 92c-12-14-14-26-6-34 4 14 8 22 6 34zM177 92c10-12 14-22 12-30-8 8-12 18-12 30z" fill="#03c3ec"/></svg></div></div>
+<div id="prog"></div>
+<div id="wd"></div>
 <div id="today"></div>
-<div class="card ch"><div class="chl"><h3>Pertemuan per Bulan</h3><div class="lgd"><span><i style="background:#696cff"></i>Efektif</span><span><i style="background:#03c3ec"></i>Tanpa KBM</span></div><div id="bars"></div></div><div class="chr" id="gauge"></div></div>
 <h2 class="sec">🗂️ Program tersimpan</h2><div id="list"></div>
 </section>
 
@@ -420,12 +434,7 @@ function draw(){
   $('#wt').textContent=`Selamat datang, ${nm}! 🎉`;
   $('#ta').innerHTML=`Tahun ajaran <b>${esc(S.tahun)}</b> semester <b>${S.semester}</b>.<br>Anda punya <b>${L.length}</b> program dengan <b>${E}</b> pertemuan efektif.`;
   $('#pt').textContent=S.tahun+' · '+S.semester;$('#av2').textContent=((AUTH&&AUTH.u)||'G')[0].toUpperCase();drawToday();
-  const C=(ic,bg,fg,l,v,sb,up)=>`<div class="card sc2"><div class="ic" style="background:${bg};color:${fg}">${ic}</div><span>${l}</span><b>${v}</b><small class="${up?'':'dn'}">${sb}</small></div>`;
-  $('#wd').innerHTML=C('🗂️','#e7e7ff','#696cff','Program',L.length,'tersimpan',1)+C('✅','#e8fadf','#71dd37','Efektif',E,pc+'% dari hari',1)+C('🏖️','#ffe0db','#ff3e1d','Tanpa KBM',N,'libur / ujian / kegiatan',0)+C('🎓','#d7f5fc','#03c3ec','Kelas',cls.size,esc([...cls].join(', '))||'-',1);
-  const ks=Object.keys(mo).sort(),top=Math.ceil(Math.max(4,...ks.map(k=>Math.max(...mo[k])))/4)*4;
-  $('#bars').innerHTML=ks.length?`<div class="plot"><div class="yl">${[0,1,2,3,4].map(i=>`<span>${top*i/4}</span>`).join('')}</div>${ks.map(k=>`<div class="bc"><div class="bb"><u style="height:${mo[k][0]/top*100}%"></u><u class="b2" style="height:${mo[k][1]/top*100}%"></u></div><em>${BL[+k.slice(5)-1].slice(0,3)}</em></div>`).join('')}</div><div></div>`:'<p>Belum ada data kalender.</p>';
-  const NT=32,tk=[...Array(NT)].map((_,i)=>{const a=(-225+270*i/(NT-1))*Math.PI/180,c=Math.cos(a),n=Math.sin(a);return `<line x1="${100+c*74}" y1="${100+n*74}" x2="${100+c*92}" y2="${100+n*92}" stroke="${i/(NT-1)*100<=pc?'#696cff':'#d9daff'}" stroke-width="4" stroke-linecap="round"/>`}).join('');
-  $('#gauge').innerHTML=`<svg viewBox="0 0 200 200">${tk}<text x="100" y="104" text-anchor="middle" font-size="30" fill="#566a7f">${pc}%</text><text x="100" y="126" text-anchor="middle" font-size="13" fill="#a1acb8">Efektif</text></svg><p><b>${E}</b> dari ${T} hari pembelajaran</p>`;
+  drawProg(L);drawYear();
 const F=L.filter(p=>!qs||(p.mapel+' '+p.kelas+' '+p.sekolah+' '+p.semester).toLowerCase().includes(qs));
 
 // 🎨 warna per hari — dipakai untuk border, gradient baris, & kotak kelas
@@ -448,6 +457,42 @@ $('#list').innerHTML=F.length?Object.keys(grp).sort((a,b)=>a-b).map(h=>{
   return `<div class="dayhead" style="--c:${c}"><span class="dot"></span><b>${H}</b><span class="count">${grp[h].length} program</span></div>${rows}`;
 }).join(''):`<div class="card"><p>${L.length?'Tidak ada program yang cocok.':'Belum ada program untuk tahun ajaran '+esc(S.tahun)+'. Klik <b>Program Baru</b> di menu untuk memulai.'}</p></div>`;
 }
+
+/* ===== beranda: progres modul ajar per kelas + ringkasan hari setahun ===== */
+let PGT=0,PGK=[];
+const ROM={I:1,II:2,III:3,IV:4,V:5,VI:6};
+function drawProg(L){
+  const el=$('#prog');if(!el)return;
+  if(!L.length){el.innerHTML=`<div class="card" style="margin-bottom:22px"><h3>Progres Modul Ajar per Kelas</h3><p style="margin:8px 0 0">Belum ada program untuk tahun ajaran ${esc(S.tahun)}. Buat program baru agar progres muncul di sini.</p></div>`;return}
+  const need=L.filter(p=>p.uuid&&!TX[p.uuid]),tk=++PGT;
+  const render=loading=>{
+    const C={};
+    L.forEach(p=>{
+      const k=String(p.kelas||'-').trim()||'-',o=C[k]=C[k]||{n:0,r:0,f:0,j:0},X0=TX[p.uuid]||{};
+      calc(p).filter(r=>r.s=='KBM'&&!r.ex).forEach(r=>{const key=p.id+'|'+r.t;o.n++;
+        if(X0.RPP&&X0.RPP[key])o.r++;if(X0.Formatif&&X0.Formatif[key])o.f++;if(X0.Jurnal&&X0.Jurnal[key])o.j++})});
+    const ks=Object.keys(C).sort((a,b)=>nk(a).localeCompare(nk(b),'id',{numeric:true}));PGK=ks;
+    const T=ks.reduce((s,k)=>({n:s.n+C[k].n,r:s.r+C[k].r,f:s.f+C[k].f,j:s.j+C[k].j}),{n:0,r:0,f:0,j:0});
+    const pct=(v,n)=>n?Math.round(v/n*100):0,all=pct(T.r+T.f+T.j,T.n*3);
+    const bar=(ic,l,v,n,c)=>`<div class="pb"><div class="pbl"><span>${ic} ${l}</span><b>${v} dari ${n}</b></div><div class="pbt"><i style="width:${pct(v,n)}%;background:${c}"></i></div></div>`;
+    const cards=ks.map(k=>{const o=C[k];return `<div class="kc" style="cursor:pointer" title="Klik untuk analisis hasil belajar siswa kelas ${esc(k)}" tabindex="0" onclick="anShort(${ks.indexOf(k)})" onkeydown="if(event.key=='Enter')anShort(${ks.indexOf(k)})"><div class="kch"><b>Kelas ${esc(k)}</b><span>${o.n} pertemuan efektif</span></div>${bar('📘','RPP tersusun',o.r,o.n,'#12806F')}${bar('📝','Penilaian formatif',o.f,o.n,'#D98200')}${bar('📒','Jurnal',o.j,o.n,'#5B6CE0')}</div>`}).join('');
+    const R=70,CI=2*Math.PI*R,dash=CI*all/100;
+    const donut=`<div class="dn2"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${R}" fill="none" stroke="#e6e6ef" stroke-width="18"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="#696cff" stroke-width="18" stroke-linecap="round" stroke-dasharray="${dash} ${CI}" transform="rotate(-90 100 100)"/><text x="100" y="106" text-anchor="middle" font-size="34" fill="#566a7f">${all}%</text><text x="100" y="128" text-anchor="middle" font-size="12" fill="#a1acb8">Selesai</text></svg></div>`;
+    el.innerHTML=`<div class="card ch"><div class="chl"><h3>Progres Modul Ajar per Kelas</h3><small style="color:var(--mt)">Tahun ajaran ${esc(S.tahun)} · klik kelas untuk analisis hasil belajar${loading?' · memuat status...':''}</small><div class="pgl">${cards}</div></div>
+      <div class="chr">${donut}<b style="color:var(--hd)">Progres keseluruhan</b><small style="color:var(--mt)">Pertemuan, RPP, formatif &amp; jurnal seluruh kelas</small>
+      <div class="dg"><div><span><i style="background:#a1acb8"></i>Pertemuan efektif</span><b>${T.n}</b></div><div><span><i style="background:#12806F"></i>RPP tersusun</span><b>${T.r} dari ${T.n}</b></div><div><span><i style="background:#D98200"></i>Penilaian formatif</span><b>${T.f} dari ${T.n}</b></div><div><span><i style="background:#5B6CE0"></i>Jurnal</span><b>${T.j} dari ${T.n}</b></div></div></div></div>`};
+  render(!!need.length);
+  if(need.length)txLoad(need).then(()=>{if(tk==PGT)render(false)})}
+function drawYear(){
+  const el=$('#wd');if(!el)return;
+  const a0=rng(S.tahun,'Gasal')[0],a1=rng(S.tahun,'Genap')[1],ag=agFor(S.tahun),m={};
+  (ag.length?ag:(S.agenda||[])).forEach(a=>(m[a.tgl]=m[a.tgl]||[]).push(a));
+  let Lb=0,U=0,K=0,W=0;
+  for(let d=new Date(a0+'T00:00');d<=new Date(a1+'T00:00');d.setDate(d.getDate()+1)){const w=d.getDay();if(w==0||w==6)continue;W++;const it=m[iso(d)];if(!it)continue;const tp=agTipe(it);tp=='L'?Lb++:tp=='U'?U++:K++}
+  const E=Math.max(0,W-Lb-U),pc=W?Math.round(E/W*100):0;
+  const C=(ic,bg,fg,l,v,sb,up)=>`<div class="card sc2"><div class="ic" style="background:${bg};color:${fg}">${ic}</div><span>${l}</span><b>${v}</b><small class="${up?'':'dn'}">${sb}</small></div>`;
+  el.innerHTML=`<div class="wdt"><h3>📆 Kalender Pendidikan Setahun</h3><small>${esc(S.tahun)} · ${tg(a0)} – ${tg(a1)} · dihitung pada hari kerja Senin–Jumat${ag.length||(S.agenda||[]).length?'':' · agenda sekolah belum diunggah'}</small></div>
+  <div class="wdg">${C('🏖️','#ffe0db','#ff3e1d','Hari Libur',Lb,'hari tanpa KBM',0)}${C('🏫','#fff2d6','#ffab00','Kegiatan Sekolah',K,'tetap KBM',1)}${C('📝','#d7f5fc','#03c3ec','Ujian',U,'hari tanpa KBM',0)}${C('✅','#e8fadf','#71dd37','Hari Efektif Mengajar',E,pc+'% dari '+W+' hari kerja',1)}</div>`}
 setInterval(()=>{const d=new Date();$('#hari').textContent=`${HR[d.getDay()]}, ${d.getDate()} ${BL[d.getMonth()]}`;$('#jam').textContent=d.toLocaleTimeString('id-ID')},1000);
 
 function home(){show('home');draw()}
@@ -547,7 +592,7 @@ function cetak(){const f=s=>progs.find(p=>p.kelas==$('#ck').value&&p.mapel==$('#
   const p=a[0],gs=a.find(x=>x.ttdGuru),ks=a.find(x=>x.ttdKepsek),tt=ttd(p,p.tanggal,gs?gs.ttdGuru:'',ks?ks.ttdKepsek:'');
   const idn=`<table style="border:0;width:auto">${[['Satuan Pendidikan',p.sekolah],['Mata Pelajaran',p.mapel],['Kelas',p.kelas+(mode=='sem'?' / '+p.semester:'')],['Tahun Pelajaran',p.tahun]].map(r=>`<tr><td style="border:0">${r[0]}</td><td style="border:0">: ${esc(r[1])}</td></tr>`).join('')}</table>`;
   $('#pa').innerHTML=`<div class="bn"><h2>${mode=='sem'?'PROGRAM SEMESTER '+p.semester.toUpperCase():'PROGRAM TAHUNAN'}</h2><p>TAHUN PELAJARAN ${esc(p.tahun)}</p></div>${idn}`+semHTML(a,mode=='sem',mode=='sem'?'Semester '+p.semester+': Kalender dan Minggu Efektif':'Kalender dan Minggu Efektif Tahun Pelajaran '+p.tahun)+tt;
-  $('#pgst').textContent='';$('#dc').close();setTimeout(()=>print(),200)}
+  $('#pgst').textContent='';$('#dc').close();doPrint()}
 function semHTML(ps,detail,judul){const c=ps.flatMap(p=>calc(p).map(r=>({...r,p}))).sort((a,b)=>a.t<b.t?-1:a.t>b.t?1:0),mo={},bab={},mm=r=>r.p.materi?.[r.t]||{};
   c.forEach(r=>{const k=r.t.slice(0,7),m=mo[k]=mo[k]||{h:0,e:0,x:[]},ok=r.s=='KBM'&&!r.ex;m.h++;ok?m.e++:m.x.push(`${tg(r.t)}: ${r.n||(r.ex?'Tidak ada pertemuan':r.s)}`);
     if(ok){const b=(mm(r).bab||'').trim();if(b&&b!='-')bab[b]=(bab[b]||0)+1}});
@@ -704,6 +749,7 @@ function dView(){const R=rows();BABS=[...new Set(R.map(r=>(r.bab||'').trim()).fi
   <div class="vh"><div class="av">${esc(ini)}</div><div style="flex:1;min-width:220px"><h1>${esc(VP.guru||'Guru')} <span class="chip">${esc(VP.mapel)}</span></h1><p>NIP. ${esc(VP.nipGuru||'-')}</p><p>🏫 ${esc(VP.sekolah)} &nbsp; 📅 ${esc(VP.tahun)}-${VP.semester} &nbsp; 🎓 Kelas ${esc(VP.kelas)}</p></div><button class="amb" onclick="openPA()">🖨️ Print Semua</button></div>
   <div class="kps">${KP('📅','PERTEMUAN',n,'Pertemuan efektif',100,'#5B6CE0')}${KP('📘','RPP TERSUSUN',cnt('RPP'),'dari '+n,pc(cnt('RPP')),'#12806F')}${KP('📝','PENILAIAN FORMATIF',cnt('Formatif'),'dari '+n,pc(cnt('Formatif')),'#D98200')}${KP('📒','JURNAL, HADIR '+kh+'%',cnt('Jurnal'),'dari '+n,pc(cnt('Jurnal')),'#D1495B')}</div>
   <div class="card"><h2>🏆 Penilaian Sumatif</h2><div class="va">${BABS.map((b,i)=>P(sm(b),(sm(b)?'Edit':'Isi')+' Sumatif: '+esc(b),`openNilai('S',${i})`,'#8E5BD1')).join('')}${['STS','SAS'].map(b=>P(sm(b),(sm(b)?'Edit':'Isi')+' Nilai '+b,`openNilai('S','${b}')`,'#5B6CE0')).join('')}</div></div>
+  <div class="card"><h2>📊 Analisis Hasil Belajar Siswa</h2><p style="margin:0 0 10px">Rekap nilai formatif per siswa pada setiap tujuan pembelajaran, lengkap dengan rapor individu dan analisisnya.</p><div class="va"><button class="pill" style="--c:#12806F" data-d="1" onclick="openAnalisis()">📊 Buka Analisis Penilaian Siswa</button></div></div>
   <div class="card"><div class="row"><input id="vq" placeholder="🔍 Cari materi atau bab..." value="${esc(vq)}" oninput="vq=this.value;vList()" style="flex:1;min-width:200px"><select id="vb" onchange="vb=this.value;vList()" style="max-width:280px"><option value="">Semua bab</option>${BABS.map(b=>`<option value="${esc(b)}" ${b==vb?'selected':''}>${esc(b)}</option>`).join('')}</select></div></div><div id="vl"></div>`;vList()}
 
 function vList(){
@@ -766,7 +812,12 @@ function vList(){
 
 function tool(t,h){show('tool');$('#tool').innerHTML=`<div class="row" style="margin-bottom:12px"><button class="ghost" onclick="back()">Kembali</button><h2>${t}</h2></div>`+h}
 const back=()=>{if(RET=='home'){RET=null;if(VP&&VP.uuid)TX[VP.uuid]=JSON.parse(JSON.stringify(X));home()}else{show('view');dView()}};
-function printHTML(h,pp='A4',or='portrait'){$('#pgst').textContent=`@page{size:${pp=='F4'?'215mm 330mm':'210mm 297mm'} ${or};margin:12mm}`;$('#pa').innerHTML=h;setTimeout(()=>print(),200)}
+function printHTML(h,pp='A4',or='portrait'){$('#pgst').textContent=`@page{size:${pp=='F4'?'215mm 330mm':'210mm 297mm'} ${or};margin:12mm}`;$('#pa').innerHTML=h;doPrint()}
+/* cetak: latar tanda tangan/stempel dibuat transparan agar menyatu dengan kertas putih */
+async function doPrint(){
+  try{await Promise.all([...document.querySelectorAll('#pa img')].map(async im=>{const src=im.getAttribute('src')||'';if(!src.startsWith('data:image/jpeg')&&!src.startsWith('data:image/jpg'))return;
+    try{const r=await dkSig(src);im.src=r.url;await im.decode().catch(()=>{})}catch(e){}}))}catch(e){}
+  setTimeout(()=>print(),150)}
 
 /* siswa */
 async function allSiswa(){const a=SW.filter(x=>norm(x.tahun)==norm(VP.tahun));return a.length?a:SW}
@@ -789,6 +840,88 @@ function gTable(){gRead();let n=G.sw.filter(s=>s.kelas==G.kel).map(s=>s.nama).so
    '<p>Daftar siswa kelas ini tidak ditemukan. Unggah data siswa di menu Data Siswa, atau ketik nama siswa (satu per baris):</p><textarea id="gm" rows="4"></textarea><button class="sm" onclick="gApply()">Terapkan</button>')}
 function gApply(){$('#gm').value.split('\n').map(x=>x.trim()).filter(Boolean).forEach(n=>G.nilai[n]=G.nilai[n]??'');gTable()}
 async function saveNilai(){gRead();const nilai={};Object.entries(G.nilai).forEach(([k,v])=>{if(v!=='')nilai[k]=v});if(await xput(G.t,G.key,{kelas:G.kel,nilai})){localStorage['ks_'+VP.id]=G.kel;toast('Nilai tersimpan');back()}}
+
+/* ===== ANALISIS HASIL BELAJAR SISWA (dari penilaian formatif) ===== */
+/* Skala & interval kategori. Ubah angka/label di sini bila skala sekolah berbeda. */
+const SKALA=[{min:86,max:100,kat:'Sangat Baik',c:'#c6e0b4'},{min:71,max:85,kat:'Baik',c:'#ffe699'},{min:56,max:70,kat:'Cukup',c:'#f8cbad'},{min:0,max:55,kat:'Perlu Dikembangkan',c:'#f4a6a6'}];
+const anKat=v=>v===''||v==null||isNaN(v)?null:(SKALA.find(s=>Math.round(v)>=s.min)||SKALA[SKALA.length-1]);
+const anBadge=v=>{const k=anKat(v);return k?`<span style="display:inline-block;padding:1px 8px;border-radius:99px;background:${k.c};color:#16324F;font-weight:700;font-size:.85em;white-space:nowrap">${k.kat}</span>`:'-'};
+const anTP=r=>(r.materi||r.bab||'-');
+let AN={kel:'',names:[],ks:[]};
+function anData(){
+  const R=rows(),n=AN.names.map(nm=>{
+    const it=R.map((r,i)=>{const f=X.Formatif[K(r.t)],v=f&&f.nilai?f.nilai[nm]:undefined;return{no:r.no,t:r.t,tp:anTP(r),bab:(r.bab||'').trim(),i:i+1,v:(v===undefined||v==='')?null:+v}});
+    const ok=it.filter(x=>x.v!=null),avg=ok.length?ok.reduce((a,b)=>a+b.v,0)/ok.length:null;
+    return{nama:nm,it,avg}});
+  return{R,n}}
+async function openAnalisis(){
+  tool('Analisis Hasil Belajar Siswa','<p>Memuat siswa...</p>');
+  if(AN.pid!=VP.id){AN.kel='';AN.pid=VP.id}
+  const sw=await allSiswa(),ks=[...new Set(sw.map(s=>s.kelas))].sort();AN.sw=sw;AN.ks=ks;AN.kel=guessK(ks,AN.kel);anList()}
+
+/* shortcut dari widget Progres Modul Ajar per Kelas */
+let ANS={k:''};
+function anShort(i){const k=PGK[i];if(k==null)return;ANS.k=k;
+  let d=$('#dan');if(!d){d=document.createElement('dialog');d.id='dan';document.body.appendChild(d)}
+  d.innerHTML=`<h2 style="margin-bottom:6px">📊 Analisis Hasil Belajar</h2><p style="margin:0 0 12px">Kelas <b>${esc(k)}</b> · tahun ajaran ${esc(S.tahun)}. Pilih semester yang ingin dianalisis.</p>
+  <div class="grid" style="grid-template-columns:1fr"><div><label>Semester</label><select id="ans" onchange="anShMp()"><option ${S.semester=='Gasal'?'selected':''}>Gasal</option><option ${S.semester=='Genap'?'selected':''}>Genap</option></select></div><div id="anm"></div></div>
+  <div class="row" style="margin-top:14px"><button onclick="anGo()">Buka Analisis</button><button class="ghost" onclick="$('#dan').close()">Tutup</button></div>`;
+  anShMp();d.showModal()}
+function anShList(){return progs.filter(p=>p.tahun==S.tahun&&nk(p.kelas)==nk(ANS.k)&&p.semester==$('#ans').value).sort((a,b)=>a.mapel.localeCompare(b.mapel))}
+function anShMp(){const L=anShList(),el=$('#anm');
+  el.innerHTML=!L.length?'<p style="color:var(--rose);font-weight:700;margin:0">Belum ada program untuk kelas dan semester ini.</p>':L.length>1?`<label>Mata pelajaran</label><select id="anp">${L.map(p=>`<option value="${esc(p.id)}">${esc(p.mapel)}</option>`).join('')}</select>`:`<p style="margin:0">Mata pelajaran: <b>${esc(L[0].mapel)}</b></p><input type="hidden" id="anp" value="${esc(L[0].id)}">`}
+async function anGo(){const L=anShList();if(!L.length)return toast('Belum ada program untuk kelas dan semester ini.');
+  const p=L.find(x=>x.id==($('#anp')||{}).value)||L[0];$('#dan').close();
+  VP=p;RET='home';show('tool');$('#tool').innerHTML=ld('Memuat data pertemuan...');
+  await wrap('Memuat data pertemuan...',xload);
+  BABS=[...new Set(rows().map(r=>(r.bab||'').trim()).filter(Boolean))];openAnalisis()}
+
+function anNames(){
+  let n=AN.sw.filter(s=>s.kelas==AN.kel).map(s=>s.nama);
+  if(!n.length){const N=new Set();Object.values(X.Formatif).forEach(d=>Object.keys((d&&d.nilai)||{}).forEach(x=>N.add(x)));n=[...N]}
+  return n.sort((a,b)=>a.localeCompare(b))}
+function anSkalaHTML(){return `<table style="width:auto;margin:8px 0"><tr><th>Interval nilai</th><th>Kategori</th></tr>${SKALA.map(s=>`<tr><td>${s.min} – ${s.max}</td><td style="background:${s.c}">${s.kat}</td></tr>`).join('')}</table>`}
+function anRekapHTML(D,ed){
+  const R=D.R;
+  return `<table><tr><th>No</th><th>Nama siswa</th>${R.map((r,i)=>`<th title="${esc(anTP(r))}">TP ${i+1}</th>`).join('')}<th>Rata-rata</th><th>Kategori</th></tr>`+
+   (D.n.length?D.n.map((s,i)=>`<tr><td>${i+1}</td><td style="white-space:nowrap">${ed?`<a href="#" onclick="anRapor(${i});return false" style="color:var(--pr);font-weight:700;text-decoration:none">${esc(s.nama)}</a>`:esc(s.nama)}</td>${s.it.map(x=>{const k=anKat(x.v);return `<td style="text-align:center${k?';background:'+k.c:''}">${x.v??''}</td>`}).join('')}<td style="text-align:center"><b>${s.avg==null?'':Math.round(s.avg)}</b></td><td>${anBadge(s.avg)}</td></tr>`).join(''):`<tr><td colspan="${R.length+4}">Belum ada siswa.</td></tr>`)+`</table>`}
+function anList(){
+  AN.names=anNames();const D=anData();AN.D=D;
+  tool('Analisis Hasil Belajar Siswa',`<div class="card"><div class="row" style="margin-bottom:10px"><div><label>Kelas siswa</label><select onchange="AN.kel=this.value;anList()">${kOpts(AN.ks,AN.kel)}</select></div>
+   <span style="flex:1"></span><button class="amb" onclick="anPrintRekap()">🖨️ Cetak Rekap</button><button class="amb" onclick="anPrintAll()">🖨️ Cetak Rapor Semua Siswa</button></div>
+   <p style="margin:0 0 8px">${esc(VP.mapel)} · Kelas ${esc(VP.kelas)} · ${esc(VP.tahun)}-${VP.semester}. Nilai TP diambil dari penilaian formatif tiap pertemuan efektif (TP 1 = pertemuan 1, dan seterusnya). <b>Klik nama siswa</b> untuk melihat rapor individu.</p>
+   <div class="sc">${anRekapHTML(D,1)}</div><p style="margin:10px 0 0;font-weight:700">Skala kategori</p>${anSkalaHTML()}
+   <details style="margin-top:8px"><summary>Daftar Tujuan Pembelajaran</summary><ol style="margin:6px 0">${D.R.map(r=>`<li>${esc(anTP(r))}</li>`).join('')}</ol></details></div>`)}
+function anRapor(i){
+  const s=AN.D.n[i];if(!s)return;AN.cur=i;
+  tool('Rapor Hasil Belajar: '+esc(s.nama),`<div class="row" style="margin-bottom:10px"><button class="ghost" onclick="anList()">← Daftar siswa</button>${i>0?`<button class="ghost sm" onclick="anRapor(${i-1})">◀ Sebelumnya</button>`:''}${i<AN.D.n.length-1?`<button class="ghost sm" onclick="anRapor(${i+1})">Berikutnya ▶</button>`:''}<span style="flex:1"></span><button class="amb" onclick="anPrintOne(${i})">🖨️ Cetak</button></div><div class="card">${anRaporHTML(s)}</div>`)}
+/* teks analisis otomatis dari kategori tiap TP */
+function anAnalisis(s){
+  const ok=s.it.filter(x=>x.v!=null),kosong=s.it.filter(x=>x.v==null);
+  if(!ok.length)return '<p>Belum ada nilai formatif yang tercatat untuk siswa ini, sehingga analisis belum dapat disusun.</p>';
+  const ak=anKat(s.avg),hi=ok.filter(x=>x.v>=SKALA[1].min).sort((a,b)=>b.v-a.v),lo=ok.filter(x=>x.v<SKALA[1].min).sort((a,b)=>a.v-b.v);
+  const li=a=>a.map(x=>`<li>TP ${x.i} (${x.v}, ${anKat(x.v).kat}): ${esc(x.tp)}</li>`).join('');
+  const nm=esc(s.nama);
+  let h=`<p>${nm} telah mengikuti penilaian formatif pada <b>${ok.length}</b> dari ${s.it.length} tujuan pembelajaran dengan nilai rata-rata <b>${Math.round(s.avg)}</b> (kategori <b>${ak.kat}</b>).</p>`;
+  h+=`<p><b>Kelebihan</b></p>`+(hi.length?`<p style="margin:0">${nm} menunjukkan penguasaan yang baik pada tujuan pembelajaran berikut:</p><ul style="margin:4px 0">${li(hi.slice(0,4))}</ul>`:'<p style="margin:0">Belum ada tujuan pembelajaran yang mencapai kategori Baik; pencapaian awal ini perlu terus didorong.</p>');
+  h+=`<p><b>Kekurangan</b></p>`+(lo.length?`<p style="margin:0">Pemahaman perlu diperkuat pada tujuan pembelajaran berikut:</p><ul style="margin:4px 0">${li(lo.slice(0,4))}</ul>`:'<p style="margin:0">Tidak ditemukan tujuan pembelajaran dengan kategori di bawah Baik.</p>');
+  if(kosong.length)h+=`<p style="margin:4px 0"><i>Belum ada nilai pada TP ${kosong.map(x=>x.i).join(', ')}.</i></p>`;
+  h+=`<p><b>Rekomendasi</b></p><p style="margin:0">${lo.length?'Berikan pendampingan, latihan ulang, dan asesmen remedial pada tujuan pembelajaran yang masih berkategori Cukup atau Perlu Dikembangkan.':'Pertahankan capaian dan berikan tugas pengayaan agar kemampuan terus berkembang.'}${s.avg>=SKALA[0].min?' Siswa dapat dilibatkan sebagai tutor sebaya.':''}</p>`;
+  return h}
+function anRaporHTML(s,pb){
+  const tb=s.it.map(x=>{const k=anKat(x.v);return `<tr><td style="text-align:center">${x.i}</td><td>${esc(x.tp)}${x.bab?`<br><small>${esc(x.bab)}</small>`:''}</td><td style="text-align:center">${x.v??'-'}</td><td style="text-align:center${k?';background:'+k.c:''}">${k?k.kat:'-'}</td></tr>`}).join('');
+  return `<div class="${pb?'pbk':''}"><div class="nk"><h2>RAPOR ANALISIS HASIL BELAJAR SISWA</h2><p>${esc(VP.sekolah)}</p></div>
+  <table style="border:0;width:auto">${[['Nama siswa',s.nama],['Mata pelajaran',VP.mapel],['Kelas',VP.kelas],['Semester',VP.semester],['Tahun ajaran',VP.tahun]].map(r=>`<tr><td style="border:0;padding:2px 8px 2px 0">${r[0]}</td><td style="border:0;padding:2px 0">: <b>${esc(r[1])}</b></td></tr>`).join('')}</table>
+  <h3 style="margin:12px 0 6px">Capaian Tujuan Pembelajaran</h3>
+  <table><tr><th style="width:60px">Pertemuan ke</th><th>Tujuan Pembelajaran</th><th style="width:70px">Nilai</th><th style="width:150px">Kategori</th></tr>${tb}
+  <tr><td colspan="2" style="text-align:right"><b>Rata-rata</b></td><td style="text-align:center"><b>${s.avg==null?'-':Math.round(s.avg)}</b></td><td style="text-align:center">${anBadge(s.avg)}</td></tr></table>
+  <p style="margin:6px 0 0;font-size:.85em"><b>Skala:</b> ${SKALA.map(k=>`${k.min}–${k.max} ${k.kat}`).join(' · ')}</p>
+  <h3 style="margin:12px 0 6px">Analisis Pembelajaran</h3>${anAnalisis(s)}${ttd(VP,iso(new Date()))}</div>`}
+const anPrintOne=i=>printHTML(anRaporHTML(AN.D.n[i]),'A4','portrait');
+const anPrintAll=()=>{if(!AN.D.n.length)return toast('Belum ada siswa.');printHTML(AN.D.n.map(s=>anRaporHTML(s,1)).join(''),'A4','portrait')};
+function anPrintRekap(){const D=AN.D;printHTML(`<div class="nk"><h2>REKAP ANALISIS PENILAIAN FORMATIF SISWA</h2><p>${esc(VP.sekolah)} | ${esc(VP.mapel)} | Kelas ${esc(VP.kelas)} | Semester ${VP.semester} | Tahun Ajaran ${esc(VP.tahun)}</p></div>${anRekapHTML(D,0)}
+  <p style="margin:8px 0 0;font-size:9pt"><b>Skala:</b> ${SKALA.map(k=>`${k.min}–${k.max} ${k.kat}`).join(' · ')}</p>
+  <p style="font-size:9pt">${D.R.map((r,i)=>`TP ${i+1}: ${esc(anTP(r))}`).join('<br>')}</p>${ttd(VP,iso(new Date()))}`,'A4','landscape')}
 
 /* jurnal */
 const MODEL=['Problem Based Learning (PBL)','Project Based Learning (PjBL)','Discovery / Inquiry Learning','Direct Instruction (Tatap Muka)','Cooperative Learning','Diskusi & Praktikum Lab','Lainnya'];
