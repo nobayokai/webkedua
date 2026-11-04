@@ -397,8 +397,13 @@ async function api0(a, d) {
         // Catatan: user_id otomatis diurus oleh RLS jika Anda menggunakan Auth
       };
       
-      const { error } = await sb.from('programs').upsert(payload, { onConflict: 'legacy_id' });
-      if (error) throw error;
+      let { error } = await sb.from('programs').upsert(payload, { onConflict: 'legacy_id' });
+      if (error) {
+        // Cadangan: kalau program sudah ada (edit), perbarui barisnya langsung
+        const upd = Object.assign({}, payload); delete upd.legacy_id; delete upd.user_id;
+        const r = await sb.from('programs').update(upd).eq('legacy_id', d.id).select('legacy_id');
+        if (r.error || !(r.data && r.data.length)) throw error;
+      }
       
       // Kembalikan list terbaru setelah save
       return await api0('list');
@@ -636,13 +641,17 @@ async function xcall(o) {
       });
     }
     if (a === 'xput') {
-      const { error } = await sb.from('konten_pembelajaran').upsert({
-        program_id: pid,
-        jenis: t,
-        kunci: key,
-        data: data
-      }, { on_conflict: 'program_id,jenis,kunci' });
-      if (error) throw error;
+      const row = { program_id: pid, jenis: t, kunci: key, data: data };
+      let { error } = await sb.from('konten_pembelajaran').upsert(row, { onConflict: 'program_id,jenis,kunci' });
+      if (error) {
+        // Cadangan: update dulu, kalau belum ada baru insert (tahan terhadap constraint yang berbeda)
+        const up = await sb.from('konten_pembelajaran').update({ data: data })
+          .eq('program_id', pid).eq('jenis', t).eq('kunci', key).select('kunci');
+        if (up.error) throw up.error;
+        if (up.data && up.data.length) return true;
+        const ins = await sb.from('konten_pembelajaran').insert(row);
+        if (ins.error) throw ins.error;
+      }
       return true;
     }
     if (a === 'xdel') {
