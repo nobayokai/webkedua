@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Katering Sekolah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        .print-only { display: none; }
+        .rk-wrap { overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 12px; }
+        .rk { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+        .rk th, .rk td { border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 8px 12px; text-align: center; vertical-align: middle; white-space: nowrap; }
+        .rk thead th { background: #1e293b; color: #fff; font-weight: 600; border-color: #334155; }
+        .rk tbody tr:nth-child(even) td { background: #f8fafc; }
+        .rk tbody tr:hover td { background: #eef2ff; }
+        .rk td:first-child, .rk th:first-child { position: sticky; left: 0; z-index: 1; }
+        .rk tbody td:first-child { font-weight: 700; background: #f1f5f9 !important; }
+        .rk td.tot { font-weight: 700; }
+        .rk .cn { font-size: 18px; font-weight: 700; color: #4338ca; }
+        .rk tfoot td { background: #fde047; font-weight: 700; border-color: #ca8a04; }
+        .rk tfoot tr.rpr td { background: #facc15; }
+        .rk tfoot tr.nm td { background: #fff; font-weight: 400; font-size: 12px; text-align: left; vertical-align: top; white-space: normal; border-color: #e2e8f0; }
+        .rk tfoot tr.nm td:first-child { font-weight: 700; text-align: center; background: #fef9c3; }
+        .rk td small { display: block; white-space: normal; font-size: 11px; color: #64748b; font-style: italic; max-width: 150px; margin: 2px auto 0; line-height: 1.25; }
+        .rk .warn { color: #c2410c; font-weight: 700; background: #ffedd5; border-radius: 6px; padding: 1px 8px; }
+        .sign { justify-content: space-around; margin-top: 28px; text-align: center; font-size: 12px; }
+        .sign .sp { height: 64px; }
+
+        
+        @media print {
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            html, body { height: auto !important; overflow: visible !important; display: block !important; background: #fff; }
+            aside, header, #toast-container, #loading-overlay, .no-print { display: none !important; }
+            main { padding: 0 !important; margin: 0 !important; background: #fff !important; overflow: visible !important; }
+            .tab-content { display: none !important; }
+            #tab-rekap { display: block !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; animation: none; }
+            #tab-rekap > div { box-shadow: none !important; border: none !important; padding: 0 !important; }
+            .print-only { display: block !important; }
+            .sign.print-only { display: flex !important; }
+            .rk-wrap { overflow: visible; border: none; border-radius: 0; }
+            .rk { font-size: 11px; }
+            .rk th, .rk td { border: 1px solid #000 !important; padding: 3px 6px !important; color: #000 !important; }
+            .rk thead th { background: #e5e7eb !important; }
+            .rk tbody td, .rk tbody tr:nth-child(even) td { background: #fff !important; }
+            .rk tfoot td { background: #fde047 !important; }
+            .rk tfoot tr.nm td { background: #fff !important; }
+            .rk td:first-child, .rk th:first-child { position: static; }
+            .rk .warn { background: none; color: #000; padding: 0; }
+            .rk .cn { font-size: 13px; color: #000; }
+            .rk td small { max-width: none; color: #000; }
+            body.pp .rk { font-size: 9px; }
+            body.pp .rk th, body.pp .rk td { padding: 2px 3px !important; }
+            body.pp .rk .cn { font-size: 11px; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+<style id="page-style">@page { size: 297mm 210mm; margin: 10mm; }</style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Mobile Header (Visible only on small screens) -->
+    <header class="md:hidden bg-indigo-700 text-white p-4 flex justify-between items-center z-30 shadow-md print:hidden">
+        <h1 class="text-lg font-bold tracking-wider">🍴 Katering<span class="text-indigo-300">App</span></h1>
+        <button onclick="toggleSidebar()" class="p-2 focus:outline-none focus:bg-indigo-600 rounded-lg transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </header>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity print:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-indigo-700 text-white shadow-xl flex flex-col z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0 print:hidden">
+        <div class="p-6 text-center border-b border-indigo-600 flex justify-between items-center md:block">
+            <div>
+                <h1 class="text-xl font-bold tracking-wider">🍴 Katering<span class="text-indigo-300">App</span></h1>
+                <p class="text-xs text-indigo-200 mt-1">Sistem Pendataan Katering</p>
+            </div>
+            <!-- Close button for mobile inside sidebar -->
+            <button onclick="toggleSidebar()" class="md:hidden p-1 hover:bg-indigo-600 rounded-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+            <button onclick="switchTab('tab-biaya')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-600 transition duration-200 flex items-center gap-3 tab-btn" data-target="tab-biaya">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                1. Biaya Katering
+            </button>
+            <button onclick="switchTab('tab-pesanan')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-600 transition duration-200 flex items-center gap-3 tab-btn" data-target="tab-pesanan">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                2. Input Pesanan
+            </button>
+            <button onclick="switchTab('tab-kedatangan')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-600 transition duration-200 flex items-center gap-3 tab-btn" data-target="tab-kedatangan">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                3. Kedatangan
+            </button>
+            <button onclick="switchTab('tab-pengambilan')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-600 transition duration-200 flex items-center gap-3 tab-btn" data-target="tab-pengambilan">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                4. Pengambilan
+            </button>
+            <button onclick="switchTab('tab-rekap')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-600 transition duration-200 flex items-center gap-3 tab-btn" data-target="tab-rekap">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                5. Rekap & Download
+            </button>
+        </nav>
+        <div class="p-4 text-xs text-indigo-300 text-center border-t border-indigo-600">
+            Sistem Pendataan v1.0
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto bg-gray-50 relative">
+        
+        <!-- Loading Overlay (menutupi seluruh layar) -->
+        <div id="loading-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center z-[100] hidden print:hidden" role="alert" aria-live="assertive">
+            <div class="bg-white rounded-2xl shadow-2xl px-10 py-8 flex flex-col items-center text-center max-w-xs mx-4">
+                <svg class="animate-spin h-14 w-14 text-indigo-600 mb-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p id="loading-text" class="text-lg font-semibold text-gray-800">Memuat data...</p>
+                <p class="text-sm text-gray-500 mt-1">Mohon tunggu, jangan tutup halaman ini.</p>
+            </div>
+        </div>
+
+        <!-- 1. TAB BIAYA -->
+        <section id="tab-biaya" class="tab-content active max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Tentukan Biaya Katering</h2>
+                <p class="text-gray-500 mb-6 text-sm">Atur harga per porsi katering. Data ini akan digunakan untuk menghitung total tagihan di rekapitulasi.</p>
+                
+                <form id="form-biaya" class="space-y-4" onsubmit="saveBiaya(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Harga per Porsi (Rp)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
+                            <input type="number" id="input-biaya" required min="0" class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm bg-gray-50 text-lg font-semibold" placeholder="Contoh: 15000">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-medium py-3 px-4 rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition duration-200 shadow-md">
+                        Simpan Biaya
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2. TAB INPUT PESANAN -->
+        <section id="tab-pesanan" class="tab-content max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Input Pesanan Katering (Bulk)</h2>
+                <p class="text-gray-500 mb-6 text-sm">Catat pesanan katering untuk beberapa kelas sekaligus pada tanggal tertentu.</p>
+                
+                <form id="form-pesanan" class="space-y-5" onsubmit="savePesanan(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pesanan</label>
+                        <input type="date" id="pesanan-tanggal" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 shadow-sm">
+                    </div>
+                    
+                    <div id="pesanan-rows" class="space-y-3">
+                        <!-- Baris pesanan akan diisi lewat JS -->
+                    </div>
+                    
+                    <button type="button" onclick="addPesananRow()" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 flex items-center gap-1 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Tambah Baris Kelas
+                    </button>
+
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-medium py-3 px-4 rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition duration-200 shadow-md mt-4">
+                        Simpan Semua Pesanan
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. TAB KEDATANGAN -->
+        <section id="tab-kedatangan" class="tab-content max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Catat Kedatangan Katering</h2>
+                <p class="text-gray-500 mb-6 text-sm">Masukkan jumlah porsi katering yang fisik datang dari vendor pada hari tersebut.</p>
+                
+                <div id="datang-info" class="mb-5"></div>
+                <form id="form-kedatangan" class="space-y-5" onsubmit="saveKedatangan(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Kedatangan</label>
+                        <input type="date" id="datang-tanggal" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Porsi Datang</label>
+                        <input type="number" id="datang-jumlah" required min="0" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 shadow-sm font-medium text-lg" placeholder="Jumlah fisik diterima">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-3 px-4 rounded-xl hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-200 transition duration-200 shadow-md">
+                        Simpan Data Kedatangan
+                    </button>
+                </form>
+                <div id="datang-history" class="mt-8"></div>
+            </div>
+        </section>
+
+        <!-- 4. TAB PENGAMBILAN -->
+        <section id="tab-pengambilan" class="tab-content max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Catat Pengambilan Katering</h2>
+                <p class="text-gray-500 mb-6 text-sm">Input nama siswa yang mengambil katering. Kolom akan otomatis muncul sesuai jumlah pesanan per kelas pada tanggal yang dipilih.</p>
+                
+                <form id="form-pengambilan" class="space-y-5" onsubmit="savePengambilan(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Tanggal Pengambilan</label>
+                        <input type="date" id="ambil-tanggal" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 shadow-sm">
+                    </div>
+                    
+                    <div id="ambil-rows" class="space-y-4">
+                        <!-- Baris kotak nama siswa akan diisi otomatis lewat JS -->
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition duration-200 shadow-md mt-4">
+                        Simpan Data Pengambilan
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 5. TAB REKAP -->
+        <section id="tab-rekap" class="tab-content max-w-[90rem] mx-auto print:max-w-none print:m-0 print:p-0">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 print:shadow-none print:border-none print:p-0">
+                
+                <!-- Header & Filter -->
+                <div class="no-print mb-6 mt-4 md:mt-0 flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-indigo-900 tracking-tight">Laporan & Rekapitulasi</h2>
+                        <p class="text-gray-500 text-sm mt-1">Atur rentang tanggal untuk melihat rincian porsi dan biaya katering.</p>
+                    </div>
+                    <div class="flex flex-wrap items-end gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Dari tanggal</label>
+                            <input type="date" id="rekap-start" class="px-3 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500" onchange="generateRekap()">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Sampai tanggal</label>
+                            <input type="date" id="rekap-end" class="px-3 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500" onchange="generateRekap()">
+                        </div>
+                        <div class="flex gap-1">
+                            <button type="button" onclick="setRange('this')" class="px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:bg-gray-100">Bulan ini</button>
+                            <button type="button" onclick="setRange('last')" class="px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:bg-gray-100">Bulan lalu</button>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Hitung porsi dari</label>
+                            <select id="rekap-mode" onchange="setRekapOpt()" class="px-3 py-2 rounded-lg border border-gray-300 bg-white">
+                                <option value="ambil">Yang mengambil (nama terisi)</option>
+                                <option value="pesanan">Jumlah pesanan</option>
+                            </select>
+                        </div>
+                        <label class="flex items-center gap-2 text-sm text-gray-700 py-2 cursor-pointer">
+                            <input type="checkbox" id="rekap-names" checked onchange="setRekapOpt()" class="w-4 h-4 rounded"> Tampilkan nama siswa
+                        </label>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Kertas cetak</label>
+                            <select id="print-paper" class="px-3 py-2 rounded-lg border border-gray-300 bg-white">
+                                <option value="A4">A4 (210 x 297 mm)</option>
+                                <option value="F4">F4 / Folio (215 x 330 mm)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Orientasi</label>
+                            <select id="print-orient" class="px-3 py-2 rounded-lg border border-gray-300 bg-white">
+                                <option value="landscape">Landscape (mendatar)</option>
+                                <option value="portrait">Portrait (tegak)</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 ml-auto">
+                            <button onclick="downloadExcel()" class="bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-emerald-700 active:scale-95 transition">Unduh Excel</button>
+                            <button onclick="printRekap()" class="bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700 active:scale-95 transition">Cetak / Simpan PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards (Sembunyi saat print, diganti text statis jika perlu) -->
+                <div id="rekap-cards" class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6 no-print">
+                    <!-- Cards will be injected by JS -->
+                </div>
+
+                <!-- Laporan Print Area -->
+                <div id="print-area" class="w-full">
+                    <div class="print-only text-center mb-4">
+                        <h2 class="text-2xl font-bold uppercase" id="print-title">REKAPITULASI KATERING SEKOLAH</h2>
+                        <p class="text-sm mt-1" id="print-subtitle">Periode</p>
+                    </div>
+                    <div class="rk-wrap">
+                        <table class="rk">
+                            <thead id="rekap-thead"></thead>
+                            <tbody id="rekap-tbody"><tr><td class="p-8 text-gray-400 italic">Pilih rentang tanggal untuk melihat data.</td></tr></tbody>
+                            <tfoot id="rekap-tfoot-jumlah"></tfoot>
+                        </table>
+                    </div>
+                    <p id="rekap-note" class="no-print text-xs text-gray-500 mt-3"></p>
+                    <div class="print-only sign">
+                        <div><p>Mengetahui,</p><div class="sp"></div><p>(........................)</p></div>
+                        <div><p>Petugas Katering,</p><div class="sp"></div><p>(........................)</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Set today's date on all date inputs by default
+        const today = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+        
+        // Buat rentang default: tanggal 1 bulan ini sampai tanggal hari ini
+        const startOfMonth = today.substring(0, 8) + '01';
+
+        document.getElementById('pesanan-tanggal').value = today;
+        document.getElementById('datang-tanggal').value = today;
+        document.getElementById('ambil-tanggal').value = today;
+        document.getElementById('rekap-start').value = startOfMonth;
+        document.getElementById('rekap-end').value = today;
+
+        // Config - Ganti URL di bawah dengan URL Web App Google Apps Script Anda
+        let APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzENLXMeUSg295a-qoz1KDo26gIcj2rKyTgNNkqxVQwfJIpOkYbkCaXZMPAjEi3Gce0WQ/exec'; // Contoh: "https://script.google.com/macros/s/AKfycbw.../exec"
+
+        // Helpers
+        function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function fmtTgl(d) { return new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
+        function rp(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
+        function normKelas(k) {
+            let t = String(k || '').toUpperCase().replace(/\s+/g, ' ').trim().replace(/^KELAS\s*/, '');
+            return t ? 'KELAS ' + t : '';
+        }
+        function readLocal(name) { return JSON.parse(localStorage.getItem('db_' + name) || '[]'); }
+        function mirrorLocal(d) {
+            try {
+                if (d.biaya) localStorage.setItem('db_biaya', String(d.biaya));
+                ['pesanan', 'kedatangan', 'pengambilan'].forEach(k => { if (Array.isArray(d[k])) localStorage.setItem('db_' + k, JSON.stringify(d[k])); });
+            } catch (e) {}
+        }
+
+        // Local Storage Initialization
+        async function initLocalDB() {
+            if (!localStorage.getItem('db_biaya')) localStorage.setItem('db_biaya', '0');
+            ['pesanan', 'kedatangan', 'pengambilan'].forEach(k => { if (!localStorage.getItem('db_' + k)) localStorage.setItem('db_' + k, '[]'); });
+            document.getElementById('input-biaya').value = localStorage.getItem('db_biaya');
+            refreshForms();
+            if (APPS_SCRIPT_URL) {
+                await fetchAllData(); // otomatis disalin ke penyimpanan lokal
+                document.getElementById('input-biaya').value = localStorage.getItem('db_biaya');
+                refreshForms();
+            }
+        }
+        function refreshForms() {
+            loadPesananUI(document.getElementById('pesanan-tanggal').value);
+            loadAmbilUI(document.getElementById('ambil-tanggal').value);
+            loadKedatanganUI(document.getElementById('datang-tanggal').value);
+        }
+
+        // Listeners to reload data when date is changed
+        document.getElementById('pesanan-tanggal').addEventListener('change', (e) => loadPesananUI(e.target.value));
+        document.getElementById('ambil-tanggal').addEventListener('change', (e) => loadAmbilUI(e.target.value));
+        document.getElementById('datang-tanggal').addEventListener('change', (e) => loadKedatanganUI(e.target.value));
+
+        // Kedatangan: isi otomatis kalau tanggal ini sudah pernah diinput
+        function loadKedatanganUI(tanggal) {
+            const db = readLocal('kedatangan');
+            const existing = db.find(p => p.tanggal === tanggal);
+            const pesTotal = readLocal('pesanan').filter(p => p.tanggal === tanggal).reduce((a, p) => a + (parseInt(p.jumlah) || 0), 0);
+            document.getElementById('datang-jumlah').value = existing ? existing.jumlah : '';
+
+            const info = document.getElementById('datang-info');
+            if (existing) {
+                const n = parseInt(existing.jumlah) || 0, sel = n - pesTotal;
+                const banding = pesTotal ? ` Pesanan tanggal ini ${pesTotal} porsi (${sel === 0 ? 'sesuai' : 'selisih ' + (sel > 0 ? '+' : '') + sel}).` : '';
+                info.innerHTML = `<div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 p-4 text-sm">Sudah diinput untuk ${fmtTgl(tanggal)}: <b>${n} porsi</b>.${banding} Ubah angka lalu simpan untuk memperbarui.</div>`;
+            } else {
+                info.innerHTML = `<div class="rounded-xl border border-gray-200 bg-gray-50 text-gray-600 p-4 text-sm">Belum ada data kedatangan untuk ${fmtTgl(tanggal)}.${pesTotal ? ' Pesanan tanggal ini ' + pesTotal + ' porsi.' : ''}</div>`;
+            }
+
+            const hist = [...db].sort((a, b) => b.tanggal.localeCompare(a.tanggal)).slice(0, 8);
+            document.getElementById('datang-history').innerHTML = hist.length ? `
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">Riwayat kedatangan terakhir</h3>
+                <div class="divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden">
+                    ${hist.map(h => `<button type="button" onclick="pickDatang('${h.tanggal}')" class="w-full flex justify-between px-4 py-2.5 text-sm hover:bg-gray-50 ${h.tanggal === tanggal ? 'bg-emerald-50' : ''}"><span>${fmtTgl(h.tanggal)}</span><b>${parseInt(h.jumlah) || 0} porsi</b></button>`).join('')}
+                </div>` : '';
+        }
+        function pickDatang(d) { document.getElementById('datang-tanggal').value = d; loadKedatanganUI(d); }
+
+        // Load existing Pesanan for the selected date
+        function loadPesananUI(tanggal) {
+            const existing = readLocal('pesanan').filter(p => p.tanggal === tanggal);
+            document.getElementById('pesanan-rows').innerHTML = '';
+            if (existing.length > 0) existing.forEach(p => addPesananRow(p.kelas, p.jumlah));
+            else addPesananRow();
+        }
+
+        // Load dynamically generated Ambil (Pickup) form based on Pesanan (Order)
+        function loadAmbilUI(tanggal) {
+            const dbPesanan = JSON.parse(localStorage.getItem('db_pesanan') || "[]");
+            const dbAmbil = JSON.parse(localStorage.getItem('db_pengambilan') || "[]");
+            
+            const pesananHariIni = dbPesanan.filter(p => p.tanggal === tanggal);
+            const ambilHariIni = dbAmbil.filter(p => p.tanggal === tanggal);
+            
+            const container = document.getElementById('ambil-rows');
+            container.innerHTML = '';
+            
+            if (pesananHariIni.length === 0) {
+                container.innerHTML = `<div class="p-4 bg-yellow-50 text-yellow-700 rounded-xl text-sm text-center border border-yellow-200">Belum ada data pesanan katering untuk tanggal ${tanggal}. Silakan input di tab Pesanan terlebih dahulu.</div>`;
+                return;
+            }
+            
+            pesananHariIni.forEach(pesanan => {
+                const qty = parseInt(pesanan.jumlah);
+                if (qty <= 0) return;
+                
+                // Create a block for each class
+                const kelasBlock = document.createElement('div');
+                kelasBlock.className = 'bg-blue-50/40 p-5 rounded-xl border border-blue-100 space-y-3';
+                
+                let html = `<h4 class="font-bold text-blue-800 border-b border-blue-200 pb-2 flex justify-between">
+                    <span>Kelas: ${pesanan.kelas}</span>
+                    <span class="text-sm font-semibold bg-blue-100 px-2 py-1 rounded-md text-blue-800">${qty} Porsi</span>
+                </h4>`;
+                
+                html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">`;
+                
+                // Retrieve existing names for this class if previously filled
+                const ambilKelasIni = ambilHariIni.filter(a => normKelas(a.kelas) === normKelas(pesanan.kelas));
+                
+                for(let i = 0; i < qty; i++) {
+                    const existingName = ambilKelasIni[i] ? ambilKelasIni[i].nama : '';
+                    html += `
+                        <div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-blue-400 transition">
+                            <span class="text-xs font-bold text-gray-400 w-6 text-right">${i+1}.</span>
+                            <input type="text" class="ambil-nama w-full bg-transparent border-none focus:ring-0 text-sm p-1 outline-none text-gray-700" placeholder="Nama Siswa..." data-kelas="${pesanan.kelas}" value="${existingName}">
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+                kelasBlock.innerHTML = html;
+                container.appendChild(kelasBlock);
+            });
+        }
+
+        // Helper untuk tambah baris input bulk pesanan
+        function addPesananRow(kelas = '', jumlah = '') {
+            const container = document.getElementById('pesanan-rows');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 pesanan-row items-center';
+            div.innerHTML = `
+                <input type="text" required value="${kelas}" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white pesanan-kelas shadow-sm" placeholder="Kelas (ex: X-A)">
+                <input type="number" required min="1" value="${jumlah}" class="w-1/3 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white pesanan-jumlah shadow-sm" placeholder="Jml">
+                <button type="button" class="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition shadow-sm" onclick="this.parentElement.remove()" title="Hapus baris">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        initLocalDB();
+
+        // Network Helper for GAS
+        async function sendDataToGAS(action, payload) {
+            if (!APPS_SCRIPT_URL) return false;
+            showLoading(true, 'Menyimpan data...');
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', action);
+                for (const key in payload) formData.append(key, payload[key]);
+                
+                const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
+                const result = await response.json();
+                showLoading(false);
+                return result.status === 'success';
+            } catch (e) {
+                console.error("Gagal mengirim ke GAS:", e);
+                showLoading(false);
+                return false;
+            }
+        }
+
+        // --- Core Functions ---
+
+        async function saveBiaya(e) {
+            e.preventDefault();
+            const biaya = document.getElementById('input-biaya').value;
+            
+            if (APPS_SCRIPT_URL) {
+                const success = await sendDataToGAS('save_biaya', { biaya });
+                if(!success) showToast("Gagal menyimpan ke Sheet, coba cek URL.", "error");
+            }
+            localStorage.setItem('db_biaya', biaya);
+            showToast("Biaya Katering Berhasil Disimpan", "success");
+        }
+
+        async function savePesanan(e) {
+            e.preventDefault();
+            const tanggal = document.getElementById('pesanan-tanggal').value;
+            const rows = document.querySelectorAll('.pesanan-row');
+            
+            const payloads = [];
+            rows.forEach(row => {
+                const kelas = row.querySelector('.pesanan-kelas').value.toUpperCase().trim();
+                const jumlah = row.querySelector('.pesanan-jumlah').value;
+                if(kelas && jumlah) payloads.push({ tanggal, kelas, jumlah });
+            });
+
+            if (payloads.length === 0) {
+                showToast("Tambahkan minimal 1 pesanan", "error");
+                return;
+            }
+
+            if (APPS_SCRIPT_URL) {
+                const success = await sendDataToGAS('save_pesanan_bulk', { tanggal, data: JSON.stringify(payloads) });
+                if(!success) showToast("Gagal menyimpan ke Sheet.", "error");
+            }
+
+            // Ganti data pesanan LAMA DENGAN KELAS YANG SAMA di tanggal ini (Fix Bug Hilang)
+            const db = JSON.parse(localStorage.getItem('db_pesanan') || "[]");
+            
+            // Filter: Buang data lama yang punya tanggal & kelas yang sama dengan payload baru
+            const filteredDb = db.filter(p => p.tanggal !== tanggal);
+            
+            filteredDb.push(...payloads);
+            localStorage.setItem('db_pesanan', JSON.stringify(filteredDb));
+            await trimPengambilan(tanggal, payloads);
+            
+            loadPesananUI(tanggal); // Reload UI
+            loadAmbilUI(document.getElementById('ambil-tanggal').value); // Refresh Tab Pengambilan
+            showToast("Pesanan Berhasil Disimpan", "success");
+        }
+
+        async function saveKedatangan(e) {
+            e.preventDefault();
+            const payload = {
+                tanggal: document.getElementById('datang-tanggal').value,
+                jumlah: document.getElementById('datang-jumlah').value
+            };
+
+            if (APPS_SCRIPT_URL) {
+                const success = await sendDataToGAS('save_kedatangan', payload);
+                if(!success) showToast("Gagal menyimpan ke Sheet.", "error");
+            }
+
+            const db = JSON.parse(localStorage.getItem('db_kedatangan') || "[]");
+            const filteredDb = db.filter(p => p.tanggal !== payload.tanggal);
+            filteredDb.push(payload);
+            localStorage.setItem('db_kedatangan', JSON.stringify(filteredDb));
+            
+            showToast("Data Kedatangan Tersimpan", "success");
+            loadKedatanganUI(payload.tanggal);
+        }
+
+        async function savePengambilan(e) {
+            e.preventDefault();
+            const tanggal = document.getElementById('ambil-tanggal').value;
+            const inputs = document.querySelectorAll('.ambil-nama');
+            
+            const payloads = [];
+            inputs.forEach(input => {
+                const nama = input.value.trim();
+                const kelas = input.getAttribute('data-kelas');
+                if(nama && kelas) payloads.push({ tanggal, kelas, nama, jumlah: 1 });
+            });
+
+            if (APPS_SCRIPT_URL) {
+                const success = await sendDataToGAS('save_pengambilan_bulk', { tanggal, data: JSON.stringify(payloads) });
+                if(!success) showToast("Gagal menyimpan ke Sheet.", "error");
+            }
+
+            // Ganti data pengambilan LAMA DENGAN KELAS YANG SAMA di tanggal ini (Fix Bug Hilang)
+            const db = JSON.parse(localStorage.getItem('db_pengambilan') || "[]");
+            
+            // Filter: Karena ada banyak nama per kelas, kita buat identifikasi unik (tanggal_kelas) dari inputan
+            const filteredDb = db.filter(p => p.tanggal !== tanggal);
+            
+            filteredDb.push(...payloads);
+            localStorage.setItem('db_pengambilan', JSON.stringify(filteredDb));
+            
+            showToast("Data Pengambilan Tersimpan", "success");
+        }
+
+        // Jika jumlah pesanan dikurangi: hapus hanya nama terakhir yang melebihi jumlah baru
+        async function trimPengambilan(tanggal, pesanan) {
+            const qty = {};
+            pesanan.forEach(p => { const k = normKelas(p.kelas); qty[k] = (qty[k] || 0) + (parseInt(p.jumlah) || 0); });
+            const db = readLocal('pengambilan');
+            const hari = db.filter(p => p.tanggal === tanggal);
+            if (!hari.length) return;
+            const seen = {};
+            const kept = hari.filter(p => { const k = normKelas(p.kelas); seen[k] = (seen[k] || 0) + 1; return seen[k] <= (qty[k] || 0); });
+            if (kept.length === hari.length) return;
+            if (APPS_SCRIPT_URL) {
+                const ok = await sendDataToGAS('save_pengambilan_bulk', { tanggal, data: JSON.stringify(kept) });
+                if (!ok) showToast('Gagal memperbarui data pengambilan di Sheet.', 'error');
+            }
+            localStorage.setItem('db_pengambilan', JSON.stringify([...db.filter(p => p.tanggal !== tanggal), ...kept]));
+        }
+
+        // Helper timezone adjustment
+        function getLocalDateString(dateInput) {
+            if (!dateInput) return "";
+            if (typeof dateInput === 'string' && dateInput.length === 10 && !dateInput.includes('T')) {
+                return dateInput;
+            }
+            let d = new Date(dateInput);
+            let year = d.getFullYear();
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Helper filter to pick only the latest submissions per date based on GAS timestamps
+        function filterLatestGASData(dataArray, groupByKelas = false) {
+            if (!dataArray) return [];
+            const groups = {};
+            dataArray.forEach(r => {
+                const ts = new Date(r[0]).getTime();
+                const tgl = getLocalDateString(r[1]);
+                
+                let key = tgl;
+                if (groupByKelas && r[2]) {
+                    key = tgl + '_' + r[2]; // Pastikan data tidak saling timpa jika kelasnya berbeda
+                }
+                
+                if (!groups[key] || ts > groups[key].ts) {
+                    groups[key] = { ts: ts, rows: [] };
+                }
+                if (ts === groups[key].ts) {
+                    groups[key].rows.push(r);
+                }
+            });
+            let finalRows = [];
+            Object.values(groups).forEach(g => finalRows.push(...g.rows));
+            return finalRows;
+        }
+
+        async function fetchAllData() {
+            if (APPS_SCRIPT_URL) {
+                showLoading(true, 'Memuat data...');
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL);
+                    const result = await response.json();
+                    showLoading(false);
+                    if (result.status === 'success') {
+                        // Keep only the latest update per date (and per class)
+                        const latestPesanan = filterLatestGASData(result.data.pesanan, true);
+                        const latestKedatangan = filterLatestGASData(result.data.kedatangan, false);
+                        const latestAmbil = filterLatestGASData(result.data.pengambilan, true);
+                        
+                        const remote = {
+                            biaya: result.data.biaya || 0,
+                            pesanan: latestPesanan.map(r => ({tanggal: getLocalDateString(r[1]), kelas: String(r[2]), jumlah: r[3]})),
+                            kedatangan: latestKedatangan.map(r => ({tanggal: getLocalDateString(r[1]), jumlah: r[2]})),
+                            pengambilan: latestAmbil.map(r => ({tanggal: getLocalDateString(r[1]), kelas: String(r[2]), nama: r[3], jumlah: r[4]}))
+                        };
+                        mirrorLocal(remote);
+                        return remote;
+                    }
+                } catch (e) {
+                    showLoading(false);
+                    showToast("Gagal konek GAS, memuat data lokal", "error");
+                }
+            }
+            return {
+                biaya: localStorage.getItem('db_biaya') || 0,
+                pesanan: JSON.parse(localStorage.getItem('db_pesanan') || "[]"),
+                kedatangan: JSON.parse(localStorage.getItem('db_kedatangan') || "[]"),
+                pengambilan: JSON.parse(localStorage.getItem('db_pengambilan') || "[]")
+            }
+        }
+
+        let rekapMode = 'ambil', rekapNames = true, lastRekap = null;
+
+        function applyPageSize() {
+            const f4 = document.getElementById('print-paper').value === 'F4';
+            const land = document.getElementById('print-orient').value === 'landscape';
+            const w = f4 ? 215 : 210, h = f4 ? 330 : 297;
+            document.getElementById('page-style').textContent = `@page { size: ${land ? h : w}mm ${land ? w : h}mm; margin: 10mm; }`;
+            document.body.classList.toggle('pp', !land);
+        }
+        function printRekap() { applyPageSize(); window.print(); }
+        window.addEventListener('beforeprint', applyPageSize);
+
+        function setRekapOpt() {
+            rekapMode = document.getElementById('rekap-mode').value;
+            rekapNames = document.getElementById('rekap-names').checked;
+            generateRekap();
+        }
+        function setRange(w) {
+            const t = new Date(), y = w === 'this' ? t.getFullYear() : new Date(t.getFullYear(), t.getMonth() - 1, 1).getFullYear();
+            const m = w === 'this' ? t.getMonth() : new Date(t.getFullYear(), t.getMonth() - 1, 1).getMonth();
+            const p = n => String(n).padStart(2, '0'), last = new Date(y, m + 1, 0).getDate();
+            document.getElementById('rekap-start').value = `${y}-${p(m + 1)}-01`;
+            document.getElementById('rekap-end').value = `${y}-${p(m + 1)}-${p(last)}`;
+            generateRekap();
+        }
+
+        async function generateRekap() {
+            const start = document.getElementById('rekap-start').value;
+            const end = document.getElementById('rekap-end').value;
+            if (!start || !end) return;
+
+            const db = await fetchAllData();
+            const harga = parseInt(db.biaya) || 0;
+            const inRange = p => p.tanggal >= start && p.tanggal <= end;
+
+            const cells = {}, datang = {}, pes = {}, nameMap = {};
+            const get = (d, k) => { cells[d] = cells[d] || {}; return cells[d][k] = cells[d][k] || { pesan: 0, names: [] }; };
+            db.pesanan.filter(inRange).forEach(p => {
+                const k = normKelas(p.kelas), q = parseInt(p.jumlah) || 0;
+                if (k) { get(p.tanggal, k).pesan += q; pes[p.tanggal] = (pes[p.tanggal] || 0) + q; }
+            });
+            db.pengambilan.filter(inRange).forEach(p => {
+                const k = normKelas(p.kelas), n = String(p.nama || '').trim();
+                if (!k || !n) return;
+                get(p.tanggal, k).names.push(n);
+                nameMap[k] = nameMap[k] || {};
+                const key = n.toLowerCase();
+                (nameMap[k][key] = nameMap[k][key] || { name: n, c: 0 }).c++;
+            });
+            db.kedatangan.filter(inRange).forEach(p => { datang[p.tanggal] = parseInt(p.jumlah) || 0; });
+
+            const val = c => rekapMode === 'ambil' ? c.names.length : (c.pesan || c.names.length);
+
+            const kset = new Set(), dset = new Set();
+            Object.keys(cells).forEach(d => Object.keys(cells[d]).forEach(k => { if (val(cells[d][k]) > 0) { kset.add(k); dset.add(d); } }));
+            Object.keys(datang).forEach(d => { if (datang[d] > 0) dset.add(d); });
+            Object.keys(pes).forEach(d => { if (pes[d] > 0) dset.add(d); });
+            const classes = [...kset].sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
+            const dates = [...dset].sort();
+            if (!classes.length) classes.push('-');
+
+            document.getElementById('print-subtitle').textContent = `Periode: ${fmtTgl(start)} s/d ${fmtTgl(end)}  |  Harga per porsi: ${rp(harga)}`;
+
+            const thead = document.getElementById('rekap-thead'), tbody = document.getElementById('rekap-tbody');
+            const tfoot = document.getElementById('rekap-tfoot-jumlah'), note = document.getElementById('rekap-note');
+
+            if (dates.length === 0) {
+                lastRekap = null;
+                thead.innerHTML = ''; tfoot.innerHTML = ''; note.textContent = '';
+                tbody.innerHTML = `<tr><td class="p-8 text-gray-500 italic">Tidak ada data pada rentang tanggal tersebut.</td></tr>`;
+                document.getElementById('rekap-cards').innerHTML = '';
+                return;
+            }
+
+            const sameMonth = start.slice(0, 7) === end.slice(0, 7);
+            const rows = dates.map(d => {
+                const cs = classes.map(k => { const c = cells[d] && cells[d][k]; return { n: c ? val(c) : 0, names: c ? c.names : [] }; });
+                const parts = d.split('-');
+                return { label: sameMonth ? String(parseInt(parts[2])) : `${parseInt(parts[2])}/${parseInt(parts[1])}`, cs,
+                         total: cs.reduce((a, c) => a + c.n, 0), pes: pes[d] || 0, datang: datang[d] || 0 };
+            });
+            const colTotals = classes.map((_, i) => rows.reduce((a, r) => a + r.cs[i].n, 0));
+            const grand = colTotals.reduce((a, b) => a + b, 0);
+            const grandPes = rows.reduce((a, r) => a + r.pes, 0);
+            const grandDatang = rows.reduce((a, r) => a + r.datang, 0);
+            const namesByClass = classes.map(k => Object.values(nameMap[k] || {}).sort((a, b) => a.name.localeCompare(b.name, 'id')));
+            lastRekap = { start, end, harga, classes, rows, colTotals, grand, grandPes, grandDatang, namesByClass };
+
+            thead.innerHTML = `<tr><th rowspan="2">TGL.</th><th colspan="${classes.length}">KELAS</th><th rowspan="2">TOTAL</th><th rowspan="2">PESANAN</th><th rowspan="2">KEDATANGAN</th></tr>
+                <tr>${classes.map(k => `<th>${esc(k)}</th>`).join('')}</tr>`;
+
+            let mismatch = false;
+            tbody.innerHTML = rows.map(r => {
+                let dc = '';
+                if (r.datang > 0) {
+                    const ref = r.pes || r.total;
+                    if (r.datang !== ref) { mismatch = true; dc = `<span class="warn" title="Selisih ${r.datang - ref} dari jumlah pesanan">${r.datang}</span>`; }
+                    else dc = r.datang;
+                }
+                return `<tr><td>${r.label}</td>${r.cs.map(c => `<td>${c.n ? `<span class="cn">${c.n}</span>` : ''}${rekapNames && c.names.length ? `<small>${esc(c.names.join(', '))}</small>` : ''}</td>`).join('')}
+                    <td class="tot">${r.total || ''}</td><td>${r.pes || ''}</td><td>${dc}</td></tr>`;
+            }).join('');
+
+            const nameCell = list => `<td>${list.map(n => `<div>${esc(n.name)}${n.c > 1 ? ` <b>&times;${n.c}</b>` : ''}</div>`).join('')}</td>`;
+            tfoot.innerHTML = `<tr class="jm"><td>JUMLAH</td>${colTotals.map(t => `<td>${t || ''}</td>`).join('')}<td>${grand}</td><td>${grandPes || ''}</td><td>${grandDatang || ''}</td></tr>
+                <tr class="rpr"><td>TOTAL BIAYA</td>${colTotals.map(t => `<td>${t ? rp(t * harga) : ''}</td>`).join('')}<td>${rp(grand * harga)}</td><td colspan="2"></td></tr>`;
+
+            note.textContent = (mismatch ? 'Angka kedatangan berwarna oranye berarti tidak sama dengan jumlah pesanan hari itu. ' : '') +
+                (rekapMode === 'pesanan' ? 'Kolom TOTAL dihitung dari jumlah pesanan per kelas. ' : 'Kolom TOTAL dihitung dari siswa yang namanya terisi di Pengambilan; nama kosong dianggap tidak mengambil. ') +
+                '';
+
+            const card = (label, v, c) => `<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm border-l-4 ${c}"><p class="text-sm text-gray-500 mb-1">${label}</p><h3 class="text-2xl font-extrabold text-gray-800">${v}</h3></div>`;
+            const unit = '<span class="text-base font-medium text-gray-500">porsi</span>';
+            document.getElementById('rekap-cards').innerHTML =
+                card('Total Porsi / Siswa', grand + ' ' + unit, 'border-l-blue-500') +
+                card('Total Input Pesanan', grandPes + ' ' + unit, 'border-l-indigo-500') +
+                card('Total Biaya', `<span class="text-emerald-600">${rp(grand * harga)}</span>`, 'border-l-emerald-500') +
+                card('Harga per Porsi', rp(harga), 'border-l-purple-500') +
+                card('Total Kedatangan', grandDatang + ' ' + unit, 'border-l-amber-500');
+        }
+
+        function downloadExcel() {
+            const r = lastRekap;
+            if (!r) { showToast('Belum ada data untuk diunduh', 'error'); return; }
+            const B = 'border:1px solid #000;text-align:center;';
+            const th = `style="${B}background:#1e293b;color:#fff;font-weight:bold"`;
+            const td = `style="${B}"`, tb = `style="${B}font-weight:bold"`;
+            const ft = `style="${B}background:#fde047;font-weight:bold"`;
+            const num = `style="${B}background:#fde047;font-weight:bold;mso-number-format:'\\#\\,\\#\\#0'"`;
+            const nm = `style="border:1px solid #000;text-align:left;vertical-align:top"`;
+            const span = r.classes.length + 4;
+            let h = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table>
+                <tr><td colspan="${span}" style="font-size:16pt;font-weight:bold">REKAPITULASI KATERING SEKOLAH</td></tr>
+                <tr><td colspan="${span}">Periode: ${fmtTgl(r.start)} s/d ${fmtTgl(r.end)}</td></tr>
+                <tr><td colspan="${span}">Harga per porsi: ${rp(r.harga)}</td></tr><tr><td></td></tr>
+                <tr><th rowspan="2" ${th}>TGL.</th><th colspan="${r.classes.length}" ${th}>KELAS</th><th rowspan="2" ${th}>TOTAL</th><th rowspan="2" ${th}>PESANAN</th><th rowspan="2" ${th}>KEDATANGAN</th></tr>
+                <tr>${r.classes.map(k => `<th ${th}>${esc(k)}</th>`).join('')}</tr>`;
+            r.rows.forEach(x => {
+                h += `<tr><td ${tb}>${x.label}</td>${x.cs.map(c => `<td ${td}>${c.n || ''}${rekapNames && c.names.length ? '<br style="mso-data-placement:same-cell" />' + esc(c.names.join(', ')) : ''}</td>`).join('')}<td ${tb}>${x.total || ''}</td><td ${td}>${x.pes || ''}</td><td ${td}>${x.datang || ''}</td></tr>`;
+            });
+            h += `<tr><td ${ft}>JUMLAH</td>${r.colTotals.map(t => `<td ${ft}>${t || ''}</td>`).join('')}<td ${ft}>${r.grand}</td><td ${ft}>${r.grandPes || ''}</td><td ${ft}>${r.grandDatang || ''}</td></tr>
+                <tr><td ${ft}>TOTAL BIAYA (Rp)</td>${r.colTotals.map(t => `<td ${num}>${t ? t * r.harga : ''}</td>`).join('')}<td ${num}>${r.grand * r.harga}</td><td ${ft}></td><td ${ft}></td></tr>
+                </table></body></html>`;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob(['\ufeff' + h], { type: 'application/vnd.ms-excel;charset=utf-8' }));
+            a.download = `Rekap_Katering_${r.start}_sd_${r.end}.xls`;
+            document.body.appendChild(a); a.click(); a.remove();
+            showToast('File Excel diunduh', 'success');
+        }
+
+        // --- UI Interactions ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function switchTab(tabId) {
+            // Tutup otomatis sidebar di mode mobile jika menu diklik
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-indigo-600');
+                el.classList.add('hover:bg-indigo-600');
+            });
+            document.getElementById(tabId).classList.add('active');
+            
+            const activeBtn = document.querySelector(`.tab-btn[data-target="${tabId}"]`);
+            if(activeBtn) {
+                activeBtn.classList.remove('hover:bg-indigo-600');
+                activeBtn.classList.add('bg-indigo-600');
+            }
+
+            if(tabId === 'tab-rekap') generateRekap();
+            if(tabId === 'tab-pesanan') loadPesananUI(document.getElementById('pesanan-tanggal').value);
+            if(tabId === 'tab-pengambilan') loadAmbilUI(document.getElementById('ambil-tanggal').value);
+            if(tabId === 'tab-kedatangan') loadKedatanganUI(document.getElementById('datang-tanggal').value);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-gray-800' : 'bg-red-600';
+            
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-x-full opacity-0 z-50`;
+            toast.innerHTML = `
+                <svg class="w-5 h-5 ${type === 'success' ? 'text-green-400' : 'text-white'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="font-medium text-sm">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showLoading(show, msg) {
+            const overlay = document.getElementById('loading-overlay');
+            if (show && msg) document.getElementById('loading-text').textContent = msg;
+            overlay.classList.toggle('hidden', !show);
+        }
+
+        // Init default tab
+        switchTab('tab-pesanan');
+
+    </script>
+</body>
+</html>
