@@ -171,8 +171,17 @@
                         <input type="date" id="pesanan-tanggal" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 shadow-sm">
                     </div>
                     
+                    <div class="flex gap-2 sm:gap-3 items-end px-1 -mb-2 text-xs font-semibold text-gray-500">
+                        <span class="flex-1 min-w-0">Nama Kelas</span>
+                        <span class="w-20 sm:w-28 shrink-0 text-center">Jumlah Porsi</span>
+                        <span class="w-11 shrink-0"></span>
+                    </div>
                     <div id="pesanan-rows" class="space-y-3">
                         <!-- Baris pesanan akan diisi lewat JS -->
+                    </div>
+                    <div class="flex justify-between items-center bg-indigo-50 border border-indigo-100 text-indigo-900 rounded-xl px-4 py-3">
+                        <span class="text-sm font-semibold">Total Pesanan</span>
+                        <span class="text-lg font-extrabold"><span id="pesanan-total">0</span> <span class="text-sm font-medium">porsi</span></span>
                     </div>
                     
                     <button type="button" onclick="addPesananRow()" class="text-sm text-indigo-600 font-semibold hover:text-indigo-800 flex items-center gap-1 transition">
@@ -455,18 +464,26 @@
         }
 
         // Helper untuk tambah baris input bulk pesanan
+        function updatePesananTotal() {
+            let t = 0;
+            document.querySelectorAll('#pesanan-rows .pesanan-jumlah').forEach(i => { t += parseInt(i.value) || 0; });
+            document.getElementById('pesanan-total').textContent = t;
+        }
+        document.getElementById('pesanan-rows').addEventListener('input', updatePesananTotal);
+
         function addPesananRow(kelas = '', jumlah = '') {
             const container = document.getElementById('pesanan-rows');
             const div = document.createElement('div');
-            div.className = 'flex gap-3 pesanan-row items-center';
+            div.className = 'flex gap-2 sm:gap-3 pesanan-row items-center w-full';
             div.innerHTML = `
-                <input type="text" required value="${kelas}" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white pesanan-kelas shadow-sm" placeholder="Kelas (ex: X-A)">
-                <input type="number" required min="1" value="${jumlah}" class="w-1/3 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white pesanan-jumlah shadow-sm" placeholder="Jml">
-                <button type="button" class="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition shadow-sm" onclick="this.parentElement.remove()" title="Hapus baris">
+                <input type="text" required value="${esc(kelas)}" class="flex-1 min-w-0 px-3 sm:px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white pesanan-kelas shadow-sm" placeholder="Kelas (ex: X-A)">
+                <input type="number" required min="1" value="${esc(jumlah)}" class="w-20 sm:w-28 shrink-0 min-w-0 px-3 sm:px-4 py-3 text-center rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white pesanan-jumlah shadow-sm" placeholder="Jml">
+                <button type="button" class="shrink-0 p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition shadow-sm" onclick="this.parentElement.remove(); updatePesananTotal()" title="Hapus baris">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             `;
             container.appendChild(div);
+            updatePesananTotal();
         }
 
         initLocalDB();
