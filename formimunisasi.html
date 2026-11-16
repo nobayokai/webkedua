@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skrining Kesehatan & Persetujuan Imunisasi BIAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF6E5;--ink:#2B2350;--purple:#6C4CF1;--teal:#13B5A6;--coral:#FF6B6B;--sun:#FFC93C;--sky:#3FB8F0;--pink:#FF7EB6;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,system-ui,sans-serif}
+h1,h2{font-family:'Baloo 2',Nunito,sans-serif;margin:0;line-height:1.15}
+.hero{background:linear-gradient(120deg,var(--purple),var(--pink) 60%,var(--sun));color:#fff;padding:28px 20px 56px;text-align:center}
+.hero h1{font-size:clamp(26px,5vw,40px)}
+.hero p{margin:8px auto 0;max-width:560px;opacity:.95}
+.wrap{max-width:760px;margin:-34px auto 40px;padding:0 14px}
+.bar{position:sticky;top:0;z-index:5;background:#fff;border-radius:14px;padding:10px 14px;box-shadow:0 4px 14px #2b235022;display:flex;gap:12px;align-items:center;font-weight:700;font-size:14px;margin-bottom:16px}
+.bar i{flex:1;height:10px;background:#eee;border-radius:9px;overflow:hidden}
+.bar b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--sun));transition:width .3s}
+.card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:16px;border-top:8px solid var(--c,var(--purple));box-shadow:0 6px 18px #2b23501a}
+.card h2{font-size:22px;color:var(--c,var(--purple));margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label.f{display:block;font-weight:700;font-size:14px}
+input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;margin-top:4px;padding:11px 12px;border:2px solid #e6e0f5;border-radius:12px;font:inherit;background:#fcfbff;color:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--c,var(--purple));box-shadow:0 0 0 4px #6c4cf122}
+.q{border:2px solid #efeaff;border-radius:16px;padding:14px;margin-bottom:12px;background:#fdfcff}
+.q p{margin:0 0 10px;font-weight:600}
+.q p span{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;font-weight:800;margin-right:8px;font-size:14px}
+.pills{display:flex;gap:10px}
+.pills label{flex:1;cursor:pointer}
+.pills input{position:absolute;opacity:0}
+.pills em{display:block;text-align:center;font-style:normal;font-weight:800;padding:10px;border-radius:12px;border:2px solid #ddd;background:#fff;transition:.15s}
+.pills input:focus-visible+em{outline:3px solid var(--purple)}
+.pills .y input:checked+em{background:var(--coral);border-color:var(--coral);color:#fff}
+.pills .n input:checked+em{background:var(--teal);border-color:var(--teal);color:#fff}
+.more{display:none;margin-top:10px}
+.q.open .more{display:block}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice label{cursor:pointer}
+.choice input{position:absolute;opacity:0}
+.choice em{display:block;font-style:normal;text-align:center;padding:16px 8px;border-radius:16px;font-weight:800;border:3px solid #ddd;font-family:'Baloo 2',sans-serif;font-size:18px}
+.choice .ok input:checked+em{background:var(--teal);border-color:var(--teal);color:#fff}
+.choice .no input:checked+em{background:var(--coral);border-color:var(--coral);color:#fff}
+.chip{margin-top:12px;background:#fff7d6;border:2px dashed var(--sun);border-radius:14px;padding:10px 12px;font-size:14px;display:none}
+#sig{width:100%;height:150px;border:2px dashed var(--purple);border-radius:14px;background:#fff;touch-action:none;display:block}
+.btn{border:0;border-radius:14px;padding:13px 20px;font:800 16px 'Baloo 2',sans-serif;cursor:pointer;color:#fff}
+.btn.g{background:linear-gradient(120deg,var(--teal),var(--sky))}
+.btn.p{background:linear-gradient(120deg,var(--purple),var(--pink))}
+.btn.l{background:#eee;color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.row .btn{flex:1;min-width:150px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;display:none;z-index:9;max-width:90%}
+/* ===== lembar cetak ===== */
+#paper{display:none}
+.sheet{font:13px/1.45 'Times New Roman',serif;color:#000;padding:0}
+.sheet h3{text-align:center;margin:0;font-size:15px}
+.sheet .sub{text-align:center;margin:2px 0 10px}
+.sheet table{border-collapse:collapse;width:100%}
+.sheet td,.sheet th{border:1px solid #000;padding:4px 6px;vertical-align:top}
+.sheet .kv td{border:0;padding:2px 4px}
+.sheet .u{border-bottom:1px solid #000;display:inline-block;min-width:60%;font-family:'Comic Sans MS',cursive;padding:0 4px}
+.sheet .sg img{display:block;margin:4px 0 4px auto;height:64px;width:auto;max-width:240px}
+#cap{position:fixed;left:-9999px;top:0;width:720px}
+#cap .sheet{background:#fff;padding:28px 32px;width:720px}
+.pb{page-break-after:always}
+
+.sheet{font:13px/1.5 Arial,Helvetica,sans-serif}
+.sheet .h{font-family:Caveat,'Comic Sans MS',cursive;font-size:20px;font-weight:600;color:#1a2a8a;line-height:1}
+.sheet .r{display:flex;gap:8px;margin:5px 0;align-items:flex-end}
+.sheet .l{width:190px;flex:none}
+.sheet .v{flex:1;border-bottom:1px solid #000;min-height:20px}
+.sheet .ind{margin-left:198px;margin-top:3px}
+.sheet .cap{font-size:11px;margin-top:0}
+.sheet .c{text-align:center}
+.sheet .sg{text-align:right;margin-top:10px}
+.sheet .t td,.sheet .t th{border:2px solid #000;padding:6px}
+.sheet .t th{text-align:center}
+#pvw{background:#e9e4f7;border-radius:14px;overflow:hidden}
+#pv{width:720px;transform-origin:0 0;padding:12px 12px 0}
+#pv .sheet{background:#fff;padding:28px 32px;margin-bottom:14px;border-radius:6px;box-shadow:0 4px 16px #2b235033}
+#pv .pb{page-break-after:auto}
+@media print{
+ body{background:#fff}.hero,.wrap,#toast{display:none!important}
+ #paper{display:block}
+ @page{size:A4;margin:16mm}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<header class="hero">
+  <h1>💉 Skrining Kesehatan &amp; Persetujuan BIAS</h1>
+  <p>Bulan Imunisasi Anak Sekolah. Isi formulir ini di HP, lalu kirim dan cetak seperti lembar kertas dari sekolah.</p>
+</header>
+
+<main class="wrap">
+  <div class="bar"><span id="pct">0%</span><i><b id="fill"></b></i></div>
+
+  <section class="card" style="--c:var(--purple)">
+    <h2>1. Data anak</h2>
+    <div class="grid">
+      <label class="f full">Nama peserta didik<input type="text" id="namaAnak" autocomplete="off"></label>
+      <label class="f">Jenis kelamin<select id="jk"><option value="">Pilih…</option><option>Laki-laki</option><option>Perempuan</option></select></label>
+      <label class="f">Tanggal lahir<input type="date" id="tglLahir"></label>
+      <label class="f">NIK anak<input type="text" id="nik" inputmode="numeric" pattern="[0-9]*" maxlength="16" placeholder="16 digit angka"></label>
+      <label class="f">Sekolah<input type="text" id="sekolah" value="SDIT Hidayatut Taufiq" readonly></label>
+      <label class="f">Kelas<select id="kelas"><option value="">Pilih…</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></label>
+      <label class="f full">Alamat anak (jalan)<input type="text" id="alamatAnak"></label>
+      <label class="f">RT/RW<input type="text" id="rtrwAnak" inputmode="numeric" maxlength="5" placeholder="02/05"></label>
+      <label class="f">Kelurahan<input type="text" id="kelAnak"></label>
+      <label class="f full">Kecamatan<input type="text" id="kecAnak"></label>
+    </div>
+  </section>
+
+  <section class="card" style="--c:var(--teal)">
+    <h2>2. Data orang tua / wali</h2>
+    <div class="grid">
+      <label class="f full">Nama lengkap orang tua / wali<input type="text" id="namaOrtu"></label>
+      <label class="f">Usia (tahun)<input type="text" id="usia" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="mis. 41"></label>
+      <label class="f">No HP<input type="tel" id="hp" inputmode="numeric" pattern="[0-9]*" maxlength="15" placeholder="08xxxxxxxxxx (angka saja)"></label>
+      <label class="f full"><input type="checkbox" id="sama" style="width:auto;margin-right:6px">Alamat orang tua sama dengan alamat anak</label>
+      <label class="f full">Alamat orang tua (jalan)<input type="text" id="alamatOrtu"></label>
+      <label class="f">RT/RW<input type="text" id="rtrwOrtu" inputmode="numeric" maxlength="5" placeholder="02/05"></label>
+      <label class="f">Kelurahan<input type="text" id="kelOrtu"></label>
+      <label class="f full">Kecamatan<input type="text" id="kecOrtu"></label>
+    </div>
+  </section>
+
+  <section class="card" style="--c:var(--coral)">
+    <h2>3. Skrining kesehatan anak</h2>
+    <div id="qs"></div>
+  </section>
+
+  <section class="card" style="--c:var(--sky)">
+    <h2>4. Surat persetujuan</h2>
+    <p style="margin-top:0">Dengan ini saya menyatakan bahwa saya:</p>
+    <div class="choice">
+      <label class="ok"><input type="radio" name="setuju" value="Setuju"><em>✅ Setuju</em></label>
+      <label class="no"><input type="radio" name="setuju" value="Tidak Setuju"><em>❌ Tidak setuju</em></label>
+    </div>
+    <div class="chip" id="chip"></div>
+    <label class="f" id="alasanBox" style="display:none;margin-top:12px">Alasan tidak setuju<textarea id="alasan" rows="3"></textarea></label>
+    <p style="font-size:14px;margin-bottom:0">Persetujuan ini saya berikan sesungguhnya dengan penuh kesadaran dan tanpa paksaan dari pihak manapun.</p>
+  </section>
+
+  <section class="card" style="--c:var(--pink)">
+    <h2>5. Tanda tangan</h2>
+    <label class="f" style="margin-bottom:10px">Tanggal<input type="date" id="tgl"></label>
+    <canvas id="sig"></canvas>
+    <div class="row"><button class="btn l" id="clr" type="button">Hapus tanda tangan</button></div>
+  </section>
+
+  <section class="card" style="--c:var(--sun)">
+    <h2>6. Pratinjau hasil cetak</h2>
+    <p style="margin-top:0;font-size:14px">Ini tampilan kertas yang akan dicetak. Isian dan tanda tangan langsung muncul di sini. Cek dulu, lalu klik Simpan &amp; Kirim: data masuk ke Google Sheets dan PDF langsung dibagikan ke WhatsApp.</p>
+    <div id="pvw"><div id="pv"></div></div>
+    <div class="row"><button class="btn g" id="kirim" type="button">💾 Simpan &amp; Kirim ke WhatsApp</button></div>
+  </section>
+</main>
+<div id="toast"></div>
+<div id="cap"></div>
+
+<script>
+// ====== GANTI dengan URL Web App Google Apps Script Anda ======
+const SHEETS_URL = "PASTE_URL_WEB_APP_DI_SINI";
+
+const Q = [
+ ["Apakah anak Anda mengalami demam dalam 3 hari terakhir?"],
+ ["Apakah anak Anda sedang batuk/pilek dalam beberapa hari terakhir?"],
+ ["Apakah anak Anda sedang sakit lain dalam beberapa hari terakhir?","Sebutkan sakitnya"],
+ ["Apakah anak Anda sedang dalam pengobatan dokter?","Jika ya, sebutkan"],
+ ["Apakah anak Anda pernah menderita kanker/gangguan pembekuan darah/gangguan kekebalan?"],
+ ["Apakah anak Anda sedang/pernah mengalami kejang?","Kapan terakhir kejang?"],
+ ["Apakah anak Anda tampak tidak sebugar biasanya?"],
+ ["Apakah anak Anda pernah mengalami keluhan setelah imunisasi sebelumnya?"]
+];
+const $=id=>document.getElementById(id);
+const qs=$("qs");
+Q.forEach((q,i)=>{
+  const d=document.createElement("div");d.className="q";d.style.setProperty("--c","var(--coral)");
+  d.innerHTML=`<p><span>${i+1}</span>${q[0]}</p>
+   <div class="pills"><label class="y"><input type="radio" name="q${i}" value="Ya"><em>Ya</em></label>
+   <label class="n"><input type="radio" name="q${i}" value="Tidak"><em>Tidak</em></label></div>
+   ${q[1]?`<div class="more"><input type="text" id="d${i}" placeholder="${q[1]}"></div>`:""}`;
+  qs.appendChild(d);
+  d.addEventListener("change",()=>{d.classList.toggle("open",!!q[1]&&val("q"+i)==="Ya");prog()});
+});
+const val=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:""};
+$("tgl").valueAsDate=new Date();
+
+// alamat sama
+$("sama").onchange=e=>{if(e.target.checked){$("alamatOrtu").value=$("alamatAnak").value;$("rtrwOrtu").value=$("rtrwAnak").value;$("kelOrtu").value=$("kelAnak").value;$("kecOrtu").value=$("kecAnak").value}prog()};
+
+// info imunisasi sesuai kelas
+const INFO={1:"Kelas 1: Imunisasi MR (Agustus) dan DT (November).",2:"Kelas 2: Imunisasi Td (November).",5:"Kelas 5: Imunisasi HPV khusus siswi (Agustus) dan Td (November).",6:"Kelas 6: Imunisasi HPV khusus siswi yang belum vaksin HPV di kelas 5.",9:"Kelas 9: Imunisasi HPV khusus siswi yang belum vaksin HPV di kelas 5."};
+function chip(){const k=$("kelas").value,c=$("chip");c.style.display=INFO[k]?"block":"none";c.textContent="💡 "+(INFO[k]||"")}
+$("kelas").onchange=chip;
+document.querySelectorAll('input[name=setuju]').forEach(r=>r.onchange=()=>{$("alasanBox").style.display=val("setuju")==="Tidak Setuju"?"block":"none"});
+
+// tanda tangan
+const cv=$("sig"),cx=cv.getContext("2d");let draw=false,signed=false,bb=null;
+function fit(){const r=cv.getBoundingClientRect();cv.width=Math.round(r.width*2);cv.height=Math.round(r.height*2);cx.lineWidth=4.5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle="#1d1a6b"}
+fit();
+const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+function grow(x,y){bb=bb?[Math.min(bb[0],x),Math.min(bb[1],y),Math.max(bb[2],x),Math.max(bb[3],y)]:[x,y,x,y]}
+cv.onpointerdown=e=>{e.preventDefault();draw=true;cv.setPointerCapture(e.pointerId);const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y);grow(x,y)};
+cv.onpointermove=e=>{if(!draw)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke();grow(x,y);signed=true};
+cv.onpointerup=cv.onpointercancel=()=>{draw=false;prog()};
+$("clr").onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);signed=false;bb=null;prog()};
+function sigImg(){if(!signed||!bb)return"";const p=8,x=Math.max(0,bb[0]-p),y=Math.max(0,bb[1]-p),w=Math.min(cv.width,bb[2]+p)-x,h=Math.min(cv.height,bb[3]+p)-y;const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(cv,x,y,w,h,0,0,w,h);return c.toDataURL()}
+
+// progres
+const REQ=["namaAnak","jk","tglLahir","nik","sekolah","kelas","namaOrtu","usia","hp","alamatOrtu"];
+function prog(){let n=REQ.filter(i=>$(i).value.trim()).length;Q.forEach((_,i)=>{if(val("q"+i))n++});if(val("setuju"))n++;if(signed)n++;
+  const t=REQ.length+Q.length+2,p=Math.round(n/t*100);$("pct").textContent=p+"%";$("fill").style.width=p+"%";sent=false;readyFile=null;const kb=$("kirim");if(kb&&!kb.disabled)kb.textContent=BTN;upd()}
+document.addEventListener("input",prog);
+
+function fmtTgl(s){if(!s)return"";const b=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];const [y,m,d]=s.split("-");return `${+d} ${b[+m-1]} ${y}`}
+function data(){
+  const o={Waktu:new Date().toLocaleString("id-ID"),"Nama Anak":$("namaAnak").value,"Jenis Kelamin":$("jk").value,"Tanggal Lahir":fmtTgl($("tglLahir").value),"NIK":"'"+$("nik").value,"Sekolah":$("sekolah").value,"Kelas":$("kelas").value,
+   "Alamat Anak":`${$("alamatAnak").value}, RT/RW ${$("rtrwAnak").value}, ${$("kelAnak").value}, ${$("kecAnak").value}`,
+   "Nama Orang Tua/Wali":$("namaOrtu").value,"Usia":$("usia").value,"No HP":"'"+$("hp").value,
+   "Alamat Orang Tua":`${$("alamatOrtu").value}, RT/RW ${$("rtrwOrtu").value}, ${$("kelOrtu").value}, ${$("kecOrtu").value}`};
+  Q.forEach((q,i)=>{o[`Q${i+1}`]=val("q"+i)+($("d"+i)&&$("d"+i).value?` (${$("d"+i).value})`:"")});
+  o["Persetujuan"]=val("setuju");o["Alasan Tidak Setuju"]=$("alasan").value;o["Tanggal TTD"]=fmtTgl($("tgl").value);o["TTD Digital"]=signed?"Ya":"Tidak";
+  return o}
+function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",3500)}
+function valid(){
+  const miss=REQ.filter(i=>!$(i).value.trim());
+  if(miss.length){$(miss[0]).focus();toast("Lengkapi dulu data yang masih kosong.");return false}
+  for(const id of ["rtrwAnak","rtrwOrtu"])if($(id).value&&!/^\d{2}\/\d{2}$/.test($(id).value)){$(id).focus();toast("RT/RW harus 2 digit / 2 digit, contoh 02/03.");return false}
+  for(let i=0;i<Q.length;i++)if(!val("q"+i)){toast(`Pertanyaan nomor ${i+1} belum dijawab.`);return false}
+  if(!val("setuju")){toast("Pilih Setuju atau Tidak setuju.");return false}
+  if(!signed){toast("Tanda tangan dulu di kotak tanda tangan.");return false}
+  return true}
+
+const BTN="💾 Simpan & Kirim ke WhatsApp";
+let sent=false,sheetsOk=false,readyFile=null;
+async function makePdf(){
+  const box=$("cap");box.innerHTML=html();
+  try{await document.fonts.ready}catch(e){}
+  const pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"});
+  const sh=[...box.querySelectorAll(".sheet")];
+  for(let i=0;i<sh.length;i++){
+    const c=await html2canvas(sh[i],{scale:2,backgroundColor:"#fff"});
+    let w=190,h=c.height*w/c.width;if(h>277){h=277;w=c.width*h/c.height}
+    if(i)pdf.addPage();
+    pdf.addImage(c.toDataURL("image/jpeg",.92),"JPEG",10,10,w,h);
+  }
+  box.innerHTML="";
+  const nm=("Surat-BIAS-"+($("namaAnak").value||"siswa")).replace(/[^\w\-]+/g,"-")+".pdf";
+  return new File([pdf.output("blob")],nm,{type:"application/pdf"});
+}
+async function bagikan(f){
+  const ok=sheetsOk?" dan data tersimpan di Google Sheets 🎉":" (data belum tersimpan ke Sheets: URL belum diisi atau gagal)";
+  if(navigator.canShare&&navigator.canShare({files:[f]})){
+    try{await navigator.share({files:[f],title:"Skrining & Persetujuan BIAS",text:"Skrining & surat persetujuan imunisasi BIAS a.n. "+$("namaAnak").value});readyFile=null;toast("PDF dibagikan"+ok);return}
+    catch(e){
+      if(e.name==="AbortError"){readyFile=f;$("kirim").textContent="📲 Bagikan PDF ke WhatsApp";toast("Pembagian dibatalkan. Tekan tombol lagi untuk membagikan.");return}
+      readyFile=f;$("kirim").textContent="📲 Bagikan PDF ke WhatsApp";toast("PDF siap. Tekan tombol sekali lagi, lalu pilih WhatsApp dan grup kelas.");return}
+  }
+  const a=document.createElement("a");a.href=URL.createObjectURL(f);a.download=f.name;a.click();
+  toast("Perangkat ini belum mendukung bagikan file. PDF diunduh, silakan kirim lewat WhatsApp.");
+}
+$("kirim").onclick=async()=>{
+  if(readyFile){await bagikan(readyFile);return}
+  if(!valid())return;
+  const b=$("kirim");b.disabled=true;b.textContent="⏳ Menyiapkan PDF…";
+  try{
+    let sv=Promise.resolve();
+    if(!sent&&!SHEETS_URL.startsWith("PASTE")){sv=fetch(SHEETS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(data())}).then(()=>{sent=true;sheetsOk=true}).catch(()=>{sheetsOk=false})}
+    else if(sent)sheetsOk=true;
+    const f=await makePdf();await sv;
+    b.disabled=false;b.textContent=BTN;
+    await bagikan(f);
+  }catch(e){toast("Gagal membuat PDF. Periksa koneksi internet lalu coba lagi.")}
+  b.disabled=false;if(!readyFile)b.textContent=BTN;
+};
+
+// ====== lembar cetak (sama dengan pratinjau) ======
+function html(){
+  const d=data(),B="&nbsp;",H=x=>`<span class="h">${x||B}</span>`;
+  const ya=n=>d["Q"+n].startsWith("Ya")?"✓":"",tdk=n=>d["Q"+n].startsWith("Tidak")?"✓":"";
+  const det=i=>$("d"+i)&&$("d"+i).value?`<br>${H($("d"+i).value)}`:"";
+  const rows=Q.map((q,i)=>`<tr><td align="center">${i+1}</td><td>${q[0]}${det(i)}</td><td align="center" width="46">${ya(i+1)}</td><td align="center" width="46">${tdk(i+1)}</td></tr>`).join("");
+  const si=sigImg(),img=si?`<img src="${si}">`:"",s=d.Persetujuan,jk=d["Jenis Kelamin"];
+  const ket=jk==="Perempuan"?"<s>Laki - Laki</s> / Perempuan":jk?"Laki - Laki / <s>Perempuan</s>":"Laki - Laki / Perempuan";
+  const L=(l,v)=>`<div class="r"><span class="l">${l}</span><span class="v">${H(v)}</span></div>`;
+  const I=(a)=>`<div class="ind">${a}</div>`;
+  const g=id=>$(id).value;
+  const tg=d["Tanggal TTD"],ttd=`<div class="sg">Tanggal: ${H(tg)}<br>Orang Tua / Wali<br>${img||"<br><br>"}${H(g("namaOrtu"))}</div>`;
+  return `
+  <div class="sheet pb"><h3>SKRINING KESEHATAN PESERTA DIDIK</h3><div class="sub">UNTUK PELAKSANAAN IMUNISASI<br>( diisi oleh orang tua / wali )</div>
+  <p>Sehubungan dengan akan dilaksanakan pemberian imunisasi dalam kegiatan Bulan Imunisasi Anak Sekolah (BIAS), mohon kesediaan Bapak/Ibu mengisi beberapa pertanyaan dengan tanda ( √ ) sebagai skrining awal status kesehatan anak.</p>
+  ${L("Nama Peserta Didik",g("namaAnak"))}${L("Jenis Kelamin",ket)}${L("Tanggal Lahir",d["Tanggal Lahir"])}${L("Nama Orang Tua / Wali",g("namaOrtu"))}${L("Alamat",d["Alamat Orang Tua"].replace(/^, RT\/RW ,? ?,? ?/,""))}<br>
+  <table class="t"><tr><th width="34">No.</th><th>Pertanyaan</th><th>Ya</th><th>Tidak</th></tr>${rows}</table>
+  ${ttd}</div>
+  <div class="sheet"><h3>SURAT PERSETUJUAN ORANG TUA / WALI</h3><p>Saya yang bertanda tangan di bawah ini</p>
+  ${L("Nama Lengkap Orang Tua / Wali",g("namaOrtu"))}${L("Usia",g("usia")?g("usia")+" tahun":"")}${L("No HP",g("hp"))}${L("Alamat",g("alamatOrtu"))}
+  <div class="ind cap">Jalan</div>${I(`RT/RW ${H(g("rtrwOrtu"))} Kelurahan ${H(g("kelOrtu"))}`)}${I(`Kecamatan ${H(g("kecOrtu"))}`)}
+  <p>Dalam hal ini bertindak selaku orang tua / wali dari</p>
+  ${L("Nama Lengkap Siswa",g("namaAnak"))}${L("NIK",g("nik"))}${L("Tanggal Lahir",d["Tanggal Lahir"])}${L("Jenis Kelamin",ket)}${L("Alamat",g("alamatAnak"))}
+  ${I(`RT/RW ${H(g("rtrwAnak"))} Kelurahan ${H(g("kelAnak"))}`)}${I(`Kecamatan ${H(g("kecAnak"))}`)}<br>
+  ${L("Sekolah",g("sekolah"))}${L("Kelas",g("kelas"))}
+  <p class="c" style="margin-bottom:0">Dengan ini menyatakan bahwa</p>
+  <p class="c" style="margin-top:2px"><b style="font-size:16px">${s==="Setuju"?"":"<s>"}SETUJU${s==="Setuju"?"":"</s>"}${s==="Setuju"?"":""} / ${s==="Tidak Setuju"?"TIDAK SETUJU":(s?"<s>TIDAK SETUJU</s>":"TIDAK SETUJU")} *)</b></p>
+  <p><b>Jika Tidak Setuju, Sebutkan Alasannya</b> ${H(d["Alasan Tidak Setuju"])}<br><b>Untuk dilakukan imunisasi pada program BIAS (Bulan Imunisasi Anak Sekolah),</b></p>
+  <table class="t"><tr><th>BIAS</th><th>Kelas 1</th><th>Kelas 2</th><th>Kelas 5<br>Dosis 1<br>( Mulai 2023 )</th><th>Kelas 6 atau Kelas 9<br>Dosis 1<br>( Mulai 2025 )</th></tr>
+  <tr><td><b>Bulan Agustus</b></td><td><b>Imunisasi MR</b></td><td></td><td align="center"><b>Khusus Siswi</b><br>Imunisasi HPV<br>(Kanker Serviks)</td><td align="center"><b>Khusus Siswi yang belum vaksin HPV di kelas 5</b><br>Imunisasi HPV<br>(Kanker Serviks)</td></tr>
+  <tr><td><b>Bulan November</b></td><td>Imunisasi DT</td><td>Imunisasi Td</td><td>Imunisasi Td</td><td></td></tr></table>
+  <p>Demikian persetujuan ini saya berikan sesungguhnya dengan penuh kesadaran dan tanpa paksaan dari pihak manapun</p>
+  ${ttd}<small>*) Coret yang tidak perlu</small></div>`}
+function fitPv(){const w=$("pvw").clientWidth,k=Math.min(1,w/720),p=$("pv");p.style.transform=`scale(${k})`;$("pvw").style.height=p.offsetHeight*k+"px"}
+function upd(){$("pv").innerHTML=html();fitPv()}
+window.addEventListener("resize",fitPv);
+$("usia").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,2)});
+["rtrwAnak","rtrwOrtu"].forEach(i=>$(i).addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"").slice(0,4);e.target.value=d.length>2?d.slice(0,2)+"/"+d.slice(2):d}));
+["nik","hp"].forEach(i=>$(i).addEventListener("input",e=>{const v=e.target.value.replace(/\D/g,"");if(v!==e.target.value)e.target.value=v}));
+prog();
+</script>
+</body>
+</html>
