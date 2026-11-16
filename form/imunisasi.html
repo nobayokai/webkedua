@@ -103,7 +103,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--c,var(--
 </header>
 
 <main class="wrap">
-  <div class="bar"><span id="pct">0%</span><i><b id="fill"></b></i></div>
+  <div class="bar"><span id="pct">0%</span><i><b id="fill"></b></i><button class="btn l" id="reset" type="button" title="Hapus semua isian" style="padding:6px 10px;font-size:14px;border-radius:10px">🗑️</button></div>
 
   <section class="card" style="--c:var(--purple)">
     <h2>1. Data anak</h2>
@@ -270,7 +270,7 @@ async function bagikan(f){
   ld(false);
   const ok=sheetsOk?" dan data tersimpan di Google Sheets 🎉":" (data belum tersimpan ke Sheets: URL belum diisi atau gagal)";
   if(navigator.canShare&&navigator.canShare({files:[f]})){
-    try{await navigator.share({files:[f],title:"Skrining & Persetujuan BIAS",text:"Skrining & surat persetujuan imunisasi BIAS a.n. "+$("namaAnak").value});readyFile=null;toast("PDF dibagikan"+ok);return}
+    try{await navigator.share({files:[f],title:"Skrining & Persetujuan BIAS",text:"Skrining & surat persetujuan imunisasi BIAS a.n. "+$("namaAnak").value});readyFile=null;clearDraft();toast("PDF dibagikan"+ok);return}
     catch(e){
       if(e.name==="AbortError"){readyFile=f;$("kirim").textContent="📲 Bagikan PDF ke WhatsApp";toast("Pembagian dibatalkan. Tekan tombol lagi untuk membagikan.");return}
       readyFile=f;$("kirim").textContent="📲 Bagikan PDF ke WhatsApp";toast("PDF siap. Tekan tombol sekali lagi, lalu pilih WhatsApp dan grup kelas.");return}
@@ -333,6 +333,80 @@ $("usia").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D
 ["rtAnak","rwAnak","rtOrtu","rwOrtu"].forEach(i=>{const e=$(i);e.addEventListener("input",()=>{e.value=e.value.replace(/\D/g,"").slice(0,2)});e.addEventListener("blur",()=>{if(e.value.length===1){e.value="0"+e.value;prog()}})});
 ["nik","hp"].forEach(i=>$(i).addEventListener("input",e=>{const v=e.target.value.replace(/\D/g,"");if(v!==e.target.value)e.target.value=v}));
 prog();
+/* ====== DRAF OTOMATIS: isian tidak hilang saat refresh / halaman tertutup ====== */
+const LS_KEY="bias_draft_v1";
+let lsTimer=null,lsOff=false;
+
+function draftData(){
+  const d={v:1,fields:{},radios:{},checks:{},sig:null};
+  document.querySelectorAll("input[id],select[id],textarea[id]").forEach(el=>{
+    if(el.type==="radio"||el.type==="checkbox"||el.id==="sig")return;
+    d.fields[el.id]=el.value;
+  });
+  document.querySelectorAll('input[type="radio"]:checked').forEach(el=>{d.radios[el.name]=el.value});
+  document.querySelectorAll('input[type="checkbox"][id]').forEach(el=>{d.checks[el.id]=el.checked});
+  if(signed&&bb)d.sig={img:cv.toDataURL("image/png"),w:cv.width,h:cv.height,bb:bb.slice()};
+  return d;
+}
+function saveDraft(){
+  if(lsOff)return;
+  try{localStorage.setItem(LS_KEY,JSON.stringify(draftData()))}catch(e){}
+}
+function queueSave(){clearTimeout(lsTimer);lsTimer=setTimeout(saveDraft,500)}
+function clearDraft(){clearTimeout(lsTimer);try{localStorage.removeItem(LS_KEY)}catch(e){}}
+
+function restoreDraft(){
+  let raw=null;try{raw=localStorage.getItem(LS_KEY)}catch(e){}
+  if(!raw)return false;
+  let d;try{d=JSON.parse(raw)}catch(e){return false}
+  if(!d||!d.fields)return false;
+
+  Object.keys(d.fields).forEach(id=>{const el=$(id);if(el&&d.fields[id]!=="")el.value=d.fields[id]});
+  Object.keys(d.radios||{}).forEach(n=>{
+    document.querySelectorAll('input[name="'+n+'"]').forEach(el=>{el.checked=(el.value===d.radios[n])});
+  });
+  Object.keys(d.checks||{}).forEach(id=>{const el=$(id);if(el)el.checked=!!d.checks[id]});
+
+  const done=()=>{
+    chip();
+    $("alasanBox").style.display=val("setuju")==="Tidak Setuju"?"block":"none";
+    document.querySelectorAll(".q").forEach((el,i)=>{el.classList.toggle("open",!!Q[i][1]&&val("q"+i)==="Ya")});
+    prog();
+    toast("Draf isian sebelumnya dipulihkan ✔");
+  };
+
+  if(d.sig&&d.sig.img){
+    const im=new Image();
+    im.onload=()=>{
+      cx.clearRect(0,0,cv.width,cv.height);
+      cx.drawImage(im,0,0,cv.width,cv.height);
+      signed=true;
+      if(d.sig.bb&&d.sig.w&&d.sig.h){
+        const kx=cv.width/d.sig.w,ky=cv.height/d.sig.h;
+        bb=[d.sig.bb[0]*kx,d.sig.bb[1]*ky,d.sig.bb[2]*kx,d.sig.bb[3]*ky];
+      }else bb=[0,0,cv.width,cv.height];
+      done();
+    };
+    im.onerror=done;
+    im.src=d.sig.img;
+    return true;
+  }
+  done();return true;
+}
+
+document.addEventListener("input",queueSave);
+document.addEventListener("change",queueSave);
+cv.addEventListener("pointerup",queueSave);
+cv.addEventListener("pointercancel",queueSave);
+$("clr").addEventListener("click",queueSave);
+window.addEventListener("pagehide",saveDraft);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")saveDraft()});
+$("reset").onclick=()=>{
+  if(!confirm("Hapus semua isian dan mulai dari awal?"))return;
+  lsOff=true;clearDraft();location.reload();
+};
+
+restoreDraft();
 </script>
 </body>
 </html>
