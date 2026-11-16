@@ -17,7 +17,7 @@ async function loadNilai(id) {
   try {
     const m = MM.find(x => x.id == id);
     const [tps, ss, nl] = (await Promise.all([
-      sb.from('tp').select('id,teks').eq('mapel_id', id).order('id'),
+      sb.from('tp').select('id,teks').eq('mapel_id', id).eq('semester', +CFG.semester).order('id'),
       sb.from('siswa').select('id,nama,nisn,nis').eq('kelas', m.kelas).order('nama'),
       sb.from('nilai').select('*').eq('mapel_id', id).eq('tahun', CFG.tahun_ajaran).eq('semester', CFG.semester)])).map(r => chk(r));
     NG = { m, tps, ss: ss.map(s => { const n = nl.find(x => x.siswa_id == s.id) || {}; return { ...s, nilai: n.nilai, capai: n.tp_capai || [], perlu: n.tp_perlu || [] }; }) };

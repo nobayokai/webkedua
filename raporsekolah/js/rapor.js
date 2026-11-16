@@ -24,7 +24,7 @@ async function loadRapor(kelas) {
   if (sids.length) (await all(() => sb.from('absen').select('*').eq('tahun', ta).in('siswa_id', sids))).forEach(a => { (A[a.semester] ??= {})[a.siswa_id] = a; });
   const W = chk(await sb.from('profiles').select('nama,kelas,jabatan')).find(p => /wali/i.test(p.jabatan || '') && (p.kelas || '').split(',')[0].trim() == kelas);
   const res = S.map(s => ({ ...s, sem: {} }));
-  for (const sm of [1, 2]) {
+  for (const sm of [+CFG.semester]) {
     const rata = {};
     M.forEach(m => { const v = S.map(s => N[sm]?.[s.id]?.[m.id]?.nilai).filter(x => x != null); rata[m.id] = v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null; });
     res.forEach(s => {
@@ -47,11 +47,11 @@ async function loadRapor(kelas) {
 async function show() {
   try { R = await loadRapor(KL); } catch (e) { return fail(e); }
   $('#content').innerHTML = `<div class="card">${ME.role == 'admin' ? `<select style="max-width:220px;margin-bottom:10px" onchange="KL=this.value;show()">${KLS.map(k => `<option ${k == KL ? 'selected' : ''}>${esc(k)}</option>`).join('')}</select>` : ''}
-  <p class="muted">Rapor memuat Semester 1 (kiri) dan Semester 2 (kanan) untuk TA ${esc(CFG.tahun_ajaran)}. Gunakan kertas A4 landscape dan aktifkan "Background graphics" saat mencetak.</p>
+  <p class="muted">Rapor yang dicetak: Semester ${CFG.semester == 1 ? 'Ganjil' : 'Genap'} (semester aktif), TA ${esc(CFG.tahun_ajaran)}, satu halaman per siswa. Atur kertas F4 (215 x 330 mm) potret dan aktifkan "Background graphics" saat mencetak.</p>
   <button class="btn" onclick="cetak(R.siswa)">Cetak Semua (${R.siswa.length} siswa)</button></div>
   <div class="card"><table class="tb"><tr><th>No</th><th>Nama</th><th>NIS</th><th></th></tr>${R.siswa.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.nama)}</td><td>${esc(s.nis)}</td><td><button class="btn sm" onclick="cetak([R.siswa[${i}]])">Cetak</button></td></tr>`).join('')}</table></div>`;
 }
-function cetak(list) { $('#print').innerHTML = list.map(s => `<div class="sheet">${half(s, 1, R)}${half(s, 2, R)}</div>`).join(''); setTimeout(() => window.print(), 250); }
+function cetak(list) { $('#print').innerHTML = list.map(s => `<div class="sheet">${half(s, +CFG.semester, R)}</div>`).join(''); setTimeout(() => window.print(), 250); }
 
 function half(s,sm,d){
   const c=d.cfg,x=s.sem[sm],g=sm==1?'ganjil':'genap';
@@ -61,7 +61,7 @@ function half(s,sm,d){
   <table class="idt"><tr><td>Nama Murid</td><td>: ${esc(s.nama)}</td><td>Kelas</td><td>: ${esc(d.kelas)}</td></tr>
   <tr><td>NISN / NIS</td><td>: ${esc(s.nisn)} / ${esc(s.nis)}</td><td>Semester</td><td>: ${sm}</td></tr>
   <tr><td>Nama Sekolah</td><td>: ${esc(c.sekolah_nama)}</td><td>Tahun Pelajaran</td><td>: ${esc(c.tahun_ajaran)}</td></tr>
-  <tr><td>Alamat</td><td colspan="3">: ${esc(c.alamat)} ${c.npsn?'(NPSN '+esc(c.npsn)+')':''}</td></tr></table>
+  <tr><td>Alamat</td><td colspan="3">: ${esc(c.alamat)} </td></tr></table>
   <table class="nl"><tr><th style="width:4%">No</th><th style="width:20%">Mata Pelajaran</th><th style="width:6%">KKM</th><th style="width:7%">Nilai</th><th>Deskripsi Capaian Kompetensi</th><th style="width:8%">Rata-rata Kelas</th></tr>${rows}
   <tr class="tot"><td colspan="3">Jumlah Nilai</td><td class="c">${x.ada?x.jumlah:''}</td><td colspan="2"></td></tr>
   <tr class="tot"><td colspan="3">Rata-rata Nilai</td><td class="c">${x.rata??''}</td><td colspan="2"></td></tr>

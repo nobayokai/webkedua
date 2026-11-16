@@ -7,7 +7,7 @@
     const ids = M.map(m => m.id);
     const [S, T, N, L] = await Promise.all([
       all(() => sb.from('siswa').select('kelas')),
-      all(() => sb.from('tp').select('mapel_id')),
+      all(() => sb.from('tp').select('mapel_id').eq('semester', sm)),
       ids.length ? all(() => sb.from('nilai').select('mapel_id').eq('tahun', ta).eq('semester', sm).not('nilai', 'is', null).in('mapel_id', ids)) : [],
       sb.from('log').select('teks,waktu').order('id', { ascending: false }).limit(8).then(chk)]);
     const cnt = (arr, f) => arr.reduce((o, x) => (o[f(x)] = (o[f(x)] || 0) + 1, o), {});
