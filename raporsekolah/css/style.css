@@ -63,7 +63,7 @@ aside h3{margin:0 0 16px;color:#aaa;text-align:center}
 /* cetak */
 #print{display:none}
 @media print{
- @page{size:A4 landscape;margin:7mm}
+ @page{size:215mm 330mm;margin:10mm}
  body>*:not(#print){display:none!important}
  #print{display:block}
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -86,7 +86,7 @@ aside h3{margin:0 0 16px;color:#aaa;text-align:center}
 .sg div{width:32%}.sg .ln{height:26px}
 
 /* ===== Cetak: F4 potret, satu semester aktif ===== */
-@media print{ @page{size:215mm 330mm portrait;margin:10mm} }
+@media print{ @page{size:215mm 330mm;margin:10mm} }
 .sheet{display:block;font-size:11px;line-height:1.35;page-break-after:always}
 .sheet:last-child{page-break-after:auto}
 .half{width:100%;padding:10px;border-radius:12px}
