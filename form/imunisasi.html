@@ -119,6 +119,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--c,var(--
       <label class="f">RW<input type="text" id="rwAnak" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="mis. 05"></label>
       <label class="f">Kelurahan<input type="text" id="kelAnak"></label>
       <label class="f">Kecamatan<input type="text" id="kecAnak"></label>
+      <div class="full" style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;color:var(--purple);margin-top:6px;border-top:2px dashed #e6e0f5;padding-top:12px">👩 Data ibu kandung</div>
+      <label class="f full">Nama ibu kandung<input type="text" id="namaIbu" autocomplete="off"></label>
+      <label class="f">NIK ibu kandung<input type="text" id="nikIbu" inputmode="numeric" pattern="[0-9]*" maxlength="16" placeholder="16 digit angka"></label>
+      <label class="f">Tanggal lahir ibu kandung<input type="date" id="tglLahirIbu"></label>
     </div>
   </section>
 
@@ -222,7 +226,7 @@ $("clr").onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);signed=false;bb=null;
 function sigImg(){if(!signed||!bb)return"";const p=8,x=Math.max(0,bb[0]-p),y=Math.max(0,bb[1]-p),w=Math.min(cv.width,bb[2]+p)-x,h=Math.min(cv.height,bb[3]+p)-y;const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(cv,x,y,w,h,0,0,w,h);return c.toDataURL()}
 
 // progres
-const REQ=["namaAnak","jk","tglLahir","nik","sekolah","kelas","namaOrtu","usia","hp","alamatOrtu"];
+const REQ=["namaAnak","jk","tglLahir","nik","sekolah","kelas","namaIbu","nikIbu","tglLahirIbu","namaOrtu","usia","hp","alamatOrtu"];
 function prog(){let n=REQ.filter(i=>$(i).value.trim()).length;Q.forEach((_,i)=>{if(val("q"+i))n++});if(val("setuju"))n++;if(signed)n++;
   const t=REQ.length+Q.length+2,p=Math.round(n/t*100);$("pct").textContent=p+"%";$("fill").style.width=p+"%";sent=false;readyFile=null;const kb=$("kirim");if(kb&&!kb.disabled)kb.textContent=BTN;upd()}
 document.addEventListener("input",prog);
@@ -231,6 +235,7 @@ function fmtTgl(s){if(!s)return"";const b=["Januari","Februari","Maret","April",
 function data(){
   const o={Waktu:new Date().toLocaleString("id-ID"),"Nama Anak":$("namaAnak").value,"Jenis Kelamin":$("jk").value,"Tanggal Lahir":fmtTgl($("tglLahir").value),"NIK":"'"+$("nik").value,"Sekolah":$("sekolah").value,"Kelas":$("kelas").value,
    "Alamat Anak":`${$("alamatAnak").value}, RT/RW ${RR("Anak")}, ${$("kelAnak").value}, ${$("kecAnak").value}`,
+   "Nama Ibu Kandung":$("namaIbu").value,"NIK Ibu Kandung":"'"+$("nikIbu").value,"Tanggal Lahir Ibu Kandung":fmtTgl($("tglLahirIbu").value),
    "Nama Orang Tua/Wali":$("namaOrtu").value,"Usia":$("usia").value,"No HP":"'"+$("hp").value,
    "Alamat Orang Tua":`${$("alamatOrtu").value}, RT/RW ${RR("Ortu")}, ${$("kelOrtu").value}, ${$("kecOrtu").value}`};
   Q.forEach((q,i)=>{o[`Q${i+1}`]=val("q"+i)+($("d"+i)&&$("d"+i).value?` (${$("d"+i).value})`:"")});
@@ -240,6 +245,7 @@ function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";cle
 function valid(){
   const miss=REQ.filter(i=>!$(i).value.trim());
   if(miss.length){$(miss[0]).focus();toast("Lengkapi dulu data yang masih kosong.");return false}
+  for(const [id,nm] of [["nik","NIK anak"],["nikIbu","NIK ibu kandung"]])if($(id).value.length!==16){$(id).focus();toast(nm+" harus 16 digit angka.");return false}
   for(const p of ["Anak","Ortu"])if(!!$("rt"+p).value!==!!$("rw"+p).value){$("rt"+p).focus();toast("Isi RT dan RW dua-duanya (contoh RT 02, RW 03).");return false}
   for(let i=0;i<Q.length;i++)if(!val("q"+i)){toast(`Pertanyaan nomor ${i+1} belum dijawab.`);return false}
   if(!val("setuju")){toast("Pilih Setuju atau Tidak setuju.");return false}
@@ -318,6 +324,7 @@ function html(){
   ${L("Nama Lengkap Siswa",g("namaAnak"))}${L("NIK",g("nik"))}${L("Tanggal Lahir",d["Tanggal Lahir"])}${L("Jenis Kelamin",ket)}${L("Alamat",g("alamatAnak"))}
   ${I(`RT/RW ${H(RR("Anak"))} Kelurahan ${H(g("kelAnak"))}`)}${I(`Kecamatan ${H(g("kecAnak"))}`)}<br>
   ${L("Sekolah",g("sekolah"))}${L("Kelas",g("kelas"))}
+  ${L("Nama Ibu Kandung",g("namaIbu"))}${L("NIK Ibu Kandung",g("nikIbu"))}${L("Tanggal Lahir Ibu Kandung",d["Tanggal Lahir Ibu Kandung"])}
   <p class="c" style="margin-bottom:0">Dengan ini menyatakan bahwa</p>
   <p class="c" style="margin-top:2px"><b style="font-size:16px">${s==="Setuju"?"":"<s>"}SETUJU${s==="Setuju"?"":"</s>"}${s==="Setuju"?"":""} / ${s==="Tidak Setuju"?"TIDAK SETUJU":(s?"<s>TIDAK SETUJU</s>":"TIDAK SETUJU")} *)</b></p>
   <p><b>Jika Tidak Setuju, Sebutkan Alasannya</b> ${H(d["Alasan Tidak Setuju"])}<br><b>Untuk dilakukan imunisasi pada program BIAS (Bulan Imunisasi Anak Sekolah),</b></p>
@@ -331,7 +338,7 @@ function upd(){$("pv").innerHTML=html();fitPv()}
 window.addEventListener("resize",fitPv);
 $("usia").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,2)});
 ["rtAnak","rwAnak","rtOrtu","rwOrtu"].forEach(i=>{const e=$(i);e.addEventListener("input",()=>{e.value=e.value.replace(/\D/g,"").slice(0,2)});e.addEventListener("blur",()=>{if(e.value.length===1){e.value="0"+e.value;prog()}})});
-["nik","hp"].forEach(i=>$(i).addEventListener("input",e=>{const v=e.target.value.replace(/\D/g,"");if(v!==e.target.value)e.target.value=v}));
+["nik","nikIbu","hp"].forEach(i=>$(i).addEventListener("input",e=>{const v=e.target.value.replace(/\D/g,"");if(v!==e.target.value)e.target.value=v}));
 prog();
 /* ====== DRAF OTOMATIS: isian tidak hilang saat refresh / halaman tertutup ====== */
 const LS_KEY="bias_draft_v1";
