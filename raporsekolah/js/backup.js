@@ -7,7 +7,7 @@
 async function doBackup() {
   try {
     const d = { meta: { dibuat: new Date().toISOString(), app: 'rapor-supabase' } };
-    for (const t of ['profiles', 'setting', 'mapel', 'tp', 'siswa', 'nilai', 'absen', 'log']) d[t] = await all(() => sb.from(t).select('*').order(t == 'setting' ? 'k' : 'id'));
+    for (const t of ['profiles', 'setting', 'mapel', 'tp', 'siswa', 'nilai', 'absen', 'tahfidz_target', 'tahfidz_target_siswa', 'tahfidz_nilai', 'tahfidz_tahsin', 'log']) d[t] = await all(() => sb.from(t).select('*').order(t == 'setting' ? 'k' : 'id'));
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' }));
     a.download = 'backup_rapor_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
   } catch (e) { fail(e); }

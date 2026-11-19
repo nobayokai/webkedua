@@ -22,6 +22,20 @@ async function all(build) {
   for (;;) { const r = chk(await build().range(from, from + 999)); out = out.concat(r); if (r.length < 1000) break; from += 1000; }
   return out;
 }
+// Skala otomatis: tiap rapor (.sheet) diperkecil secukupnya agar pas satu halaman F4 potret (margin 10 mm)
+function fitSheets(pageW = 195, pageH = 306) {
+  const MM = 96 / 25.4, W = pageW * MM, H = pageH * MM, box = $('#print');
+  box.classList.add('measure');                       // ditampilkan di luar layar hanya untuk mengukur
+  box.querySelectorAll('.sheet').forEach(sh => {
+    const el = sh.firstElementChild; el.style.transformOrigin = 'top left'; let s = 1;
+    for (; s > 0.4; s = Math.round((s - 0.02) * 100) / 100) {
+      el.style.width = (W / s) + 'px'; el.style.transform = `scale(${s})`;
+      if (el.offsetHeight * s <= H - 24) break;   // sisakan ruang agar garis bawah tidak terpotong
+    }
+    sh.style.height = Math.min(H, Math.ceil(el.offsetHeight * s) + 18) + 'px';   // +18px cadangan jika hasil cetak sedikit lebih tinggi
+  });
+  box.classList.remove('measure');
+}
 const logit = t => sb.from('log').insert({ teks: t }).then(() => {}, () => {}); // .then() wajib agar query terkirim
 const fail = e => { if (!e.shown) toast(e.message || 'Terjadi kesalahan', 1); console.error(e); };
 
@@ -41,50 +55,28 @@ function tpl(name, cols, rows) {
   XLSX.writeFile(wb, name + '.xlsx');
 }
 
-// ---------- Menu & akses ----------
-// akses: * semua | a admin | g guru | w wali kelas | r admin atau wali kelas
-const MENU = [
-  ['dashboard.html', 'Dashboard', '🏠', '*'],
-  ['guru.html', 'Data Guru', '👩‍🏫', 'a'],
-  ['pengaturan.html', 'Tahun Ajaran & Sekolah', '⚙️', 'a'],
-  ['mapel.html', 'Mata Pelajaran', '📚', 'a'],
-  ['kkm-tp.html', 'KKM & Tujuan Pembelajaran', '🎯', 'g'],
-  ['nilai.html', 'Input Nilai', '✏️', 'g'],
-  ['siswa.html', 'Data Siswa', '🎒', 'w'],
-  ['absen.html', 'Ketidakhadiran', '📅', 'w'],
-  ['rapor.html', 'Cetak Rapor', '🖨️', 'r'],
-  ['backup.html', 'Backup & Restore', '💾', 'a'],
-];
-const boleh = a => a == '*' || (a == 'a' && ME.role == 'admin') || (a == 'g' && ME.role == 'guru') ||
-  (a == 'w' && ME.role == 'guru' && ME.wali) || (a == 'r' && (ME.role == 'admin' || ME.wali));
-
+// ---------- Menu & sidebar: lihat js/sidebar.js ----------
 function headInfo() {
   $('#who').textContent = ME.nama + ' • ' + ME.jabatan;
   $('#ta').textContent = `TA ${CFG.tahun_ajaran} • Semester ${CFG.semester == 1 ? 'Ganjil' : 'Genap'}`;
   $('#sn').textContent = CFG.sekolah_nama || 'Rapor Digital';
+  simpanUI(); // simpan cache sidebar (js/sidebar.js)
 }
-async function logout() { await sb.auth.signOut(); location.replace('index.html'); }
+async function logout() { sessionStorage.removeItem('rapor_ui'); sessionStorage.removeItem('rapor_ind'); await sb.auth.signOut(); location.replace('index.html'); }
 
 // Dipanggil di awal setiap halaman. Mengembalikan profil, atau null jika dialihkan.
 async function init(opt = {}) {
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { location.replace('index.html'); return null; }
+    if (!session) { sessionStorage.removeItem('rapor_ui'); location.replace('index.html'); return null; }
     ME = chk(await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle());
     if (!ME) { toast('Profil akun belum dibuat. Jalankan sql/02_admin.sql atau hubungi admin.', 1); await sb.auth.signOut(); setTimeout(() => location.replace('index.html'), 2500); return null; }
-    CFG = Object.fromEntries(chk(await sb.from('setting').select('*')).map(x => [x.k, x.v]));
+    CFG = Object.fromEntries(chk(await sb.from('setting').select('*').neq('k', 'logo')).map(x => [x.k, x.v]));
     ME.wali = /wali/i.test(ME.jabatan || '') ? ((ME.kelas || '').split(',')[0].trim() || null) : null;
-    const file = location.pathname.split('/').pop() || 'index.html';
-    const m = MENU.find(x => x[0] == file);
+    ME.tahfidz = /tahfidz/i.test(ME.jabatan || '');
+    const m = MENU.find(x => x[0] == FILE);
     if (m && !boleh(m[3])) { location.replace('dashboard.html'); return null; }
-    $('#app').className = opt.aside ? '' : 'noaside';
-    $('#app').innerHTML = `
-      <nav><div class="brand"><span id="sn"></span><small id="who"></small></div>
-        <div id="menu">${MENU.filter(x => boleh(x[3])).map(x => `<a href="${x[0]}" class="${x[0] == file ? 'on' : ''}"><span>${x[2]}</span>${x[1]}</a>`).join('')}</div>
-        <div class="out" onclick="logout()">⎋ &nbsp;Keluar</div></nav>
-      <main><div class="top"><h2>${m ? m[1] : ''}</h2><span class="pill" id="ta"></span></div><div id="content"><p class="muted">Memuat…</p></div></main>
-      ${opt.aside ? `<aside><h3>Aktivitas Terbaru</h3><div id="pct"><b>0%</b></div>
-        <p style="text-align:center;color:var(--pink);font-weight:700;margin:4px 0 22px">SELESAI</p><div id="act"></div></aside>` : ''}`;
+    renderMenu();
     headInfo();
     return ME;
   } catch (e) { fail(e); return null; }

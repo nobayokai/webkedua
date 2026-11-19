@@ -1,5 +1,14 @@
 // Cetak rapor: semester 1 (kiri) + semester 2 (kanan)
 let R, KL = '';
+// "1" -> "1 (Satu)", "3A" -> "3 (Tiga) A"
+const ANGKA = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas', 'Dua Belas'];
+function kelasTeks(k) {
+  const m = String(k || '').trim().match(/^(\d+)\s*(.*)$/); if (!m) return k || '';
+  const n = +m[1]; return `${n} (${ANGKA[n] || n})${m[2] ? ' ' + m[2] : ''}`;
+}
+const kelas6 = k => parseInt(k) == 6;
+const BLANK = '<span class="bl"></span>';
+
 (async () => {
   if (!await init()) return;
   try {
@@ -42,7 +51,8 @@ async function loadRapor(kelas) {
     let r = 0, prev = null;
     [...res].sort((a, b) => b.sem[sm].jumlah - a.sem[sm].jumlah).forEach((s, i) => { const t = s.sem[sm].jumlah; if (t !== prev) r = i + 1; prev = t; s.sem[sm].rank = t > 0 ? r : null; });
   }
-  return { cfg: CFG, kelas, wali: W?.nama || '', siswa: res };
+  const logo = (chk(await sb.from('setting').select('v').eq('k', 'logo').maybeSingle()))?.v || '';
+  return { cfg: CFG, kelas, wali: W?.nama || '', logo, siswa: res };
 }
 async function show() {
   try { R = await loadRapor(KL); } catch (e) { return fail(e); }
@@ -51,15 +61,15 @@ async function show() {
   <button class="btn" onclick="cetak(R.siswa)">Cetak Semua (${R.siswa.length} siswa)</button></div>
   <div class="card"><table class="tb"><tr><th>No</th><th>Nama</th><th>NIS</th><th></th></tr>${R.siswa.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.nama)}</td><td>${esc(s.nis)}</td><td><button class="btn sm" onclick="cetak([R.siswa[${i}]])">Cetak</button></td></tr>`).join('')}</table></div>`;
 }
-function cetak(list) { $('#print').innerHTML = list.map(s => `<div class="sheet">${half(s, +CFG.semester, R)}</div>`).join(''); setTimeout(() => window.print(), 250); }
+async function cetak(list) { $('#print').innerHTML = list.map(s => `<div class="sheet">${half(s, +CFG.semester, R)}</div>`).join(''); await document.fonts?.ready; fitSheets(); setTimeout(() => window.print(), 150); }
 
 function half(s,sm,d){
   const c=d.cfg,x=s.sem[sm],g=sm==1?'ganjil':'genap';
   const rows=x.rows.map((r,i)=>`<tr><td class="c">${i+1}</td><td>${esc(r.nama)}</td><td class="c">${r.kkm}</td><td class="c"><b>${r.nilai??''}</b></td><td class="d">${esc(r.desc)}</td><td class="c">${r.rata??''}</td></tr>`).join('');
-  return `<div class="half">
+  return `<div class="half">${d.logo ? `<img class="wm" src="${d.logo}" alt="">` : ''}
   <div class="rb"><span>LAPORAN HASIL BELAJAR</span><span>SEMESTER ${sm} • ${esc(c.tahun_ajaran)}</span></div>
-  <table class="idt"><tr><td>Nama Murid</td><td>: ${esc(s.nama)}</td><td>Kelas</td><td>: ${esc(d.kelas)}</td></tr>
-  <tr><td>NISN / NIS</td><td>: ${esc(s.nisn)} / ${esc(s.nis)}</td><td>Semester</td><td>: ${sm}</td></tr>
+  <table class="idt"><tr><td>Nama Murid</td><td>: ${esc(s.nama)}</td><td>Kelas</td><td>: ${esc(kelasTeks(d.kelas))}</td></tr>
+  <tr><td>NISN / NIS</td><td>: ${esc(s.nisn)} / ${esc(s.nis)}</td><td>Semester</td><td>: ${sm} (${sm == 1 ? 'Ganjil' : 'Genap'})</td></tr>
   <tr><td>Nama Sekolah</td><td>: ${esc(c.sekolah_nama)}</td><td>Tahun Pelajaran</td><td>: ${esc(c.tahun_ajaran)}</td></tr>
   <tr><td>Alamat</td><td colspan="3">: ${esc(c.alamat)} </td></tr></table>
   <table class="nl"><tr><th style="width:4%">No</th><th style="width:20%">Mata Pelajaran</th><th style="width:6%">KKM</th><th style="width:7%">Nilai</th><th>Deskripsi Capaian Kompetensi</th><th style="width:8%">Rata-rata Kelas</th></tr>${rows}
@@ -68,7 +78,10 @@ function half(s,sm,d){
   <tr class="tot"><td colspan="3">Peringkat</td><td class="c">${x.rank??''}</td><td colspan="2"></td></tr></table>
   <div class="box"><h6>CATATAN</h6><p>${esc(x.catatan)}</p></div>
   <table class="ab" style="margin-top:4px;width:60%"><tr><th colspan="3">KETIDAKHADIRAN</th></tr><tr><td>1</td><td>Sakit</td><td>${x.sakit} hari</td></tr><tr><td>2</td><td>Izin</td><td>${x.izin} hari</td></tr><tr><td>3</td><td>Tanpa Keterangan</td><td>${x.alpa} hari</td></tr></table>
-  ${sm==2?`<div class="box" style="margin-top:3px"><p><b>Keputusan:</b> Berdasarkan hasil semester 1 dan 2, siswa ditetapkan: <b>${esc(x.keputusan||'..............')}</b></p></div>`:''}
+  ${sm==2?`<div class="box" style="margin-top:6px"><p><b>Keputusan:</b> Berdasarkan hasil belajar semester 1 dan 2, ${kelas6(d.kelas)?'siswa dinyatakan':'siswa ditetapkan'}: ${x.keputusan?`<b>${esc(x.keputusan)}</b>`:BLANK}</p></div>`:''}
   <p style="margin:4px 0 0">Diberikan di: ${esc(c['tempat_'+g])||'..............'} &nbsp; Tanggal: ${tgl(c['tgl_'+g])}</p>
-  <div class="sg"><div>Mengetahui,<br>Orang Tua/Wali<div class="ln"></div>( ................ )</div><div>Wali Kelas<div class="ln"></div>( ${esc(d.wali)||'................'} )</div><div>Kepala Sekolah<div class="ln"></div>( ${esc(c.kepsek)||'................'} )</div></div></div>`;
+  <div class="sg">
+    <div><span class="lb">Mengetahui,<br>Orang Tua/Wali</span><span class="ln"></span><span class="nm">( ${BLANK} )</span></div>
+    <div><span class="lb">&nbsp;<br>Wali Kelas</span><span class="ln"></span><span class="nm">( ${esc(d.wali) || BLANK} )</span></div>
+    <div><span class="lb">&nbsp;<br>Kepala Sekolah</span><span class="ln"></span><span class="nm">( ${esc(c.kepsek) || BLANK} )</span></div></div></div>`;
 }

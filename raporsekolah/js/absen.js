@@ -7,13 +7,13 @@ async function render() {
       sb.from('absen').select('*').eq('tahun', CFG.tahun_ajaran).eq('semester', CFG.semester)])).map(r => chk(r));
     A = ss.map(s => ({ ...s, ...(ab.find(a => a.siswa_id == s.id) || {}) , id: s.id }));
   } catch (e) { return fail(e); }
-  const g2 = CFG.semester == 2;
+  const g2 = CFG.semester == 2, KEP = parseInt(ME.wali) == 6 ? ['Lulus', 'Tidak Lulus'] : ['Naik Kelas', 'Tinggal Kelas'];
   $('#content').innerHTML = `<div class="card"><h4>Ketidakhadiran & Catatan — Kelas ${esc(ME.wali)}, Semester ${CFG.semester}</h4>
   <button class="btn" onclick="saveAbsen()">Simpan</button><button class="btn alt" onclick="importAbsen()">Import XLSX</button>
   <button class="btn ghost" onclick="tpl('template_absen',['nis','nama','sakit','izin','alpa'],A.map(s=>[s.nis,s.nama,s.sakit||0,s.izin||0,s.alpa||0]))">Unduh Template</button></div>
   <div class="card"><table class="tb" id="at"><tr><th>Nama</th><th>Sakit</th><th>Izin</th><th>Tanpa Ket.</th><th>Catatan Wali Kelas</th>${g2 ? '<th>Keputusan</th>' : ''}</tr>
   ${A.map(s => `<tr data-s="${s.id}"><td>${esc(s.nama)}</td><td><input type="number" min="0" class="a1" value="${s.sakit || 0}"></td><td><input type="number" min="0" class="a2" value="${s.izin || 0}"></td><td><input type="number" min="0" class="a3" value="${s.alpa || 0}"></td>
-  <td><input class="cat" value="${esc(s.catatan)}"></td>${g2 ? `<td><select class="kp"><option value="">-</option><option ${s.keputusan == 'Naik Kelas' ? 'selected' : ''}>Naik Kelas</option><option ${s.keputusan == 'Tinggal Kelas' ? 'selected' : ''}>Tinggal Kelas</option></select></td>` : ''}</tr>`).join('')}</table></div>`;
+  <td><input class="cat" value="${esc(s.catatan)}"></td>${g2 ? `<td><select class="kp"><option value="">-</option>${KEP.map(o => `<option ${s.keputusan == o ? 'selected' : ''}>${o}</option>`).join('')}</select></td>` : ''}</tr>`).join('')}</table></div>`;
 }
 async function saveAbsen() {
   const rows = [...document.querySelectorAll('#at tr[data-s]')].map(r => ({ siswa_id: +r.dataset.s, tahun: CFG.tahun_ajaran, semester: +CFG.semester,
