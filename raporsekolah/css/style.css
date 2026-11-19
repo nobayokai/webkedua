@@ -15,14 +15,6 @@ body{margin:0;font-family:Poppins,system-ui,sans-serif;background:var(--bg);colo
 #app{display:grid;grid-template-columns:240px 1fr 280px;min-height:100vh}
 #app.noaside{grid-template-columns:240px 1fr}
 #app.noaside aside{display:none}
-nav{background:linear-gradient(170deg,#f0558f,#e8506a 60%,#f0708a);color:#fff;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
-nav .brand{padding:22px 20px;font-weight:700;font-size:16px;border-bottom:1px solid #fff3}
-nav .brand small{display:block;font-weight:400;opacity:.85;font-size:11px;margin-top:2px}
-#menu{flex:1;padding:10px 0;overflow:auto}
-#menu a{display:flex;gap:12px;align-items:center;padding:13px 22px;cursor:pointer;opacity:.9}
-#menu a:hover{background:#fff2}
-#menu a.on{background:#c43a6a;opacity:1;font-weight:600}
-nav .out{padding:16px 22px;cursor:pointer;border-top:1px solid #fff3}
 main{min-width:0}
 .top{background:#fff;padding:16px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px #0001}
 .top h2{margin:0;font-size:17px;color:#7a7280}
@@ -100,3 +92,51 @@ aside h3{margin:0 0 16px;color:#aaa;text-align:center}
 .sg{margin-top:22px;font-size:11px}
 .sg div{width:31%}
 .sg .ln{height:95px}
+
+/* ===== Transisi antar halaman ===== */
+@view-transition{navigation:auto}
+.top{view-transition-name:topbar}
+::view-transition-group(sidebar),::view-transition-group(topbar){animation-duration:0s}
+::view-transition-old(root){animation:vtout .18s ease both}
+::view-transition-new(root){animation:vtin .3s ease both}
+@keyframes vtout{to{opacity:0}}
+@keyframes vtin{from{opacity:0}}
+#content.enter>*{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+#content.enter>*:nth-child(2){animation-delay:.06s}
+#content.enter>*:nth-child(3){animation-delay:.12s}
+#content.enter>*:nth-child(4){animation-delay:.18s}
+#content.enter>*:nth-child(n+5){animation-delay:.24s}
+#content.leave{opacity:0;transform:translateY(-6px);transition:opacity .18s,transform .18s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@media(prefers-reduced-motion:reduce){*,::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important;transition:none!important}}
+
+/* ===== Tanda tangan sejajar & kolom lebar ===== */
+.sg{display:flex;justify-content:space-between;align-items:stretch}
+.sg>div{display:flex;flex-direction:column;align-items:center;text-align:center;width:31%}
+.sg .lb{display:block;line-height:1.5}
+.sg .ln{display:block;flex:1;min-height:95px}
+.sg .nm{display:block;white-space:nowrap}
+.bl{display:inline-block;min-width:170px;vertical-align:bottom}
+.box .bl{min-width:120px;border-bottom:1px solid #777}
+
+/* ===== Logo sekolah: pratinjau & watermark rapor ===== */
+.logo-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.logo-prev{width:120px;height:120px;border:1px dashed #d8cfe0;border-radius:12px;display:grid;place-items:center;background:#fafafa;padding:6px}
+.logo-prev img{max-width:100%;max-height:100%}
+.half{position:relative;overflow:hidden}
+.half>*{position:relative;z-index:1}
+.half>img.wm{position:absolute;z-index:0;top:52%;left:50%;transform:translate(-50%,-50%);width:62%;max-height:62%;object-fit:contain;opacity:.17;pointer-events:none}
+/* sel tabel transparan agar logo tetap terlihat di balik tabel */
+.nl td{background:transparent}
+.nl tr:nth-child(even) td{background:rgba(236,226,250,.38)}
+.nl tr.tot td{background:rgba(253,226,180,.45)}
+.box p{background:transparent}
+.ab td{background:transparent}
+/* hilangkan latar abu-abu pada kertas saat cetak */
+@media print{html,body,#print{background:#fff!important;margin:0}}
+
+a.btn{text-decoration:none;display:inline-block}
+
+/* ===== Skala satu halaman ===== */
+#print.measure{display:block!important;position:absolute;left:-99999px;top:0;width:195mm;visibility:hidden}
+.sheet{overflow:hidden;break-inside:avoid}

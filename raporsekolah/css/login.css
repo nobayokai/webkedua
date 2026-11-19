@@ -1,0 +1,29 @@
+/* ============ HALAMAN LOGIN (glass card) ============ */
+.lg-page{margin:0;min-height:100vh;overflow-x:hidden;position:relative;font-family:Poppins,system-ui,sans-serif;
+  background:radial-gradient(55% 65% at 4% 50%,#ff4fe0 0,#ff4fe000 72%),linear-gradient(100deg,#fff 0%,#ffeaf4 34%,#ffc4d3 70%,#ffa6b6 100%)}
+.lg-blob{position:fixed;border-radius:50%;filter:blur(34px);z-index:0;pointer-events:none}
+.lg-blob.b1{width:260px;height:260px;background:#27f3ff;top:6%;left:56%;opacity:.8}
+.lg-blob.b2{width:210px;height:210px;background:#22d6ff;bottom:-50px;left:3%;opacity:.75}
+.lg-blob.b3{width:430px;height:430px;background:#e946ff;top:38%;left:-140px;opacity:.5}
+.lg-wrap{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:24px}
+.lg-card{width:min(980px,100%);min-height:560px;display:grid;grid-template-columns:36% 1fr;border-radius:30px;
+  background:rgba(255,255,255,.3);border:1.5px solid rgba(255,255,255,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:0 24px 70px #c026d333;overflow:hidden;animation:lgIn .7s cubic-bezier(.2,.7,.2,1) both}
+.lg-photo{background:#fff;border-radius:30px;overflow:hidden}
+.lg-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.lg-form{padding:46px 52px;display:flex;flex-direction:column;justify-content:center}
+.lg-form h1{margin:0;font-size:38px;line-height:1.15;color:#ff8fc9;font-weight:700}
+.lg-sub{color:#fff;font-weight:600;font-size:17px;margin:2px 0 24px;text-shadow:0 1px 8px #d946ef55}
+.lg-form label{display:block;color:#ff7fc0;font-weight:700;font-size:17px;margin:12px 0 7px}
+.lg-form input{width:100%;border:0;border-radius:999px;padding:14px 22px;font:500 15px Poppins,sans-serif;color:#7a3b62;background:rgba(255,255,255,.62);outline:none;transition:box-shadow .2s,background .2s}
+.lg-form input::placeholder{color:#e2a3c8}
+.lg-form input:focus{background:rgba(255,255,255,.92);box-shadow:0 0 0 3px #ff8fc966}
+.lg-hint{color:#ff7fc0;font-weight:600;font-size:13px;margin:10px 0 24px}
+.lg-form button{align-self:flex-start;width:210px;padding:13px;border:0;border-radius:999px;font:700 22px Poppins,sans-serif;color:#fff;cursor:pointer;
+  background:linear-gradient(90deg,#86c8d6,#b3eee6);box-shadow:0 8px 22px #5fc2c455;transition:transform .2s,box-shadow .2s}
+.lg-form button:hover{transform:translateY(-2px);box-shadow:0 12px 26px #5fc2c477}
+.lg-foot{display:flex;gap:14px;align-items:center;margin-top:32px;color:#fff;font-weight:600;font-size:14px;text-shadow:0 1px 6px #d946ef44}
+.lg-foot b{background:rgba(255,190,210,.75);color:#fff;padding:9px 18px;border-radius:999px;font-size:12px;text-shadow:none}
+@keyframes lgIn{from{opacity:0;transform:translateY(18px) scale(.985)}}
+@media(max-width:760px){.lg-card{grid-template-columns:1fr}.lg-photo{height:240px;border-radius:30px 30px 0 0}.lg-form{padding:28px 24px}.lg-form h1{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.lg-card{animation:none}}

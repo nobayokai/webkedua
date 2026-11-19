@@ -1,0 +1,70 @@
+/* Halaman Tahfidz: input & cetak */
+a.btn{text-decoration:none;display:inline-block}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.hgrid{overflow-x:auto;margin-bottom:10px}
+.hgrid table{border-collapse:collapse}
+.hgrid th,.hgrid td{border:1px solid #eee;padding:4px 6px;white-space:nowrap;text-align:center;font-size:12px}
+.hgrid th{background:#f6eefb;color:#7b5ea7}
+.hgrid td:first-child,.hgrid th:first-child{position:sticky;left:0;background:#fff;z-index:2;min-width:170px;text-align:left}
+.hgrid th:first-child{background:#f6eefb}
+.hgrid input{width:58px;text-align:center}
+.hgrid .c{font-weight:600}
+.ar{font-family:'Amiri','Traditional Arabic','Noto Naskh Arabic',serif;font-size:14px}
+.hgrid .ar{font-size:15px}
+/* cetak */
+.th{position:relative;padding:12px;border:2px solid #ec4a8b;border-radius:12px;font-size:11px;line-height:1.35;overflow:hidden;background:linear-gradient(#fff7fa,#fff 25%);color:#222}
+.th>*{position:relative;z-index:1}
+.th>img.wm{position:absolute;z-index:0;top:50%;left:50%;transform:translate(-50%,-50%);width:62%;max-height:62%;object-fit:contain;opacity:.17;pointer-events:none}
+.th .thh{background:linear-gradient(90deg,#ec4a8b,#f2a03d);color:#fff;text-align:center;border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.th .t1{font-size:13px;font-weight:600}.th .t2{font-size:17px;font-weight:700}.th .t3{font-size:12px;font-weight:600}
+.th table{width:100%;border-collapse:collapse}
+.th .idt td{padding:2px 4px;font-size:11px}
+.th .idt td:nth-child(odd){font-weight:600;white-space:nowrap}
+.th h5{margin:9px 0 3px;font-size:11.5px;color:#7b5ea7}
+.th .tb2 th{background:#7b5ea7;color:#fff;border:1px solid #6a4d96;padding:3px;font-size:10.5px}
+.th .tb2 td{border:1px solid #d9cfe8;padding:2px 6px}
+.th .tb2 tr:nth-child(even) td{background:rgba(236,226,250,.38)}
+.th .tb2 td.c{text-align:center}.th .tb2 td.r{text-align:right;font-weight:700}
+.th .tb2 td.ar{direction:rtl}
+.th .tb2 td.ar:not(.c){text-align:right}
+.th .tb2 tr.tot td{background:rgba(253,226,180,.5);font-weight:700}
+.th .pd th{background:#f2a03d;border-color:#d98a28}
+.th .bt{display:flex;gap:18px;margin-top:10px}.th .bt>div{flex:1}
+.th .sgt{display:flex;justify-content:space-between;margin-top:14px;text-align:center}
+.th .sgt>div{display:flex;flex-direction:column;align-items:center;width:42%}
+.th .sgt.mid{justify-content:center;margin-top:4px}
+.th .lb{display:block;line-height:1.5}.th .ln{display:block;min-height:70px}.th .nm{display:block;white-space:nowrap;font-weight:600}
+.th.dense .tb2 td{padding:0 4px;font-size:8.5px}.th.dense .ar{font-size:10px}
+
+/* ---- pembaruan: surah & predikat dua bahasa, siswa khusus ---- */
+.hgrid input[type=checkbox]{width:auto}
+.hgrid select{min-width:240px}
+.hgrid td.na{background:#f4f4f4;color:#ccc}
+.th .tb2 td{font-size:10px}
+.th .tb2 td.sr{text-align:left}
+.th .ar{font-size:12px}
+.th.dense .tb2 td{font-size:8.5px}.th.dense .ar{font-size:10px}
+
+/* ---- pembaruan: satu baris rapi, riwayat nilai, lembar PDF ---- */
+.th .tb2 td,.th .tb2 th{white-space:nowrap}
+.th .tb2.fx{table-layout:fixed}
+.th .tb2.fx td{font-size:9.5px;overflow:hidden;padding:2px 4px}
+.th .tb2.fx td.sr{text-align:left}
+.th.dense .tb2.fx td{font-size:8.5px}
+.hgrid td.tgc{background:#faf5ff}
+.hgrid td.hist{background:#fff6dc}
+.hgrid td.hist input{background:#fffbea;border-color:#f0d58a}
+.form-land{font-size:9px;color:#222}
+.form-land h3{margin:0 0 2px;font-size:14px}.form-land p{margin:0 0 6px}
+.fm{width:100%;border-collapse:collapse;table-layout:fixed}
+.fm th,.fm td{border:1px solid #555;height:7mm;padding:0 2px;text-align:center;overflow:hidden}
+.fm th{background:#ece2fa;height:auto}
+.fm th:nth-child(1){width:8mm}.fm th:nth-child(2){width:52mm}.fm th:nth-child(3){width:22mm}
+.fm th.v{height:36mm;padding:2px 0}
+.fm th.v span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:inline-block;font-size:8px}
+.fm td.nm{text-align:left;white-space:nowrap}
+.fm thead{display:table-header-group}.fm tr{page-break-inside:avoid}
+
+/* kotak Penilaian: nilai persen rapat dengan labelnya */
+.th .idt.pn{width:auto;margin-top:2px}
+.th .idt.pn td:first-child{padding-right:8px}

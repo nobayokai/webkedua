@@ -1,0 +1,20 @@
+/* ============ SIDEBAR ============ */
+nav{background:linear-gradient(170deg,#f0558f,#e8506a 60%,#f0708a);color:#fff;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;box-shadow:4px 0 24px #e8506a33;z-index:5;view-transition-name:sidebar}
+nav a,nav a:hover,nav a:visited{color:#fff;text-decoration:none}
+nav .brand{padding:22px 20px;font-weight:700;font-size:16px;border-bottom:1px solid #fff3;min-height:76px}
+nav .brand small{display:block;font-weight:400;opacity:.85;font-size:11px;margin-top:2px;min-height:14px}
+#menu{flex:1;padding:12px 0;overflow:auto;position:relative}
+#menu a{position:relative;z-index:1;display:flex;gap:12px;align-items:center;padding:13px 22px;opacity:.88;
+  transition:opacity .2s,transform .25s;-webkit-tap-highlight-color:transparent;cursor:pointer}
+#menu a b{font-weight:500;transition:font-weight .2s}
+#menu a .ic{display:inline-block;transition:transform .25s}
+#menu a:hover{opacity:1;transform:translateX(4px)}
+#menu a:hover .ic{transform:scale(1.2) rotate(-6deg)}
+#menu a.on{opacity:1}#menu a.on b{font-weight:600}
+#menu .ind{position:absolute;left:0;right:0;top:0;height:0;background:#c43a6a;border-radius:0 16px 16px 0;
+  box-shadow:inset 4px 0 0 #fff;transition:transform .38s cubic-bezier(.4,0,.2,1),height .2s;opacity:0;z-index:0;pointer-events:none}
+nav .out{padding:16px 22px;cursor:pointer;border-top:1px solid #fff3;transition:background .2s}
+nav .out:hover{background:#fff2}
+.sk{display:block;height:20px;margin:16px 22px;border-radius:8px;background:#fff3;animation:skp 1s infinite alternate}
+@keyframes skp{to{opacity:.4}}
+@media(max-width:760px){nav{position:static;height:auto}#menu{display:flex;overflow-x:auto}#menu .ind{display:none}#menu a.on{background:#c43a6a}}
